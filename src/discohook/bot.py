@@ -27,7 +27,7 @@ class Bot(FastAPI):
         self.application_id = application_id
         self.public_key = public_key
         self.token = token
-        self._sync_able_commands: Dict[str, ApplicationCommand] = {}
+        self._sync_able_commands: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
 
@@ -42,7 +42,6 @@ class Bot(FastAPI):
             guild_id: int = None,
             category: CommandType = CommandType.SLASH
     ):
-        unique_id = secrets.token_urlsafe(16)
         apc = ApplicationCommand(
             name=name,
             description=description,
@@ -52,21 +51,20 @@ class Bot(FastAPI):
             guild_id=guild_id,
             category=category
         )
-        apc.id = unique_id
 
         def decorator(coro: Callable):
             @wraps(coro)
             def wrapper(*args, **kwargs):
                 if asyncio.iscoroutinefunction(coro):
                     apc.callback = coro
-                    self._sync_able_commands[unique_id] = apc
+                    self._sync_able_commands.append(apc)
                     return apc
             return wrapper()
         return decorator
 
     def sync(self):
         headers = {"Authorization": f"Bot {self.token}"}
-        for command in self._sync_able_commands.values():
+        for command in self._sync_able_commands:
             if command.guild_id:
                 url = f"{self.root_url}/applications/{self.application_id}/guilds/{command.guild_id}/commands"
             else:
