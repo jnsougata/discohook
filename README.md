@@ -19,7 +19,7 @@ async def abc(context):
     pass
 
 
-@test.subcommand(name="xyz", description="abc sub command")
+@abc.subcommand(name="xyz", description="subcommand of abc")
 async def xyz(context):
     pass
 
