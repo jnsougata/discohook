@@ -51,16 +51,6 @@ class ChannelType(Enum):
     GUILD_STAGE_VOICE = 13
 
 
-class InteractionCallbackType(Enum):
-    PONG = 1
-    CHANNEL_MESSAGE_WITH_SOURCE = 4
-    DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5
-    COMPONENT_DEFERRED_UPDATE_MESSAGE = 6
-    COMPONENT_UPDATE_MESSAGE = 7
-    AUTOCOMPLETE_RESULT = 8
-    MODAL_RESPONSE = 9
-
-
 class ComponentType(Enum):
     ACTION_ROW = 1
     BUTTON = 2
@@ -69,18 +59,18 @@ class ComponentType(Enum):
 
 
 class InteractionType(Enum):
-    PING = 1
-    APPLICATION_COMMAND = 2
-    MESSAGE_COMPONENT = 3
-    APPLICATION_COMMAND_AUTOCOMPLETE = 4
-    MODAL_SUBMIT = 5
+    ping = 1
+    app_command = 2
+    component = 3
+    autocomplete = 4
+    modal_submit = 5
 
 
-class CallbackType(Enum):
-    PONG = 1
-    CHANNEL_MESSAGE_WITH_SOURCE = 4
-    DEFERRED_CHANEL_MESSAGE_WITH_SOURCE = 5
-    DEFERRED_UPDATE_MESSAGE = 6
-    UPDATE_MESSAGE = 7
-    APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8
-    MODAL = 9
+class InteractionCallbackType(Enum):
+    pong = 1
+    channel_message_with_source = 4
+    deferred_channel_message_with_source = 5
+    deferred_update_message = 6
+    update_message = 7
+    autocomplete_result = 8
+    modal = 9

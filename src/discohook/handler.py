@@ -8,7 +8,7 @@ from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
 from typing import Optional, List, Dict, Any, Union, Callable
-from .enums import CallbackType, InteractionType, ComponentType, CommandType
+from .enums import InteractionCallbackType, InteractionType, ComponentType, CommandType
 
 
 async def handler(request: Request):
@@ -17,20 +17,18 @@ async def handler(request: Request):
     body = await request.body()
     key = VerifyKey(bytes.fromhex(request.app.public_key))
     try:
-        key.verify(stimestamp.encode() + body, bytes.fromhex(signature))
+        key.verify(timestamp.encode() + body, bytes.fromhex(signature))
     except BadSignatureError:
         return Response(content='invalid request signature', status_code=401)
     else:
         interaction = Interaction(await request.json())
-        if interaction.type is InteractionType.PING:
-            return JSONResponse(status_code=200, content={'type': CallbackType.PONG.value})
-        elif interaction.type is InteractionType.APPLICATION_COMMAND:
+        if interaction.type is InteractionType.ping:
+            return JSONResponse({'type': InteractionCallbackType.pong.value}, status_code=200, )
+        elif interaction.type is InteractionType.app_command:
             return JSONResponse(
                 status_code=200,
                 content={
-                    'type': CallbackType.CHANNEL_MESSAGE_WITH_SOURCE.value,
+                    'type': InteractionCallbackType.channel_message_with_source.value,
                     'data': {'content': interaction.token}
                 }
             )
-
-
