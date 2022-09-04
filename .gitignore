@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 main.py
 .idea/
+.deta/
+.env
+.detaignore

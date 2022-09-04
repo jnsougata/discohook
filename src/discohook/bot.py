@@ -1,15 +1,14 @@
 from __future__ import annotations
 import asyncio
-from .models import *
+import secrets
+import requests
 from .command import *
 from fastapi import FastAPI
 from functools import wraps
-from typing import Optional, List, Dict, Any, Union, Callable
 from .handler import handler
 from .enums import CommandType
 from .command import ApplicationCommand
-import secrets
-import requests
+from typing import Optional, List, Dict, Any, Union, Callable
 
 
 class Bot(FastAPI):
