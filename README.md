@@ -3,31 +3,24 @@
 # Quickstart
 
 ```python
-from discohook import Bot
+import discohook
 import os
 
-bot = Bot(
-    int(os.getenv("APPLICATION_ID")),
-    public_key=os.getenv("PUBLIC_KEY"),
-    token=os.getenv("DISCORD_TOKEN")
-)
+
+APPLICATION_ID = int(os.getenv("APPLICATION_ID"))
+APPLICATION_TOKEN = os.getenv("DISCORD_TOKEN")
+APPLICATION_PUBLIC_KEY = os.getenv("PUBLIC_KEY")
+
+client = discohook.Client(application_id=APPLICATION_ID, token=APPLICATION_TOKEN, public_key=APPLICATION_PUBLIC_KEY)
 
 
-@bot.command(name="abc", description="abc command")
-async def abc(context):
-    pass
+@client.command(name="help", description="basic help command for the bot")
+async def help_command(interaction: discohook.Interaction):
+    return interaction.response(
+        "Hello, World!",
+        embed=discohook.Embed(title="Help", description="This is a help command"),
+        ephemeral=True,
+    )
 
-
-@abc.subcommand(name="xyz", description="subcommand of abc")
-async def xyz(context):
-    pass
-
-
-@test.subcommand(name="another", description="sub command")
-async def sub(context):
-    pass
-
-
-bot.sync()
-
+client.sync()
 ```
