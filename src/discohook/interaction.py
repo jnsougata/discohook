@@ -1,7 +1,7 @@
-from .enums import interaction_types
+from .enums import interaction_types, callback_types
 from typing import Any, Dict, Optional, List
 from pydantic import BaseModel
-from .webhook import Webhook
+from fastapi.responses import JSONResponse
 
 
 class CommandData(BaseModel):
@@ -36,14 +36,59 @@ class Interaction(BaseModel):
             return CommandData(**self.data)
         return None
 
-    @property
-    def response(self) -> Webhook:
-        return Webhook(
-            id=self.application_id,
-            type=self.type,
-            token=self.token,
-            application_id=self.application_id,
-            guild_id=self.guild_id,
-            channel_id=self.channel_id
+    @staticmethod
+    def response(
+            content: Optional[str] = None,
+            *,
+            embed: Optional[Dict[str, Any]] = None,
+            embeds: Optional[List[Dict[str, Any]]] = None,
+            component: Optional[Dict[str, Any]] = None,
+            components: Optional[List[Dict[str, Any]]] = None,
+            tts: Optional[bool] = False,
+            file: Optional[Dict[str, Any]] = None,
+            files: Optional[List[Dict[str, Any]]] = None,
+            ephemeral: Optional[bool] = False,
+            supress_embeds: Optional[bool] = False,
+    ) -> JSONResponse:
+        payload = {}
+        embeds_container = []
+        components_container = []
+        attachments_container = []
+        flag_value = 0
+        if embed:
+            embeds_container.append(embed)
+        if embeds:
+            embeds_container.extend(embeds)
+        if component:
+            components_container.append(component)
+        if components:
+            components_container.extend(components)
+        if file:
+            attachments_container.append(file)
+        if files:
+            attachments_container.extend(files)
+        if ephemeral:
+            flag_value |= 1 << 6
+        if supress_embeds:
+            flag_value |= 1 << 2
+        if content:
+            payload["content"] = str(content)
+        if tts:
+            payload["tts"] = True
+        if embeds_container:
+            payload["embeds"] = embeds_container
+        if components_container:
+            payload["components"] = components_container
+        if attachments_container:
+            payload["attachments"] = attachments_container
+        if flag_value:
+            payload["flags"] = flag_value
+
+        return JSONResponse(
+            {
+                "type": callback_types.channel_message_with_source.value,
+                "data": payload
+            },
+            status_code=200
         )
 
