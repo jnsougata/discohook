@@ -1,3 +1,4 @@
-fastapi
+fastapi~=0.81.0
 PyNaCl
-requests
+requests~=2.28.1
+pydantic~=1.10.1

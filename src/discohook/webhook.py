@@ -1,9 +1,9 @@
-from .interaction import Interaction
 from .enums import interaction_types, try_enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 from dataclasses import dataclass
 from fastapi.responses import JSONResponse
 from .utils import MISSING
+
 
 @dataclass
 class Webhook:
@@ -14,8 +14,8 @@ class Webhook:
     guild_id: Optional[str] = None
     channel_id: Optional[str] = None
 
+    @staticmethod
     def send(
-        self,
         content: Optional[str] = MISSING,
         *,
         embed: Optional[Dict[str, Any]] = MISSING,

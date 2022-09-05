@@ -25,7 +25,7 @@ async def handler(interaction: Interaction, request: Request):
             return JSONResponse({'type': callback_types.pong.value}, status_code=200, )
         elif interaction.type is interaction_types.app_command.value:
             command: ApplicationCommand = request.app.application_commands.get(interaction.app_command_data.id)
-            if command:
+            if not command:
                 return interaction.response.send(content='Command not Implemented!', ephemeral=True)
             else:
                 # TODO: use parser to make sufficient arguments later
