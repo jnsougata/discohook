@@ -6,7 +6,6 @@
 from discohook import Bot
 import os
 
-
 bot = Bot(
     int(os.getenv("APPLICATION_ID")),
     public_key=os.getenv("PUBLIC_KEY"),

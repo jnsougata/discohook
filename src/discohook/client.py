@@ -1,11 +1,11 @@
 from __future__ import annotations
+import aiohttp
 import asyncio
 import secrets
-import requests
 from .command import *
 from fastapi import FastAPI
 from functools import wraps
-from .handler import handler
+from .listener import listener
 from .enums import command_types
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
@@ -18,9 +18,9 @@ class Client(FastAPI):
     def __init__(
             self,
             application_id: int,
-            *,
-            token: str,
             public_key: str,
+            *,
+            token: str = None,
             route: str = '/interactions',
             **kwargs
     ):
@@ -30,7 +30,7 @@ class Client(FastAPI):
         self.token = token
         self._sync_able_commands: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
-        self.add_route(route, handler, methods=['POST'], include_in_schema=False)
+        self.add_route(route, listener, methods=['POST'], include_in_schema=False)
         self.middleware('http')(catch_exceptions_middleware)
 
     def command(
@@ -64,15 +64,19 @@ class Client(FastAPI):
             return wrapper()
         return decorator
 
-    def sync(self):
-        headers = {"Authorization": f"Bot {self.token}"}
-        for command in self._sync_able_commands:
-            if command.guild_id:
-                url = f"{self.root_url}/applications/{self.application_id}/guilds/{command.guild_id}/commands"
-            else:
-                url = f"{self.root_url}/applications/{self.application_id}/commands"
-            payload = command.to_json()
-            resp = requests.post(url, headers=headers, json=payload).json()
-            command.id = resp['id']
-            self.application_commands[resp['id']] = command
-        self._sync_able_commands.clear()
+    def sync(self) -> None:
+        async def sync_():
+            headers = {"Authorization": f"Bot {self.token}"}
+            async with aiohttp.ClientSession() as session:
+                for command in self._sync_able_commands:
+                    if command.guild_id:
+                        url = f"{self.root_url}/applications/{self.application_id}/guilds/{command.guild_id}/commands"
+                    else:
+                        url = f"{self.root_url}/applications/{self.application_id}/commands"
+                    payload = command.to_json()
+                    resp = await (await session.post(url, headers=headers, json=payload)).json()
+                    command.id = resp['id']
+                    self.application_commands[resp['id']] = command
+            self._sync_able_commands.clear()
+        if self.token:
+            asyncio.get_event_loop().run_until_complete(sync_())

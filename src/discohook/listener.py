@@ -11,7 +11,7 @@ from typing import Optional, List, Dict, Any, Union, Callable
 from .enums import callback_types, interaction_types, component_type, command_types
 
 
-async def handler(request: Request):
+async def listener(request: Request):
     signature = request.headers["X-Signature-Ed25519"]
     timestamp = request.headers["X-Signature-Timestamp"]
     body = await request.body()
