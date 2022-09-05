@@ -2,6 +2,7 @@ from .enums import interaction_types, callback_types
 from typing import Any, Dict, Optional, List
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
+from .embed import Embed
 
 
 class CommandData(BaseModel):
@@ -40,8 +41,8 @@ class Interaction(BaseModel):
     def response(
             content: Optional[str] = None,
             *,
-            embed: Optional[Dict[str, Any]] = None,
-            embeds: Optional[List[Dict[str, Any]]] = None,
+            embed: Optional[Embed] = None,
+            embeds: Optional[List[Embed]] = None,
             component: Optional[Dict[str, Any]] = None,
             components: Optional[List[Dict[str, Any]]] = None,
             tts: Optional[bool] = False,
@@ -76,7 +77,7 @@ class Interaction(BaseModel):
         if tts:
             payload["tts"] = True
         if embeds_container:
-            payload["embeds"] = embeds_container
+            payload["embeds"] = [embed.to_json() for embed in embeds_container]
         if components_container:
             payload["components"] = components_container
         if attachments_container:
