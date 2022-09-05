@@ -11,7 +11,7 @@ from typing import Optional, List, Dict, Any, Union, Callable
 from .enums import callback_types, interaction_types, component_type, command_types
 
 
-async def handler(interaction: Interaction, request: Request):
+async def handler(request: Request):
     signature = request.headers["X-Signature-Ed25519"]
     timestamp = request.headers["X-Signature-Timestamp"]
     body = await request.body()
@@ -21,6 +21,7 @@ async def handler(interaction: Interaction, request: Request):
     except BadSignatureError:
         return Response(content='invalid request signature', status_code=401)
     else:
+        interaction = Interaction(**(await request.json()))
         if interaction.type == interaction_types.ping.value:
             return JSONResponse({'type': callback_types.pong.value}, status_code=200, )
         elif interaction.type is interaction_types.app_command.value:

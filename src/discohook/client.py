@@ -9,6 +9,7 @@ from .handler import handler
 from .enums import command_types
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
+from .errors import catch_exceptions_middleware
 
 
 class Client(FastAPI):
@@ -30,6 +31,7 @@ class Client(FastAPI):
         self._sync_able_commands: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
+        self.middleware('http')(catch_exceptions_middleware)
 
     def command(
             self,

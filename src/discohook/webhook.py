@@ -1,4 +1,4 @@
-from .enums import interaction_types, try_enum
+from .enums import interaction_types, try_enum, callback_types
 from typing import Any, Dict, Optional, List
 from dataclasses import dataclass
 from fastapi.responses import JSONResponse
@@ -53,5 +53,9 @@ class Webhook:
             payload["attachments"].append(file)
         if files is not MISSING:
             payload["attachments"].extend(files)
-        return JSONResponse(content=payload, status_code=200)
+        resp_dict = {
+            "type": callback_types.channel_message_with_source.value,
+            "data": payload,
+        }
+        return JSONResponse(content=resp_dict, status_code=200)
 
