@@ -6,7 +6,7 @@ from .command import *
 from fastapi import FastAPI
 from functools import wraps
 from .handler import handler
-from .enums import CommandType
+from .enums import command_types
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
 
@@ -40,7 +40,7 @@ class Bot(FastAPI):
             permissions: str = None,
             dm_access: bool = True,
             guild_id: int = None,
-            category: CommandType = CommandType.SLASH
+            category: command_types = command_types.slash
     ):
         apc = ApplicationCommand(
             name=name,

@@ -1,4 +1,4 @@
-from .enums import OptionType
+from .enums import option_types
 from typing import Optional, List, Dict, Any, Union, Callable
 
 
@@ -33,7 +33,7 @@ class StringOption(Option):
             auto_complete: bool = False,
     ):
         super().__init__(name, description, required)
-        self.type = OptionType.STRING.value
+        self.type = option_types.string.value
 
     def to_json(self) -> Dict[str, Any]:
         payload = {

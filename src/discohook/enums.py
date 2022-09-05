@@ -8,57 +8,57 @@ def try_enum(enum_class, value):
         return None
 
 
-class TextFieldLength(Enum):
-    SHORT = 1
-    LONG = 2
+class text_field_lengths(Enum):
+    short = 1
+    long = 2
 
 
-class ModalFieldType(Enum):
-    TEXT_INPUT = 4
+class modal_field_types(Enum):
+    text_input = 4
 
 
-class CommandType(Enum):
-    SLASH = 1
-    USER = 2
-    MESSAGE = 3
+class command_types(Enum):
+    slash = 1
+    user = 2
+    message = 3
 
 
-class OptionType(Enum):
-    SUBCOMMAND = 1
-    SUBCOMMAND_GROUP = 2
-    STRING = 3
-    INTEGER = 4
-    BOOLEAN = 5
-    USER = 6
-    CHANNEL = 7
-    ROLE = 8
-    MENTIONABLE = 9
-    NUMBER = 10
-    ATTACHMENT = 11
+class option_types(Enum):
+    subcommand = 1
+    subcommmand_groups = 2
+    string = 3
+    ineteger = 4
+    boolean = 5
+    user = 6
+    channel = 7
+    role = 8
+    mentionable = 9
+    number = 10
+    attachment = 11
 
 
-class ChannelType(Enum):
-    GUILD_TEXT = 0
-    DM = 1
-    GUILD_VOICE = 2
-    GROUP_DM = 3
-    GUILD_CATEGORY = 4
-    GUILD_NEWS = 5
-    GUILD_STORE = 6
-    GUILD_NEWS_THREAD = 10
-    GUILD_PUBLIC_THREAD = 11
-    GUILD_PRIVATE_THREAD = 12
-    GUILD_STAGE_VOICE = 13
+class channel_types(Enum):
+    guild_text = 0
+    dm = 1
+    guild_voice = 2
+    group_dm = 3
+    guild_category = 4
+    guild_news = 5
+    guild_store = 6
+    guild_news_thread = 10
+    guild_public_thread = 11
+    guild_private_thread = 12
+    guild_stage_voice = 13
 
 
-class ComponentType(Enum):
+class component_type(Enum):
     ACTION_ROW = 1
     BUTTON = 2
     SELECT_MENU = 3
     TEXT_INPUT = 4
 
 
-class InteractionType(Enum):
+class interaction_types(Enum):
     ping = 1
     app_command = 2
     component = 3
@@ -66,7 +66,7 @@ class InteractionType(Enum):
     modal_submit = 5
 
 
-class InteractionCallbackType(Enum):
+class callback_types(Enum):
     pong = 1
     channel_message_with_source = 4
     deferred_channel_message_with_source = 5

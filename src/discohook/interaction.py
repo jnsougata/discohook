@@ -1,18 +1,49 @@
-from .enums import InteractionType
+from .enums import interaction_types
+from typing import Any, Dict, Optional
+from pydantic import BaseModel
+from .webhook import Webhook
 
 
-class Interaction:
-    def __init__(self, payload: dict):
-        self.id = int(payload['id'])
-        self.application_id = int(payload['application_id'])
-        self.type = InteractionType(payload['type'])
-        self.data = payload.get('data', {})
-        self.guild_id = int(payload.get('guild_id', 0))
-        self.channel_id = int(payload.get('channel_id', 0))
-        self.member = payload.get('member', {})
-        self.user = payload.get('user', {})
-        self.token = payload['token']
-        self.version = payload['version']
-        self.message = payload.get('message', {})
-        self.locale = payload.get('locale')
-        self.guild_locale = payload.get('guild_locale')
+class ApplicationCommandData(BaseModel):
+    id: str
+    name: str
+    type: int
+    guild_id: Optional[str] = None
+    target_id: Optional[str] = None
+    resolved: Optional[Dict[str, Any]] = None
+    options: Optional[List[Dict[str, Any]]] = None
+
+
+class Interaction(BaseModel):
+    id: str
+    type: int
+    token: str
+    version: int
+    application_id: str
+    data: Optional[Dict[str, Any]] = None
+    guild_id: Optional[str] = None
+    channel_id: Optional[str] = None
+    member: Optional[Dict[str, Any]] = None
+    user: Optional[Dict[str, Any]] = None
+    message: Optional[Dict[str, Any]] = None
+    app_permissions: Optional[int] = None
+    locale: Optional[str] = None
+    guild_locale: Optional[str] = None
+
+    @property
+    def app_command_data(self) -> Optional[ApplicationCommandData]:
+        if self.type == interaction_types.app_command.value:
+            return ApplicationCommandData(**self.data)
+        return None
+
+    @property
+    def response(self) -> Webhook:
+        return Webhook(
+            id=self.application_id,
+            type=self.type,
+            token=self.token,
+            application_id=self.application_id,
+            guild_id=self.guild_id,
+            channel_id=self.channel_id
+        )
+
