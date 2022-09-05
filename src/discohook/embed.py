@@ -23,7 +23,7 @@ class Embed:
         if timestamp:
             self._data["timestamp"] = timestamp
 
-        self._data["fields"] = []
+        self._fields_container: List[Dict[str, Any]] = []
 
     def author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
         self._data["author"] = {"name": name}
@@ -44,7 +44,9 @@ class Embed:
         self._data["thumbnail"] = {"url": url}
 
     def add_field(self, *, name: str, value: str, inline: bool = False):
-        self._data["fields"].append({"name": name, "value": value, "inline": inline})
+        self._fields_container.append({"name": name, "value": value, "inline": inline})
 
     def to_json(self) -> Dict[str, Any]:
+        if self._fields_container:
+            self._data["fields"] = self._fields_container
         return self._data
