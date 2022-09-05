@@ -131,3 +131,5 @@ main.py
 .idea/
 .deta/
 .detaignore
+main.py
+.deta

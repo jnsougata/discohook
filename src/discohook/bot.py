@@ -11,7 +11,7 @@ from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
 
 
-class Bot(FastAPI):
+class Client(FastAPI):
     root_url = "https://discord.com/api/v10"
 
     def __init__(
