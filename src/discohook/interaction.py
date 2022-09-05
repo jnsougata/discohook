@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from .webhook import Webhook
 
 
-class ApplicationCommandData(BaseModel):
+class CommandData(BaseModel):
     id: str
     name: str
     type: int
@@ -31,9 +31,9 @@ class Interaction(BaseModel):
     guild_locale: Optional[str] = None
 
     @property
-    def app_command_data(self) -> Optional[ApplicationCommandData]:
+    def app_command_data(self) -> Optional[CommandData]:
         if self.type == interaction_types.app_command.value:
-            return ApplicationCommandData(**self.data)
+            return CommandData(**self.data)
         return None
 
     @property

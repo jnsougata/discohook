@@ -11,7 +11,7 @@ from typing import Optional, List, Dict, Any, Union, Callable
 from .enums import callback_types, interaction_types, component_type, command_types
 
 
-async def handler(interaction: Interaction,request: Request):
+async def handler(interaction: Interaction, request: Request):
     signature = request.headers["X-Signature-Ed25519"]
     timestamp = request.headers["X-Signature-Timestamp"]
     body = await request.body()
@@ -25,7 +25,7 @@ async def handler(interaction: Interaction,request: Request):
             return JSONResponse({'type': callback_types.pong.value}, status_code=200, )
         elif interaction.type is interaction_types.app_command.value:
             command: ApplicationCommand = request.app.application_commands.get(interaction.app_command_data.id)
-            if command is None:
+            if command:
                 return interaction.response.send(content='Command not Implemented!', ephemeral=True)
             else:
                 # TODO: use parser to make sufficient arguments later
