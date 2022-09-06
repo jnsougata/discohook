@@ -74,3 +74,18 @@ class callback_types(Enum):
     update_message = 7
     autocomplete_result = 8
     modal = 9
+
+
+class component_types(Enum):
+    action_row = 1
+    button = 2
+    select_menu = 3
+    text_input = 4
+
+
+class button_styles(Enum):
+    blurple = 1
+    grey = 2
+    green = 3
+    red = 4
+    url = 5
