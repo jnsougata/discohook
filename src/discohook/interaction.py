@@ -73,7 +73,7 @@ class Interaction(BaseModel):
             payload["tts"] = True
         if embeds_container:
             payload["embeds"] = [embed.to_json() for embed in embeds_container]
-        if content:
+        if component:
             payload["components"] = component.to_json()
         if attachments_container:
             payload["attachments"] = attachments_container

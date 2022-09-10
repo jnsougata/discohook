@@ -1,12 +1,16 @@
 import secrets
 from .enums import button_styles, component_types
 from .emoji import PartialEmoji
-from typing import Optional, Union, List, Dict, Any
+from typing import Optional, Union, List, Dict, Any, Callable
+from functools import wraps
+
+_button_callbacks: Dict[str, Callable] = {}
 
 
 class Button:
     def __init__(
             self,
+            custom_id: str,
             label: str,
             *,
             url: Optional[str] = None,
@@ -18,8 +22,16 @@ class Button:
         self.url = url
         self.style = style
         self.disabled = disabled
-        self.custom_id = secrets.token_hex(8)
+        if custom_id:
+            self.custom_id = custom_id
+        else:
+            raise ValueError("custom_id cannot be none or empty")
         self.emoji = emoji
+        self._callback: Optional[Callable] = None
+
+    def callback(self, func: Callable):
+        self._callback = func
+        return func
 
     def to_json(self) -> Dict[str, Any]:
         payload = dict()

@@ -6,11 +6,19 @@ import asyncio
 
 
 class SubCommand:
-    def __init__(self, name: str, description: str, options: List[Option] = None, *, callback: Callable = None):
+    def __init__(
+            self,
+            name: str,
+            description: str,
+            options: List[Option] = None,
+            *,
+            callback: Callable = None
+    ):
         self.name = name
-        self.description = description
         self.options = options
         self.callback = callback
+        self.description = description
+        self._component_callback: Optional[Callable] = None
 
     def to_json(self) -> Dict[str, Any]:
         payload = {
@@ -55,7 +63,13 @@ class ApplicationCommand:
         self.__payload: Dict[str, Any] = {}
         self._subcommand_callbacks: Dict[str, Callable] = {}
 
-    def subcommand(self, name: str, description: str, *, options: List[Option] = None) -> None:
+    def subcommand(
+            self,
+            name: str,
+            description: str,
+            *,
+            options: List[Option] = None,
+    ) -> None:
         subcommand = SubCommand(name, description, options)
         if self.options:
             self.options.append(subcommand)

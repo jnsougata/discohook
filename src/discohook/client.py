@@ -10,6 +10,7 @@ from .enums import command_types
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
 from .errors import catch_exceptions_middleware
+from .component import Button
 
 
 class Client(FastAPI):
@@ -28,6 +29,7 @@ class Client(FastAPI):
         self.application_id = application_id
         self.public_key = public_key
         self.token = token
+        self.ui_factory: Optional[Dict[str, Union[Button]]] = {}
         self._sync_able_commands: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, listener, methods=['POST'], include_in_schema=False)
@@ -42,7 +44,7 @@ class Client(FastAPI):
             permissions: str = None,
             dm_access: bool = True,
             guild_id: int = None,
-            category: command_types = command_types.slash
+            category: command_types = command_types.slash,
     ):
         apc = ApplicationCommand(
             name=name,

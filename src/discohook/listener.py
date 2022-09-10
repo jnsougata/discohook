@@ -8,7 +8,8 @@ from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
 from typing import Optional, List, Dict, Any, Union, Callable
-from .enums import callback_types, interaction_types, component_type, command_types
+from .enums import callback_types, interaction_types, command_types, component_types
+from .component import _button_callbacks
 
 
 async def listener(request: Request):
@@ -23,13 +24,15 @@ async def listener(request: Request):
         interaction = Interaction(**(await request.json()))
         if interaction.type == interaction_types.ping.value:
             return JSONResponse({'type': callback_types.pong.value}, status_code=200)
-        elif interaction.type is interaction_types.app_command.value:
+        elif interaction.type == interaction_types.app_command.value:
             command: ApplicationCommand = request.app.application_commands.get(interaction.app_command_data.id)
             if not command:
                 return interaction.response(content='command not implemented!', ephemeral=True)
             else:
                 # TODO: use parser to make sufficient arguments later
                 return await command.callback(interaction)
+        elif interaction.type == interaction_types.component.value:
+            return JSONResponse({'type': str(request.app.ui_factory)}, status_code=200)
         else:
             return JSONResponse({'message': "unhandled interaction type"}, status_code=300)
 

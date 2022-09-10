@@ -27,7 +27,7 @@ class option_types(Enum):
     subcommand = 1
     subcommmand_groups = 2
     string = 3
-    ineteger = 4
+    integer = 4
     boolean = 5
     user = 6
     channel = 7
@@ -49,13 +49,6 @@ class channel_types(Enum):
     guild_public_thread = 11
     guild_private_thread = 12
     guild_stage_voice = 13
-
-
-class component_type(Enum):
-    ACTION_ROW = 1
-    BUTTON = 2
-    SELECT_MENU = 3
-    TEXT_INPUT = 4
 
 
 class interaction_types(Enum):
