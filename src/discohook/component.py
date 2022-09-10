@@ -4,8 +4,6 @@ from .emoji import PartialEmoji
 from typing import Optional, Union, List, Dict, Any, Callable
 from functools import wraps
 
-_button_callbacks: Dict[str, Callable] = {}
-
 
 class Button:
     def __init__(

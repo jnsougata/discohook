@@ -9,7 +9,6 @@ from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
 from typing import Optional, List, Dict, Any, Union, Callable
 from .enums import callback_types, interaction_types, command_types, component_types
-from .component import _button_callbacks
 
 
 async def listener(request: Request):
