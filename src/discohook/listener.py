@@ -28,10 +28,14 @@ async def listener(request: Request):
             if not command:
                 return interaction.response(content='command not implemented!', ephemeral=True)
             else:
-                # TODO: use parser to make sufficient arguments later
+                # TODO: use parser & interaction to form sufficient arguments
                 return await command.callback(interaction)
         elif interaction.type == interaction_types.component.value:
-            return JSONResponse({'type': str(request.app.ui_factory)}, status_code=200)
+            component_data = interaction.data
+            custom_id = component_data.get('custom_id', '')
+            component = request.app.ui_factory.get(custom_id, None)
+            if custom_id and component:
+                return await component._callback(interaction)
         else:
             return JSONResponse({'message': "unhandled interaction type"}, status_code=300)
 
