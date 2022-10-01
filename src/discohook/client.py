@@ -67,7 +67,6 @@ class Client(FastAPI):
         return decorator
 
     async def __call__(self, scope, receive, send):
-        print("Called")
         if self.root_path:
             scope["root_path"] = self.root_path
         if not self.token:
