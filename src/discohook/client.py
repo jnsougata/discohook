@@ -66,19 +66,22 @@ class Client(FastAPI):
             return wrapper()
         return decorator
 
-    def sync(self) -> None:
-        async def sync_():
-            headers = {"Authorization": f"Bot {self.token}"}
-            async with aiohttp.ClientSession() as session:
-                for command in self._sync_able_commands:
-                    if command.guild_id:
-                        url = f"{self.root_url}/applications/{self.application_id}/guilds/{command.guild_id}/commands"
-                    else:
-                        url = f"{self.root_url}/applications/{self.application_id}/commands"
-                    payload = command.to_json()
-                    resp = await (await session.post(url, headers=headers, json=payload)).json()
-                    command.id = resp['id']
-                    self.application_commands[resp['id']] = command
-            self._sync_able_commands.clear()
-        if self.token:
-            asyncio.get_event_loop().run_until_complete(sync_())
+    async def __call__(self, scope, receive, send):
+        print("Called")
+        if self.root_path:
+            scope["root_path"] = self.root_path
+        if not self.token:
+            raise ValueError("Token is not provided")
+        headers = {"Authorization": f"Bot {self.token}"}
+        async with aiohttp.ClientSession() as session:
+            for command in self._sync_able_commands:
+                if command.guild_id:
+                    url = f"{self.root_url}/applications/{self.application_id}/guilds/{command.guild_id}/commands"
+                else:
+                    url = f"{self.root_url}/applications/{self.application_id}/commands"
+                payload = command.to_json()
+                resp = await (await session.post(url, headers=headers, json=payload)).json()
+                command.id = resp['id']
+                self.application_commands[resp['id']] = command
+        self._sync_able_commands.clear()
+        await super().__call__(scope, receive, send)
