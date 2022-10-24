@@ -1,5 +1,5 @@
 PyNaCl
-aiohttp
-fastapi~=0.81.0
-pydantic~=1.10.1
+uvicorn
+fastapi==0.85.1
+aiohttp==3.8.3
 python-dotenv

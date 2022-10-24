@@ -9,7 +9,6 @@ from .listener import listener
 from .enums import command_types
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
-from .errors import catch_exceptions_middleware
 from .component import Button
 
 
@@ -20,8 +19,8 @@ class Client(FastAPI):
             self,
             application_id: int,
             public_key: str,
+            token: str,
             *,
-            token: str = None,
             route: str = '/interactions',
             **kwargs
     ):
@@ -33,7 +32,6 @@ class Client(FastAPI):
         self._sync_able_commands: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, listener, methods=['POST'], include_in_schema=False)
-        self.middleware('http')(catch_exceptions_middleware)
 
     def command(
             self,
@@ -46,7 +44,7 @@ class Client(FastAPI):
             guild_id: int = None,
             category: command_types = command_types.slash,
     ):
-        apc = ApplicationCommand(
+        command = ApplicationCommand(
             name=name,
             description=description,
             options=options,
@@ -58,11 +56,11 @@ class Client(FastAPI):
 
         def decorator(coro: Callable):
             @wraps(coro)
-            def wrapper(*args, **kwargs):
+            def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
-                    apc.callback = coro
-                    self._sync_able_commands.append(apc)
-                    return apc
+                    command.callback = coro
+                    self._sync_able_commands.append(command)
+                    return command
             return wrapper()
         return decorator
 

@@ -15,5 +15,5 @@ setup(
     ],
     packages=["discohook"],
     python_requires=">=3.6",
-    requires=["fastapi", "requests"],
+    requires=["fastapi", "aiohttp"],
 )

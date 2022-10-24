@@ -127,9 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
 main.py
 .idea/
 .deta/
 .detaignore
-main.py
-.deta

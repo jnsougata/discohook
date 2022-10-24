@@ -9,6 +9,7 @@ from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
 from typing import Optional, List, Dict, Any, Union, Callable
 from .enums import callback_types, interaction_types, command_types, component_types
+from .parser import build_prams
 
 
 async def listener(request: Request):
@@ -28,8 +29,8 @@ async def listener(request: Request):
             if not command:
                 return interaction.response(content='command not implemented!', ephemeral=True)
             else:
-                # TODO: use parser & interaction to form sufficient arguments
-                return await command.callback(interaction)
+                args, kwargs = build_prams(interaction.app_command_data.options, command.callback)
+                return await command.callback(interaction, *args, **kwargs)
         elif interaction.type == interaction_types.component.value:
             component_data = interaction.data
             custom_id = component_data.get('custom_id', '')

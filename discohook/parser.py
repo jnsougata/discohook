@@ -4,114 +4,33 @@ from .enums import command_types
 from typing import List, Dict, Any, Optional, Union, Callable
 
 
-def _build_prams(options: Dict[str, Any], func: Callable):
-    args = []
-    kwargs = {}
+def build_prams(cmd_ops: List[Dict[str, Any]], func: Callable):
+    cmd_ops = {option['name']: option for option in cmd_ops}
     params = inspect.getfullargspec(func)
-    default_args = params.defaults
+    defaults = params.defaults
     default_kwargs = params.kwonlydefaults
-    if default_args:
-        default_list = [*default_args]
-        for i in range(len(params.args[:2]) - len(default_list) - 1):
-            default_list.insert(i, None)
-
-        for arg, default_value in zip(params.args[2:], default_list):
-            option = options.get(arg)
-            if option:
-                args.append(option.value)
-            else:
-                args.append(default_value)
-    else:
-        for arg in params.args[2:]:
-            option = options.get(arg)
-            if option:
-                args.append(option.value)
-            else:
-                args.append(None)
-
-    for kw in params.kwonlyargs:
-        option = options.get(kw)
-        if option:
-            kwargs[kw] = option.value
-        elif default_kwargs:
-            kwargs[kw] = default_kwargs.get(kw)
-        else:
-            kwargs[kw] = None
-    return args, kwargs
-
-
-def _build_ctx_menu_param(c: Context):
-    if c.type is command_types.user:
-        return c._target_user
-    elif c.type is command_types.message:
-        return c._target_message
-
-
-def _build_modal_prams(options: Dict[str, Any], func: Callable):
     args = []
-    kwargs = {}
-    params = inspect.getfullargspec(func)
-    default_args = params.defaults
-    default_kwargs = params.kwonlydefaults
-    if default_args:
-        default_list = [*default_args]
-        for i in range(len(params.args[:1]) - len(default_list) - 1):
-            default_list.insert(i, None)
-
-        for arg, default_value in zip(params.args[1:], default_list):
-            option = options.get(arg)
+    if defaults:
+        for i in range(len(params.args[:1]) - len(defaults) - 1):
+            defaults.insert(i, None)
+        for arg, value in zip(params.args[1:], defaults):
+            option = cmd_ops.get(arg)
             if option:
-                args.append(option)
+                args.append(option.get('value'))
             else:
-                args.append(default_value)
+                args.append(value)
     else:
         for arg in params.args[1:]:
-            option = options.get(arg)
+            option = cmd_ops.get(arg)
             if option:
-                args.append(option)
+                args.append(option.get('value'))
             else:
                 args.append(None)
-
-    for kw in params.kwonlyargs:
-        option = options.get(kw)
-        if option:
-            kwargs[kw] = option
-        elif default_kwargs:
-            kwargs[kw] = default_kwargs.get(kw)
-        else:
-            kwargs[kw] = None
-    return args, kwargs
-
-
-def _build_autocomplete_prams(options: Dict[str, Any], func: Callable):
-    args = []
     kwargs = {}
-    params = inspect.getfullargspec(func)
-    default_args = params.defaults
-    default_kwargs = params.kwonlydefaults
-    if default_args:
-        default_list = [*default_args]
-        for i in range(len(params.args[:1]) - len(default_list) - 1):
-            default_list.insert(i, None)
-
-        for arg, default_value in zip(params.args[1:], default_list):
-            option = options.get(arg)
-            if option:
-                args.append(option.value)
-            else:
-                args.append(default_value)
-    else:
-        for arg in params.args[1:]:
-            option = options.get(arg)
-            if option:
-                args.append(option.value)
-            else:
-                args.append(None)
-
     for kw in params.kwonlyargs:
-        option = options.get(kw)
+        option = cmd_ops.get(kw)
         if option:
-            kwargs[kw] = option.value
+            kwargs[kw] = option.get('value')
         elif default_kwargs:
             kwargs[kw] = default_kwargs.get(kw)
         else:
