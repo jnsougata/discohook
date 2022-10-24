@@ -29,7 +29,7 @@ class Client(FastAPI):
         self.application_id = application_id
         self.public_key = public_key
         self.token = token
-        self.ui_factory: Optional[Dict[str, Union[Button]]] = {}
+        self.ui_factory: Optional[Dict[str, Button]] = {}
         self._sync_able_commands: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, listener, methods=['POST'], include_in_schema=False)
