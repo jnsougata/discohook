@@ -22,6 +22,7 @@ async def listener(request: Request):
         return Response(content='request validation failed', status_code=401)
     else:
         interaction = Interaction(**(await request.json()))
+        interaction.app = request.app
         if interaction.type == interaction_types.ping.value:
             return JSONResponse({'type': callback_types.pong.value}, status_code=200)
         elif interaction.type == interaction_types.app_command.value:
@@ -40,4 +41,3 @@ async def listener(request: Request):
             return await component._handler(interaction)  # noqa
         else:
             return JSONResponse({'message': "unhandled interaction type"}, status_code=300)
-

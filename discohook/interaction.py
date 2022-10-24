@@ -17,6 +17,7 @@ class CommandData(BaseModel):
 
 
 class Interaction(BaseModel):
+    app: Any
     id: str
     type: int
     token: str
@@ -38,8 +39,8 @@ class Interaction(BaseModel):
             return CommandData(**self.data)
         return None
 
-    @staticmethod
     def response(
+            self,
             content: Optional[str] = None,
             *,
             embed: Optional[Embed] = None,
@@ -75,6 +76,8 @@ class Interaction(BaseModel):
             payload["embeds"] = [embed.to_json() for embed in embeds_container]
         if components:
             payload["components"] = components.to_json()
+            for component in components._items:  # noqa
+                self.app.ui_factory[component.custom_id] = component
         if attachments_container:
             payload["attachments"] = attachments_container
         if flag_value:

@@ -24,9 +24,8 @@ class Button:
         self.emoji = emoji
         self._handler: Optional[Callable] = None
 
-    def on_click(self, app: FastAPI, coro: Callable):
+    def on_click(self, coro: Callable):
         self._handler = coro
-        app.ui_factory[self.custom_id] = self
 
     def to_json(self) -> Dict[str, Any]:
         payload = {
@@ -45,13 +44,15 @@ class Button:
 
 class Components:
     def __init__(self):
-        self._structure: List[Dict[str, Any]] = list()
+        self._structure: List[Dict[str, Any]] = []
+        self._items = []
 
     def add_buttons(self, *buttons: Button):
         self._structure.append({
             "type": component_types.action_row.value,
             "components": [button.to_json() for button in buttons[:5]],
         })
+        self._items.extend(buttons)
 
     def add_select_menu(self):
         raise NotImplementedError
