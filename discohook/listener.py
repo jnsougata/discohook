@@ -33,10 +33,11 @@ async def listener(request: Request):
                 return await command.callback(interaction, *args, **kwargs)
         elif interaction.type == interaction_types.component.value:
             component_data = interaction.data
-            custom_id = component_data.get('custom_id', '')
-            component = request.app.ui_factory.get(custom_id, None)
-            if custom_id and component:
-                return await component._callback(interaction)
+            custom_id = component_data.get('custom_id')
+            component = request.app.ui_factory.pop(custom_id, None)
+            if not (custom_id and component):
+                return JSONResponse({'error': 'component not found!'}, status_code=404)
+            return await component._handler(interaction)  # noqa
         else:
             return JSONResponse({'message': "unhandled interaction type"}, status_code=300)
 

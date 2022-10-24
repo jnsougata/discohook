@@ -1,14 +1,14 @@
 import secrets
-from .enums import button_styles, component_types
-from .emoji import PartialEmoji
-from typing import Optional, Union, List, Dict, Any, Callable
+from fastapi import FastAPI
 from functools import wraps
+from .emoji import PartialEmoji
+from .enums import button_styles, component_types
+from typing import Optional, Union, List, Dict, Any, Callable
 
 
 class Button:
     def __init__(
             self,
-            custom_id: str,
             label: str,
             *,
             url: Optional[str] = None,
@@ -20,24 +20,22 @@ class Button:
         self.url = url
         self.style = style
         self.disabled = disabled
-        if custom_id:
-            self.custom_id = custom_id
-        else:
-            raise ValueError("custom_id cannot be none or empty")
+        self.custom_id = secrets.token_urlsafe(16)
         self.emoji = emoji
-        self._callback: Optional[Callable] = None
+        self._handler: Optional[Callable] = None
 
-    def callback(self, func: Callable):
-        self._callback = func
-        return func
+    def on_click(self, app: FastAPI, coro: Callable):
+        self._handler = coro
+        app.ui_factory[self.custom_id] = self
 
     def to_json(self) -> Dict[str, Any]:
-        payload = dict()
-        payload["type"] = component_types.button.value
-        payload["style"] = self.style.value
-        payload["label"] = self.label
-        payload["disabled"] = self.disabled
-        payload["custom_id"] = self.custom_id
+        payload = {
+            "type": component_types.button.value,
+            "style": self.style.value,
+            "label": self.label,
+            "custom_id": self.custom_id,
+            "disabled": self.disabled,
+        }
         if self.emoji:
             payload["emoji"] = self.emoji.to_json()
         if self.url and self.style is button_styles.url:
@@ -45,7 +43,7 @@ class Button:
         return payload
 
 
-class Component:
+class Components:
     def __init__(self):
         self._structure: List[Dict[str, Any]] = list()
 

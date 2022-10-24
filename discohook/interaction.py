@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, List
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from .embed import Embed
-from .component import Component
+from .component import Components
 
 
 class CommandData(BaseModel):
@@ -44,7 +44,7 @@ class Interaction(BaseModel):
             *,
             embed: Optional[Embed] = None,
             embeds: Optional[List[Embed]] = None,
-            component: Optional[Component] = None,
+            components: Optional[Components] = None,
             tts: Optional[bool] = False,
             file: Optional[Dict[str, Any]] = None,
             files: Optional[List[Dict[str, Any]]] = None,
@@ -73,8 +73,8 @@ class Interaction(BaseModel):
             payload["tts"] = True
         if embeds_container:
             payload["embeds"] = [embed.to_json() for embed in embeds_container]
-        if component:
-            payload["components"] = component.to_json()
+        if components:
+            payload["components"] = components.to_json()
         if attachments_container:
             payload["attachments"] = attachments_container
         if flag_value:

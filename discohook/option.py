@@ -57,6 +57,7 @@ class StringOption(Option):
             self.data["min_length"] = self.min_length
         return self.data
 
+
 class IntegerOption(Option):
     def __init__(
             self,
@@ -85,6 +86,7 @@ class IntegerOption(Option):
         if self.min_value is not None:
             self.data["min_value"] = self.min_value
         return self.data
+
 
 class NumberOption(Option):
     def __init__(
@@ -115,6 +117,7 @@ class NumberOption(Option):
             self.data["min_value"] = self.min_value
         return self.data
 
+
 class BooleanOption(Option):
     def __init__(
             self,
@@ -128,6 +131,7 @@ class BooleanOption(Option):
     def to_json(self) -> Dict[str, Any]:
         return self.data
 
+
 class UserOption(Option):
     def __init__(
             self,
@@ -140,6 +144,7 @@ class UserOption(Option):
 
     def to_json(self) -> Dict[str, Any]:
         return self.data
+
 
 class ChannelOption(Option):
     def __init__(
@@ -158,6 +163,7 @@ class ChannelOption(Option):
             self.data["channel_types"] = self.channel_types
         return self.data
 
+
 class RoleOption(Option):
     def __init__(
             self,
@@ -171,6 +177,7 @@ class RoleOption(Option):
     def to_json(self) -> Dict[str, Any]:
         return self.data
 
+
 class MentionableOption(Option):
     def __init__(
             self,
@@ -183,6 +190,7 @@ class MentionableOption(Option):
 
     def to_json(self) -> Dict[str, Any]:
         return self.data
+
 
 class AttachmentOption(Option):
     def __init__(
