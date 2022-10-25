@@ -1,5 +1,0 @@
-PyNaCl
-uvicorn
-fastapi==0.85.1
-aiohttp==3.8.3
-python-dotenv
