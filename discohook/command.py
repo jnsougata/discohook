@@ -72,7 +72,7 @@ class ApplicationCommand:
             description: str,
             *,
             options: List[Option] = None,
-    ) -> None:
+    ):
         subcommand = SubCommand(name, description, options)
         if self.options:
             self.options.append(subcommand)
@@ -81,14 +81,14 @@ class ApplicationCommand:
 
         def decorator(coro: Callable):
             @wraps(coro)
-            def wrapper(*args, **kwargs):
+            def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
                     self._subcommand_callbacks[name] = coro
                     return coro
             return wrapper()
         return decorator  # type: ignore
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         if self.category is command_types.slash:
             self.__payload["type"] = self.category.value
             if self.description:

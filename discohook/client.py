@@ -79,7 +79,7 @@ class Client(FastAPI):
                     url = f"{self.root_url}/applications/{self.application_id}/guilds/{command.guild_id}/commands"
                 else:
                     url = f"{self.root_url}/applications/{self.application_id}/commands"
-                payload = command.to_json()
+                payload = command.json()
                 resp = await (await session.post(url, headers=headers, json=payload)).json()
                 command.id = resp['id']
                 self.application_commands[resp['id']] = command
