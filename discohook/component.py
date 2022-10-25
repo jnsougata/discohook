@@ -27,7 +27,7 @@ class Button:
     def on_click(self, coro: Callable):
         self._handler = coro
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         payload = {
             "type": component_types.button.value,
             "style": self.style.value,
@@ -36,26 +36,91 @@ class Button:
             "disabled": self.disabled,
         }
         if self.emoji:
-            payload["emoji"] = self.emoji.to_json()
+            payload["emoji"] = self.emoji.json()
         if self.url and self.style is button_styles.url:
             payload["url"] = self.url
         return payload
 
 
+class SelectOption:
+    def __init__(
+            self,
+            label: str,
+            value: str,
+            *,
+            description: Optional[str] = None,
+            emoji: Optional[PartialEmoji] = None,
+            default: Optional[bool] = False,
+    ):
+        self.label = label
+        self.value = value
+        self.description = description
+        self.emoji = emoji
+        self.default = default
+
+    def json(self) -> Dict[str, Any]:
+        payload = {
+            "label": self.label,
+            "value": self.value,
+            "description": self.description,
+            "default": self.default,
+        }
+        if self.emoji:
+            payload["emoji"] = self.emoji.json()
+        return payload
+
+
+class SelectMenu:
+    def __init__(
+            self,
+            options: List[SelectOption],
+            *,
+            placeholder: Optional[str] = None,
+            min_values: Optional[int] = None,
+            max_values: Optional[int] = None,
+            disabled: Optional[bool] = False,
+    ):
+        self._handler: Optional[Callable] = None
+        self.custom_id = secrets.token_urlsafe(16)
+        self.data = {
+            "type": 3,
+            "custom_id": self.custom_id,
+            "options": [option.json() for option in options],
+        }
+        if placeholder:
+            self.data["placeholder"] = placeholder
+        if min_values:
+            self.data["min_values"] = min_values
+        if max_values:
+            self.data["max_values"] = max_values
+        if disabled:
+            self.data["disabled"] = disabled
+
+    def on_select(self, coro: Callable):
+        self._handler = coro
+
+    def json(self) -> Dict[str, Any]:
+        return self.data
+
+
 class Components:
     def __init__(self):
+        self.children = []
         self._structure: List[Dict[str, Any]] = []
-        self._items = []
 
     def add_buttons(self, *buttons: Button):
         self._structure.append({
             "type": component_types.action_row.value,
-            "components": [button.to_json() for button in buttons[:5]],
+            "components": [button.json() for button in buttons[:5]],
         })
-        self._items.extend(buttons[:5])
+        self.children.extend(buttons[:5])
 
-    def add_select_menu(self):
-        raise NotImplementedError
+    def add_select_menu(self, select_menu: SelectMenu):
+        self._structure.append({
+            "type": component_types.action_row.value,
+            "components": [select_menu.json()],
+        })
+        self.children.append(select_menu)
 
-    def to_json(self) -> List[Dict[str, Any]]:
+    def json(self) -> List[Dict[str, Any]]:
         return self._structure

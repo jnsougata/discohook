@@ -76,8 +76,8 @@ class Interaction(BaseModel):
         if embeds:
             payload["embeds"] = [embed.to_json() for embed in embeds]
         if components:
-            payload["components"] = components.to_json()
-            for component in components._items:  # noqa
+            payload["components"] = components.json()
+            for component in components.children:
                 self.app.ui_factory[component.custom_id] = component
         if files:
             payload["attachments"] = files
@@ -117,9 +117,9 @@ class Interaction(BaseModel):
         if embeds is not MISSING:
             data["embeds"] = [embed.to_json() for embed in embeds]
         if components is not MISSING:
-            data["components"] = components.to_json() if components else []
+            data["components"] = components.json() if components else []
             if components:
-                for component in components._items: # noqa
+                for component in components.children: # noqa
                     self.app.ui_factory[component.custom_id] = component
         if files is not MISSING:
             data["attachments"] = files
