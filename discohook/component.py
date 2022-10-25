@@ -52,7 +52,7 @@ class Components:
             "type": component_types.action_row.value,
             "components": [button.to_json() for button in buttons[:5]],
         })
-        self._items.extend(buttons)
+        self._items.extend(buttons[:5])
 
     def add_select_menu(self):
         raise NotImplementedError

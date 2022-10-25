@@ -132,3 +132,5 @@ main.py
 .idea/
 .deta/
 .detaignore
+.space/
+Spacefile
