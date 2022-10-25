@@ -58,11 +58,14 @@ class Client(FastAPI):
             @wraps(coro)
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
-                    command.callback = coro
+                    command._callback = coro
                     self._sync_able_commands.append(command)
                     return command
             return wrapper()
         return decorator
+
+    def load_commands(self, *commands: ApplicationCommand):
+        self._sync_able_commands.extend(commands)
 
     async def __call__(self, scope, receive, send):
         if self.root_path:

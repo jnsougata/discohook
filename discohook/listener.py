@@ -31,8 +31,8 @@ async def listener(request: Request):
                 return interaction.response(content='command not implemented!', ephemeral=True)
             else:
                 options = build_options(interaction)
-                args, kwargs = build_prams(options, command.callback)
-                return await command.callback(interaction, *args, **kwargs)
+                args, kwargs = build_prams(options, command._callback)  # noqa
+                return await command._callback(interaction, *args, **kwargs) # noqa
         elif interaction.type == interaction_types.component.value:
             component_data = interaction.data
             custom_id = component_data.get('custom_id')

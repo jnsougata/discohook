@@ -59,9 +59,12 @@ class ApplicationCommand:
         self.application_id = None
         self.category = category
         self.permissions = permissions
-        self.callback = callback
+        self._callback = callback
         self.__payload: Dict[str, Any] = {}
         self._subcommand_callbacks: Dict[str, Callable] = {}
+
+    def callback(self, coro: Callable):
+        self._callback = coro
 
     def subcommand(
             self,
