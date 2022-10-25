@@ -15,5 +15,5 @@ setup(
     ],
     packages=["discohook"],
     python_requires=">=3.6",
-    install_requires=["fastapi", "aiohttp"],
+    install_requires=["fastapi", "aiohttp", "PyNaCl"],
 )
