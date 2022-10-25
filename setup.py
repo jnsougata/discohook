@@ -4,7 +4,7 @@ setup(
     name="discohook",
     version="0.0.1",
     description="discord webhook wrapper for serverless apps",
-    url="http://github.com/jnsougata/discohook",
+    url="https://github.com/jnsougata/discohook",
     author="jnsougata",
     author_email="jnsougata@gmail.com",
     license="MIT",
