@@ -1,42 +1,46 @@
 from .enums import InteractionType, InteractionCallbackType
-from typing import Any, Dict, Optional, List, Union
-from pydantic import BaseModel
+from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 from fastapi.responses import JSONResponse
 from .embed import Embed
 from .models import User, Member
 from .component import Components
 from .modal import Modal
 import aiohttp
+if TYPE_CHECKING:
+    from .client import Client
 
 MISSING = object()
 
 
-class CommandData(BaseModel):
-    id: str
-    name: str
-    type: int
-    guild_id: Optional[str] = None
-    target_id: Optional[str] = None
-    resolved: Optional[Dict[str, Any]] = None
-    options: Optional[List[Dict[str, Any]]] = None
+class CommandData:
+    def __init__(self, data: Dict[str, Any]):
+        self.id: str = data['id']
+        self.name: str = data['name']
+        self.type: int = data['type']
+        self.guild_id: Optional[str] = data.get('guild_id')
+        self.target_id: Optional[str] = data.get('target_id')
+        self.resolved: Optional[Dict[str, Any]] = data.get('resolved')
+        self.options: Optional[List[Dict[str, Any]]] = data.get('options')
 
 
-class Interaction(BaseModel):
-    app: Any
-    id: str
-    type: int
-    token: str
-    version: int
-    application_id: str
-    data: Optional[Dict[str, Any]] = None
-    guild_id: Optional[str] = None
-    channel_id: Optional[str] = None
-    member: Optional[Dict[str, Any]] = None
-    user: Optional[Dict[str, Any]] = None
-    message: Optional[Dict[str, Any]] = None
-    app_permissions: Optional[int] = None
-    locale: Optional[str] = None
-    guild_locale: Optional[str] = None
+class Interaction:
+
+    def __init__(self, data: Dict[str, Any]):
+        self.app: Optional['Client'] = None
+        self.id: str = data['id']
+        self.type: int = data['type']
+        self.token: str = data['token']
+        self.version: int = data['version']
+        self.application_id: str = data['application_id']
+        self.data: Optional[Dict[str, Any]] = data.get('data')
+        self.guild_id: Optional[str] = data.get('guild_id')
+        self.channel_id: Optional[str] = data.get('channel_id')
+        self.member: Optional[Dict[str, Any]] = data.get('member')
+        self.user: Optional[Dict[str, Any]] = data.get('user')
+        self.message: Optional[Dict[str, Any]] = data.get('message')
+        self.app_permissions: Optional[int] = data.get('app_permissions')
+        self.locale: Optional[str] = data.get('locale')
+        self.guild_locale: Optional[str] = data.get('guild_locale')
 
     @property
     def original_author(self) -> Optional[User]:
@@ -60,7 +64,7 @@ class Interaction(BaseModel):
     @property
     def app_command_data(self) -> Optional[CommandData]:
         if self.type == InteractionType.app_command.value:
-            return CommandData(**self.data)
+            return CommandData(self.data)
         return None
 
     def response(

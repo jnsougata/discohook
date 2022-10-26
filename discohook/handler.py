@@ -22,7 +22,7 @@ async def listener(request: Request):
     except BadSignatureError:
         return Response(content='request validation failed', status_code=401)
     else:
-        interaction = Interaction(**(await request.json()))
+        interaction = Interaction(await request.json())
         interaction.app = request.app
         if interaction.type == InteractionType.ping.value:
             return JSONResponse({'type': InteractionCallbackType.pong.value}, status_code=200)

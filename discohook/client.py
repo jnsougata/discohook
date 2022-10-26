@@ -10,6 +10,7 @@ from .enums import AppCmdType
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
 from .component import Button
+from .modal import Modal
 
 
 class Client(FastAPI):
@@ -29,7 +30,7 @@ class Client(FastAPI):
         self.token = token
         self.public_key = public_key
         self.application_id = application_id
-        self.ui_factory: Optional[Dict[str, Button]] = {}
+        self.ui_factory: Optional[Dict[str, Union[Button, Modal]]] = {}
         self._sync_able_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self._component_interaction_original_authors: Dict[str, str] = {}
@@ -65,6 +66,9 @@ class Client(FastAPI):
                     return command
             return wrapper()
         return decorator
+
+    def load_commands(self, *commands: ApplicationCommand):
+        self._sync_able_commands.extend(commands)
 
     async def __call__(self, scope, receive, send):
         if self.root_path:
