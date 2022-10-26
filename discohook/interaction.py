@@ -67,7 +67,77 @@ class Interaction:
             return CommandData(self.data)
         return None
 
+    def send_modal(self, modal: Modal):
+        self.app.ui_factory[modal.custom_id] = modal
+        return JSONResponse(
+            {
+                "data": modal.json(), "type": InteractionCallbackType.modal.value,
+            },
+            status_code=200
+        )
+
+
+class CommandContext(Interaction):
+    def __init__(self, app: "Application", data: Dict[str, Any]):
+        super().__init__(data)
+        self.app = app
+
     async def response(
+            self,
+            content: Optional[str] = None,
+            *,
+            embed: Optional[Embed] = None,
+            embeds: Optional[List[Embed]] = None,
+            components: Optional[Components] = None,
+            tts: Optional[bool] = False,
+            file: Optional[Dict[str, Any]] = None,
+            files: Optional[List[Dict[str, Any]]] = None,
+            ephemeral: Optional[bool] = False,
+            supress_embeds: Optional[bool] = False,
+    ) -> JSONResponse:
+        payload = {}
+        flag_value = 0
+        if embed:
+            if not embeds:
+                embeds = []
+            embeds.append(embed)
+        if file:
+            if not files:
+                files = []
+            files.append(file)
+        if ephemeral:
+            flag_value |= 1 << 6
+        if supress_embeds:
+            flag_value |= 1 << 2
+        if content:
+            payload["content"] = str(content)
+        if tts:
+            payload["tts"] = True
+        if embeds:
+            payload["embeds"] = [embed.to_json() for embed in embeds]
+        if components:
+            payload["components"] = components.json()
+            for component in components.children:
+                self.app.ui_factory[component.custom_id] = component
+        if files:
+            payload["attachments"] = files
+        if flag_value:
+            payload["flags"] = flag_value
+        self.app.cached_interactions[self.id] = self.token
+        return JSONResponse(
+            {
+                "data": payload, "type": InteractionCallbackType.channel_message_with_source.value,
+            },
+            status_code=200
+        )
+
+
+class ComponentContext(Interaction):
+    def __init__(self, app: "Application", data: Dict[str, Any]):
+        super().__init__(data)
+        self.app = app
+
+    async def follow_up(
             self,
             content: Optional[str] = None,
             *,
@@ -157,21 +227,18 @@ class Interaction:
             status_code=200
         )
 
-    def send_modal(self, modal: Modal):
-        self.app.ui_factory[modal.custom_id] = modal
-        return JSONResponse(
-            {
-                "data": modal.json(), "type": InteractionCallbackType.modal.value,
-            },
-            status_code=200
-        )
-
     def _origin_token(self):
         if self.message:
             parent_id = self.message["interaction"]["id"]
             token = self.app.cached_interactions.get(parent_id, None)
             return token is not None, token
         return False, ""
+
+    async def fetch_original(self):
+        ok, token = self._origin_token()
+        if not ok:
+            return
+        return await request("GET", f"/webhooks/{self.application_id}/{token}/messages/@original")
 
     async def delete_original(self):
         ok, token = self._origin_token()
