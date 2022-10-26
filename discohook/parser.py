@@ -105,9 +105,8 @@ def build_context_menu_param(interaction: Interaction):
 
 
 def build_modal_params(func: Callable, interaction: Interaction):
-    root_comps = interaction.data['components']
     options = {}
-    for comp in root_comps:
+    for comp in interaction.data['components']:
         c = comp['components'][0]
         if c['type'] == 4:
             options[c['custom_id']] = c['value']
