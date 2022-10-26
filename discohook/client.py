@@ -25,12 +25,13 @@ class Client(FastAPI):
             **kwargs
     ):
         super().__init__(**kwargs)
-        self.application_id = application_id
-        self.public_key = public_key
         self.token = token
+        self.public_key = public_key
+        self.application_id = application_id
         self.ui_factory: Optional[Dict[str, Button]] = {}
         self._sync_able_commands: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
+        self._component_interaction_original_authors: Dict[str, str] = {}
         self.add_route(route, listener, methods=['POST'], include_in_schema=False)
 
     def command(

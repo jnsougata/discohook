@@ -30,6 +30,9 @@ class User:
             return f"https://cdn.discordapp.com/avatars/{self.id}/{self.avatar}.{dynamic_extension}?size={size}"
         return f"https://cdn.discordapp.com/avatars/{self.id}/{self.avatar}.{static_extension}?size={size}"
 
+    def __eq__(self, other):
+        return self.id == other.id
+
 
 class Member(User):
     def __init__(self, **kwargs):

@@ -22,10 +22,10 @@ class Button:
         self.disabled = disabled
         self.custom_id = secrets.token_urlsafe(16)
         self.emoji = emoji
-        self._handler: Optional[Callable] = None
+        self._callback: Optional[Callable] = None
 
     def on_click(self, coro: Callable):
-        self._handler = coro
+        self._callback = coro
 
     def json(self) -> Dict[str, Any]:
         payload = {
@@ -80,7 +80,7 @@ class SelectMenu:
             max_values: Optional[int] = None,
             disabled: Optional[bool] = False,
     ):
-        self._handler: Optional[Callable] = None
+        self._callback: Optional[Callable] = None
         self.custom_id = secrets.token_urlsafe(16)
         self.data = {
             "type": 3,
@@ -96,8 +96,8 @@ class SelectMenu:
         if disabled:
             self.data["disabled"] = disabled
 
-    def on_select(self, coro: Callable):
-        self._handler = coro
+    def on_selection(self, coro: Callable):
+        self._callback = coro
 
     def json(self) -> Dict[str, Any]:
         return self.data

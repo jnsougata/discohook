@@ -73,3 +73,13 @@ def build_options(interaction: Interaction):
         elif option['type'] == option_types.sub_command_group.value:
             pass
     return options
+
+
+def build_modal_params(modal_data: dict) -> dict:
+    root_comps = modal_data['components']
+    params = {}
+    for comp in root_comps:
+        c = comp['components'][0]
+        if c['type'] == 4:
+            params[c['custom_id']] = c['value']
+    return params

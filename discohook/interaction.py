@@ -1,9 +1,11 @@
 from .enums import interaction_types, callback_types
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional, List, Union
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from .embed import Embed
+from .resolved import User, Member
 from .component import Components
+from .modal import Modal
 import aiohttp
 
 MISSING = object()
@@ -35,6 +37,25 @@ class Interaction(BaseModel):
     app_permissions: Optional[int] = None
     locale: Optional[str] = None
     guild_locale: Optional[str] = None
+
+    @property
+    def original_author(self) -> Optional[User]:
+        if not self.message:
+            return None
+        return User(**self.message["interaction"]["user"])
+
+    @property
+    def from_original_author(self) -> bool:
+        if not self.message:
+            return True
+        return self.original_author.id == self.author.id
+
+    @property
+    def author(self) -> Optional[Union[User, Member]]:
+        if self.guild_id:
+            self.member.update(self.member.pop("user"))
+            return Member(**self.member)
+        return User(**self.user)
 
     @property
     def app_command_data(self) -> Optional[CommandData]:
@@ -128,6 +149,15 @@ class Interaction(BaseModel):
         return JSONResponse(
             {
                 "data": data, "type": callback_types.update_message.value,
+            },
+            status_code=200
+        )
+
+    def send_modal(self, modal: Modal):
+        self.app.ui_factory[modal.custom_id] = modal
+        return JSONResponse(
+            {
+                "data": modal.json(), "type": callback_types.modal.value,
             },
             status_code=200
         )

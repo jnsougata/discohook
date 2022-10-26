@@ -20,7 +20,7 @@ class SubCommand:
         self.description = description
         self._component_callback: Optional[Callable] = None
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         payload = {
             "type": option_types.subcommand.value,
             "name": self.name,

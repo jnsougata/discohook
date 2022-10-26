@@ -9,7 +9,7 @@ from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
 from typing import Optional, List, Dict, Any, Union, Callable
 from .enums import callback_types, interaction_types, command_types, component_types
-from .parser import build_prams, build_options
+from .parser import build_prams, build_options, build_modal_params
 
 
 async def listener(request: Request):
@@ -25,6 +25,7 @@ async def listener(request: Request):
         interaction.app = request.app
         if interaction.type == interaction_types.ping.value:
             return JSONResponse({'type': callback_types.pong.value}, status_code=200)
+
         elif interaction.type == interaction_types.app_command.value:
             command: ApplicationCommand = request.app.application_commands.get(interaction.app_command_data.id)
             if not command:
@@ -33,12 +34,24 @@ async def listener(request: Request):
                 options = build_options(interaction)
                 args, kwargs = build_prams(options, command._callback)  # noqa
                 return await command._callback(interaction, *args, **kwargs) # noqa
+
         elif interaction.type == interaction_types.component.value:
             component_data = interaction.data
             custom_id = component_data.get('custom_id')
-            component = request.app.ui_factory.pop(custom_id, None)
+            component = request.app.ui_factory.get(custom_id, None)
             if not (custom_id and component):
                 return JSONResponse({'error': 'component not found!'}, status_code=404)
-            return await component._handler(interaction)  # noqa
+            if component_data['component_type'] == component_types.select_menu.value:
+                values = component_data['values']
+                return await component._callback(interaction, values) # noqa
+            return await component._callback(interaction)  # noqa
+
+        elif interaction.type == interaction_types.modal_submit.value:
+            component = request.app.ui_factory.get(interaction.data['custom_id'], None)
+            if not component:
+                return JSONResponse({'error': 'component not found!'}, status_code=404)
+            params = build_modal_params(interaction.data)
+            return await component._callback(interaction, **params)  # noqa
+
         else:
             return JSONResponse({'message': "unhandled interaction type"}, status_code=300)

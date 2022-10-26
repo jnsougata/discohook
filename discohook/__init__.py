@@ -6,3 +6,4 @@ from .enums import button_styles
 from .option import *
 from .resolved import User, Member
 from .command import ApplicationCommand
+from .modal import Modal
