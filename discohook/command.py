@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List, Optional, Union, Any
 from .option import Option
-from .enums import command_types, option_types
+from .enums import AppCmdType, AppCmdOptionType
 from functools import wraps
 import asyncio
 
@@ -22,7 +22,7 @@ class SubCommand:
 
     def json(self) -> Dict[str, Any]:
         payload = {
-            "type": option_types.subcommand.value,
+            "type": AppCmdOptionType.subcommand.value,
             "name": self.name,
             "description": self.description,
         }
@@ -44,7 +44,7 @@ class ApplicationCommand:
             options: List[Option] = None,
             dm_access: bool = True,
             permissions: str = None,
-            category: command_types = command_types.slash,
+            category: AppCmdType = AppCmdType.slash,
             *,
             guild_id: int = None,
             callback: Callable = None,
@@ -89,7 +89,7 @@ class ApplicationCommand:
         return decorator  # type: ignore
 
     def json(self) -> Dict[str, Any]:
-        if self.category is command_types.slash:
+        if self.category is AppCmdType.slash:
             self.__payload["type"] = self.category.value
             if self.description:
                 self.__payload["description"] = self.description

@@ -1,9 +1,9 @@
-from .enums import interaction_types, callback_types
+from .enums import InteractionType, InteractionCallbackType
 from typing import Any, Dict, Optional, List, Union
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from .embed import Embed
-from .resolved import User, Member
+from .models import User, Member
 from .component import Components
 from .modal import Modal
 import aiohttp
@@ -59,7 +59,7 @@ class Interaction(BaseModel):
 
     @property
     def app_command_data(self) -> Optional[CommandData]:
-        if self.type == interaction_types.app_command.value:
+        if self.type == InteractionType.app_command.value:
             return CommandData(**self.data)
         return None
 
@@ -107,7 +107,7 @@ class Interaction(BaseModel):
 
         return JSONResponse(
             {
-                "data": payload, "type": callback_types.channel_message_with_source.value,
+                "data": payload, "type": InteractionCallbackType.channel_message_with_source.value,
             },
             status_code=200
         )
@@ -148,7 +148,7 @@ class Interaction(BaseModel):
             data["flags"] = 1 << 2
         return JSONResponse(
             {
-                "data": data, "type": callback_types.update_message.value,
+                "data": data, "type": InteractionCallbackType.update_message.value,
             },
             status_code=200
         )
@@ -157,7 +157,7 @@ class Interaction(BaseModel):
         self.app.ui_factory[modal.custom_id] = modal
         return JSONResponse(
             {
-                "data": modal.json(), "type": callback_types.modal.value,
+                "data": modal.json(), "type": InteractionCallbackType.modal.value,
             },
             status_code=200
         )

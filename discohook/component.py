@@ -2,7 +2,7 @@ import secrets
 from fastapi import FastAPI
 from functools import wraps
 from .emoji import PartialEmoji
-from .enums import button_styles, component_types
+from .enums import ButtonStyle, MessageComponentType
 from typing import Optional, Union, List, Dict, Any, Callable
 
 
@@ -12,7 +12,7 @@ class Button:
             label: str,
             *,
             url: Optional[str] = None,
-            style: button_styles = button_styles.blurple,
+            style: ButtonStyle = ButtonStyle.blurple,
             disabled: Optional[bool] = False,
             emoji: Optional[PartialEmoji] = None,
     ):
@@ -29,7 +29,7 @@ class Button:
 
     def json(self) -> Dict[str, Any]:
         payload = {
-            "type": component_types.button.value,
+            "type": MessageComponentType.button.value,
             "style": self.style.value,
             "label": self.label,
             "custom_id": self.custom_id,
@@ -37,7 +37,7 @@ class Button:
         }
         if self.emoji:
             payload["emoji"] = self.emoji.json()
-        if self.url and self.style is button_styles.url:
+        if self.url and self.style is ButtonStyle.url:
             payload["url"] = self.url
         return payload
 
@@ -110,14 +110,14 @@ class Components:
 
     def add_buttons(self, *buttons: Button):
         self._structure.append({
-            "type": component_types.action_row.value,
+            "type": MessageComponentType.action_row.value,
             "components": [button.json() for button in buttons[:5]],
         })
         self.children.extend(buttons[:5])
 
     def add_select_menu(self, select_menu: SelectMenu):
         self._structure.append({
-            "type": component_types.action_row.value,
+            "type": MessageComponentType.action_row.value,
             "components": [select_menu.json()],
         })
         self.children.append(select_menu)

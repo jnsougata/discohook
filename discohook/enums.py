@@ -8,24 +8,24 @@ def try_enum(enum_class, value):
         return None
 
 
-class text_field_lengths(Enum):
+class TextInputFieldLength(Enum):
     short = 1
     long = 2
 
 
-class modal_field_types(Enum):
+class ModalFieldType(Enum):
     text_input = 4
 
 
-class command_types(Enum):
+class AppCmdType(Enum):
     slash = 1
     user = 2
     message = 3
 
 
-class option_types(Enum):
+class AppCmdOptionType(Enum):
     subcommand = 1
-    subcommmand_groups = 2
+    subcommand_groups = 2
     string = 3
     integer = 4
     boolean = 5
@@ -37,7 +37,7 @@ class option_types(Enum):
     attachment = 11
 
 
-class channel_types(Enum):
+class ChannelType(Enum):
     guild_text = 0
     dm = 1
     guild_voice = 2
@@ -51,7 +51,7 @@ class channel_types(Enum):
     guild_stage_voice = 13
 
 
-class interaction_types(Enum):
+class InteractionType(Enum):
     ping = 1
     app_command = 2
     component = 3
@@ -59,7 +59,7 @@ class interaction_types(Enum):
     modal_submit = 5
 
 
-class callback_types(Enum):
+class InteractionCallbackType(Enum):
     pong = 1
     channel_message_with_source = 4
     deferred_channel_message_with_source = 5
@@ -69,14 +69,14 @@ class callback_types(Enum):
     modal = 9
 
 
-class component_types(Enum):
+class MessageComponentType(Enum):
     action_row = 1
     button = 2
     select_menu = 3
     text_input = 4
 
 
-class button_styles(Enum):
+class ButtonStyle(Enum):
     blurple = 1
     grey = 2
     green = 3

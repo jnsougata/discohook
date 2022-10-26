@@ -1,8 +1,8 @@
 import inspect
-from .enums import command_types
+from .enums import AppCmdType
 from .interaction import Interaction
-from .resolved import User, Member
-from .enums import option_types
+from .models import User, Member
+from .enums import AppCmdOptionType
 from typing import List, Dict, Any, Optional, Union, Callable
 
 
@@ -46,13 +46,13 @@ def build_options(interaction: Interaction):
         return {}
     options = {}
     for option in interaction.app_command_data.options:
-        if option['type'] == option_types.string.value:
+        if option['type'] == AppCmdOptionType.string.value:
             options[option['name']] = option['value']
-        elif option['type'] == option_types.integer.value:
+        elif option['type'] == AppCmdOptionType.integer.value:
             options[option['name']] = int(option['value'])
-        elif option['type'] == option_types.boolean.value:
+        elif option['type'] == AppCmdOptionType.boolean.value:
             options[option['name']] = bool(option['value'])
-        elif option['type'] == option_types.user.value:
+        elif option['type'] == AppCmdOptionType.user.value:
             user_data = interaction.data['resolved']['users'][option['value']]
             if interaction.guild_id:
                 member_data = interaction.data['resolved']['members'][option['value']]
@@ -62,21 +62,21 @@ def build_options(interaction: Interaction):
                 options[option['name']] = Member(**user_data)
             else:
                 options[option['name']] = User(**user_data)
-        elif option['type'] == option_types.channel.value:
+        elif option['type'] == AppCmdOptionType.channel.value:
             pass
-        elif option['type'] == option_types.role.value:
+        elif option['type'] == AppCmdOptionType.role.value:
             pass
-        elif option['type'] == option_types.mentionable.value:
+        elif option['type'] == AppCmdOptionType.mentionable.value:
             pass
-        elif option['type'] == option_types.sub_command.value:
+        elif option['type'] == AppCmdOptionType.sub_command.value:
             pass
-        elif option['type'] == option_types.sub_command_group.value:
+        elif option['type'] == AppCmdOptionType.sub_command_group.value:
             pass
     return options
 
 
-def build_modal_params(modal_data: dict) -> dict:
-    root_comps = modal_data['components']
+def build_modal_params(interaction: Interaction) -> dict:
+    root_comps = interaction.data['components']
     params = {}
     for comp in root_comps:
         c = comp['components'][0]

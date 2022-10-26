@@ -5,8 +5,8 @@ import secrets
 from .command import *
 from fastapi import FastAPI
 from functools import wraps
-from .listener import listener
-from .enums import command_types
+from .handler import listener
+from .enums import AppCmdType
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
 from .component import Button
@@ -43,7 +43,7 @@ class Client(FastAPI):
             permissions: str = None,
             dm_access: bool = True,
             guild_id: int = None,
-            category: command_types = command_types.slash,
+            category: AppCmdType = AppCmdType.slash,
     ):
         command = ApplicationCommand(
             name=name,
