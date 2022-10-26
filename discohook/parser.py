@@ -63,14 +63,21 @@ def build_options(interaction: Interaction):
             else:
                 options[option['name']] = User(user_data)
         elif option['type'] == AppCmdOptionType.channel.value:
-            pass
+            # TODO: objectify
+            options[option['name']] = interaction.data['resolved']['channels'][option['value']]
         elif option['type'] == AppCmdOptionType.role.value:
-            pass
+            # TODO: objectify
+            options[option['name']] = interaction.data['resolved']['roles'][option['value']]
         elif option['type'] == AppCmdOptionType.mentionable.value:
+            # TODO: this is a shit option
+            # IDK if someone uses this shit
+            # I mean what's the use case of this shi**
             pass
         elif option['type'] == AppCmdOptionType.sub_command.value:
+            # TODO: handle later
             pass
         elif option['type'] == AppCmdOptionType.sub_command_group.value:
+            # TODO: Handle later
             pass
     return options
 
