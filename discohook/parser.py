@@ -6,9 +6,7 @@ from .enums import AppCmdOptionType
 from typing import List, Dict, Any, Optional, Union, Callable
 
 
-def build_prams(cmd_ops: Dict[str, Any], func: Callable):
-    if not cmd_ops:
-        return [], {}
+def handle_params_by_signature(func: Callable, options: Dict[str, Any]) -> (List[Any], Dict[str, Any]):
     params = inspect.getfullargspec(func)
     defaults = params.defaults
     default_kwargs = params.kwonlydefaults
@@ -17,21 +15,21 @@ def build_prams(cmd_ops: Dict[str, Any], func: Callable):
         for i in range(len(params.args[:1]) - len(defaults) - 1):
             defaults.insert(i, None)
         for arg, value in zip(params.args[1:], defaults):
-            option = cmd_ops.get(arg)
+            option = options.get(arg)
             if option:
                 args.append(option)
             else:
                 args.append(value)
     else:
         for arg in params.args[1:]:
-            option = cmd_ops.get(arg)
+            option = options.get(arg)
             if option:
                 args.append(option)
             else:
                 args.append(None)
     kwargs = {}
     for kw in params.kwonlyargs:
-        option = cmd_ops.get(kw)
+        option = options.get(kw)
         if option:
             kwargs[kw] = option
         elif default_kwargs:
@@ -41,7 +39,7 @@ def build_prams(cmd_ops: Dict[str, Any], func: Callable):
     return args, kwargs
 
 
-def build_options(interaction: Interaction):
+def resolve_command_options(interaction: Interaction):
     if not interaction.app_command_data.options:
         return {}
     options = {}
@@ -82,11 +80,36 @@ def build_options(interaction: Interaction):
     return options
 
 
-def build_modal_params(interaction: Interaction) -> dict:
+def build_slash_command_prams(func: Callable, interaction: Interaction):
+    options = resolve_command_options(interaction)
+    if not options:
+        return [], {}
+    return handle_params_by_signature(func, options)
+
+
+def build_context_menu_param(interaction: Interaction):
+    if interaction.data['type'] == AppCmdType.user.value:
+        user_id = interaction.data['target_id']
+        user_dict = interaction.data['resolved']['users'][user_id]
+        member_dict = interaction.data['resolved']['members'][user_id] if interaction.guild_id else {}
+        if member_dict:
+            member_dict['avatar'] = user_dict['avatar']
+            user_dict.update(member_dict)
+        return User(user_dict)
+
+    if interaction.data['type'] == AppCmdType.message.value:
+        message_id = interaction.data['target_id']
+        message_dict = interaction.data['resolved']['messages'][message_id]
+        # TODO: objectify
+        return message_dict
+
+
+def build_modal_params(func: Callable, interaction: Interaction):
     root_comps = interaction.data['components']
-    params = {}
+    options = {}
     for comp in root_comps:
         c = comp['components'][0]
         if c['type'] == 4:
-            params[c['custom_id']] = c['value']
-    return params
+            options[c['custom_id']] = c['value']
+    return handle_params_by_signature(func, options)
+

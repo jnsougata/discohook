@@ -5,12 +5,12 @@ import secrets
 from .command import *
 from fastapi import FastAPI
 from functools import wraps
-from .handler import listener
+from .handler import handler
 from .enums import AppCmdType
+from .modal import Modal
+from .component import Button
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
-from .component import Button
-from .modal import Modal
 
 
 class Client(FastAPI):
@@ -24,17 +24,19 @@ class Client(FastAPI):
             *,
             commands: List[ApplicationCommand] = None,
             route: str = '/interactions',
+            express_debug: bool = False,
             **kwargs
     ):
         super().__init__(**kwargs)
         self.token = token
         self.public_key = public_key
         self.application_id = application_id
+        self.express_debug = express_debug
         self.ui_factory: Optional[Dict[str, Union[Button, Modal]]] = {}
         self._sync_able_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self._component_interaction_original_authors: Dict[str, str] = {}
-        self.add_route(route, listener, methods=['POST'], include_in_schema=False)
+        self.add_route(route, handler, methods=['POST'], include_in_schema=False)
 
     def command(
             self,
