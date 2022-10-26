@@ -2,7 +2,7 @@ import secrets
 from fastapi import FastAPI
 from functools import wraps
 from .emoji import PartialEmoji
-from .enums import ButtonStyle, MessageComponentType, SelectMenuType
+from .enums import ButtonStyle, MessageComponentType, SelectMenuType, ChannelType
 from typing import Optional, Union, List, Dict, Any, Callable
 
 
@@ -76,6 +76,7 @@ class SelectMenu:
             menu_type: SelectMenuType,
             options: Optional[List[SelectOption]] = None,
             *,
+            channel_types: Optional[List[ChannelType]] = None,
             placeholder: Optional[str] = None,
             min_values: Optional[int] = None,
             max_values: Optional[int] = None,
@@ -87,8 +88,10 @@ class SelectMenu:
             "type": menu_type.value,
             "custom_id": self.custom_id,
         }
-        if menu_type == SelectMenuType.text:
+        if (menu_type == SelectMenuType.text) and (options is not None):
             self.data["options"] = [option.json() for option in options]
+        if (menu_type == SelectMenuType.channel) and (channel_types is not None):
+            self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
         if placeholder:
             self.data["placeholder"] = placeholder
         if min_values:

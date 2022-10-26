@@ -59,9 +59,9 @@ def build_options(interaction: Interaction):
                 if not member_data['avatar']:
                     member_data['avatar'] = user_data['avatar']
                 user_data.update(member_data)
-                options[option['name']] = Member(**user_data)
+                options[option['name']] = Member(user_data)
             else:
-                options[option['name']] = User(**user_data)
+                options[option['name']] = User(user_data)
         elif option['type'] == AppCmdOptionType.channel.value:
             pass
         elif option['type'] == AppCmdOptionType.role.value:

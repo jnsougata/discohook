@@ -42,7 +42,7 @@ class Interaction(BaseModel):
     def original_author(self) -> Optional[User]:
         if not self.message:
             return None
-        return User(**self.message["interaction"]["user"])
+        return User(self.message["interaction"]["user"])
 
     @property
     def from_original_author(self) -> bool:
@@ -54,8 +54,8 @@ class Interaction(BaseModel):
     def author(self) -> Optional[Union[User, Member]]:
         if self.guild_id:
             self.member.update(self.member.pop("user"))
-            return Member(**self.member)
-        return User(**self.user)
+            return Member(self.member)
+        return User(self.user)
 
     @property
     def app_command_data(self) -> Optional[CommandData]:

@@ -2,19 +2,19 @@ from typing import Optional
 
 
 class User:
-    def __init__(self, **kwargs):
-        self.id = kwargs.get("id")
-        self.username = kwargs.get("username")
-        self.discriminator = kwargs.get("discriminator")
-        self.avatar = kwargs.get("avatar")
-        self.bot = kwargs.get("bot")
-        self.system = kwargs.get("system")
-        self.mfa_enabled = kwargs.get("mfa_enabled")
-        self.locale = kwargs.get("locale")
-        self.verified = kwargs.get("verified")
-        self.email = kwargs.get("email")
-        self.premium_type = kwargs.get("premium_type")
-        self.public_flags = kwargs.get("public_flags")
+    def __init__(self, data):
+        self.id = data.get("id")
+        self.username = data.get("username")
+        self.discriminator = data.get("discriminator")
+        self.avatar = data.get("avatar")
+        self.bot = data.get("bot")
+        self.system = data.get("system")
+        self.mfa_enabled = data.get("mfa_enabled")
+        self.locale = data.get("locale")
+        self.verified = data.get("verified")
+        self.email = data.get("email")
+        self.premium_type = data.get("premium_type")
+        self.public_flags = data.get("public_flags")
 
     def avatar_url(
             self,
@@ -35,13 +35,47 @@ class User:
 
 
 class Member(User):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.nick = kwargs.get("nick")
-        self.roles = kwargs.get("roles")
-        self.joined_at = kwargs.get("joined_at")
-        self.premium_since = kwargs.get("premium_since")
-        self.pending = kwargs.get("pending")
-        self.is_pending = kwargs.get("is_pending")
-        self.communication_disabled_until = kwargs.get("communication_disabled_until")
-        self.flags = kwargs.get("flags")
+    def __init__(self, data):
+        super().__init__(data)
+        self.nick = data.get("nick")
+        self.roles = data.get("roles")
+        self.joined_at = data.get("joined_at")
+        self.premium_since = data.get("premium_since")
+        self.pending = data.get("pending")
+        self.is_pending = data.get("is_pending")
+        self.communication_disabled_until = data.get("communication_disabled_until")
+        self.flags = data.get("flags")
+
+
+class Channel:
+    def __init__(self, data: dict):
+        self.id: str = data.get("id")
+        self.type: int = data.get("type")
+        self.name: str = data.get("name")
+        self.parent_id: str = data.get("parent_id")
+        self.permissions: str = data.get("permissions")
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __repr__(self):
+        return f"<PartialChannel id={self.id} name={self.name} type={self.type}>"
+
+
+class Role:
+    def __init__(self, data: dict):
+        self.id: str = data.get("id")
+        self.name: str = data.get("name")
+        self.color: int = data.get("color")
+        self.hoist: bool = data.get("hoist")
+        self.position: int = data.get("position")
+        self.permissions: str = data.get("permissions")
+        self.managed: bool = data.get("managed")
+        self.mentionable: bool = data.get("mentionable")
+        self.description: Optional[str] = data.get("description")
+        self.unicode_emoji: Optional[str] = data.get("unicode_emoji")
+        self.icon: Optional[str] = data.get("icon")
+        self.flags: int = data.get("flags")
+
+    def __eq__(self, other):
+        return self.id == other.id

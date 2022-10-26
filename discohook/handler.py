@@ -9,7 +9,8 @@ from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
 from typing import Optional, List, Dict, Any, Union, Callable
 from .parser import build_prams, build_options, build_modal_params
-from .enums import InteractionCallbackType, InteractionType, AppCmdType, MessageComponentType
+from .enums import InteractionCallbackType, InteractionType, AppCmdType, SelectMenuType
+from .models import Channel, User, Role
 
 
 async def listener(request: Request):
@@ -36,15 +37,39 @@ async def listener(request: Request):
                 return await command._callback(interaction, *args, **kwargs) # noqa
 
         elif interaction.type == InteractionType.component.value:
-            component_data = interaction.data
-            custom_id = component_data.get('custom_id')
+            custom_id = interaction.data.get('custom_id')
             component = request.app.ui_factory.get(custom_id, None)
             if not (custom_id and component):
                 return JSONResponse({'error': 'component not found!'}, status_code=404)
-            if component_data['component_type'] == MessageComponentType.select_menu.value:
-                values = component_data['values']
-                return await component._callback(interaction, values) # noqa
-            return await component._callback(interaction)  # noqa
+            if interaction.data['component_type'] == SelectMenuType.text.value:
+                return await component._callback(interaction, interaction.data['values']) # noqa
+            elif interaction.data['component_type'] == SelectMenuType.channel.value:
+                raw_channels = interaction.data['resolved']['channels']
+                values = [Channel(raw_channels.get(channel_id, {}))
+                          for channel_id in interaction.data['values']]
+                return await component._callback(interaction, values)  # noqa
+            elif interaction.data['component_type'] == SelectMenuType.user.value:
+                raw_users = interaction.data['resolved']['users']
+                values = [User(raw_users.get(user_id, {}))
+                          for user_id in interaction.data['values']]
+                return await component._callback(interaction, values)  # noqa
+            elif interaction.data['component_type'] == SelectMenuType.role.value:
+                raw_roles = interaction.data['resolved']['roles']
+                values = [Role(raw_roles.get(role_id, {}))
+                          for role_id in interaction.data['values']]
+                return await component._callback(interaction, values)  # noqa
+            elif interaction.data['component_type'] == SelectMenuType.mentionable.value:
+                raw_values = interaction.data['values']
+                raw_resolved_roles = interaction.data['resolved'].get('roles', {})
+                raw_resolved_users = interaction.data['resolved'].get('users', {})
+                user_values = [User(raw_resolved_users[user_id])
+                               for user_id in raw_values if user_id in raw_resolved_users]
+                role_values = [Role(raw_resolved_roles[role_id])
+                               for role_id in raw_values if role_id in raw_resolved_roles]
+                values = user_values + role_values  # noqa
+                return await component._callback(interaction, values)  # noqa
+            else:
+                return await component._callback(interaction, [])  # noqa
 
         elif interaction.type == InteractionType.modal_submit.value:
             component = request.app.ui_factory.get(interaction.data['custom_id'], None)
