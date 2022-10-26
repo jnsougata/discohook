@@ -6,9 +6,18 @@ from functools import wraps
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
-from typing import Optional, List, Dict, Any, Union, Callable, TYPE_CHECKING
-from .parser import build_slash_command_prams, build_modal_params, build_context_menu_param
-from .enums import InteractionCallbackType, InteractionType, AppCmdType, SelectMenuType
+from .parser import (
+    build_slash_command_prams,
+    build_modal_params,
+    build_context_menu_param
+)
+from .enums import (
+    InteractionCallbackType,
+    InteractionType,
+    AppCmdType,
+    SelectMenuType
+)
+from typing import Optional, List, Dict, Any, Union, Callable
 from .models import Channel, User, Role
 from .debugger import build_traceback_embed
 

@@ -1,4 +1,3 @@
-from __future__ import annotations
 import aiohttp
 import asyncio
 import secrets
@@ -37,6 +36,7 @@ class Client(FastAPI):
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self._component_interaction_original_authors: Dict[str, str] = {}
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
+        self.cached_interactions: Dict[str, str] = {}
 
     def command(
             self,

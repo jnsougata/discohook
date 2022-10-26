@@ -5,7 +5,7 @@ from .embed import Embed
 from .models import User, Member
 from .component import Components
 from .modal import Modal
-import aiohttp
+from .https import request
 if TYPE_CHECKING:
     from .client import Client
 
@@ -67,7 +67,7 @@ class Interaction:
             return CommandData(self.data)
         return None
 
-    def response(
+    async def response(
             self,
             content: Optional[str] = None,
             *,
@@ -108,7 +108,7 @@ class Interaction:
             payload["attachments"] = files
         if flag_value:
             payload["flags"] = flag_value
-
+        self.app.cached_interactions[self.id] = self.token
         return JSONResponse(
             {
                 "data": payload, "type": InteractionCallbackType.channel_message_with_source.value,
@@ -165,3 +165,55 @@ class Interaction:
             },
             status_code=200
         )
+
+    def _origin_token(self):
+        if self.message:
+            parent_id = self.message["interaction"]["id"]
+            token = self.app.cached_interactions.get(parent_id, None)
+            return token is not None, token
+        return False, ""
+
+    async def delete_original(self):
+        ok, token = self._origin_token()
+        if not ok:
+            return
+        await request("DELETE", f"/webhooks/{self.application_id}/{token}/messages/@original")
+
+    async def edit_original(
+            self,
+            content: Optional[str] = MISSING,
+            *,
+            embed: Optional[Embed] = MISSING,
+            embeds: Optional[List[Embed]] = MISSING,
+            components: Optional[Components] = MISSING,
+            tts: Optional[bool] = MISSING,
+            file: Optional[Dict[str, Any]] = MISSING,
+            files: Optional[List[Dict[str, Any]]] = MISSING,
+            supress_embeds: Optional[bool] = MISSING,
+    ):
+        data = {}
+        if embed is None:
+            embeds = []
+        if file is None:
+            files = []
+        if components is None:
+            components = []
+        if content is not MISSING:
+            data["content"] = str(content)
+        if tts is not MISSING:
+            data["tts"] = tts
+        if embeds is not MISSING:
+            data["embeds"] = [embed.to_json() for embed in embeds]
+        if components is not MISSING:
+            data["components"] = components.json() if components else []
+            if components:
+                for component in components.children:  # noqa
+                    self.app.ui_factory[component.custom_id] = component
+        if files is not MISSING:
+            data["attachments"] = files
+        if supress_embeds is not MISSING:
+            data["flags"] = 1 << 2
+        ok, token = self._origin_token()
+        if not ok:
+            return
+        return await request("PATCH", f'/webhooks/{self.application_id}/{token}/messages/@original', json=data)

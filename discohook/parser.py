@@ -1,8 +1,8 @@
 import inspect
 from .enums import AppCmdType
-from .interaction import Interaction
-from .models import User, Member
 from .enums import AppCmdOptionType
+from .interaction import Interaction
+from .models import User, Member, Channel
 from typing import List, Dict, Any, Optional, Union, Callable
 
 
@@ -61,8 +61,7 @@ def resolve_command_options(interaction: Interaction):
             else:
                 options[option['name']] = User(user_data)
         elif option['type'] == AppCmdOptionType.channel.value:
-            # TODO: objectify
-            options[option['name']] = interaction.data['resolved']['channels'][option['value']]
+            options[option['name']] = Channel(interaction.data['resolved']['channels'][option['value']])
         elif option['type'] == AppCmdOptionType.role.value:
             # TODO: objectify
             options[option['name']] = interaction.data['resolved']['roles'][option['value']]
@@ -111,4 +110,3 @@ def build_modal_params(func: Callable, interaction: Interaction):
         if c['type'] == 4:
             options[c['custom_id']] = c['value']
     return handle_params_by_signature(func, options)
-
