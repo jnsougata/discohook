@@ -82,3 +82,12 @@ class ButtonStyle(Enum):
     green = 3
     red = 4
     url = 5
+
+
+class SelectMenuType(Enum):
+    text = 3
+    user = 5
+    role = 6
+    mentionable = 7
+    channel = 8
+

@@ -2,7 +2,7 @@ import secrets
 from fastapi import FastAPI
 from functools import wraps
 from .emoji import PartialEmoji
-from .enums import ButtonStyle, MessageComponentType
+from .enums import ButtonStyle, MessageComponentType, SelectMenuType
 from typing import Optional, Union, List, Dict, Any, Callable
 
 
@@ -73,7 +73,8 @@ class SelectOption:
 class SelectMenu:
     def __init__(
             self,
-            options: List[SelectOption],
+            menu_type: SelectMenuType,
+            options: Optional[List[SelectOption]] = None,
             *,
             placeholder: Optional[str] = None,
             min_values: Optional[int] = None,
@@ -83,10 +84,11 @@ class SelectMenu:
         self._callback: Optional[Callable] = None
         self.custom_id = secrets.token_urlsafe(16)
         self.data = {
-            "type": 3,
+            "type": menu_type.value,
             "custom_id": self.custom_id,
-            "options": [option.json() for option in options],
         }
+        if menu_type == SelectMenuType.text:
+            self.data["options"] = [option.json() for option in options]
         if placeholder:
             self.data["placeholder"] = placeholder
         if min_values:
