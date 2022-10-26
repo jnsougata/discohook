@@ -1,4 +1,4 @@
-from .enums import AppCmdOptionType
+from .enums import AppCmdOptionType, ChannelType
 from typing import Optional, List, Dict, Any, Union, Callable
 
 
@@ -46,7 +46,7 @@ class StringOption(Option):
         self.min_length = min_length
         super().__init__(name, description, required, type_=AppCmdOptionType.string)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         if self.choices:
             self.data["choices"] = [choice.to_json() for choice in self.choices]
         if self.auto_complete:
@@ -76,7 +76,7 @@ class IntegerOption(Option):
         self.min_value = min_value
         super().__init__(name, description, required, type_=AppCmdOptionType.integer)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         if self.choices:
             self.data["choices"] = [choice.to_json() for choice in self.choices]
         if self.auto_complete:
@@ -106,7 +106,7 @@ class NumberOption(Option):
         self.min_value = min_value
         super().__init__(name, description, required, type_=AppCmdOptionType.number)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         if self.choices:
             self.data["choices"] = [choice.to_json() for choice in self.choices]
         if self.auto_complete:
@@ -128,7 +128,7 @@ class BooleanOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.boolean)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -142,7 +142,7 @@ class UserOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.user)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -153,14 +153,14 @@ class ChannelOption(Option):
             description: str,
             *,
             required: Optional[bool] = False,
-            channel_types: Optional[List[int]] = None,
+            channel_types: Optional[List[ChannelType]] = None,
     ):  
         self.channel_types = channel_types  
         super().__init__(name, description, required, type_=AppCmdOptionType.channel)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         if self.channel_types:
-            self.data["channel_types"] = self.channel_types
+            self.data["channel_types"] = [ct.value for ct in self.channel_types]
         return self.data
 
 
@@ -174,7 +174,7 @@ class RoleOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.role)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -188,7 +188,7 @@ class MentionableOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.mentionable)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -202,5 +202,5 @@ class AttachmentOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.attachment)
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         return self.data

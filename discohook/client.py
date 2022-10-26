@@ -21,6 +21,7 @@ class Client(FastAPI):
             public_key: str,
             token: str,
             *,
+            commands: List[ApplicationCommand] = None,
             route: str = '/interactions',
             **kwargs
     ):
@@ -29,7 +30,7 @@ class Client(FastAPI):
         self.public_key = public_key
         self.application_id = application_id
         self.ui_factory: Optional[Dict[str, Button]] = {}
-        self._sync_able_commands: List[ApplicationCommand] = []
+        self._sync_able_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self._component_interaction_original_authors: Dict[str, str] = {}
         self.add_route(route, listener, methods=['POST'], include_in_schema=False)
@@ -65,9 +66,6 @@ class Client(FastAPI):
             return wrapper()
         return decorator
 
-    def load_commands(self, *commands: ApplicationCommand):
-        self._sync_able_commands.extend(commands)
-
     async def __call__(self, scope, receive, send):
         if self.root_path:
             scope["root_path"] = self.root_path
@@ -80,8 +78,7 @@ class Client(FastAPI):
                     url = f"{self.root_url}/applications/{self.application_id}/guilds/{command.guild_id}/commands"
                 else:
                     url = f"{self.root_url}/applications/{self.application_id}/commands"
-                payload = command.json()
-                resp = await (await session.post(url, headers=headers, json=payload)).json()
+                resp = await (await session.post(url, headers=headers, json=command.json())).json()
                 command.id = resp['id']
                 self.application_commands[resp['id']] = command
         self._sync_able_commands.clear()

@@ -47,8 +47,6 @@ class ApplicationCommand:
             category: AppCmdType = AppCmdType.slash,
             *,
             guild_id: int = None,
-            callback: Callable = None,
-            **kwargs
     ):
         self.id = None
         self.name = name
@@ -59,8 +57,8 @@ class ApplicationCommand:
         self.application_id = None
         self.category = category
         self.permissions = permissions
-        self._callback = callback
-        self.__payload: Dict[str, Any] = {}
+        self._callback = None
+        self._payload: Dict[str, Any] = {}
         self._subcommand_callbacks: Dict[str, Callable] = {}
 
     def callback(self, coro: Callable):
@@ -89,15 +87,15 @@ class ApplicationCommand:
         return decorator  # type: ignore
 
     def json(self) -> Dict[str, Any]:
+        self._payload["type"] = self.category.value
         if self.category is AppCmdType.slash:
-            self.__payload["type"] = self.category.value
             if self.description:
-                self.__payload["description"] = self.description
+                self._payload["description"] = self.description
             if self.options:
-                self.__payload["options"] = [option.to_json() for option in self.options]
-        self.__payload["name"] = self.name
+                self._payload["options"] = [option.json() for option in self.options]
+        self._payload["name"] = self.name
         if not self.dm_access:
-            self.__payload["dm_permission"] = self.dm_access
+            self._payload["dm_permission"] = self.dm_access
         if self.permissions:
-            self.__payload["default_member_permissions"] = self.permissions
-        return self.__payload
+            self._payload["default_member_permissions"] = self.permissions
+        return self._payload
