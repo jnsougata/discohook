@@ -40,10 +40,10 @@ def handle_params_by_signature(func: Callable, options: Dict[str, Any]) -> (List
 
 
 def resolve_command_options(interaction: Interaction):
-    if not interaction._app_command_data.options:
+    if not interaction._app_command_data.options:  # noqa
         return {}
     options = {}
-    for option in interaction._app_command_data.options:
+    for option in interaction._app_command_data.options:  # noqa
         if option['type'] == AppCmdOptionType.string.value:
             options[option['name']] = option['value']
         elif option['type'] == AppCmdOptionType.integer.value:
