@@ -17,4 +17,4 @@ from .option import *
 from .modal import Modal
 from .command import ApplicationCommand
 from .models import User, Member, Channel, Role
-from .interaction import CommandContext, ComponentContext
+from .interaction import Interaction
