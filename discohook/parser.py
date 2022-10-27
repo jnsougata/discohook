@@ -129,6 +129,6 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         raw_resolved_users = interaction.data['resolved'].get('users', {})
         user_values = [User(raw_resolved_users[user_id]) for user_id in raw_values if user_id in raw_resolved_users]
         role_values = [Role(raw_resolved_roles[role_id]) for role_id in raw_values if role_id in raw_resolved_roles]
-        return user_values + role_values
+        return user_values + role_values  # type: ignore
     else:
         return []
