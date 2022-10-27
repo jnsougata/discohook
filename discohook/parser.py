@@ -1,6 +1,6 @@
 import inspect
 from .interaction import Interaction
-from .models import User, Member, Channel
+from .models import User, Member, Channel, Role
 from typing import List, Dict, Any, Optional, Union, Callable
 from .enums import AppCmdOptionType, SelectMenuType, AppCmdType
 

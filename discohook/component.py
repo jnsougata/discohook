@@ -108,24 +108,29 @@ class SelectMenu:
         return self.data
 
 
-class Components:
-    def __init__(self):
-        self.children = []
+class ActionRows:
+    def __init__(self, buttons: Optional[List[Button]] = None, select_menus: Optional[List[SelectMenu]] = None):
+        self._children = []
         self._structure: List[Dict[str, Any]] = []
+        if buttons:
+            self.append_button_row(*buttons)
+        if select_menus:
+            for select_menu in select_menus:
+                self.append_select_menu(select_menu)
 
-    def add_buttons(self, *buttons: Button):
+    def append_button_row(self, *buttons: Button):
         self._structure.append({
             "type": MessageComponentType.action_row.value,
             "components": [button.json() for button in buttons[:5]],
         })
-        self.children.extend(buttons[:5])
+        self._children.extend(buttons[:5])
 
-    def add_select_menu(self, select_menu: SelectMenu):
+    def append_select_menu(self, select_menu: SelectMenu):
         self._structure.append({
             "type": MessageComponentType.action_row.value,
             "components": [select_menu.json()],
         })
-        self.children.append(select_menu)
+        self._children.append(select_menu)
 
     def json(self) -> List[Dict[str, Any]]:
         return self._structure

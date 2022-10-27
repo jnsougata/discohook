@@ -8,7 +8,7 @@ from .enums import (
     AppCmdType
 )
 from .component import (
-    Components,
+    ActionRows,
     Button,
     SelectOption,
     SelectMenu

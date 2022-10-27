@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 from fastapi.responses import JSONResponse
 from .embed import Embed
 from .models import User, Member
-from .component import Components
+from .component import ActionRows
 from .modal import Modal
 from .https import request
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ def handle_send_params(
     *,
     embed: Optional[Embed] = None,
     embeds: Optional[List[Embed]] = None,
-    components: Optional[Components] = None,
+    components: Optional[ActionRows] = None,
     tts: Optional[bool] = False,
     file: Optional[Dict[str, Any]] = None,
     files: Optional[List[Dict[str, Any]]] = None,
@@ -59,7 +59,7 @@ def handle_edit_params(
             *,
             embed: Optional[Embed] = MISSING,
             embeds: Optional[List[Embed]] = MISSING,
-            components: Optional[Components] = MISSING,
+            components: Optional[ActionRows] = MISSING,
             tts: Optional[bool] = MISSING,
             file: Optional[Dict[str, Any]] = MISSING,
             files: Optional[List[Dict[str, Any]]] = MISSING,
@@ -111,7 +111,7 @@ class CommandInteraction:
             *,
             embed: Optional[Embed] = None,
             embeds: Optional[List[Embed]] = None,
-            components: Optional[Components] = None,
+            components: Optional[ActionRows] = None,
             tts: Optional[bool] = False,
             file: Optional[Dict[str, Any]] = None,
             files: Optional[List[Dict[str, Any]]] = None,
@@ -130,7 +130,7 @@ class CommandInteraction:
             supress_embeds=supress_embeds
         )
         if components:
-            for component in components.children:
+            for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
         return JSONResponse(
@@ -156,7 +156,7 @@ class ComponentInteraction:
             *,
             embed: Optional[Embed] = None,
             embeds: Optional[List[Embed]] = None,
-            components: Optional[Components] = None,
+            components: Optional[ActionRows] = None,
             tts: Optional[bool] = False,
             file: Optional[Dict[str, Any]] = None,
             files: Optional[List[Dict[str, Any]]] = None,
@@ -175,7 +175,7 @@ class ComponentInteraction:
             supress_embeds=supress_embeds
         )
         if components:
-            for component in components.children:
+            for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
         return JSONResponse(
@@ -192,7 +192,7 @@ class ComponentInteraction:
             *,
             embed: Optional[Embed] = MISSING,
             embeds: Optional[List[Embed]] = MISSING,
-            components: Optional[Components] = MISSING,
+            components: Optional[ActionRows] = MISSING,
             tts: Optional[bool] = MISSING,
             file: Optional[Dict[str, Any]] = MISSING,
             files: Optional[List[Dict[str, Any]]] = MISSING,
@@ -209,7 +209,7 @@ class ComponentInteraction:
             supress_embeds=supress_embeds
         )
         if components is not MISSING and components:
-            for component in components.children:
+            for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
         return JSONResponse(
@@ -243,7 +243,7 @@ class ComponentInteraction:
             *,
             embed: Optional[Embed] = MISSING,
             embeds: Optional[List[Embed]] = MISSING,
-            components: Optional[Components] = MISSING,
+            components: Optional[ActionRows] = MISSING,
             tts: Optional[bool] = MISSING,
             file: Optional[Dict[str, Any]] = MISSING,
             files: Optional[List[Dict[str, Any]]] = MISSING,
@@ -260,7 +260,7 @@ class ComponentInteraction:
             supress_embeds=supress_embeds
         )
         if components is not MISSING and components:
-            for component in components.children:
+            for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
         if not self._origin_token:
