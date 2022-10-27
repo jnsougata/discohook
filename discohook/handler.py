@@ -16,7 +16,8 @@ from .enums import (
     InteractionCallbackType,
     InteractionType,
     AppCmdType,
-    SelectMenuType
+    SelectMenuType,
+    MessageComponentType
 )
 from typing import Optional, List, Dict, Any, Union, Callable
 from .models import Channel, User, Role
@@ -55,6 +56,8 @@ async def handler(request: Request):
                 component = request.app.ui_factory.get(custom_id, None)
                 if not component:
                     return JSONResponse({'error': 'component not found!'}, status_code=404)
+                if interaction.data['component_type'] == MessageComponentType.button.value:
+                    return await component._callback(interaction)  # noqa
                 return await component._callback(interaction, build_select_menu_values(interaction))  # noqa
 
             elif interaction.type == InteractionType.modal_submit.value:

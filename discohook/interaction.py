@@ -235,6 +235,7 @@ class ComponentInteraction:
     async def delete_original(self):
         if not self._origin_token:
             return
+        self._app.cached_inter_tokens.pop(self._id, None)
         await request("DELETE", f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original")
 
     async def edit_original(
