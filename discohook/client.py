@@ -7,7 +7,7 @@ from functools import wraps
 from .handler import handler
 from .enums import AppCmdType
 from .modal import Modal
-from .component import Button
+from .component import Button, SelectMenu
 from .command import ApplicationCommand
 from typing import Optional, List, Dict, Any, Union, Callable
 
@@ -31,12 +31,17 @@ class Client(FastAPI):
         self.public_key = public_key
         self.application_id = application_id
         self.express_debug = express_debug
-        self.ui_factory: Optional[Dict[str, Union[Button, Modal]]] = {}
+        self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
         self._sync_able_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
-        self._component_interaction_original_authors: Dict[str, str] = {}
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
-        self.cached_interactions: Dict[str, str] = {}
+        self.cached_inter_tokens: Dict[str, str] = {}
+
+    def _load_component(self, component: Union[Button, Modal, SelectMenu]):
+        self.ui_factory[component.custom_id] = component
+
+    def _load_inter_token(self, interaction_id: str, token: str):
+        self.cached_inter_tokens[interaction_id] = token
 
     def command(
             self,

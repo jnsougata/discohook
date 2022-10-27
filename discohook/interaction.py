@@ -65,7 +65,7 @@ def handle_edit_params(
             files: Optional[List[Dict[str, Any]]] = MISSING,
             supress_embeds: Optional[bool] = MISSING,
 ):
-    data = {}
+    payload = {}
     if embed is None:
         embeds = []
     if file is None:
@@ -73,19 +73,19 @@ def handle_edit_params(
     if components is None:
         components = []
     if content is not MISSING:
-        data["content"] = str(content)
+        payload["content"] = str(content)
     if tts is not MISSING:
-        data["tts"] = tts
+        payload["tts"] = tts
     if embeds is not MISSING:
-        data["embeds"] = [embed.json() for embed in embeds]
+        payload["embeds"] = [embed.json() for embed in embeds]
     if components is not MISSING:
-        data["components"] = components.json() if components else []
+        payload["components"] = components.json() if components else []
     if files is not MISSING:
-        data["attachments"] = files
+        payload["attachments"] = files
     if supress_embeds is not MISSING:
-        data["flags"] = 1 << 2
+        payload["flags"] = 1 << 2
 
-    return data
+    return payload
 
 
 class CommandData:
@@ -131,11 +131,12 @@ class CommandInteraction:
         )
         if components:
             for component in components.children:
-                self._app.ui_factory[component.custom_id] = component
-        self._app.cached_interactions[self._id] = self._token
+                self._app._load_component(component)  # noqa
+        self._app._load_inter_token(self._id, self._token)  # noqa
         return JSONResponse(
             {
-                "data": payload, "type": InteractionCallbackType.channel_message_with_source.value,
+                "data": payload,
+                "type": InteractionCallbackType.channel_message_with_source.value,
             },
             status_code=200
         )
@@ -162,38 +163,25 @@ class ComponentInteraction:
             ephemeral: Optional[bool] = False,
             supress_embeds: Optional[bool] = False,
     ) -> JSONResponse:
-        payload = {}
-        flag_value = 0
-        if embed:
-            if not embeds:
-                embeds = []
-            embeds.append(embed)
-        if file:
-            if not files:
-                files = []
-            files.append(file)
-        if ephemeral:
-            flag_value |= 1 << 6
-        if supress_embeds:
-            flag_value |= 1 << 2
-        if content:
-            payload["content"] = str(content)
-        if tts:
-            payload["tts"] = True
-        if embeds:
-            payload["embeds"] = [embed.json() for embed in embeds]
+        payload = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            components=components,
+            tts=tts,
+            file=file,
+            files=files,
+            ephemeral=ephemeral,
+            supress_embeds=supress_embeds
+        )
         if components:
-            payload["components"] = components.json()
             for component in components.children:
-                self._app.ui_factory[component.custom_id] = component
-        if files:
-            payload["attachments"] = files
-        if flag_value:
-            payload["flags"] = flag_value
-        self._app.cached_interactions[self._id] = self._token
+                self._app._load_component(component)  # noqa
+        self._app._load_inter_token(self._id, self._token)  # noqa
         return JSONResponse(
             {
-                "data": payload, "type": InteractionCallbackType.channel_message_with_source.value,
+                "data": payload,
+                "type": InteractionCallbackType.channel_message_with_source.value,
             },
             status_code=200
         )
@@ -220,12 +208,14 @@ class ComponentInteraction:
             files=files,
             supress_embeds=supress_embeds
         )
-        if components:
+        if components is not MISSING and components:
             for component in components.children:
-                self._app.ui_factory[component.custom_id] = component
+                self._app._load_component(component)  # noqa
+        self._app._load_inter_token(self._id, self._token)  # noqa
         return JSONResponse(
             {
-                "data": payload, "type": InteractionCallbackType.update_message.value,
+                "data": payload,
+                "type": InteractionCallbackType.update_message.value,
             },
             status_code=200
         )
@@ -234,8 +224,7 @@ class ComponentInteraction:
     def _origin_token(self):
         if self._message:
             parent_id = self._message["interaction"]["id"]
-            token = self._app.cached_interactions.get(parent_id, '')
-            return token
+            return self._app.cached_inter_tokens.get(parent_id, '')
         return ''
 
     async def fetch_original(self):
@@ -270,9 +259,10 @@ class ComponentInteraction:
             files=files,
             supress_embeds=supress_embeds
         )
-        if components:
-            for component in components.children:  # noqa
-                self._app.ui_factory[component.custom_id] = component
+        if components is not MISSING and components:
+            for component in components.children:
+                self._app._load_component(component)  # noqa
+        self._app._load_inter_token(self._id, self._token)  # noqa
         if not self._origin_token:
             return
         return await request(
@@ -336,7 +326,8 @@ class Interaction:
         self.app.ui_factory[modal.custom_id] = modal
         return JSONResponse(
             {
-                "data": modal.json(), "type": InteractionCallbackType.modal.value,
+                "data": modal.json(),
+                "type": InteractionCallbackType.modal.value,
             },
             status_code=200
         )

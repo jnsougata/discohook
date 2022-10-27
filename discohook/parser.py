@@ -1,9 +1,8 @@
 import inspect
-from .enums import AppCmdType
-from .enums import AppCmdOptionType
 from .interaction import Interaction
 from .models import User, Member, Channel
 from typing import List, Dict, Any, Optional, Union, Callable
+from .enums import AppCmdOptionType, SelectMenuType, AppCmdType
 
 
 def handle_params_by_signature(func: Callable, options: Dict[str, Any]) -> (List[Any], Dict[str, Any]):
@@ -110,3 +109,26 @@ def build_modal_params(func: Callable, interaction: Interaction):
         if c['type'] == 4:
             options[c['custom_id']] = c['value']
     return handle_params_by_signature(func, options)
+
+
+def build_select_menu_values(interaction: Interaction) -> List[Any]:
+    if interaction.data['component_type'] == SelectMenuType.text.value:
+        return interaction.data['values']
+    elif interaction.data['component_type'] == SelectMenuType.channel.value:
+        raw_channels = interaction.data['resolved']['channels']
+        return [Channel(raw_channels.get(channel_id, {})) for channel_id in interaction.data['values']]
+    elif interaction.data['component_type'] == SelectMenuType.user.value:
+        raw_users = interaction.data['resolved']['users']
+        return [User(raw_users.get(user_id, {})) for user_id in interaction.data['values']]
+    elif interaction.data['component_type'] == SelectMenuType.role.value:
+        raw_roles = interaction.data['resolved']['roles']
+        return [Role(raw_roles.get(role_id, {})) for role_id in interaction.data['values']]
+    elif interaction.data['component_type'] == SelectMenuType.mentionable.value:
+        raw_values = interaction.data['values']
+        raw_resolved_roles = interaction.data['resolved'].get('roles', {})
+        raw_resolved_users = interaction.data['resolved'].get('users', {})
+        user_values = [User(raw_resolved_users[user_id]) for user_id in raw_values if user_id in raw_resolved_users]
+        role_values = [Role(raw_resolved_roles[role_id]) for role_id in raw_values if role_id in raw_resolved_roles]
+        return user_values + role_values
+    else:
+        return []

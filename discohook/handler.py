@@ -9,7 +9,8 @@ from fastapi.responses import JSONResponse, Response
 from .parser import (
     build_slash_command_prams,
     build_modal_params,
-    build_context_menu_param
+    build_context_menu_param,
+    build_select_menu_values
 )
 from .enums import (
     InteractionCallbackType,
@@ -50,39 +51,11 @@ async def handler(request: Request):
                     return await command._callback(interaction, *args, **kwargs) # noqa
 
             elif interaction.type == InteractionType.component.value:
-                custom_id = interaction.data.get('custom_id')
+                custom_id = interaction.data['custom_id']
                 component = request.app.ui_factory.get(custom_id, None)
-                if not (custom_id and component):
+                if not component:
                     return JSONResponse({'error': 'component not found!'}, status_code=404)
-                if interaction.data['component_type'] == SelectMenuType.text.value:
-                    return await component._callback(interaction, interaction.data['values']) # noqa
-                elif interaction.data['component_type'] == SelectMenuType.channel.value:
-                    raw_channels = interaction.data['resolved']['channels']
-                    values = [Channel(raw_channels.get(channel_id, {}))
-                              for channel_id in interaction.data['values']]
-                    return await component._callback(interaction, values)  # noqa
-                elif interaction.data['component_type'] == SelectMenuType.user.value:
-                    raw_users = interaction.data['resolved']['users']
-                    values = [User(raw_users.get(user_id, {}))
-                              for user_id in interaction.data['values']]
-                    return await component._callback(interaction, values)  # noqa
-                elif interaction.data['component_type'] == SelectMenuType.role.value:
-                    raw_roles = interaction.data['resolved']['roles']
-                    values = [Role(raw_roles.get(role_id, {}))
-                              for role_id in interaction.data['values']]
-                    return await component._callback(interaction, values)  # noqa
-                elif interaction.data['component_type'] == SelectMenuType.mentionable.value:
-                    raw_values = interaction.data['values']
-                    raw_resolved_roles = interaction.data['resolved'].get('roles', {})
-                    raw_resolved_users = interaction.data['resolved'].get('users', {})
-                    user_values = [User(raw_resolved_users[user_id])
-                                   for user_id in raw_values if user_id in raw_resolved_users]
-                    role_values = [Role(raw_resolved_roles[role_id])
-                                   for role_id in raw_values if role_id in raw_resolved_roles]
-                    values = user_values + role_values  # noqa
-                    return await component._callback(interaction, values)  # noqa
-                else:
-                    return await component._callback(interaction, [])  # noqa
+                return await component._callback(interaction, build_select_menu_values(interaction))  # noqa
 
             elif interaction.type == InteractionType.modal_submit.value:
                 component = request.app.ui_factory.get(interaction.data['custom_id'], None)
