@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 import secrets
+from .cog import Cog
 from .command import *
 from fastapi import FastAPI
 from functools import wraps
@@ -32,7 +33,7 @@ class Client(FastAPI):
         self.application_id = application_id
         self.express_debug = express_debug
         self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
-        self._sync_able_commands: List[ApplicationCommand] = commands or []
+        self._qualified_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
         self.cached_inter_tokens: Dict[str, str] = {}
@@ -69,13 +70,13 @@ class Client(FastAPI):
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
                     command._callback = coro
-                    self._sync_able_commands.append(command)
+                    self._qualified_commands.append(command)
                     return command
             return wrapper()
         return decorator
 
     def load_commands(self, *commands: ApplicationCommand):
-        self._sync_able_commands.extend(commands)
+        self._qualified_commands.extend(commands)
 
     async def __call__(self, scope, receive, send):
         if self.root_path:
@@ -84,7 +85,7 @@ class Client(FastAPI):
             raise ValueError("Token is not provided")
         headers = {"Authorization": f"Bot {self.token}"}
         async with aiohttp.ClientSession() as session:
-            for command in self._sync_able_commands:
+            for command in self._qualified_commands:
                 if command.guild_id:
                     url = f"{self.root_url}/applications/{self.application_id}/guilds/{command.guild_id}/commands"
                 else:
@@ -92,5 +93,13 @@ class Client(FastAPI):
                 resp = await (await session.post(url, headers=headers, json=command.json())).json()
                 command.id = resp['id']
                 self.application_commands[resp['id']] = command
-        self._sync_able_commands.clear()
+        self._qualified_commands.clear()
         await super().__call__(scope, receive, send)
+
+    def add_cog(self, cog: Cog):
+        if isinstance(cog, Cog):
+            self.load_commands(*cog.private_commands)
+
+    def load_cog(self, path: str):
+        import importlib
+        importlib.import_module(path).setup(self)

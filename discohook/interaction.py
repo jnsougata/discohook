@@ -274,7 +274,7 @@ class Interaction:
 
     def __init__(self, data: Dict[str, Any]):
         self._raw_data = data
-        self.app: Optional['Client'] = None
+        self.client: Optional['Client'] = None
         self.id: str = data['id']
         self.type: int = data['type']
         self.token: str = data['token']
@@ -317,14 +317,14 @@ class Interaction:
 
     @property
     def component(self) -> ComponentInteraction:
-        return ComponentInteraction(self.app, self._raw_data)
+        return ComponentInteraction(self.client, self._raw_data)
 
     @property
     def command(self) -> CommandInteraction:
-        return CommandInteraction(self.app, self._raw_data)
+        return CommandInteraction(self.client, self._raw_data)
 
     async def send_modal(self, modal: Modal):
-        self.app.ui_factory[modal.custom_id] = modal
+        self.client.ui_factory[modal.custom_id] = modal
         return JSONResponse(
             {
                 "data": modal.json(),

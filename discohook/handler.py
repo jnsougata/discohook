@@ -35,7 +35,7 @@ async def handler(request: Request):
     else:
         data = await request.json()
         interaction = Interaction(data)
-        interaction.app = request.app
+        interaction.client = request.app
         try:
             if interaction.type == InteractionType.ping.value:
                 return JSONResponse({'type': InteractionCallbackType.pong.value}, status_code=200)
@@ -43,13 +43,19 @@ async def handler(request: Request):
             elif interaction.type == InteractionType.app_command.value:
                 command: ApplicationCommand = request.app.application_commands.get(interaction._app_command_data.id)  # noqa
                 if not command:
-                    return interaction.response(content='command not implemented', ephemeral=True)
+                    return await interaction.command.response(content='command not implemented', ephemeral=True)
                 if not (interaction.data['type'] == AppCmdType.slash.value):
                     target_object = build_context_menu_param(interaction)
-                    return await command._callback(interaction, target_object)  # noqa
+                    if command.cog:
+                        return await command._callback(command.cog, interaction, target_object)  # noqa
+                    else:
+                        return await command._callback(interaction, target_object)  # noqa
                 else:
                     args, kwargs = build_slash_command_prams(command._callback, interaction)  # noqa
-                    return await command._callback(interaction, *args, **kwargs) # noqa
+                    if command.cog:
+                        return await command._callback(command.cog, interaction, *args, **kwargs)  # noqa
+                    else:
+                        return await command._callback(interaction, *args, **kwargs) # noqa
 
             elif interaction.type == InteractionType.component.value:
                 custom_id = interaction.data['custom_id']

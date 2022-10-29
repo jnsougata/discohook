@@ -49,6 +49,7 @@ class ApplicationCommand:
             guild_id: int = None,
     ):
         self.id = None
+        self.cog = None
         self.name = name
         self.description = description
         self.options: List[Option] = options

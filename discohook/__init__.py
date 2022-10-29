@@ -18,3 +18,4 @@ from .modal import Modal
 from .command import ApplicationCommand
 from .models import User, Member, Channel, Role
 from .interaction import Interaction
+from .cog import Cog
