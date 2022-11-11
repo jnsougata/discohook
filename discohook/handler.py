@@ -7,10 +7,10 @@ from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
 from .parser import (
-    build_slash_command_prams,
     build_modal_params,
+    build_slash_command_prams,
     build_context_menu_param,
-    build_select_menu_values
+    build_select_menu_values,
 )
 from .enums import (
     InteractionCallbackType,
@@ -51,10 +51,11 @@ async def handler(request: Request):
                     else:
                         return await command._callback(interaction, target_object)  # noqa
                 else:
-                    args, kwargs = build_slash_command_prams(command._callback, interaction)  # noqa
                     if command.cog:
+                        args, kwargs = build_slash_command_prams(command._callback, interaction, 2)  # noqa
                         return await command._callback(command.cog, interaction, *args, **kwargs)  # noqa
                     else:
+                        args, kwargs = build_slash_command_prams(command._callback, interaction)  # noqa
                         return await command._callback(interaction, *args, **kwargs) # noqa
 
             elif interaction.type == InteractionType.component.value:

@@ -1,26 +1,26 @@
 import inspect
 from .interaction import Interaction
 from .models import User, Member, Channel, Role
-from typing import List, Dict, Any, Optional, Union, Callable
+from typing import List, Dict, Any, Callable, Tuple
 from .enums import AppCmdOptionType, SelectMenuType, AppCmdType
 
 
-def handle_params_by_signature(func: Callable, options: Dict[str, Any]) -> (List[Any], Dict[str, Any]):
+def handle_params_by_signature(func: Callable, options: Dict[str, Any], skips: int = 1) -> Tuple[List[Any], Dict[str, Any]]:
     params = inspect.getfullargspec(func)
     defaults = params.defaults
     default_kwargs = params.kwonlydefaults
     args = []
     if defaults:
-        for i in range(len(params.args[:1]) - len(defaults) - 1):
+        for i in range(len(params.args[:skips]) - len(defaults) - 1):
             defaults.insert(i, None)
-        for arg, value in zip(params.args[1:], defaults):
+        for arg, value in zip(params.args[skips:], defaults):
             option = options.get(arg)
             if option:
                 args.append(option)
             else:
                 args.append(value)
     else:
-        for arg in params.args[1:]:
+        for arg in params.args[skips:]:
             option = options.get(arg)
             if option:
                 args.append(option)
@@ -78,11 +78,12 @@ def resolve_command_options(interaction: Interaction):
     return options
 
 
-def build_slash_command_prams(func: Callable, interaction: Interaction):
+def build_slash_command_prams(func: Callable, interaction: Interaction, skips: int = 1):
     options = resolve_command_options(interaction)
     if not options:
         return [], {}
-    return handle_params_by_signature(func, options)
+    return handle_params_by_signature(func, options, skips)
+
 
 
 def build_context_menu_param(interaction: Interaction):
