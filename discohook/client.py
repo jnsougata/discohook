@@ -77,7 +77,16 @@ class Client(FastAPI):
 
     def load_commands(self, *commands: ApplicationCommand):
         self._qualified_commands.extend(commands)
-
+    
+    async def delete_command(self, command_id: str, guild_id: int = None):
+        if not guild_id:
+            url = f"{self.root_url}/applications/{self.application_id}/commands/{command_id}"
+        else:
+            url = f"{self.root_url}/applications/{self.application_id}/guilds/{guild_id}/commands/{command_id}"
+        headers = {"Authorization": f"Bot {self.token}"}
+        async with aiohttp.ClientSession() as session:
+            await session.delete(url, headers=headers)
+            
     async def __call__(self, scope, receive, send):
         if self.root_path:
             scope["root_path"] = self.root_path
