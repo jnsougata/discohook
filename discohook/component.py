@@ -1,9 +1,7 @@
 import secrets
-from fastapi import FastAPI
-from functools import wraps
 from .emoji import PartialEmoji
+from typing import Optional, List, Dict, Any, Callable
 from .enums import ButtonStyle, MessageComponentType, SelectMenuType, ChannelType
-from typing import Optional, Union, List, Dict, Any, Callable
 
 
 class Button:
@@ -16,12 +14,12 @@ class Button:
             disabled: Optional[bool] = False,
             emoji: Optional[PartialEmoji] = None,
     ):
-        self.label = label
         self.url = url
+        self.label = label
+        self.emoji = emoji
         self.style = style
         self.disabled = disabled
         self.custom_id = secrets.token_urlsafe(16)
-        self.emoji = emoji
         self._callback: Optional[Callable] = None
 
     def on_click(self, coro: Callable):
@@ -32,12 +30,13 @@ class Button:
             "type": MessageComponentType.button.value,
             "style": self.style.value,
             "label": self.label,
-            "custom_id": self.custom_id,
-            "disabled": self.disabled,
         }
+        if not self.style == ButtonStyle.link:
+            payload["custom_id"] = self.custom_id
+            payload["disabled"] = self.disabled
         if self.emoji:
             payload["emoji"] = self.emoji.json()
-        if self.url and self.style is ButtonStyle.url:
+        if self.url and self.style == ButtonStyle.link:
             payload["url"] = self.url
         return payload
 

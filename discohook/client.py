@@ -100,7 +100,10 @@ class Client(FastAPI):
                 else:
                     url = f"{self.root_url}/applications/{self.application_id}/commands"
                 resp = await (await session.post(url, headers=headers, json=command.json())).json()
-                command.id = resp['id']
+                try:
+                    command.id = resp['id']
+                except KeyError:
+                    raise ValueError(str(resp))
                 self.application_commands[resp['id']] = command
         self._qualified_commands.clear()
         await super().__call__(scope, receive, send)

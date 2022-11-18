@@ -81,7 +81,7 @@ class ButtonStyle(Enum):
     grey = 2
     green = 3
     red = 4
-    url = 5
+    link = 5
 
 
 class SelectMenuType(Enum):
