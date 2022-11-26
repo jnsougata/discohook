@@ -1,4 +1,3 @@
-import asyncio
 from fastapi import Request
 from .interaction import Interaction
 from .command import *
@@ -51,6 +50,12 @@ async def handler(request: Request):
                     else:
                         return await command._callback(interaction, target_object)  # noqa
                 else:
+                    if command.options and command.options[0].data['type'] == AppCmdOptionType.subcommand.value:
+                        subcommand = command._subcommand_callbacks.get(interaction.data['options'][0]['name'])
+                        if command.cog:
+                            return await subcommand(command.cog, interaction, *build_slash_command_prams(subcommand, interaction, 2))
+                        else:
+                            return await subcommand(interaction, *build_slash_command_prams(subcommand, interaction))
                     if command.cog:
                         args, kwargs = build_slash_command_prams(command._callback, interaction, 2)  # noqa
                         return await command._callback(command.cog, interaction, *args, **kwargs)  # noqa

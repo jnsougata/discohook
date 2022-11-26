@@ -5,7 +5,11 @@ from typing import List, Dict, Any, Callable, Tuple
 from .enums import AppCmdOptionType, SelectMenuType, AppCmdType
 
 
-def handle_params_by_signature(func: Callable, options: Dict[str, Any], skips: int = 1) -> Tuple[List[Any], Dict[str, Any]]:
+def handle_params_by_signature(
+    func: Callable, 
+    options: Dict[str, Any], 
+    skips: int = 1
+) -> Tuple[List[Any], Dict[str, Any]]:
     params = inspect.getfullargspec(func)
     defaults = params.defaults
     default_kwargs = params.kwonlydefaults
@@ -70,8 +74,7 @@ def resolve_command_options(interaction: Interaction):
             # I mean what's the use case of this shi**
             pass
         elif option['type'] == AppCmdOptionType.sub_command.value:
-            # TODO: handle later
-            pass
+            options = option['options']
         elif option['type'] == AppCmdOptionType.sub_command_group.value:
             # TODO: Handle later
             pass
@@ -83,7 +86,6 @@ def build_slash_command_prams(func: Callable, interaction: Interaction, skips: i
     if not options:
         return [], {}
     return handle_params_by_signature(func, options, skips)
-
 
 
 def build_context_menu_param(interaction: Interaction):
