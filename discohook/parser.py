@@ -73,9 +73,9 @@ def resolve_command_options(interaction: Interaction):
             # IDK if someone uses this shit
             # I mean what's the use case of this shi**
             pass
-        elif option['type'] == AppCmdOptionType.sub_command.value:
+        elif option['type'] == AppCmdOptionType.subcommand.value:
             options = option['options']
-        elif option['type'] == AppCmdOptionType.sub_command_group.value:
+        elif option['type'] == AppCmdOptionType.subcommand_groups.value:
             # TODO: Handle later
             pass
     return options

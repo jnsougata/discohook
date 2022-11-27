@@ -50,12 +50,15 @@ async def handler(request: Request):
                     else:
                         return await command._callback(interaction, target_object)  # noqa
                 else:
-                    if command.options and command.options[0].data['type'] == AppCmdOptionType.subcommand.value:
+                    if interaction.data.get('options') and interaction.data['options'][0].get('type') == AppCmdOptionType.subcommand.value:
                         subcommand = command._subcommand_callbacks.get(interaction.data['options'][0]['name'])
                         if command.cog:
-                            return await subcommand(command.cog, interaction, *build_slash_command_prams(subcommand, interaction, 2))
+                            args, kwargs = build_slash_command_prams(subcommand, interaction, 2)
+                            return await subcommand(command.cog, interaction, *args, **kwargs)
                         else:
-                            return await subcommand(interaction, *build_slash_command_prams(subcommand, interaction))
+                            args, kwargs = build_slash_command_prams(subcommand, interaction)
+                            return await subcommand(interaction, *args, **kwargs)
+                            
                     if command.cog:
                         args, kwargs = build_slash_command_prams(command._callback, interaction, 2)  # noqa
                         return await command._callback(command.cog, interaction, *args, **kwargs)  # noqa
