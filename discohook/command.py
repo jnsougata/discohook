@@ -27,7 +27,7 @@ class SubCommand:
             "description": self.description,
         }
         if self.options:
-            payload["options"] = [option.to_json() for option in self.options]
+            payload["options"] = [option.json() for option in self.options]
         return payload
 
 
