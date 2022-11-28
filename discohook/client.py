@@ -7,6 +7,7 @@ from functools import wraps
 from .handler import handler
 from .enums import AppCmdType
 from .modal import Modal
+from .permissions import Permissions
 from .command import ApplicationCommand
 from .component import Button, SelectMenu
 from typing import Optional, List, Dict, Union, Callable
@@ -54,7 +55,7 @@ class Client(FastAPI):
             description: str = None,
             *,
             options: List[Option] = None,
-            permissions: str = None,
+            permissions: List[Permissions] = None,
             dm_access: bool = True,
             guild_id: int = None,
             category: AppCmdType = AppCmdType.slash,

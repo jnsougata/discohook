@@ -1,18 +1,19 @@
-from typing import Callable, Dict, List, Optional, Union, Any
-from .option import Option
-from .enums import AppCmdType, AppCmdOptionType
-from functools import wraps
 import asyncio
+from functools import wraps
+from .option import Option
+from .permissions import Permissions
+from .enums import AppCmdType, AppCmdOptionType
+from typing import Callable, Dict, List, Optional, Union, Any
 
 
 class SubCommand:
     def __init__(
-            self,
-            name: str,
-            description: str,
-            options: List[Option] = None,
-            *,
-            callback: Callable = None
+        self,
+        name: str,
+        description: str,
+        options: List[Option] = None,
+        *,
+        callback: Callable = None
     ):
         self.name = name
         self.options = options
@@ -38,15 +39,14 @@ class SubCommandGroup:
 class ApplicationCommand:
 
     def __init__(
-            self,
-            name: str,
-            description: str = None,
-            options: List[Option] = None,
-            dm_access: bool = True,
-            permissions: str = None,
-            category: AppCmdType = AppCmdType.slash,
-            *,
-            guild_id: int = None,
+        self,
+        name: str,
+        description: str = None,
+        options: List[Option] = None,
+        dm_access: bool = True,
+        permissions: List[Permissions] = None,
+        guild_id: int = None,
+        category: AppCmdType = AppCmdType.slash,
     ):
         self.id = None
         self.cog = None
@@ -98,5 +98,8 @@ class ApplicationCommand:
         if not self.dm_access:
             self._payload["dm_permission"] = self.dm_access
         if self.permissions:
-            self._payload["default_member_permissions"] = self.permissions
+            base = 0
+            for permission in self.permissions:
+                base |= permission.value
+            self._payload["default_member_permissions"] = str(base)
         return self._payload
