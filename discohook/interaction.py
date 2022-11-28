@@ -2,7 +2,8 @@ from .enums import InteractionType, InteractionCallbackType
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 from fastapi.responses import JSONResponse
 from .embed import Embed
-from .models import User, Member
+from .user import User
+from .member import Member
 from .component import ActionRows
 from .modal import Modal
 from .https import request
