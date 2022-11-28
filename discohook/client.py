@@ -1,6 +1,5 @@
 import aiohttp
 import asyncio
-import secrets
 from .cog import Cog
 from .command import *
 from fastapi import FastAPI
@@ -8,9 +7,9 @@ from functools import wraps
 from .handler import handler
 from .enums import AppCmdType
 from .modal import Modal
-from .component import Button, SelectMenu
 from .command import ApplicationCommand
-from typing import Optional, List, Dict, Any, Union, Callable
+from .component import Button, SelectMenu
+from typing import Optional, List, Dict, Union, Callable
 
 
 class Client(FastAPI):
@@ -28,13 +27,18 @@ class Client(FastAPI):
             **kwargs
     ):
         super().__init__(**kwargs)
+
         self.token = token
         self.public_key = public_key
         self.application_id = application_id
+
         self.express_debug = express_debug
+
         self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
+
         self._qualified_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
+
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
         self.cached_inter_tokens: Dict[str, str] = {}
 

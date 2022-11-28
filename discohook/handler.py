@@ -15,11 +15,8 @@ from .enums import (
     InteractionCallbackType,
     InteractionType,
     AppCmdType,
-    SelectMenuType,
     MessageComponentType
 )
-from typing import Optional, List, Dict, Any, Union, Callable
-from .models import Channel, User, Role
 from .debugger import build_traceback_embed
 
 
@@ -30,7 +27,7 @@ async def handler(request: Request):
         key = VerifyKey(bytes.fromhex(request.app.public_key))
         key.verify(str(timestamp).encode() + await request.body(), bytes.fromhex(str(signature)))
     except BadSignatureError:
-        return Response(content='request validation failed', status_code=401)
+        return Response(content='Signature validation failed', status_code=401)
     else:
         data = await request.json()
         interaction = Interaction(data)
