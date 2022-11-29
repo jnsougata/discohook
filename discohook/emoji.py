@@ -8,8 +8,4 @@ class PartialEmoji:
         self.animated = animated
 
     def json(self):
-        return {
-            "name": self.name,
-            "id": self.id,
-            "animated": self.animated,
-        }
+        return {"name": self.name, "id": self.id, "animated": self.animated}
