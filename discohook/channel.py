@@ -11,3 +11,7 @@ class Channel:
 
     def __repr__(self):
         return f"<PartialChannel id={self.id} name={self.name} type={self.type}>"
+
+    @property
+    def mention(self) -> str:
+        return f"<#{self.id}>"
