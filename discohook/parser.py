@@ -3,6 +3,7 @@ from .user import User
 from .channel import Channel
 from .member import Member  
 from .role import Role
+from .attachment import Attachment
 from .interaction import Interaction
 from typing import List, Dict, Any, Callable, Tuple
 from .enums import AppCmdOptionType, SelectMenuType, AppCmdType
@@ -48,32 +49,37 @@ def handle_params_by_signature(
 def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interaction):
     options = {}
     for option in payload:
-        if option['type'] == AppCmdOptionType.string.value:
-            options[option['name']] = option['value']
-        elif option['type'] == AppCmdOptionType.integer.value:
-            options[option['name']] = int(option['value'])
-        elif option['type'] == AppCmdOptionType.boolean.value:
-            options[option['name']] = bool(option['value'])
-        elif option['type'] == AppCmdOptionType.user.value:
-            user_data = interaction.data['resolved']['users'][option['value']]
+        name = option['name']
+        value = option['value']
+        option_type = option['type']
+        if option_type == AppCmdOptionType.string.value:
+            options[name] = value
+        elif option_type == AppCmdOptionType.integer.value:
+            options[name] = int(value)
+        elif option_type == AppCmdOptionType.boolean.value:
+            options[name] = bool(value)
+        elif option_type == AppCmdOptionType.user.value:
+            user_data = interaction.data['resolved']['users'][value]
             if interaction.guild_id:
-                member_data = interaction.data['resolved']['members'][option['value']]
+                member_data = interaction.data['resolved']['members'][value]
                 if not member_data['avatar']:
                     member_data['avatar'] = user_data['avatar']
                 user_data.update(member_data)
-                options[option['name']] = Member(user_data)
+                options[name] = Member(user_data)
             else:
-                options[option['name']] = User(user_data)
-        elif option['type'] == AppCmdOptionType.channel.value:
-            options[option['name']] = Channel(interaction.data['resolved']['channels'][option['value']])
-        elif option['type'] == AppCmdOptionType.role.value:
+                options[name] = User(user_data)
+        elif option_type == AppCmdOptionType.channel.value:
+            options[name] = Channel(interaction.data['resolved']['channels'][value])
+        elif option_type == AppCmdOptionType.role.value:
             # TODO: objectify
-            options[option['name']] = interaction.data['resolved']['roles'][option['value']]
-        elif option['type'] == AppCmdOptionType.mentionable.value:
+            options[name] = Role(interaction.data['resolved']['roles'][value])
+        elif option_type == AppCmdOptionType.mentionable.value:
             # TODO: this is a shit option
             # IDK if someone uses this shit
             # I mean what's the use case of this shi**
             pass
+        elif option_type == AppCmdOptionType.attachment.value:
+            options[name] = Attachment(interaction.data['resolved']['attachments'][value])
     return options
 
 

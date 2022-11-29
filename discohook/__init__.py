@@ -7,6 +7,7 @@ from .channel import Channel
 from .role import Role
 from .modal import Modal
 from .embed import Embed
+from .attachment import Attachment
 from .client import Client
 from .interaction import Interaction
 from .permissions import Permissions
