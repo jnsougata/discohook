@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from .embed import Embed
 from .user import User
 from .member import Member
-from .component import ActionRows
+from .component import View
 from .modal import Modal
 from .https import request
 if TYPE_CHECKING:
@@ -18,7 +18,7 @@ def handle_send_params(
     *,
     embed: Optional[Embed] = None,
     embeds: Optional[List[Embed]] = None,
-    components: Optional[ActionRows] = None,
+    components: Optional[View] = None,
     tts: Optional[bool] = False,
     file: Optional[Dict[str, Any]] = None,
     files: Optional[List[Dict[str, Any]]] = None,
@@ -60,7 +60,7 @@ def handle_edit_params(
             *,
             embed: Optional[Embed] = MISSING,
             embeds: Optional[List[Embed]] = MISSING,
-            components: Optional[ActionRows] = MISSING,
+            components: Optional[View] = MISSING,
             tts: Optional[bool] = MISSING,
             file: Optional[Dict[str, Any]] = MISSING,
             files: Optional[List[Dict[str, Any]]] = MISSING,
@@ -112,7 +112,7 @@ class CommandInteraction:
             *,
             embed: Optional[Embed] = None,
             embeds: Optional[List[Embed]] = None,
-            components: Optional[ActionRows] = None,
+            components: Optional[View] = None,
             tts: Optional[bool] = False,
             file: Optional[Dict[str, Any]] = None,
             files: Optional[List[Dict[str, Any]]] = None,
@@ -152,17 +152,17 @@ class ComponentInteraction:
         self._message = data.get("message")
 
     async def follow_up(
-            self,
-            content: Optional[str] = None,
-            *,
-            embed: Optional[Embed] = None,
-            embeds: Optional[List[Embed]] = None,
-            components: Optional[ActionRows] = None,
-            tts: Optional[bool] = False,
-            file: Optional[Dict[str, Any]] = None,
-            files: Optional[List[Dict[str, Any]]] = None,
-            ephemeral: Optional[bool] = False,
-            supress_embeds: Optional[bool] = False,
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        components: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[Dict[str, Any]] = None,
+        files: Optional[List[Dict[str, Any]]] = None,
+        ephemeral: Optional[bool] = False,
+        supress_embeds: Optional[bool] = False,
     ) -> JSONResponse:
         payload = handle_send_params(
             content=content,
@@ -188,16 +188,16 @@ class ComponentInteraction:
         )
 
     def edit(
-            self,
-            content: Optional[str] = MISSING,
-            *,
-            embed: Optional[Embed] = MISSING,
-            embeds: Optional[List[Embed]] = MISSING,
-            components: Optional[ActionRows] = MISSING,
-            tts: Optional[bool] = MISSING,
-            file: Optional[Dict[str, Any]] = MISSING,
-            files: Optional[List[Dict[str, Any]]] = MISSING,
-            supress_embeds: Optional[bool] = MISSING,
+        self,
+        content: Optional[str] = MISSING,
+        *,
+        embed: Optional[Embed] = MISSING,
+        embeds: Optional[List[Embed]] = MISSING,
+        components: Optional[View] = MISSING,
+        tts: Optional[bool] = MISSING,
+        file: Optional[Dict[str, Any]] = MISSING,
+        files: Optional[List[Dict[str, Any]]] = MISSING,
+        supress_embeds: Optional[bool] = MISSING,
     ):
         payload = handle_edit_params(
             content=content,
@@ -245,7 +245,7 @@ class ComponentInteraction:
             *,
             embed: Optional[Embed] = MISSING,
             embeds: Optional[List[Embed]] = MISSING,
-            components: Optional[ActionRows] = MISSING,
+            components: Optional[View] = MISSING,
             tts: Optional[bool] = MISSING,
             file: Optional[Dict[str, Any]] = MISSING,
             files: Optional[List[Dict[str, Any]]] = MISSING,
@@ -292,21 +292,21 @@ class Interaction:
         self.guild_locale: Optional[str] = data.get('guild_locale')
 
     @property
-    def original_author(self) -> Optional[User]:
+    def owner(self) -> Optional[User]:
         if not self.message:
             return None
         return User(self.message["interaction"]["user"])
 
     @property
-    def from_original_author(self) -> bool:
+    def from_owner(self) -> bool:
         if not self.message:
             return True
-        return self.original_author.id == self.author.id
+        return self.owner == self.author
 
     @property
     def author(self) -> Optional[Union[User, Member]]:
         if self.guild_id:
-            self.member.update(self.member.pop("user"))
+            self.member.update(self.member.pop("user", {}))
             return Member(self.member)
         return User(self.user)
 

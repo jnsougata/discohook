@@ -19,7 +19,7 @@ def handle_params_by_signature(
     args = []
     if defaults:
         for i in range(len(params.args[:skips]) - len(defaults) - 1):
-            defaults.insert(i, None)
+            defaults.insert(i, None)  # noqa
         for arg, value in zip(params.args[skips:], defaults):
             option = options.get(arg)
             if option:
@@ -43,6 +43,7 @@ def handle_params_by_signature(
         else:
             kwargs[kw] = None
     return args, kwargs
+
 
 def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interaction):
     options = {}
@@ -79,11 +80,11 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
 def resolve_command_options(interaction: Interaction):
     if not interaction._app_command_data.options:  # noqa
         return {}
-    for option in interaction._app_command_data.options:
+    for option in interaction._app_command_data.options:  # noqa
         if option['type'] == AppCmdOptionType.subcommand.value:
             return parse_generic_options(option['options'], interaction)
         else:
-            return parse_generic_options(interaction._app_command_data.options, interaction)
+            return parse_generic_options(interaction._app_command_data.options, interaction)  # noqa
 
 
 def build_slash_command_prams(func: Callable, interaction: Interaction, skips: int = 1):

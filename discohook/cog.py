@@ -3,7 +3,7 @@ from functools import wraps
 from .enums import AppCmdType
 from .option import Option
 from typing import List
-from .command import ApplicationCommand, SubCommand
+from .command import ApplicationCommand
 
 
 class Cog(metaclass=type):

@@ -12,4 +12,11 @@ class Member(User):
         self.is_pending = data.get("is_pending")
         self.communication_disabled_until = data.get("communication_disabled_until")
         self.flags = data.get("flags")
+    
+    def __eq__(self, other):
+        return self.id == other.id
+    
+    @property
+    def mention(self) -> str:
+        return f"<@!{self.id}>"
 

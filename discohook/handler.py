@@ -1,7 +1,6 @@
 from fastapi import Request
 from .interaction import Interaction
 from .command import *
-from functools import wraps
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
@@ -47,8 +46,9 @@ async def handler(request: Request):
                     else:
                         return await command._callback(interaction, target_object)  # noqa
                 else:
-                    if interaction.data.get('options') and interaction.data['options'][0].get('type') == AppCmdOptionType.subcommand.value:
-                        subcommand = command._subcommand_callbacks.get(interaction.data['options'][0]['name'])
+                    if interaction.data.get('options') and (
+                            interaction.data['options'][0].get('type') == AppCmdOptionType.subcommand.value):
+                        subcommand = command._subcommand_callbacks.get(interaction.data['options'][0]['name'])  # noqa
                         if command.cog:
                             args, kwargs = build_slash_command_prams(subcommand, interaction, 2)
                             return await subcommand(command.cog, interaction, *args, **kwargs)

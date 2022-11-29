@@ -3,7 +3,7 @@ from functools import wraps
 from .option import Option
 from .permissions import Permissions
 from .enums import AppCmdType, AppCmdOptionType
-from typing import Callable, Dict, List, Optional, Union, Any
+from typing import Callable, Dict, List, Optional, Any
 
 
 class SubCommand:

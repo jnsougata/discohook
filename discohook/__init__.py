@@ -11,4 +11,4 @@ from .client import Client
 from .interaction import Interaction
 from .permissions import Permissions
 from .command import ApplicationCommand
-from .component import ActionRows, Button, SelectOption, SelectMenu
+from .component import View, Button, SelectOption, SelectMenu

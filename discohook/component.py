@@ -72,7 +72,7 @@ class SelectOption:
 class SelectMenu:
     def __init__(
             self,
-            menu_type: SelectMenuType,
+            type: SelectMenuType,  # noqa
             options: Optional[List[SelectOption]] = None,
             *,
             channel_types: Optional[List[ChannelType]] = None,
@@ -84,12 +84,12 @@ class SelectMenu:
         self._callback: Optional[Callable] = None
         self.custom_id = secrets.token_urlsafe(16)
         self.data = {
-            "type": menu_type.value,
+            "type": type.value,
             "custom_id": self.custom_id,
         }
-        if (menu_type == SelectMenuType.text) and (options is not None):
+        if (type == SelectMenuType.text) and (options is not None):
             self.data["options"] = [option.json() for option in options]
-        if (menu_type == SelectMenuType.channel) and (channel_types is not None):
+        if (type == SelectMenuType.channel) and (channel_types is not None):
             self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
         if placeholder:
             self.data["placeholder"] = placeholder
@@ -107,24 +107,19 @@ class SelectMenu:
         return self.data
 
 
-class ActionRows:
-    def __init__(self, buttons: Optional[List[Button]] = None, select_menus: Optional[List[SelectMenu]] = None):
+class View:
+    def __init__(self):
         self._children = []
         self._structure: List[Dict[str, Any]] = []
-        if buttons:
-            self.append_button_row(*buttons)
-        if select_menus:
-            for select_menu in select_menus:
-                self.append_select_menu(select_menu)
-
-    def append_button_row(self, *buttons: Button):
+        
+    def add_button_row(self, *buttons: Button):
         self._structure.append({
             "type": MessageComponentType.action_row.value,
             "components": [button.json() for button in buttons[:5]],
         })
         self._children.extend(buttons[:5])
 
-    def append_select_menu(self, select_menu: SelectMenu):
+    def add_select_menu(self, select_menu: SelectMenu):
         self._structure.append({
             "type": MessageComponentType.action_row.value,
             "components": [select_menu.json()],

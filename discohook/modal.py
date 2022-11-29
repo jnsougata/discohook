@@ -1,9 +1,7 @@
 import secrets
-from functools import wraps
 from typing import Callable
-from typing import Optional, Union, Any, Sequence, List, Dict
 from .enums import MessageComponentType, TextInputFieldLength
-from .component import Button, SelectMenu
+# from .component import Button, SelectMenu
 
 
 class Modal:
@@ -12,7 +10,7 @@ class Modal:
         self.title = title
         self._callback = None
         self.custom_id = secrets.token_urlsafe(16)
-        self._action_row = {"type": MessageComponentType.action_row.value, "components": []}
+        self._row = {"type": MessageComponentType.action_row.value, "components": []}
         self._data = {"title": title, "custom_id": self.custom_id, "components": []}
 
     # def add_select(self, select: SelectMenu):
@@ -55,8 +53,8 @@ class Modal:
         )
 
     def json(self):
-        if self._action_row["components"]:
-            self._data['components'].append(self._action_row)
+        if self._row["components"]:
+            self._data['components'].append(self._row)
         return self._data
 
     def on_submit(self, coro: Callable):
