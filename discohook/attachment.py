@@ -18,8 +18,8 @@ class Attachment:
 
     async def read(self) -> bytes:
         async with aiohttp.ClientSession() as session:
-            resp = session.get(self.url)
-            return await resp.read()
+            resp = await session.get(self.url)
+            return await resp.content.read()
     
     async def iter(self) -> aiohttp.StreamReader:
         async with aiohttp.ClientSession() as session:

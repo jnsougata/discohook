@@ -21,5 +21,4 @@ async def help_command(interaction: discohook.Interaction):
         embed=discohook.Embed(title="Help", description="This is a help command"),
         ephemeral=True,
     )
-    
 ```
