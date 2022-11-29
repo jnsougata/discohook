@@ -1,6 +1,6 @@
 # discohook
 
-# Quickstart
+### Quickstart
 
 ```python
 import discohook
