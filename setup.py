@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="discohook",
-    version="0.0.1",
+    version="0.0.2",
     description="discord webhook wrapper for serverless apps",
     url="https://github.com/jnsougata/discohook",
     author="jnsougata",
