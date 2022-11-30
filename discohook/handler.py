@@ -97,12 +97,8 @@ async def handler(request: Request):
                 callback = command._autocomplete_callback # noqa
                 option_name = interaction.data['options'][0]['name'] # noqa
                 option_value = interaction.data['options'][0]['value'] # noqa
-                if command.cog:
-                    await callback(command.cog, interaction, option_name, option_value) # noqa
-                    return request.app._populated_return  # noqa
-                else:
-                    await callback(interaction, option_name, option_value)
-                    return request.app._populated_return  # noqa
+                await callback(interaction, option_name, option_value)  # noqa
+                return request.app._populated_return  # noqa
             else:
                 return JSONResponse({'message': "unhandled interaction type"}, status_code=300)
         except Exception as e:
