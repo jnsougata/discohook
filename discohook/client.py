@@ -30,6 +30,7 @@ class Client(FastAPI):
     ):
         super().__init__(**kwargs)
         self.token = token
+        self.__call_count = 0
         self.public_key = public_key
         self.application_id = application_id
         self.express_debug = express_debug
@@ -42,6 +43,7 @@ class Client(FastAPI):
         self.cached_inter_tokens: Dict[str, str] = {}
         self._populated_return: Optional[JSONResponse] = None
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
+        self._global_error_handler: Optional[Callable] = None
 
     def _load_component(self, component: Union[Button, Modal, SelectMenu]):
         self.ui_factory[component.custom_id] = component
@@ -116,11 +118,13 @@ class Client(FastAPI):
                 self.application_commands[command.id] = command
 
     async def __call__(self, scope, receive, send):
+        self.__call_count += 1
         if self.root_path:
             scope["root_path"] = self.root_path
         await self.__init_session()
         await self.__cache_client()
-        await self.__sync_cmds()
+        if self.__call_count == 2:
+            await self.__sync_cmds()
         self._qualified_commands.clear()
         await super().__call__(scope, receive, send)
 
@@ -131,3 +135,10 @@ class Client(FastAPI):
     def load_cog(self, path: str):
         import importlib
         importlib.import_module(path).setup(self)
+
+    def on_error(self, error_handler_coro: Callable):
+        self._global_error_handler = error_handler_coro
+
+    async def send_channel_message(self, channel_id: int, content: Dict[str, Any]):
+        url = f"/api/v10/channels/{channel_id}/messages"
+        await self._session.post(url, json=content)
