@@ -1,13 +1,9 @@
 import aiohttp
 
 
-ROOT = "https://discord.com/api/v10"
-
-
-async def request(method: str, path: str, **kwargs):
-    async with aiohttp.ClientSession() as session:
-        async with session.request(method, f"{ROOT}{path}", **kwargs) as resp:
-            try:
-                return await resp.json()
-            except Exception:
-                return await resp.text()
+async def request(session: aiohttp.ClientSession, path: str, method: str = "GET", **kwargs):
+    r =  await session.request(method, f'/api/v10/{path}', **kwargs)
+    try:
+        return await r.json()
+    except aiohttp.ContentTypeError:
+        return {"content": await r.text()}

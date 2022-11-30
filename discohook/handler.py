@@ -76,9 +76,12 @@ async def handler(request: Request):
                     return JSONResponse({'error': 'component not found!'}, status_code=404)
                 if interaction.data['component_type'] == MessageComponentType.button.value:
                     await component._callback(interaction)  # noqa
-                    return request.app._poulated_return
-                await component._callback(interaction, build_select_menu_values(interaction))  # noqa
-                return request.app._poulated_return
+                    if request.app._poulated_return:
+                        return request.app._poulated_return
+                if interaction.data['component_type'] == MessageComponentType.select_menu.value:
+                    await component._callback(interaction, build_select_menu_values(interaction))  # noqa
+                    if request.app._poulated_return:
+                        return request.app._poulated_return
 
             elif interaction.type == InteractionType.modal_submit.value:
                 component = request.app.ui_factory.get(interaction.data['custom_id'], None)

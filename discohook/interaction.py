@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .client import Client
 
 MISSING = object()
-
+NO_AUTH_HEADER = {"Content-Type": "application/json"}
 
 def handle_send_params(
     content: Optional[str] = None,
@@ -231,13 +231,24 @@ class ComponentInteraction:
     async def fetch_original(self):
         if not self._origin_token:
             return
-        return await request("GET", f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original")
+        self._app._poulated_return = None
+        return await request(
+            self._app._session,
+            f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original",
+            headers=NO_AUTH_HEADER,
+        )
 
     async def delete_original(self):
         if not self._origin_token:
             return
         self._app.cached_inter_tokens.pop(self._id, None)
-        await request("DELETE", f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original")
+        self._app._poulated_return = None
+        await request(
+            self._app._session, 
+            f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original",
+            method="DELETE",
+            headers=NO_AUTH_HEADER,
+        )
 
     async def edit_original(
             self,
@@ -267,8 +278,12 @@ class ComponentInteraction:
         self._app._load_inter_token(self._id, self._token)  # noqa
         if not self._origin_token:
             return
+        self._app._poulated_return = None
         return await request(
-            "PATCH", f'/webhooks/{self._application_id}/{self._origin_token}/messages/@original', json=payload)
+            self._app._session,
+            f'/webhooks/{self._application_id}/{self._origin_token}/messages/@original', 
+            method='PATCH', json=payload, headers=NO_AUTH_HEADER
+        )
 
 
 class Interaction:
