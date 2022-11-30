@@ -72,7 +72,6 @@ class SelectOption:
 class SelectMenu:
     def __init__(
             self,
-            type: SelectMenuType,  # noqa
             options: Optional[List[SelectOption]] = None,
             *,
             channel_types: Optional[List[ChannelType]] = None,
@@ -80,6 +79,7 @@ class SelectMenu:
             min_values: Optional[int] = None,
             max_values: Optional[int] = None,
             disabled: Optional[bool] = False,
+            type: SelectMenuType = SelectMenuType.text,  # noqa
     ):
         self._callback: Optional[Callable] = None
         self.custom_id = secrets.token_urlsafe(16)

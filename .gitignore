@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 main.py
+check.py
 .idea/
 .deta/
 .detaignore

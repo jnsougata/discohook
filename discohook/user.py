@@ -1,17 +1,20 @@
+from typing import Optional
+
+
 class User:
-    def __init__(self, data):
-        self.id = data.get("id")
-        self.username = data.get("username")
-        self.discriminator = data.get("discriminator")
-        self.avatar = data.get("avatar")
-        self.bot = data.get("bot")
-        self.system = data.get("system")
-        self.mfa_enabled = data.get("mfa_enabled")
-        self.locale = data.get("locale")
-        self.verified = data.get("verified")
-        self.email = data.get("email")
-        self.premium_type = data.get("premium_type")
-        self.public_flags = data.get("public_flags")
+    def __init__(self, data: dict):
+        self.id: str = data["id"]
+        self.username: str = data["username"]
+        self.discriminator: str = data["discriminator"]
+        self.avatar: Optional[str] = data.get("avatar")
+        self.bot: bool = data.get("bot", False)
+        self.system: bool = data.get("system", False)
+        self.mfa_enabled: bool = data.get("mfa_enabled", False)
+        self.locale: Optional[str] = data.get("locale")
+        self.verified: bool = data.get("verified", False)
+        self.email: Optional[str] = data.get("email")
+        self.premium_type: Optional[int] = data.get("premium_type")
+        self.public_flags: Optional[int] = data.get("public_flags")
 
     def avatar_url(
             self,
@@ -33,4 +36,48 @@ class User:
     @property
     def mention(self) -> str:
         return f"<@{self.id}>"
-        
+
+
+class ClientUser:
+    def __init__(self, data: dict) -> None:
+        self._data = data
+    
+    @property
+    def id(self) -> str:
+        return self._data["id"]
+    
+    @property
+    def name(self) -> str:
+        return self._data["name"]
+    
+    @property
+    def icon_hash(self) -> Optional[str]:
+        return self._data.get("icon")
+    
+    @property
+    def icon_url(self) -> Optional[str]:
+        return f"https://cdn.discordapp.com/app-icons/{self.id}/{self.icon_hash}.png"
+    
+    @property
+    def public(self) -> bool:
+        return self._data["bot_public"]
+    
+    @property
+    def require_code_grant(self) -> bool:
+        return self._data["bot_require_code_grant"]
+    
+    @property
+    def permissions(self) -> str:
+        return self._data["install_params"]["permissions"]
+    
+    @property
+    def scopes(self) -> str:
+        return self._data["install_params"]["scopes"]
+    
+    @property
+    def owner(self) -> User:
+        return User(self._data["owner"])
+    
+    @property
+    def flags(self) -> int:
+        return self._data["flags"]
