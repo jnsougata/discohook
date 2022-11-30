@@ -24,7 +24,7 @@ class Modal:
     def add_field(
             self,
             label: str,
-            custom_id: str,
+            field_id: str,
             *,
             required: bool = False,
             hint: str = None,
@@ -42,7 +42,7 @@ class Modal:
                         "label": label,
                         "style": style.value,
                         "value": default_text,
-                        "custom_id": custom_id,
+                        "custom_id": field_id,
                         "min_length": min_length,
                         "max_length": max_length,
                         "placeholder": hint or "",
