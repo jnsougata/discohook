@@ -134,7 +134,7 @@ class CommandInteraction:
             for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
-        self._app._poulated_return = JSONResponse(
+        self._app._populated_return = JSONResponse(
             {
                 "data": payload,
                 "type": InteractionCallbackType.channel_message_with_source.value,
@@ -179,7 +179,7 @@ class ComponentInteraction:
             for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
-        self._app._poulated_return = JSONResponse(
+        self._app._populated_return = JSONResponse(
             {
                 "data": payload,
                 "type": InteractionCallbackType.channel_message_with_source.value,
@@ -213,7 +213,7 @@ class ComponentInteraction:
             for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
-        self._app._poulated_return = JSONResponse(
+        self._app._populated_return = JSONResponse(
             {
                 "data": payload,
                 "type": InteractionCallbackType.update_message.value,
@@ -231,7 +231,7 @@ class ComponentInteraction:
     async def fetch_original(self):
         if not self._origin_token:
             return
-        self._app._poulated_return = None
+        self._app._populated_return = None
         return await request(
             self._app._session,
             f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original",
@@ -242,7 +242,7 @@ class ComponentInteraction:
         if not self._origin_token:
             return
         self._app.cached_inter_tokens.pop(self._id, None)
-        self._app._poulated_return = None
+        self._app._populated_return = None
         await request(
             self._app._session, 
             f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original",
@@ -278,7 +278,7 @@ class ComponentInteraction:
         self._app._load_inter_token(self._id, self._token)  # noqa
         if not self._origin_token:
             return
-        self._app._poulated_return = None
+        self._app._populated_return = None
         return await request(
             self._app._session,
             f'/webhooks/{self._application_id}/{self._origin_token}/messages/@original', 
@@ -341,7 +341,7 @@ class Interaction:
 
     async def send_modal(self, modal: Modal):
         self.client.ui_factory[modal.custom_id] = modal
-        self.client._poulated_return = JSONResponse(
+        self.client._populated_return = JSONResponse(
             {
                 "data": modal.json(),
                 "type": InteractionCallbackType.modal.value,

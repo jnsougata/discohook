@@ -1,5 +1,4 @@
 import aiohttp
-import asyncio
 from .cog import Cog
 from .command import *
 from fastapi import FastAPI
@@ -30,18 +29,18 @@ class Client(FastAPI):
             **kwargs
     ):
         super().__init__(**kwargs)
-        self._session: aiohttp.ClientSession = None
-        self.user: ClientUser = None
-        self.owner: User = None
         self.token = token
         self.public_key = public_key
         self.application_id = application_id
         self.express_debug = express_debug
+        self.owner: Optional[User] = None
+        self.user: Optional[ClientUser] = None
+        self._session: Optional[aiohttp.ClientSession] = None
         self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
         self._qualified_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
-        self._poulated_return: JSONResponse = None
+        self._populated_return: Optional[JSONResponse] = None
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
 
     def _load_component(self, component: Union[Button, Modal, SelectMenu]):
