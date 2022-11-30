@@ -1,4 +1,5 @@
 from typing import Optional
+from .permissions import Permissions
 
 
 class User:
@@ -81,3 +82,7 @@ class ClientUser:
     @property
     def flags(self) -> int:
         return self._data["flags"]
+    
+    def has_permission(self, permission: Permissions) -> bool:
+        return permission.value & int(self.permissions) == permission.value
+        
