@@ -6,6 +6,7 @@ from functools import wraps
 from .handler import handler
 from .enums import AppCmdType
 from .modal import Modal
+from .embed import Embed
 from .user import User, ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand
@@ -117,9 +118,13 @@ class Client(FastAPI):
                 raise ValueError(str(resp))
             else:
                 self.application_commands[command.id] = command
-                done.append(f"**[ INFO ]** Registered command `{command.name}` with id `{command.id}`")
+                done.append(f"` name ` {command.name}   ` id ` {command.id}")
         if self.log_channel_id:
-            await self.send_message(self.log_channel_id, {"content": "\n".join(done)})
+            embed = Embed(
+                title="✅ Registered commands",
+                description="\n".join(done)
+            )
+            await self.send_message(self.log_channel_id, {"embeds": [embed.json()]})
 
     async def __call__(self, scope, receive, send):
         if self.root_path:
