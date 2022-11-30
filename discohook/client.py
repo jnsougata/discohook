@@ -11,6 +11,7 @@ from .user import User, ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand
 from .component import Button, SelectMenu
+from fastapi.responses import JSONResponse
 from typing import Optional, List, Dict, Union, Callable
 
 
@@ -40,6 +41,7 @@ class Client(FastAPI):
         self._qualified_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
+        self._poulated_return: JSONResponse = None
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
 
     def _load_component(self, component: Union[Button, Modal, SelectMenu]):

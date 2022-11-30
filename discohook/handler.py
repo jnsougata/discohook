@@ -26,7 +26,7 @@ async def handler(request: Request):
         key = VerifyKey(bytes.fromhex(request.app.public_key))
         key.verify(str(timestamp).encode() + await request.body(), bytes.fromhex(str(signature)))
     except BadSignatureError:
-        return Response(content='Signature validation failed', status_code=401)
+        return Response(content='BadSignature', status_code=401)
     else:
         data = await request.json()
         interaction = Interaction(data)
@@ -42,26 +42,32 @@ async def handler(request: Request):
                 if not (interaction.data['type'] == AppCmdType.slash.value):
                     target_object = build_context_menu_param(interaction)
                     if command.cog:
-                        return await command._callback(command.cog, interaction, target_object)  # noqa
+                        await command._callback(command.cog, interaction, target_object)  # noqa
+                        return request.app._poulated_return
                     else:
-                        return await command._callback(interaction, target_object)  # noqa
+                        await command._callback(interaction, target_object)  # noqa
+                        return request.app._poulated_return
                         
                 if interaction.data.get('options') and (
                         interaction.data['options'][0].get('type') == AppCmdOptionType.subcommand.value):
                     subcommand = command._subcommand_callbacks.get(interaction.data['options'][0]['name'])  # noqa
                     if command.cog:
                         args, kwargs = build_slash_command_prams(subcommand, interaction, 2)
-                        return await subcommand(command.cog, interaction, *args, **kwargs)
+                        await subcommand(command.cog, interaction, *args, **kwargs)
+                        return request.app._poulated_return
                     else:
                         args, kwargs = build_slash_command_prams(subcommand, interaction)
-                        return await subcommand(interaction, *args, **kwargs)
+                        await subcommand(interaction, *args, **kwargs)
+                        return request.app._poulated_return
                         
                 if command.cog:
                     args, kwargs = build_slash_command_prams(command._callback, interaction, 2)  # noqa
-                    return await command._callback(command.cog, interaction, *args, **kwargs)  # noqa
+                    await command._callback(command.cog, interaction, *args, **kwargs)  # noqa
+                    return request.app._poulated_return
                 else:
                     args, kwargs = build_slash_command_prams(command._callback, interaction)  # noqa
-                    return await command._callback(interaction, *args, **kwargs)  # noqa
+                    await command._callback(interaction, *args, **kwargs)  # noqa
+                    return request.app._poulated_return
 
             elif interaction.type == InteractionType.component.value:
                 custom_id = interaction.data['custom_id']
@@ -69,15 +75,18 @@ async def handler(request: Request):
                 if not component:
                     return JSONResponse({'error': 'component not found!'}, status_code=404)
                 if interaction.data['component_type'] == MessageComponentType.button.value:
-                    return await component._callback(interaction)  # noqa
-                return await component._callback(interaction, build_select_menu_values(interaction))  # noqa
+                    await component._callback(interaction)  # noqa
+                    return request.app._poulated_return
+                await component._callback(interaction, build_select_menu_values(interaction))  # noqa
+                return request.app._poulated_return
 
             elif interaction.type == InteractionType.modal_submit.value:
                 component = request.app.ui_factory.get(interaction.data['custom_id'], None)
                 if not component:
                     return JSONResponse({'error': 'component not found!'}, status_code=404)
                 args, kwargs = build_modal_params(component._callback, interaction) # noqa
-                return await component._callback(interaction, *args, **kwargs)  # noqa
+                await component._callback(interaction, *args, **kwargs)  # noqa
+                return request.app._poulated_return
             else:
                 return JSONResponse({'message': "unhandled interaction type"}, status_code=300)
         except Exception as e:

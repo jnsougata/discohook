@@ -134,7 +134,7 @@ class CommandInteraction:
             for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
-        return JSONResponse(
+        self._app._poulated_return = JSONResponse(
             {
                 "data": payload,
                 "type": InteractionCallbackType.channel_message_with_source.value,
@@ -179,7 +179,7 @@ class ComponentInteraction:
             for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
-        return JSONResponse(
+        self._app._poulated_return = JSONResponse(
             {
                 "data": payload,
                 "type": InteractionCallbackType.channel_message_with_source.value,
@@ -213,7 +213,7 @@ class ComponentInteraction:
             for component in components._children:  # noqa
                 self._app._load_component(component)  # noqa
         self._app._load_inter_token(self._id, self._token)  # noqa
-        return JSONResponse(
+        self._app._poulated_return = JSONResponse(
             {
                 "data": payload,
                 "type": InteractionCallbackType.update_message.value,
@@ -326,7 +326,7 @@ class Interaction:
 
     async def send_modal(self, modal: Modal):
         self.client.ui_factory[modal.custom_id] = modal
-        return JSONResponse(
+        self.client._poulated_return = JSONResponse(
             {
                 "data": modal.json(),
                 "type": InteractionCallbackType.modal.value,
