@@ -25,15 +25,15 @@ class Client(FastAPI):
             *,
             commands: List[ApplicationCommand] = None,
             route: str = '/interactions',
-            express_debug: bool = False,
+            log_channel_id: int = None,
             **kwargs
     ):
         super().__init__(**kwargs)
         self.token = token
-        self.__call_count = 0
+        self._call_count = 0
         self.public_key = public_key
         self.application_id = application_id
-        self.express_debug = express_debug
+        self.log_channel_id: Optional[int] = log_channel_id
         self.owner: Optional[User] = None
         self.user: Optional[ClientUser] = None
         self._session: Optional[aiohttp.ClientSession] = None
@@ -104,6 +104,7 @@ class Client(FastAPI):
         self.owner = self.user.owner
     
     async def __sync_cmds(self):
+        done = []
         for command in self._qualified_commands:
             if command.guild_id:
                 url = f"/api/v10/applications/{self.application_id}/guilds/{command.guild_id}/commands"
@@ -116,16 +117,20 @@ class Client(FastAPI):
                 raise ValueError(str(resp))
             else:
                 self.application_commands[command.id] = command
+                done.append(f"**[ INFO ]** Registered command `{command.name}` with id `{command.id}`")
+        if self.log_channel_id:
+            await self.send_message(self.log_channel_id, {"content": "\n".join(done)})
 
     async def __call__(self, scope, receive, send):
-        self.__call_count += 1
         if self.root_path:
             scope["root_path"] = self.root_path
-        await self.__init_session()
-        await self.__cache_client()
-        if self.__call_count == 2:
+    
+        if self._call_count == 0:
+            await self.__init_session()
+            await self.__cache_client()
             await self.__sync_cmds()
-        self._qualified_commands.clear()
+            self._qualified_commands.clear()
+            self._call_count += 1
         await super().__call__(scope, receive, send)
 
     def add_cog(self, cog: Cog):
@@ -139,6 +144,6 @@ class Client(FastAPI):
     def on_error(self, error_handler_coro: Callable):
         self._global_error_handler = error_handler_coro
 
-    async def send_channel_message(self, channel_id: int, content: Dict[str, Any]):
+    async def send_message(self, channel_id: int, payload: Dict[str, Any]):
         url = f"/api/v10/channels/{channel_id}/messages"
-        await self._session.post(url, json=content)
+        await self._session.post(url, json=payload)

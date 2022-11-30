@@ -1,3 +1,4 @@
+import traceback
 from fastapi import Request
 from .interaction import Interaction
 from .command import *
@@ -102,9 +103,5 @@ async def handler(request: Request):
             else:
                 return JSONResponse({'message': "unhandled interaction type"}, status_code=300)
         except Exception as e:
-            if request.app.express_debug:
-                return JSONResponse({
-                    "data": {"embeds": [build_traceback_embed(e).json()], 'flags': 64},
-                    "type": InteractionCallbackType.channel_message_with_source.value
-                }, status_code=200)
-            return JSONResponse({'error': str(e)}, status_code=500)
+            if request.app._global_error_handler:
+                await request.app._global_error_handler(e, data)
