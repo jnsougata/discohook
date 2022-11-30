@@ -7,6 +7,7 @@ from .member import Member
 from .component import View
 from .modal import Modal
 from .https import request
+from .option import Choice
 if TYPE_CHECKING:
     from .client import Client
 
@@ -345,6 +346,17 @@ class Interaction:
             {
                 "data": modal.json(),
                 "type": InteractionCallbackType.modal.value,
+            },
+            status_code=200
+        )
+
+    async def send_autocomplete(self, choices: List[Choice]):
+        self.client._populated_return = JSONResponse(
+            {
+                "data": {
+                    "choices": [choice.to_json() for choice in choices]
+                },
+                "type": InteractionCallbackType.autocomplete_result.value,
             },
             status_code=200
         )

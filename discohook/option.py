@@ -1,9 +1,9 @@
 from .enums import AppCmdOptionType, ChannelType
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 
 class Choice:
-    def __init__(self, name: str, value: str):
+    def __init__(self, name: str, value: Union[str, int, float]):
         self.name = name
         self.value = value
 

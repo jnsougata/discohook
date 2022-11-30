@@ -60,10 +60,14 @@ class ApplicationCommand:
         self.permissions = permissions
         self._callback = None
         self._payload: Dict[str, Any] = {}
+        self._autocomplete_callback = None
         self._subcommand_callbacks: Dict[str, Callable] = {}
 
     def callback(self, coro: Callable):
         self._callback = coro
+    
+    def autocomplete_callback(self, coro: Callable):
+        self._autocomplete_callback = coro
 
     def subcommand(
             self,
