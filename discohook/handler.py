@@ -45,23 +45,23 @@ async def handler(request: Request):
                         return await command._callback(command.cog, interaction, target_object)  # noqa
                     else:
                         return await command._callback(interaction, target_object)  # noqa
-                else:
-                    if interaction.data.get('options') and (
-                            interaction.data['options'][0].get('type') == AppCmdOptionType.subcommand.value):
-                        subcommand = command._subcommand_callbacks.get(interaction.data['options'][0]['name'])  # noqa
-                        if command.cog:
-                            args, kwargs = build_slash_command_prams(subcommand, interaction, 2)
-                            return await subcommand(command.cog, interaction, *args, **kwargs)
-                        else:
-                            args, kwargs = build_slash_command_prams(subcommand, interaction)
-                            return await subcommand(interaction, *args, **kwargs)
-                            
+                        
+                if interaction.data.get('options') and (
+                        interaction.data['options'][0].get('type') == AppCmdOptionType.subcommand.value):
+                    subcommand = command._subcommand_callbacks.get(interaction.data['options'][0]['name'])  # noqa
                     if command.cog:
-                        args, kwargs = build_slash_command_prams(command._callback, interaction, 2)  # noqa
-                        return await command._callback(command.cog, interaction, *args, **kwargs)  # noqa
+                        args, kwargs = build_slash_command_prams(subcommand, interaction, 2)
+                        return await subcommand(command.cog, interaction, *args, **kwargs)
                     else:
-                        args, kwargs = build_slash_command_prams(command._callback, interaction)  # noqa
-                        return await command._callback(interaction, *args, **kwargs) # noqa
+                        args, kwargs = build_slash_command_prams(subcommand, interaction)
+                        return await subcommand(interaction, *args, **kwargs)
+                        
+                if command.cog:
+                    args, kwargs = build_slash_command_prams(command._callback, interaction, 2)  # noqa
+                    return await command._callback(command.cog, interaction, *args, **kwargs)  # noqa
+                else:
+                    args, kwargs = build_slash_command_prams(command._callback, interaction)  # noqa
+                    return await command._callback(interaction, *args, **kwargs)  # noqa
 
             elif interaction.type == InteractionType.component.value:
                 custom_id = interaction.data['custom_id']
