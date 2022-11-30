@@ -1,12 +1,13 @@
 import aiohttp
+import asyncio
 from .cog import Cog
 from .command import *
+from .modal import Modal
+from .embed import Embed
 from fastapi import FastAPI
 from functools import wraps
 from .handler import handler
 from .enums import AppCmdType
-from .modal import Modal
-from .embed import Embed
 from .user import User, ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand

@@ -1,4 +1,3 @@
-import traceback
 from fastapi import Request
 from .interaction import Interaction
 from .command import *
@@ -98,8 +97,9 @@ async def handler(request: Request):
                 callback = command._autocomplete_callback # noqa
                 option_name = interaction.data['options'][0]['name'] # noqa
                 option_value = interaction.data['options'][0]['value'] # noqa
-                await callback(interaction, option_name, option_value)  # noqa
-                return request.app._populated_return  # noqa
+                if option_value:
+                    await callback(interaction, option_name, option_value)  # noqa
+                    return request.app._populated_return  # noqa
             else:
                 return JSONResponse({'message': "unhandled interaction type"}, status_code=300)
         except Exception as e:
