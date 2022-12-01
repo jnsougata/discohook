@@ -32,7 +32,7 @@ class Client(FastAPI):
     ):
         super().__init__(**kwargs)
         self.token = token
-        self._call_count = 0
+        self.synced = False
         self.public_key = public_key
         self.application_id = application_id
         self.log_channel_id: Optional[int] = log_channel_id
@@ -120,6 +120,7 @@ class Client(FastAPI):
             else:
                 self.application_commands[command.id] = command
                 done.append(f"` name ` {command.name}   ` id ` {command.id}")
+        self._qualified_commands.clear()
         if self.log_channel_id:
             embed = Embed(
                 title="✅ Commands Synced",
@@ -127,18 +128,18 @@ class Client(FastAPI):
             )
             await self.send_message(self.log_channel_id, {"embeds": [embed.json()]})
 
-    async def __call__(self, scope, receive, send):
-        if self.root_path:
-            scope["root_path"] = self.root_path
+    def sync(self):
+        if self.synced  and not self._qualified_commands:
+            return
+        self.synced = True
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(self._setup())
     
-        if self._call_count == 0:
-            await self.__init_session()
-            await self.__cache_client()
-            await self.__sync_cmds()
-            self._qualified_commands.clear()
-            self._call_count += 1
-        await super().__call__(scope, receive, send)
-
+    async def _setup(self):
+        await self.__init_session()
+        await self.__cache_client()
+        await self.__sync_cmds()
+            
     def add_cog(self, cog: Cog):
         if isinstance(cog, Cog):
             self.load_commands(*cog.private_commands)
