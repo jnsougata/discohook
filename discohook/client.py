@@ -123,7 +123,7 @@ class Client(FastAPI):
         if self.log_channel_id:
             embed = Embed(
                 title="✅ Commands Synced",
-                description="\n".join(done)
+                description="\n\n".join(done)
             )
             await self.send_message(self.log_channel_id, {"embeds": [embed.json()]})
 
