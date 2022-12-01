@@ -14,6 +14,7 @@ from .permissions import Permissions
 from .command import ApplicationCommand
 from .component import Button, SelectMenu
 from fastapi.responses import JSONResponse
+from .sync import sync_handler
 from typing import Optional, List, Dict, Union, Callable
 
 
@@ -46,6 +47,7 @@ class Client(FastAPI):
         self.cached_inter_tokens: Dict[str, str] = {}
         self._populated_return: Optional[JSONResponse] = None
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
+        self.add_api_route('/sync/{token}', sync_handler, methods=['GET'], include_in_schema=False)
         self._global_error_handler: Optional[Callable] = None
 
     def _load_component(self, component: Union[Button, Modal, SelectMenu]):
@@ -94,53 +96,7 @@ class Client(FastAPI):
         else:
             url = f"/api/v10/applications/{self.application_id}/guilds/{guild_id}/commands/{command_id}"
         await self._session.delete(url)
-    
-    async def __init_session(self):
-        if not self.token:
-            raise ValueError("Token is not provided")
-        headers = {"Authorization": f"Bot {self.token}"}
-        self._session = aiohttp.ClientSession(base_url="https://discord.com", headers=headers)
-    
-    async def __cache_client(self):
-        data = await (await self._session.get(f"/api/v10/oauth2/applications/@me")).json()
-        self.user = ClientUser(data)
-        self.owner = self.user.owner
-    
-    async def __sync_cmds(self):
-        done = []
-        for command in self._qualified_commands:
-            if command.guild_id:
-                url = f"/api/v10/applications/{self.application_id}/guilds/{command.guild_id}/commands"
-            else:
-                url = f"/api/v10/applications/{self.application_id}/commands"
-            resp = await (await self._session.post(url, json=command.json())).json()
-            try:
-                command.id = resp['id']
-            except KeyError:
-                raise ValueError(str(resp))
-            else:
-                self.application_commands[command.id] = command
-                done.append(f"` name ` {command.name}   ` id ` {command.id}")
-        self._qualified_commands.clear()
-        if self.log_channel_id:
-            embed = Embed(
-                title="✅ Commands Synced",
-                description="\n\n".join(done)
-            )
-            await self.send_message(self.log_channel_id, {"embeds": [embed.json()]})
-
-    def sync(self):
-        if self.synced  and not self._qualified_commands:
-            return
-        self.synced = True
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(self._setup())
-    
-    async def _setup(self):
-        await self.__init_session()
-        await self.__cache_client()
-        await self.__sync_cmds()
-            
+             
     def add_cog(self, cog: Cog):
         if isinstance(cog, Cog):
             self.load_commands(*cog.private_commands)
