@@ -144,12 +144,13 @@ class Client(FastAPI):
         if isinstance(cog, Cog):
             self.load_commands(*cog.private_commands)
 
-    def load_cog(self, path: str):
+    def load_cogs(self, *paths: str):
         import importlib
-        importlib.import_module(path).setup(self)
+        for path in paths:
+            importlib.import_module(path).setup(self)
 
-    def on_error(self, error_handler_coro: Callable):
-        self._global_error_handler = error_handler_coro
+    def on_error(self, coro: Callable):
+        self._global_error_handler = coro
 
     async def send_message(self, channel_id: int, payload: Dict[str, Any]):
         url = f"/api/v10/channels/{channel_id}/messages"
