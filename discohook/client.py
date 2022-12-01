@@ -39,7 +39,10 @@ class Client(FastAPI):
         self.log_channel_id: Optional[int] = log_channel_id
         self.owner: Optional[User] = None
         self.user: Optional[ClientUser] = None
-        self._session: Optional[aiohttp.ClientSession] = None
+        self._session: Optional[aiohttp.ClientSession] = aiohttp.ClientSession(
+            base_url="https://discord.com", 
+            headers={"Authorization": f"Bot {self.token}"}
+        )
         self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
         self._qualified_commands: List[ApplicationCommand] = commands or []
         self.application_commands: Dict[str, ApplicationCommand] = {}
@@ -116,13 +119,7 @@ class Client(FastAPI):
     async def send_message(self, channel_id: int, payload: Dict[str, Any]):
         url = f"/api/v10/channels/{channel_id}/messages"
         await self._session.post(url, json=payload)
-    
-    async def __init_session(self):
-        if not self.token:
-            raise ValueError("Token is not provided")
-        headers = {"Authorization": f"Bot {self.token}"}
-        self._session = aiohttp.ClientSession(base_url="https://discord.com", headers=headers)
-    
+
     async def __cache_client(self):
         data = await (await self._session.get(f"/api/v10/oauth2/applications/@me")).json()
         self.user = ClientUser(data)
@@ -131,7 +128,6 @@ class Client(FastAPI):
     async def _sync(self):
         if self.synced:
             return
-        await self.__init_session()
         await self.__cache_client()
         url = f"/api/v10/applications/{self.application_id}/commands"
         payload  = [command.json() for command in self._qualified_commands]
