@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+import traceback
 from .cog import Cog
 from .command import *
 from .modal import Modal
@@ -147,7 +148,13 @@ class Client(FastAPI):
     def load_cogs(self, *paths: str):
         import importlib
         for path in paths:
-            importlib.import_module(path).setup(self)
+            try:
+                importlib.import_module(path).setup(self)
+            except Exception as e:
+                err = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
+                if self.log_channel_id:
+                    loop = asyncio.new_event_loop()
+                    loop.run_until_complete(self.send_message(self.log_channel_id, {"content": f"```py\n{err}\n```"}))
 
     def on_error(self, coro: Callable):
         self._global_error_handler = coro
