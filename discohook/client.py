@@ -1,3 +1,4 @@
+import json
 import aiohttp
 import asyncio
 import traceback
@@ -14,7 +15,6 @@ from .permissions import Permissions
 from .command import ApplicationCommand
 from .component import Button, SelectMenu
 from fastapi.responses import JSONResponse
-from .sync import sync_handler
 from typing import Optional, List, Dict, Union, Callable
 
 
@@ -47,7 +47,6 @@ class Client(FastAPI):
         self.cached_inter_tokens: Dict[str, str] = {}
         self._populated_return: Optional[JSONResponse] = None
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
-        self.add_api_route('/sync/{token}', sync_handler, methods=['GET'], include_in_schema=False)
         self._global_error_handler: Optional[Callable] = None
 
     def _load_component(self, component: Union[Button, Modal, SelectMenu]):
@@ -118,3 +117,36 @@ class Client(FastAPI):
     async def send_message(self, channel_id: int, payload: Dict[str, Any]):
         url = f"/api/v10/channels/{channel_id}/messages"
         await self._session.post(url, json=payload)
+    
+    async def __init_session(self):
+        if not self.token:
+            raise ValueError("Token is not provided")
+        headers = {"Authorization": f"Bot {self.token}"}
+        self._session = aiohttp.ClientSession(base_url="https://discord.com", headers=headers)
+    
+    async def __cache_client(self):
+        data = await (await self._session.get(f"/api/v10/oauth2/applications/@me")).json()
+        self.user = ClientUser(data)
+        self.owner = self.user.owner
+
+    async def __sync_cmds(self):
+        if self.synced:
+            return
+        await self.__init_session()
+        await self.__cache_client()
+        url = f"/api/v10/applications/{self.application_id}/commands"
+        payload  = [command.json() for command in self._qualified_commands]
+        resp = await (await self._session.put(url, json=payload)).json()
+        for pl, obj in zip(resp, self._qualified_commands):
+            if pl['name'] == obj.name:
+                obj.id = pl['id']
+                self.application_commands[pl['id']] = obj
+        self.synced = True
+        self._qualified_commands.clear()
+        if self.log_channel_id:
+            embed = Embed(title="✅ Commands Synced",)
+            await self.send_message(self.log_channel_id, {"embeds": [embed.json()]})
+    
+    async def __call__(self, scope, receive, send):
+        await self.__sync_cmds()
+        await super().__call__(scope, receive, send)
