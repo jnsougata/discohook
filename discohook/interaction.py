@@ -57,15 +57,15 @@ def handle_send_params(
 
 
 def handle_edit_params(
-            content: Optional[str] = MISSING,
-            *,
-            embed: Optional[Embed] = MISSING,
-            embeds: Optional[List[Embed]] = MISSING,
-            components: Optional[View] = MISSING,
-            tts: Optional[bool] = MISSING,
-            file: Optional[Dict[str, Any]] = MISSING,
-            files: Optional[List[Dict[str, Any]]] = MISSING,
-            supress_embeds: Optional[bool] = MISSING,
+    content: Optional[str] = MISSING,
+    *,
+    embed: Optional[Embed] = MISSING,
+    embeds: Optional[List[Embed]] = MISSING,
+    components: Optional[View] = MISSING,
+    tts: Optional[bool] = MISSING,
+    file: Optional[Dict[str, Any]] = MISSING,
+    files: Optional[List[Dict[str, Any]]] = MISSING,
+    supress_embeds: Optional[bool] = MISSING,
 ):
     payload = {}
     if embed is None:
@@ -108,17 +108,17 @@ class CommandInteraction:
         self._token = data["token"]
 
     async def response(
-            self,
-            content: Optional[str] = None,
-            *,
-            embed: Optional[Embed] = None,
-            embeds: Optional[List[Embed]] = None,
-            components: Optional[View] = None,
-            tts: Optional[bool] = False,
-            file: Optional[Dict[str, Any]] = None,
-            files: Optional[List[Dict[str, Any]]] = None,
-            ephemeral: Optional[bool] = False,
-            supress_embeds: Optional[bool] = False,
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        components: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[Dict[str, Any]] = None,
+        files: Optional[List[Dict[str, Any]]] = None,
+        ephemeral: Optional[bool] = False,
+        supress_embeds: Optional[bool] = False,
     ) -> JSONResponse:
         payload = handle_send_params(
             content=content,

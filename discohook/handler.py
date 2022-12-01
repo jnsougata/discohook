@@ -4,7 +4,7 @@ from .command import *
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from fastapi.responses import JSONResponse, Response
-from .parser import (
+from .cmdparse import (
     build_modal_params,
     build_slash_command_prams,
     build_context_menu_param,
@@ -16,7 +16,6 @@ from .enums import (
     AppCmdType,
     MessageComponentType
 )
-from .debugger import build_traceback_embed
 
 
 async def handler(request: Request):
@@ -93,7 +92,7 @@ async def handler(request: Request):
             elif interaction.type == InteractionType.autocomplete.value:
                 command: ApplicationCommand = request.app.application_commands.get(interaction.data['id'])  # noqa
                 if not command:
-                    return await interaction.command.response(content='command not implemented', ephemeral=True)
+                    return JSONResponse({'error': 'command not found!'}, status_code=404)
                 callback = command._autocomplete_callback # noqa
                 option_name = interaction.data['options'][0]['name'] # noqa
                 option_value = interaction.data['options'][0]['value'] # noqa
