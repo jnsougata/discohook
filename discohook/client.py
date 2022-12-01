@@ -155,7 +155,6 @@ class Client(FastAPI):
                 if self.log_channel_id:
                     loop = asyncio.new_event_loop()
                     loop.run_until_complete(self.send_message(self.log_channel_id, {"content": f"```py\n{err}\n```"}))
-                    loop.close()
 
     def on_error(self, coro: Callable):
         self._global_error_handler = coro
