@@ -128,15 +128,22 @@ class Client(FastAPI):
         self.user = ClientUser(data)
         self.owner = self.user.owner
 
-    async def __sync_cmds(self):
+    async def _sync(self):
         if self.synced:
             return
         await self.__init_session()
         await self.__cache_client()
         url = f"/api/v10/applications/{self.application_id}/commands"
         payload  = [command.json() for command in self._qualified_commands]
-        resp = await (await self._session.put(url, json=payload)).json()
-        for pl, obj in zip(resp, self._qualified_commands):
+        resp = await self._session.put(url, json=payload)
+        data = await resp.json()
+        if resp.status != 200 and self.log_channel_id:
+            return await self.send_message(
+                self.log_channel_id, 
+                {"content": f"```py\n{data}\n```"}
+            )
+        
+        for pl, obj in zip(data, self._qualified_commands):
             if pl['name'] == obj.name:
                 obj.id = pl['id']
                 self.application_commands[pl['id']] = obj
@@ -146,6 +153,3 @@ class Client(FastAPI):
             embed = Embed(title="✅ Commands Synced",)
             await self.send_message(self.log_channel_id, {"embeds": [embed.json()]})
     
-    async def __call__(self, scope, receive, send):
-        await self.__sync_cmds()
-        await super().__call__(scope, receive, send)

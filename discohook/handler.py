@@ -17,7 +17,7 @@ from .enums import (
     MessageComponentType
 )
 
-
+   
 async def handler(request: Request):
     signature = request.headers.get("X-Signature-Ed25519")
     timestamp = request.headers.get("X-Signature-Timestamp")
@@ -27,6 +27,8 @@ async def handler(request: Request):
     except BadSignatureError:
         return Response(content='BadSignature', status_code=401)
     else:
+        if not request.app.synced:
+            await request.app._sync()  # noqa
         data = await request.json()
         interaction = Interaction(data)
         interaction.client = request.app
