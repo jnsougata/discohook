@@ -1,6 +1,5 @@
 import aiohttp
 import asyncio
-import traceback
 from .cog import Cog
 from .command import *
 from .modal import Modal
@@ -105,13 +104,7 @@ class Client(FastAPI):
     def load_cogs(self, *paths: str):
         import importlib
         for path in paths:
-            try:
-                importlib.import_module(path).setup(self)
-            except Exception as e:
-                err = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
-                if self.log_channel_id:
-                    loop = asyncio.new_event_loop()
-                    loop.run_until_complete(self.send_message(self.log_channel_id, {"content": f"```py\n{err}\n```"}))
+            importlib.import_module(path).setup(self)
 
     def on_error(self, coro: Callable):
         self._global_error_handler = coro
@@ -138,14 +131,12 @@ class Client(FastAPI):
                 self.log_channel_id, 
                 {"content": f"```py\n{data}\n```"}
             )
-        
-        for pl, obj in zip(data, self._qualified_commands):
-            if pl['name'] == obj.name:
-                obj.id = pl['id']
-                self.application_commands[pl['id']] = obj
+        for d, o in zip(data, self._qualified_commands):
+            if d['name'] == o.name:
+                o.id = d['id']
+                self.application_commands[d['id']] = o
         self.synced = True
         self._qualified_commands.clear()
         if self.log_channel_id:
-            embed = Embed(title="✅ Commands Synced",)
-            await self.send_message(self.log_channel_id, {"embeds": [embed.json()]})
+            await self.send_message(self.log_channel_id, {"content": "Commands synced ✅"})
     
