@@ -1,3 +1,4 @@
+import json
 import aiohttp
 import asyncio
 from .cog import Cog
@@ -7,12 +8,19 @@ from fastapi import FastAPI
 from functools import wraps
 from .handler import handler
 from .enums import AppCmdType
-from .user import User, ClientUser
+from .user import ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand
 from .component import Button, SelectMenu
+from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from typing import Optional, List, Dict, Union, Callable
+
+
+async def sync(request: Request, secret: str = None):
+    if secret == request.app.token:
+        return JSONResponse(await request.app.sync())
+    return JSONResponse({'error': 'Unauthorized'}, status_code=401)
 
 
 class Client(FastAPI):
@@ -30,23 +38,21 @@ class Client(FastAPI):
     ):
         super().__init__(**kwargs)
         self.token = token
-        self.synced = False
         self.static = static
         self.public_key = public_key
         self.application_id = application_id
         self.log_channel_id: Optional[int] = log_channel_id
-        self.owner: Optional[User] = None
-        self.user: Optional[ClientUser] = None
         self._session: Optional[aiohttp.ClientSession] = aiohttp.ClientSession(
             base_url="https://discord.com", 
             headers={"Authorization": f"Bot {self.token}"}
         )
         self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
-        self._qualified_commands: List[ApplicationCommand] = []
+        self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
         self._populated_return: Optional[JSONResponse] = None
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
+        self.add_api_route('/sync/{secret}', sync, methods=['GET'], include_in_schema=False)
         self._global_error_handler: Optional[Callable] = None
 
     def _load_component(self, component: Union[Button, Modal, SelectMenu]):
@@ -81,21 +87,18 @@ class Client(FastAPI):
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
                     command._callback = coro
-                    if self.static:
+                    if command.id:
                         self.application_commands[command.id] = command
-                    else:
-                        self._qualified_commands.append(command)
+                    self._sync_queue.append(command)
                     return command
             return wrapper()
         return decorator
     
     def load_commands(self, *commands: ApplicationCommand):
-        if self.static:
-            static_commands = {command.id: command for command in commands if command.id}
-            self.application_commands.update(static_commands)
-        else:
-            self._qualified_commands.extend(commands)
-    
+        static_commands = {command.id: command for command in commands if command.id}
+        self.application_commands.update(static_commands)
+        self._sync_queue.extend(commands)
+            
     async def delete_command(self, command_id: str, guild_id: int = None):
         if not guild_id:
             url = f"/api/v10/applications/{self.application_id}/commands/{command_id}"
@@ -119,30 +122,13 @@ class Client(FastAPI):
         url = f"/api/v10/channels/{channel_id}/messages"
         await self._session.post(url, json=payload)
 
-    async def __store_appinfo(self):
+    async def as_user(self) -> ClientUser:
         data = await (await self._session.get(f"/api/v10/oauth2/applications/@me")).json()
-        self.user = ClientUser(data)
-        self.owner = self.user.owner
+        return ClientUser(data)
 
-    async def _sync(self):
-        if self.static or self.synced:
-            return
-        await self.__store_appinfo()
+    async def sync(self):
         url = f"/api/v10/applications/{self.application_id}/commands"
-        payload  = [command.json() for command in self._qualified_commands]
+        payload  = [command.json() for command in self._sync_queue]
         resp = await self._session.put(url, json=payload)
-        data = await resp.json()
-        if resp.status != 200 and self.log_channel_id:
-            return await self.send_message(
-                self.log_channel_id, 
-                {"content": f"```py\n{data}\n```"}
-            )
-        for d, o in zip(data, self._qualified_commands):
-            if d['name'] == o.name:
-                o.id = d['id']
-                self.application_commands[d['id']] = o
-        self.synced = True
-        self._qualified_commands.clear()
-        if self.log_channel_id:
-            await self.send_message(self.log_channel_id, {"content": "Commands synced ✅"})
+        return await resp.json()
     
