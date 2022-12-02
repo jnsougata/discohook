@@ -26,7 +26,6 @@ class Cog(metaclass=type):
         options: List[Option] = None,
         permissions: str = None,
         dm_access: bool = True,
-        guild_id: int = None,
         category: AppCmdType = AppCmdType.slash,
     ):
         def decorator(func):
@@ -39,9 +38,22 @@ class Cog(metaclass=type):
                         options=options,
                         permissions=permissions,
                         dm_access=dm_access,
-                        guild_id=guild_id,
                         category=category
                     )
+                    command._callback = func
+                    cls.commands.append(command)
+                    return command
+            return wrapper()
+        return decorator
+
+    @classmethod
+    def static_command(cls, id : str):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(*_, **__):
+                if inspect.iscoroutinefunction(func):
+                    command = ApplicationCommand(name=...)
+                    command.id = id
                     command._callback = func
                     cls.commands.append(command)
                     return command

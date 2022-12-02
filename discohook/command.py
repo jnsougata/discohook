@@ -45,7 +45,6 @@ class ApplicationCommand:
         options: List[Option] = None,
         dm_access: bool = True,
         permissions: List[Permissions] = None,
-        guild_id: int = None,
         category: AppCmdType = AppCmdType.slash,
     ):
         self.id = None
@@ -54,7 +53,6 @@ class ApplicationCommand:
         self.description = description
         self.options: List[Option] = options
         self.dm_access = dm_access
-        self.guild_id = guild_id
         self.application_id = None
         self.category = category
         self.permissions = permissions
