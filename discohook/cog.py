@@ -1,8 +1,8 @@
 import inspect
+from typing import List
+from .option import Option
 from functools import wraps
 from .enums import AppCmdType
-from .option import Option
-from typing import List
 from .command import ApplicationCommand
 
 
@@ -23,6 +23,7 @@ class Cog(metaclass=type):
         name: str,
         description: str = None,
         *,
+        id: str = None,
         options: List[Option] = None,
         permissions: str = None,
         dm_access: bool = True,
@@ -38,22 +39,9 @@ class Cog(metaclass=type):
                         options=options,
                         permissions=permissions,
                         dm_access=dm_access,
-                        category=category
+                        category=category,
+                        id=id,
                     )
-                    command._callback = func
-                    cls.commands.append(command)
-                    return command
-            return wrapper()
-        return decorator
-
-    @classmethod
-    def static_command(cls, id : str):
-        def decorator(func):
-            @wraps(func)
-            def wrapper(*_, **__):
-                if inspect.iscoroutinefunction(func):
-                    command = ApplicationCommand(name=...)
-                    command.id = id
                     command._callback = func
                     cls.commands.append(command)
                     return command

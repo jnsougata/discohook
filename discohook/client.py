@@ -18,20 +18,20 @@ from typing import Optional, List, Dict, Union, Callable
 class Client(FastAPI):
 
     def __init__(
-            self,
-            application_id: Union[int, str],
-            public_key: str,
-            token: str,
-            *,
-            mode: str = "static",
-            route: str = '/interactions',
-            log_channel_id: int = None,
-            **kwargs
+        self,
+        application_id: Union[int, str],
+        public_key: str,
+        token: str,
+        *,
+        static: bool = False,
+        route: str = '/interactions',
+        log_channel_id: int = None,
+        **kwargs
     ):
         super().__init__(**kwargs)
         self.token = token
         self.synced = False
-        self.mode = mode
+        self.static = static
         self.public_key = public_key
         self.application_id = application_id
         self.log_channel_id: Optional[int] = log_channel_id
@@ -60,10 +60,10 @@ class Client(FastAPI):
             name: str,
             description: str = None,
             *,
+            id: str = None,
             options: List[Option] = None,
             permissions: List[Permissions] = None,
             dm_access: bool = True,
-            guild_id: int = None,
             category: AppCmdType = AppCmdType.slash,
     ):
         command = ApplicationCommand(
@@ -72,8 +72,8 @@ class Client(FastAPI):
             options=options,
             permissions=permissions,
             dm_access=dm_access,
-            guild_id=guild_id,
-            category=category
+            category=category,
+            id=id
         )
 
         def decorator(coro: Callable):
@@ -81,29 +81,18 @@ class Client(FastAPI):
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
                     command._callback = coro
-                    self._qualified_commands.append(command)
+                    if self.static:
+                        self.application_commands[command.id] = command
+                    else:
+                        self._qualified_commands.append(command)
                     return command
             return wrapper()
         return decorator
     
-    def static_command(self, id: str):
-        command = ApplicationCommand(name=...)
-        command.id = id
-
-        def decorator(coro: Callable):
-            @wraps(coro)
-            def wrapper(*_, **__):
-                if asyncio.iscoroutinefunction(coro):
-                    command._callback = coro
-                    self.application_commands[id] = command
-                    return command
-            return wrapper()
-        return decorator
-
     def load_commands(self, *commands: ApplicationCommand):
-        if self.mode == "static":
-            for command in commands:
-                self.application_commands[command.id] = command
+        if self.static:
+            static_commands = {command.id: command for command in commands if command.id}
+            self.application_commands.update(static_commands)
         else:
             self._qualified_commands.extend(commands)
     
@@ -136,7 +125,7 @@ class Client(FastAPI):
         self.owner = self.user.owner
 
     async def _sync(self):
-        if self.mode == "static" or self.synced:
+        if self.static or self.synced:
             return
         await self.__store_appinfo()
         url = f"/api/v10/applications/{self.application_id}/commands"

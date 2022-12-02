@@ -41,13 +41,14 @@ class ApplicationCommand:
     def __init__(
         self,
         name: str,
+        id: str = None,
         description: str = None,
         options: List[Option] = None,
         dm_access: bool = True,
         permissions: List[Permissions] = None,
         category: AppCmdType = AppCmdType.slash,
     ):
-        self.id = None
+        self.id = id
         self.cog = None
         self.name = name
         self.description = description
@@ -64,7 +65,7 @@ class ApplicationCommand:
     def callback(self, coro: Callable):
         self._callback = coro
     
-    def autocomplete_callback(self, coro: Callable):
+    def autocomplete(self, coro: Callable):
         self._autocomplete_callback = coro
 
     def subcommand(
