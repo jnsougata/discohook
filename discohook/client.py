@@ -101,7 +101,10 @@ class Client(FastAPI):
         return decorator
 
     def load_commands(self, *commands: ApplicationCommand):
-        self._qualified_commands.extend(commands)
+        if self.mode == "static":
+            self.application_commands = {command.id: command for command in commands}
+        else:
+            self._qualified_commands.extend(commands)
     
     async def delete_command(self, command_id: str, guild_id: int = None):
         if not guild_id:
