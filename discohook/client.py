@@ -102,7 +102,8 @@ class Client(FastAPI):
 
     def load_commands(self, *commands: ApplicationCommand):
         if self.mode == "static":
-            self.application_commands = {command.id: command for command in commands}
+            for command in commands:
+                self.application_commands[command.id] = command
         else:
             self._qualified_commands.extend(commands)
     
