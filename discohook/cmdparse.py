@@ -71,12 +71,9 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
         elif option_type == AppCmdOptionType.channel.value:
             options[name] = Channel(interaction.data['resolved']['channels'][value])
         elif option_type == AppCmdOptionType.role.value:
-            # TODO: objectify
             options[name] = Role(interaction.data['resolved']['roles'][value])
         elif option_type == AppCmdOptionType.mentionable.value:
             # TODO: this is a shit option
-            # IDK if someone uses this shit
-            # I mean what's the use case of this shi**
             pass
         elif option_type == AppCmdOptionType.attachment.value:
             options[name] = Attachment(interaction.data['resolved']['attachments'][value])
@@ -103,12 +100,12 @@ def build_slash_command_prams(func: Callable, interaction: Interaction, skips: i
 def build_context_menu_param(interaction: Interaction):
     if interaction.data['type'] == AppCmdType.user.value:
         user_id = interaction.data['target_id']
-        user_dict = interaction.data['resolved']['users'][user_id]
-        member_dict = interaction.data['resolved']['members'][user_id] if interaction.guild_id else {}
-        if member_dict:
-            member_dict['avatar'] = user_dict['avatar']
-            user_dict.update(member_dict)
-        return User(user_dict)
+        user_resolved = interaction.data['resolved']['users'][user_id]
+        member_resolved = interaction.data['resolved']['members'][user_id] if interaction.guild_id else {}
+        if member_resolved:
+            member_resolved['avatar'] = user_resolved['avatar']
+            user_resolved.update(member_resolved)
+        return User(user_resolved)
 
     if interaction.data['type'] == AppCmdType.message.value:
         message_id = interaction.data['target_id']
@@ -119,31 +116,30 @@ def build_context_menu_param(interaction: Interaction):
 
 def build_modal_params(func: Callable, interaction: Interaction):
     options = {}
-    for comp in interaction.data['components']:
-        c = comp['components'][0]
-        if c['type'] == 4:
-            options[c['custom_id']] = c['value']
+    for row in interaction.data['components']:
+        comp = row['components'][0]
+        if comp['type'] == 4:
+            options[comp['custom_id']] = comp['value']
     return handle_params_by_signature(func, options)
 
 
 def build_select_menu_values(interaction: Interaction) -> List[Any]:
     if interaction.data['component_type'] == SelectMenuType.text.value:
         return interaction.data['values']
-    elif interaction.data['component_type'] == SelectMenuType.channel.value:
-        raw_channels = interaction.data['resolved']['channels']
-        return [Channel(raw_channels.get(channel_id, {})) for channel_id in interaction.data['values']]
-    elif interaction.data['component_type'] == SelectMenuType.user.value:
-        raw_users = interaction.data['resolved']['users']
-        return [User(raw_users.get(user_id, {})) for user_id in interaction.data['values']]
-    elif interaction.data['component_type'] == SelectMenuType.role.value:
-        raw_roles = interaction.data['resolved']['roles']
-        return [Role(raw_roles.get(role_id, {})) for role_id in interaction.data['values']]
-    elif interaction.data['component_type'] == SelectMenuType.mentionable.value:
+    if interaction.data['component_type'] == SelectMenuType.channel.value:
+        resolved = interaction.data['resolved']['channels']
+        return [Channel(resolved.pop(channel_id)) for channel_id in interaction.data['values']]
+    if interaction.data['component_type'] == SelectMenuType.user.value:
+        resolved = interaction.data['resolved']['users']
+        return [User(resolved.pop(user_id)) for user_id in interaction.data['values']]
+    if interaction.data['component_type'] == SelectMenuType.role.value:
+        resolved = interaction.data['resolved']['roles']
+        return [Role(resolved.pop(role_id)) for role_id in interaction.data['values']]
+    if interaction.data['component_type'] == SelectMenuType.mentionable.value:
         raw_values = interaction.data['values']
-        raw_resolved_roles = interaction.data['resolved'].get('roles', {})
-        raw_resolved_users = interaction.data['resolved'].get('users', {})
-        user_values = [User(raw_resolved_users[user_id]) for user_id in raw_values if user_id in raw_resolved_users]
-        role_values = [Role(raw_resolved_roles[role_id]) for role_id in raw_values if role_id in raw_resolved_roles]
-        return user_values + role_values  # type: ignore
-    else:
-        return []
+        resolved_roles = interaction.data['resolved'].get('roles', {})
+        resolved_users = interaction.data['resolved'].get('users', {})
+        users = [User(resolved_users.pop(user_id)) for user_id in raw_values if user_id in resolved_users]
+        roles = [Role(resolved_roles.pop(role_id)) for role_id in raw_values if role_id in resolved_roles]
+        return users + roles  # type: ignore
+    return []
