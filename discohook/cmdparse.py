@@ -1,8 +1,8 @@
 import inspect
 from .user import User
-from .channel import Channel
-from .member import Member  
 from .role import Role
+from .member import Member 
+from .channel import Channel
 from .attachment import Attachment
 from .interaction import Interaction
 from typing import List, Dict, Any, Callable, Tuple
@@ -15,7 +15,7 @@ def handle_params_by_signature(
     skips: int = 1
 ) -> Tuple[List[Any], Dict[str, Any]]:
     params = inspect.getfullargspec(func)
-    defaults = params.defaults
+    defaults = list(params.defaults)
     default_kwargs = params.kwonlydefaults
     args = []
     if defaults:
