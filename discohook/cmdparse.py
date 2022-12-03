@@ -19,7 +19,7 @@ def handle_params_by_signature(
     default_kwargs = params.kwonlydefaults
     args = []
     if defaults:
-        for i in range(len(params.args[:skips]) - len(defaults) - 1):
+        for i in range(len(params.args[:skips]) - len(defaults)):
             defaults.insert(i, None)  # noqa
         for arg, value in zip(params.args[skips:], defaults):
             option = options.get(arg)
