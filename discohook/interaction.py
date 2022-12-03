@@ -106,7 +106,7 @@ class CommandInteraction:
         self._app = app
         self._id = data["id"]
         self._token = data["token"]
-
+            
     async def response(
         self,
         content: Optional[str] = None,

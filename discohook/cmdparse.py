@@ -15,10 +15,11 @@ def handle_params_by_signature(
     skips: int = 1
 ) -> Tuple[List[Any], Dict[str, Any]]:
     params = inspect.getfullargspec(func)
-    defaults = list(params.defaults)
+    default_args = params.defaults
     default_kwargs = params.kwonlydefaults
     args = []
-    if defaults:
+    if default_args:
+        defaults = list(default_args)
         for i in range(len(params.args[:skips]) - len(defaults)):
             defaults.insert(i, None)  # noqa
         for arg, value in zip(params.args[skips:], defaults):
