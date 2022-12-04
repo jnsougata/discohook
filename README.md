@@ -1,24 +1,75 @@
 # discohook
 
+### Installation
+
+```bash
+pip install git+https://github.com/jnsougata/discohook
+```
+
 ### Quickstart
 
 ```python
 import discohook
-import os
 
 
-APPLICATION_ID = int(os.getenv("APPLICATION_ID"))
-APPLICATION_TOKEN = os.getenv("DISCORD_TOKEN")
-APPLICATION_PUBLIC_KEY = os.getenv("PUBLIC_KEY")
+APPLICATION_ID = <YOUR_APPLICATION_ID>
+APPLICATION_TOKEN = <YOUR_APPLICATION_TOKEN>
+APPLICATION_PUBLIC_KEY = <YOUR_APPLICATION_PUBLIC_KEY>
 
-client = discohook.Client(application_id=APPLICATION_ID, token=APPLICATION_TOKEN, public_key=APPLICATION_PUBLIC_KEY)
+app = discohook.Client(
+    application_id=APPLICATION_ID,
+    token=APPLICATION_TOKEN,
+    public_key=APPLICATION_PUBLIC_KEY
+)
 
-
-@client.command(name="help", description="basic help command for the bot")
+@app.command(
+    id="", # leave empty for now
+    name="help", 
+    description="basic help command for the bot"
+)
 async def help_command(interaction: discohook.Interaction):
-    return await interaction.command.response(
+    await interaction.command.response(
         "Hello, World!",
         embed=discohook.Embed(title="Help", description="This is a help command"),
         ephemeral=True,
     )
 ```
+### Deployment
+Deploy the snippet above to your serverless function and you're good to go to next step. Remember to replace the variables with your own. Command will not be automatically registered. We provide a dashboard to register commands. We will talk about it later.
+
+### Devportal Setup
+**1.** Head over to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application. Once you've created the application, go to the "Bot" tab and create a new bot. Copy the bot token and paste it in the `APPLICATION_TOKEN` variable.
+
+**2.** Then go to the `General Information` tab and copy the `Application ID` and paste it in the `APPLICATION_ID` variable and copy the `Public Key` and paste it in the `APPLICATION_PUBLIC_KEY` variable.
+
+**3.** Then take you severless instance `URL` i.e. `https://example.io` and add `/interactions` to it (i.e. `https://example.io/interactions`). Then head over to the general information tab and paste it in the `Interactions Endpoint URL` field. If everything is correct, you should see a confirmation message. Make sure you deploy the above code to your serverless instance before doing this.
+
+#### Registering Commands
+You can sync commands by just visiting the dashbaord.
+the dashboard will be available at `https://example.io/dh/dash/<bot_token_here> `. Once you visit the dashboard, it will automatically register all the commands. You can also register commands manually by using the a bash command    
+```bash
+curl -X GET https://example.io/dh/sync/<bot_token_here>
+```
+
+### Adding the `id` to the local command
+Now that you have registered the command, you can get the `id` of the command by visiting the dashboard and clicking `Copy Id` button. Once you have the `id`, you can add it to the command in the code. Then your command should look like this
+```python
+@app.command(
+    id="1047575834602520586",
+    name="help", 
+    description="basic help command for the bot"
+)
+async def help_command(interaction: discohook.Interaction):
+    await interaction.command.response(
+        "Hello, World!",
+        embed=discohook.Embed(title="Help", description="This is a help command"),
+        ephemeral=True,
+    )
+```
+⚠️ Command withou the `id` will not work as the library will consider it as a non registered command.
+
+### 📕 Why we did not add auto registration?
+As this library is meant to be used in serverless functions, we did not add auto registration as at each invocation the scripts will be reloaded and the commands will be re-registered again. This will cause rate limit issues and also due to command registration being a slow process, it will cause a lot of latency.
+So we decided to add a dashboard to register commands. Which is a lot faster and also does not cause any rate limit issues if used properly. Thriugh the dashboard, you can also delete commands and sync the edited commands.
+
+####  📕 More Examples and Documentation will be added soon.
