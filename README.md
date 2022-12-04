@@ -46,7 +46,7 @@ Deploy the snippet above to your serverless function and you're good to go to ne
 
 #### Registering Commands
 You can sync commands by just visiting the dashbaord.
-the dashboard will be available at `https://example.io/dh/dash/<bot_token_here> `. Once you visit the dashboard, it will automatically register all the commands. You can also register commands manually by using the a bash command    
+the dashboard will be available at `https://example.io/dh/dash/<bot_token_here> `. Once you visit the dashboard, it will automatically register all the commands. You can also register commands manually by using the bash command below.   
 ```bash
 curl -X GET https://example.io/dh/sync/<bot_token_here>
 ```
@@ -55,7 +55,7 @@ curl -X GET https://example.io/dh/sync/<bot_token_here>
 Now that you have registered the command, you can get the `id` of the command by visiting the dashboard and clicking `Copy Id` button. Once you have the `id`, you can add it to the command in the code. Then your command should look like this
 ```python
 @app.command(
-    id="1047575834602520586",
+    id="1047575834602520586", # add the id like this
     name="help", 
     description="basic help command for the bot"
 )
@@ -70,6 +70,6 @@ async def help_command(interaction: discohook.Interaction):
 
 ### 📕 Why we did not add auto registration?
 As this library is meant to be used in serverless functions, we did not add auto registration as at each invocation the scripts will be reloaded and the commands will be re-registered again. This will cause rate limit issues and also due to command registration being a slow process, it will cause a lot of latency.
-So we decided to add a dashboard to register commands. Which is a lot faster and also does not cause any rate limit issues if used properly. Thriugh the dashboard, you can also delete commands and sync the edited commands.
+So we decided to add a dashboard to register commands. Which is a lot faster and also does not cause any rate limit issues if used properly. Through the dashboard, you can also delete commands and sync the edited commands.
 
 ####  📕 More Examples and Documentation will be added soon.
