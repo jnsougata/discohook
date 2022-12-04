@@ -8,6 +8,7 @@ from .component import View
 from .modal import Modal
 from .https import request
 from .option import Choice
+from fastapi.requests import Request
 if TYPE_CHECKING:
     from .client import Client
 
@@ -291,6 +292,7 @@ class Interaction:
 
     def __init__(self, data: Dict[str, Any]):
         self._raw_data = data
+        self.request: Optional[Request] = None
         self.client: Optional['Client'] = None
         self.id: str = data['id']
         self.type: int = data['type']
