@@ -169,8 +169,9 @@ async def dashboard(request: Request):
 
             function appendCommand(data) {
                 let command = document.createElement("tr");
+                command.id = data.id;
                 if (!data.description) {
-                    data.description = "N/A";
+                    data.description = "n/a";
                 }
                 command.innerHTML = `
                     <td>${data.id}</td>
@@ -189,8 +190,8 @@ async def dashboard(request: Request):
                 document.getElementById(`del-${data.id}`).addEventListener("click", () => {
                     fetch(`/dh/delete/${data.id}`)
                     .then((res) => {
-                        if (res.status == 200) {
-                            window.location.reload();
+                        if (res.status == 204) {
+                            document.getElementById(data.id).remove();
                         } else {
                             alert(JSON.stringify(res.json()));
                         }
