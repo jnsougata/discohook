@@ -36,7 +36,6 @@ class Client(FastAPI):
         public_key: str,
         token: str,
         *,
-        static: bool = False,
         route: str = '/interactions',
         log_channel_id: int = None,
         **kwargs
@@ -45,7 +44,7 @@ class Client(FastAPI):
         self.redoc_url = None
         self.docs_url = None
         self.token = token
-        self.static = static
+        self.request: Optional[Request] = None
         self.public_key = public_key
         self.application_id = application_id
         self.log_channel_id: Optional[int] = log_channel_id

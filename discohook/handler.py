@@ -32,6 +32,7 @@ async def handler(request: Request):
     data = await request.json()
     interaction = Interaction(data)
     interaction.client = request.app
+    interaction.client.request = request
     try:
         if interaction.type == InteractionType.ping.value:
             return JSONResponse({'type': InteractionCallbackType.pong.value}, status_code=200)
