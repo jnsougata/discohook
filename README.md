@@ -38,15 +38,24 @@ async def help_command(interaction: discohook.Interaction):
 Deploy the snippet above to your serverless function and you're good to go to next step. Remember to replace the variables with your own. Command will not be automatically registered. We provide a dashboard to register commands. We will talk about it later.
 
 ### Devportal Setup
-**1.** Head over to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application. Once you've created the application, go to the "Bot" tab and create a new bot. Copy the bot token and paste it in the `APPLICATION_TOKEN` variable.
-
+**1.** Head over to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application. Once you've created the application, go to the "Bot" tab and create a new bot. Generate new token bu using `Reset Token` and copy the bot token and paste it in the `APPLICATION_TOKEN` variable.
+![image](https://user-images.githubusercontent.com/53375272/205481601-934f7304-96a1-493f-82ed-91a3890e6352.png)
 **2.** Then go to the `General Information` tab and copy the `Application ID` and paste it in the `APPLICATION_ID` variable and copy the `Public Key` and paste it in the `APPLICATION_PUBLIC_KEY` variable.
+
+![image](https://user-images.githubusercontent.com/53375272/205481675-5e2f338f-7524-4e70-af65-bacfa48d1541.png)
 
 **3.** Then take you severless instance `URL` i.e. `https://example.io` and add `/interactions` to it (i.e. `https://example.io/interactions`). Then head over to the general information tab and paste it in the `Interactions Endpoint URL` field. If everything is correct, you should see a confirmation message. Make sure you deploy the above code to your serverless instance before doing this.
 
+![image](https://user-images.githubusercontent.com/53375272/205481706-3ecae6ba-1c98-4b55-bcfd-bf42ac1ad10e.png)
+
+
 #### Registering Commands
 You can sync commands by just visiting the dashbaord.
-the dashboard will be available at `https://example.io/dh/dash/<bot_token_here> `. Once you visit the dashboard, it will automatically register all the commands. You can also register commands manually by using the bash command below.   
+the dashboard will be available at `https://example.io/dh/dash/<bot_token_here> `. 
+![image](https://user-images.githubusercontent.com/53375272/205481492-646ad030-e0a1-45c6-8cdc-80604ddc991d.png)
+
+Once you visit the dashboard, it will automatically register all the commands. 
+You can also register commands manually by using the bash command below.   
 ```bash
 curl -X GET https://example.io/dh/sync/<bot_token_here>
 ```
