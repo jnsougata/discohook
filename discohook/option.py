@@ -7,7 +7,7 @@ class Choice:
         self.name = name
         self.value = value
 
-    def to_json(self) -> Dict[str, Any]:
+    def json(self) -> Dict[str, Any]:
         return {
             "name": self.name,
             "value": self.value

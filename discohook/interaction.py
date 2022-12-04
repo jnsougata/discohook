@@ -144,7 +144,6 @@ class CommandInteraction:
             status_code=200
         )
 
-
 class ComponentInteraction:
     def __init__(self, app: "Client", data: Dict[str, Any]):
         self._app = app
@@ -235,9 +234,9 @@ class ComponentInteraction:
             return
         self._app._populated_return = None
         return await request(
-            self._app._session,
-            f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original",
+            path=f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original",
             headers=NO_AUTH_HEADER,
+            session=self._app._session
         )
 
     async def delete_original(self):
@@ -246,9 +245,9 @@ class ComponentInteraction:
         self._app.cached_inter_tokens.pop(self._id, None)
         self._app._populated_return = None
         await request(
-            self._app._session, 
-            f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original",
             method="DELETE",
+            path=f"/webhooks/{self._application_id}/{self._origin_token}/messages/@original",
+            session=self._app._session, 
             headers=NO_AUTH_HEADER,
         )
 
@@ -282,9 +281,10 @@ class ComponentInteraction:
             return
         self._app._populated_return = None
         return await request(
-            self._app._session,
-            f'/webhooks/{self._application_id}/{self._origin_token}/messages/@original', 
-            method='PATCH', json=payload, headers=NO_AUTH_HEADER
+            method='PATCH',
+            path=f'/webhooks/{self._application_id}/{self._origin_token}/messages/@original', 
+            session=self._app._session,
+            json=payload, headers=NO_AUTH_HEADER
         )
 
 
@@ -356,9 +356,61 @@ class Interaction:
         self.client._populated_return = JSONResponse(
             {
                 "data": {
-                    "choices": [choice.to_json() for choice in choices]
+                    "choices": [choice.json() for choice in choices]
                 },
                 "type": InteractionCallbackType.autocomplete_result.value,
             },
             status_code=200
+        )
+
+    async def defer(self, ephemeral: bool = False):
+        payload = {
+            "type": InteractionCallbackType.deferred_channel_message_with_source.value,
+        }
+        if ephemeral:
+            payload["data"] = {
+                "flags": 64
+            }
+        await request(
+            method="POST", 
+            path=f"/interactions/{self.id}/{self.token}/callback", 
+            session=self.client._session, 
+            json={"type": InteractionCallbackType.deferred_channel_message_with_source.value}
+        )
+    
+
+    async def follow_up(
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        components: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[Dict[str, Any]] = None,
+        files: Optional[List[Dict[str, Any]]] = None,
+        ephemeral: Optional[bool] = False,
+        supress_embeds: Optional[bool] = False,
+    ) -> JSONResponse:
+        payload = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            components=components,
+            tts=tts,
+            file=file,
+            files=files,
+            ephemeral=ephemeral,
+            supress_embeds=supress_embeds
+        )
+        if components:
+            for component in components._children:
+                self._app._load_component(component)
+        self._app._load_inter_token(self.id, self.token)
+        # TODO: parse the response as a message
+        return await request(
+            method="POST",
+            path=f"/webhooks/{self.application_id}/{self.token}",
+            session=self.client._session,
+            json=payload,
         )
