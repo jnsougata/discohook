@@ -405,8 +405,8 @@ class Interaction:
         )
         if components:
             for component in components._children:
-                self._app._load_component(component)
-        self._app._load_inter_token(self.id, self.token)
+                self.client._load_component(component)
+        self.client._load_inter_token(self.id, self.token)
         # TODO: parse the response as a message
         return await request(
             method="POST",
