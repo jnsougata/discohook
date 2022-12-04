@@ -46,7 +46,7 @@ async def dashboard(request: Request):
             .container > header {
                 top: 0;
                 position: fixed;
-                background-color: var(--black-secondary);
+                background-color: rgb(84, 84, 235);
                 color: white;
                 padding: 10px;
                 width: 100%;
@@ -60,7 +60,7 @@ async def dashboard(request: Request):
             .container > header > button {
                 background-color: transparent;
                 border: none;
-                color: black;
+                color: rgb(84, 84, 235);
                 font-size: 20px;
                 cursor: pointer;
                 border-radius: 5px;
@@ -82,68 +82,45 @@ async def dashboard(request: Request):
                 padding: 0 10px;
                 border-radius: 5px;
                 transition: 0.2s;
-                color: rgb(116, 114, 114);
+                color: rgb(84, 84, 235);
             }
-            .container > .commands {
+            table {
                 width: 100%;
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: center;
-                margin-top: 50px;
-                background-color: var(--black-secondary);
-            }
-            .container > .commands > .command {
-                width: 100%;
-                height: 30px;
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-start;
-                align-items: center;
-                padding: 10px;
-                margin-bottom: 10px;
+                height: auto;
                 background-color: var(--black-main);
-                box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+                margin-top: 50px;
             }
-            .container > .commands > .command > span {
-                max-width: 250px;
-                text-align: center;
+            table > thead > tr > th {
+                background-color: var(--black-secondary);
+                color: white;
+                padding: 10px;
                 font-size: 15px;
                 font-weight: 500;
+                text-align: left;
+                top: 0;
+                position: sticky;
+            }
+            table > tbody > tr > td {
+                background-color: var(--black-secondary);
                 color: white;
-                margin-left: 10px;
-                padding: 5px 10px;
-                border-radius: 5px;
-                background-color: rgba(0, 0, 255, 0.575);
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-                flex-shrink: 0;
+                padding: 10px;
+                font-size: 15px;
+                font-weight: 500;
+                text-align: left;
             }
-            .container > .commands > .command > .options {
-                width: 100%;
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-end;
-                align-items: center;
-                margin-left: 10px;
-                margin-right: 10px;
-            }
-            .container > .commands > .command >.options > button {
-                background-color: transparent;
+
+            td > button {
+                background-color: red;
                 border: none;
                 color: white;
                 font-size: 15px;
                 cursor: pointer;
-                transition: 0.2s;
-                margin-left: 10px;
-                background-color: rgba(29, 172, 89, 0.753);
-                padding: 8px 10px;
                 border-radius: 5px;
                 transition: 0.2s;
-                outline: none;
+                margin-right: 5px;
+                padding: 8px 10px;
             }
+                      
         </style>
     </head>
     <body>
@@ -152,11 +129,22 @@ async def dashboard(request: Request):
                 <h1>commands</h1>
                 <button id="reload"><i class="fas fa-sync"></i></button>
             </header>
-            <div class="commands">
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody id="commands">
+                </tbody> 
+            </table>
         </div>
         <script>
-            let commands = document.querySelector(".commands");    
+            let commands = document.querySelector("#commands");    
             let token = window.location.href.split("/").pop();
             let reload = document.getElementById("reload");
             reload.addEventListener("click", () => {
@@ -180,43 +168,34 @@ async def dashboard(request: Request):
             }
 
             function appendCommand(data) {
-                let command = document.createElement("div");
-                command.classList.add("command");
-                let idSpan = document.createElement("span");
-                idSpan.innerText = data.id;
-                let nameSpan = document.createElement("span");
-                nameSpan.innerText = data.name;
-                let descriptionSpan = document.createElement("span");
-                descriptionSpan.innerText = data.description;
-                let options = document.createElement("div");
-                options.classList.add("options");
-                let copyId = document.createElement("button");
-                copyId.innerText = "Copy Id";
-                copyId.addEventListener("click", () => {
+                let command = document.createElement("tr");
+                if (!data.description) {
+                    data.description = "N/A";
+                }
+                command.innerHTML = `
+                    <td>${data.id}</td>
+                    <td>${data.name}</td>
+                    <td>${data.description}</td>
+                    <td>${data.type}</td>
+                    <td>
+                        <button id="copy-${data.id}" style="background-color: rgb(42, 155, 42);">Copy ID</button>
+                        <button id="del-${data.id}">Delete</button>
+                    </td>
+                `;
+                commands.appendChild(command);
+                document.getElementById(`copy-${data.id}`).addEventListener("click", () => {
                     navigator.clipboard.writeText(data.id);
                 });
-                let deleteCommand = document.createElement("button");
-                deleteCommand.innerText = "Delete";
-                deleteCommand.style.backgroundColor = "rgba(255, 0, 0, 0.514)";
-                deleteCommand.addEventListener("click", () => {
+                document.getElementById(`del-${data.id}`).addEventListener("click", () => {
                     fetch(`/dh/delete/${data.id}`)
-                        .then((res) => {
-                            if (res.status == 204) {
-                                command.remove();
-                            } else {
-                                alert(JSON.stringify(res.json()));
-                            }
-                        });
+                    .then((res) => {
+                        if (res.status == 200) {
+                            window.location.reload();
+                        } else {
+                            alert(JSON.stringify(res.json()));
+                        }
+                    });
                 });
-                options.appendChild(copyId);
-                options.appendChild(deleteCommand);
-                command.appendChild(idSpan);
-                command.appendChild(nameSpan);
-                if (data.description) {
-                    command.appendChild(descriptionSpan);
-                }
-                command.appendChild(options);
-                commands.appendChild(command);
             }
         </script>
     </body>
