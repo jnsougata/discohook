@@ -52,7 +52,8 @@ Deploy the snippet above to your serverless function and you're good to go to ne
 #### Registering Commands
 You can sync commands by just visiting the dashbaord.
 the dashboard will be available at `https://example.io/dh/dash/<bot_token_here> `. 
-![image](https://user-images.githubusercontent.com/53375272/205481492-646ad030-e0a1-45c6-8cdc-80604ddc991d.png)
+
+![image](https://user-images.githubusercontent.com/53375272/205497776-cb2c6653-5b3c-4b32-bbb3-d9be6278b466.png)
 
 Once you visit the dashboard, it will automatically register all the commands. 
 You can also register commands manually by using the bash command below.   
