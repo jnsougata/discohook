@@ -13,9 +13,15 @@ from .permissions import Permissions
 from .command import ApplicationCommand
 from .component import Button, SelectMenu
 from fastapi.requests import Request
-from fastapi.responses import JSONResponse
+from .dash import dashboard
+from fastapi.responses import JSONResponse, HTMLResponse
 from typing import Optional, List, Dict, Union, Callable
 
+async def del_cmd(request: Request, command_id: str):
+    resp = await request.app.delete_command(command_id)
+    if resp.status == 204:
+        return JSONResponse({'success': True}, status_code=resp.status)
+    return JSONResponse({'error': 'Failed to delete command'}, status_code=resp.status)
 
 async def sync(request: Request, secret: str = None):
     if secret == request.app.token:
@@ -37,6 +43,8 @@ class Client(FastAPI):
         **kwargs
     ):
         super().__init__(**kwargs)
+        self.redoc_url = None
+        self.docs_url = None
         self.token = token
         self.static = static
         self.public_key = public_key
@@ -52,7 +60,9 @@ class Client(FastAPI):
         self.cached_inter_tokens: Dict[str, str] = {}
         self._populated_return: Optional[JSONResponse] = None
         self.add_route(route, handler, methods=['POST'], include_in_schema=False)
-        self.add_api_route('/sync/{secret}', sync, methods=['GET'], include_in_schema=False)
+        self.add_api_route('/dh/sync/{secret}', sync, methods=['GET'], include_in_schema=False)
+        self.add_api_route('/dh/dash/{secret}', dashboard, methods=['GET'], include_in_schema=False)
+        self.add_api_route('/dh/delete/{command_id}', del_cmd, methods=['GET'], include_in_schema=False)
         self._global_error_handler: Optional[Callable] = None
 
     def _load_component(self, component: Union[Button, Modal, SelectMenu]):
@@ -99,12 +109,8 @@ class Client(FastAPI):
         self.application_commands.update(static_commands)
         self._sync_queue.extend(commands)
             
-    async def delete_command(self, command_id: str, guild_id: int = None):
-        if not guild_id:
-            url = f"/api/v10/applications/{self.application_id}/commands/{command_id}"
-        else:
-            url = f"/api/v10/applications/{self.application_id}/guilds/{guild_id}/commands/{command_id}"
-        await self._session.delete(url)
+    async def delete_command(self, command_id: str):
+        return await self._session.delete(f"/api/v10/applications/{self.application_id}/commands/{command_id}")
              
     def add_cog(self, cog: Cog):
         if isinstance(cog, Cog):
