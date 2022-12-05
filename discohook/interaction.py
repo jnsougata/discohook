@@ -40,37 +40,19 @@ class Interaction:
         self.data: Optional[Dict[str, Any]] = data.get('data')
         self.guild_id: Optional[str] = data.get('guild_id')
         self.channel_id: Optional[str] = data.get('channel_id')
-        self.member: Optional[Dict[str, Any]] = data.get('member')
-        self.user: Optional[Dict[str, Any]] = data.get('user')
-        self.message: Optional[Dict[str, Any]] = data.get('message')
         self.app_permissions: Optional[int] = data.get('app_permissions')
         self.locale: Optional[str] = data.get('locale')
         self.guild_locale: Optional[str] = data.get('guild_locale')
-
-    @property
-    def owner(self) -> Optional[User]:
-        if not self.message:
-            return None
-        return User(self.message["interaction"]["user"])
-
-    @property
-    def from_owner(self) -> bool:
-        if not self.message:
-            return True
-        return self.owner == self.author
-
+    
     @property
     def author(self) -> Optional[Union[User, Member]]:
-        if self.guild_id:
-            self.member.update(self.member.pop("user", {}))
-            return Member(self.member)
-        return User(self.user)
-
-    @property
-    def command_data(self) -> Optional[CommandData]:
-        if self.type == InteractionType.app_command.value:
-            return CommandData(self.data)
-        return None
+        member = self._payload.get('member')
+        user = self._payload.get('user')
+        if member:
+            member.update(member.pop('user', {}))
+            return Member(member)
+        else:
+            return User(user)
 
     async def send_modal(self, modal: Modal):
         self.client.ui_factory[modal.custom_id] = modal
@@ -197,6 +179,18 @@ class ComponentInteraction(Interaction):
 
     def __init__(self, data: Dict[str, Any], request: Request):
         super().__init__(data, request)
+    
+    @property
+    def message(self) -> Optional[Message]:
+        return Message(self._payload["message"])
+
+    @property
+    def originator(self) -> User:
+        return User(self.message.interaction["user"])
+
+    @property
+    def from_originator(self) -> bool:
+        return self.originator == self.author
 
     async def follow_up(
         self,
@@ -305,6 +299,12 @@ class CommandInteraction(Interaction):
 
     def __init__(self, data: Dict[str, Any], request: Request):
         super().__init__(data, request)
+    
+    @property
+    def command_data(self) -> Optional[CommandData]:
+        if self.type == InteractionType.app_command.value:
+            return CommandData(self.data)
+        return None
 
     async def response(
         self,
