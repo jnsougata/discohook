@@ -248,7 +248,7 @@ class ComponentInteraction(Interaction):
         file: Optional[Dict[str, Any]] = MISSING,
         files: Optional[List[Dict[str, Any]]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
-    ) -> Message:
+    ):
         data = handle_edit_params(
             content=content,
             embed=embed,
@@ -267,12 +267,12 @@ class ComponentInteraction(Interaction):
             "data": data,
             "type": InteractionCallbackType.update_message.value,
         }
-        resp = await request(
+        
+        await request(
             "POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
             session=self.client._session, json=payload,
         )
-        return Message(resp)
 
     @property
     def origin(self) -> Optional[str]:
