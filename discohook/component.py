@@ -22,7 +22,7 @@ class Button:
         self.custom_id = secrets.token_urlsafe(16)
         self._callback: Optional[Callable] = None
 
-    def on_click(self, coro: Callable):
+    def onclick(self, coro: Callable):
         self._callback = coro
 
     def json(self) -> Dict[str, Any]:
@@ -100,7 +100,7 @@ class SelectMenu:
         if disabled:
             self.data["disabled"] = disabled
 
-    def on_selection(self, coro: Callable):
+    def onselection(self, coro: Callable):
         self._callback = coro
 
     def json(self) -> Dict[str, Any]:

@@ -82,13 +82,13 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
 
 
 def resolve_command_options(interaction: Interaction):
-    if not interaction._app_command_data.options:  # noqa
+    if not interaction.command_data.options:  # noqa
         return {}
-    for option in interaction._app_command_data.options:  # noqa
+    for option in interaction.command_data.options:  # noqa
         if option['type'] == AppCmdOptionType.subcommand.value:
             return parse_generic_options(option['options'], interaction)
         else:
-            return parse_generic_options(interaction._app_command_data.options, interaction)  # noqa
+            return parse_generic_options(interaction.command_data.options, interaction)  # noqa
 
 
 def build_slash_command_prams(func: Callable, interaction: Interaction, skips: int = 1):
