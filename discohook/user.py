@@ -1,36 +1,68 @@
 from typing import Optional
+from .asset import Asset
 from .permissions import Permissions
 
 
 class User:
     def __init__(self, data: dict):
-        self.id: str = data["id"]
-        self.username: str = data["username"]
-        self.discriminator: str = data["discriminator"]
-        self.avatar: Optional[str] = data.get("avatar")
-        self.bot: bool = data.get("bot", False)
-        self.system: bool = data.get("system", False)
-        self.mfa_enabled: bool = data.get("mfa_enabled", False)
-        self.locale: Optional[str] = data.get("locale")
-        self.verified: bool = data.get("verified", False)
-        self.email: Optional[str] = data.get("email")
-        self.premium_type: Optional[int] = data.get("premium_type")
-        self.public_flags: Optional[int] = data.get("public_flags")
+        self.data = data
 
-    def avatar_url(
-            self,
-            *,
-            size: int = 1024,
-            extension: str = "png",
-            static_extension: str = "webp",
-            dynamic_extension: str = "gif"
-    ) -> str:
-        if self.avatar is None:
-            return f"https://cdn.discordapp.com/embed/avatars/{int(self.discriminator) % 5}.{extension}"
-        if self.avatar.startswith("a_"):
-            return f"https://cdn.discordapp.com/avatars/{self.id}/{self.avatar}.{dynamic_extension}?size={size}"
-        return f"https://cdn.discordapp.com/avatars/{self.id}/{self.avatar}.{static_extension}?size={size}"
-
+    @property
+    def id(self) -> str:
+        return self.data["id"]
+    
+    @property
+    def name(self) -> str:
+        return self.data["username"]
+    
+    @property
+    def discriminator(self) -> str:
+        return self.data["discriminator"]
+    
+    @property
+    def avatar(self) -> Asset:
+        hash = self.data.get("avatar")
+        if not hash:
+            fragment = f"embed/avatars/"
+            hash = str({int(self.discriminator) % 5})
+            return Asset(hash=hash, fragment=fragment)
+        return Asset(hash=hash, fragment=f"avatars/{self.id}")
+    
+    @property
+    def system(self) -> bool:
+        return self.data.get("system", False)
+    
+    @property
+    def bot(self) -> bool:
+        return self.data.get("bot", False)
+    
+    @property
+    def mfa_enabled(self) -> bool:
+        return self.data.get("mfa_enabled", False)
+    
+    @property
+    def locale(self) -> Optional[str]:
+        return self.data.get("locale")
+    
+    @property
+    def verified(self) -> bool:
+        return self.data.get("verified", False)
+    
+    @property
+    def email(self) -> Optional[str]:
+        return self.data.get("email")
+    
+    @property
+    def premium_type(self) -> Optional[int]:
+        return self.data.get("premium_type")
+    
+    @property
+    def public_flags(self) -> Optional[int]:
+        return self.data.get("public_flags")
+    
+    def __str__(self) -> str:
+        return f"{self.name}#{self.discriminator}"
+    
     def __eq__(self, other):
         return self.id == other.id
     
