@@ -1,5 +1,5 @@
 from fastapi import Request
-from .interaction import Interaction, ComponetInteraction, CommandInteraction
+from .interaction import Interaction, ComponentInteraction, CommandInteraction
 from .command import *
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
@@ -64,7 +64,7 @@ async def handler(request: Request):
                 await command._callback(interaction, *args, **kwargs)
 
         elif data['type'] == InteractionType.component.value:
-            interaction = ComponetInteraction(data, request)
+            interaction = ComponentInteraction(data, request)
             custom_id = interaction.data['custom_id']
             component = request.app.ui_factory.get(custom_id, None)
             if not component:

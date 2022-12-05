@@ -193,7 +193,7 @@ class Interaction:
         return ResponseMessage(resp, self)
 
 
-class ComponetInteraction(Interaction):
+class ComponentInteraction(Interaction):
 
     def __init__(self, data: Dict[str, Any], request: Request):
         super().__init__(data, request)

@@ -13,7 +13,7 @@ from .client import Client
 from .permissions import Permissions
 from .command import ApplicationCommand
 from .component import View, Button, SelectOption, SelectMenu
-from .interaction import Interaction, ComponetInteraction, CommandInteraction
+from .interaction import Interaction, ComponentInteraction, CommandInteraction
 
 user_command = AppCmdType.user
 slash_command = AppCmdType.slash
