@@ -48,7 +48,7 @@ class StringOption(Option):
 
     def json(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.to_json() for choice in self.choices]
+            self.data["choices"] = [choice.json() for choice in self.choices]
         if self.auto_complete:
             self.data["autocomplete"] = self.auto_complete
         if self.max_length:
@@ -78,7 +78,7 @@ class IntegerOption(Option):
 
     def json(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.to_json() for choice in self.choices]
+            self.data["choices"] = [choice.json() for choice in self.choices]
         if self.auto_complete:
             self.data["autocomplete"] = self.auto_complete
         if self.max_value is not None:
@@ -108,7 +108,7 @@ class NumberOption(Option):
 
     def json(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.to_json() for choice in self.choices]
+            self.data["choices"] = [choice.json() for choice in self.choices]
         if self.auto_complete:
             self.data["autocomplete"] = self.auto_complete
         if self.max_value is not None:
