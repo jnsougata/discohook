@@ -10,10 +10,10 @@ from .embed import Embed
 from .attachment import Attachment
 from .emoji import PartialEmoji
 from .client import Client
-from .interaction import Interaction
 from .permissions import Permissions
 from .command import ApplicationCommand
 from .component import View, Button, SelectOption, SelectMenu
+from .interaction import Interaction, ComponetInteraction, CommandInteraction
 
 user_command = AppCmdType.user
 slash_command = AppCmdType.slash

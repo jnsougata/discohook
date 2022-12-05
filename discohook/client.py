@@ -49,7 +49,7 @@ class Client(FastAPI):
         self.log_channel_id: Optional[int] = log_channel_id
         self._session: Optional[aiohttp.ClientSession] = aiohttp.ClientSession(
             base_url="https://discord.com", 
-            headers={"Authorization": f"Bot {self.token}"}
+            headers={"Authorization": f"Bot {self.token}", "Content-Type": "application/json"}
         )
         self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
         self._sync_queue: List[ApplicationCommand] = []

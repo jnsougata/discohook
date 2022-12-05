@@ -1,5 +1,5 @@
 from fastapi import Request
-from .interaction import Interaction
+from .interaction import Interaction, ComponetInteraction, CommandInteraction
 from .command import *
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
@@ -30,14 +30,12 @@ async def handler(request: Request):
         return Response(content='BadSignature', status_code=401)
     
     data = await request.json()
-    interaction = Interaction(data)
-    interaction.request = request
-    interaction.client = request.app
     try:
-        if interaction.type == InteractionType.ping.value:
+        if data['type'] == InteractionType.ping.value:
             return JSONResponse({'type': InteractionCallbackType.pong.value}, status_code=200)
 
-        elif interaction.type == InteractionType.app_command.value:
+        elif data['type'] == InteractionType.app_command.value:
+            interaction = CommandInteraction(data, request)
             command: ApplicationCommand = request.app.application_commands.get(interaction.command_data.id)
             if not command:
                 raise NotImplemented(data)
@@ -65,7 +63,8 @@ async def handler(request: Request):
                 args, kwargs = build_slash_command_prams(command._callback, interaction)
                 await command._callback(interaction, *args, **kwargs)
 
-        elif interaction.type == InteractionType.component.value:
+        elif data['type'] == InteractionType.component.value:
+            interaction = ComponetInteraction(data, request)
             custom_id = interaction.data['custom_id']
             component = request.app.ui_factory.get(custom_id, None)
             if not component:
@@ -75,13 +74,15 @@ async def handler(request: Request):
             if interaction.data['component_type'] == MessageComponentType.select_menu.value:
                 await component._callback(interaction, build_select_menu_values(interaction))
 
-        elif interaction.type == InteractionType.modal_submit.value:
+        elif data['type'] == InteractionType.modal_submit.value:
+            interaction = Interaction(data, request)
             component = request.app.ui_factory.get(interaction.data['custom_id'], None)
             if not component:
                 return JSONResponse({'error': 'component not found!'}, status_code=404)
             args, kwargs = build_modal_params(component._callback, interaction)
             await component._callback(interaction, *args, **kwargs)
-        elif interaction.type == InteractionType.autocomplete.value:
+        elif data['type'] == InteractionType.autocomplete.value:
+            interaction = Interaction(data, request)
             command: ApplicationCommand = request.app.application_commands.get(interaction.data['id'])
             if not command:
                 return JSONResponse({'error': 'command not found!'}, status_code=404)

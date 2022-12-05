@@ -6,89 +6,13 @@ from .user import User
 from .member import Member
 from .component import View
 from .modal import Modal
-from .https import request, HTTPClient
+from .https import request
 from .option import Choice
 from fastapi.requests import Request
+from .messgae import Message, ResponseMessage, FollowupMessage
+from .param_handler import handle_edit_params, handle_send_params, MISSING
 if TYPE_CHECKING:
     from .client import Client
-
-MISSING = object()
-NO_AUTH_HEADER = {"Content-Type": "application/json"}
-
-def handle_send_params(
-    content: Optional[str] = None,
-    *,
-    embed: Optional[Embed] = None,
-    embeds: Optional[List[Embed]] = None,
-    components: Optional[View] = None,
-    tts: Optional[bool] = False,
-    file: Optional[Dict[str, Any]] = None,
-    files: Optional[List[Dict[str, Any]]] = None,
-    ephemeral: Optional[bool] = False,
-    supress_embeds: Optional[bool] = False
-):
-    payload = {}
-    flag_value = 0
-    if embed:
-        if not embeds:
-            embeds = []
-        embeds.append(embed)
-    if file:
-        if not files:
-            files = []
-        files.append(file)
-    if ephemeral:
-        flag_value |= 1 << 6
-    if supress_embeds:
-        flag_value |= 1 << 2
-    if content:
-        payload["content"] = str(content)
-    if tts:
-        payload["tts"] = True
-    if embeds:
-        payload["embeds"] = [embed.json() for embed in embeds]
-    if components:
-        payload["components"] = components.json()
-    if files:
-        payload["attachments"] = files
-    if flag_value:
-        payload["flags"] = flag_value
-
-    return payload
-
-
-def handle_edit_params(
-    content: Optional[str] = MISSING,
-    *,
-    embed: Optional[Embed] = MISSING,
-    embeds: Optional[List[Embed]] = MISSING,
-    components: Optional[View] = MISSING,
-    tts: Optional[bool] = MISSING,
-    file: Optional[Dict[str, Any]] = MISSING,
-    files: Optional[List[Dict[str, Any]]] = MISSING,
-    supress_embeds: Optional[bool] = MISSING,
-):
-    payload = {}
-    if embed is None:
-        embeds = []
-    if file is None:
-        files = []
-    if components is None:
-        components = []
-    if content is not MISSING:
-        payload["content"] = str(content)
-    if tts is not MISSING:
-        payload["tts"] = tts
-    if embeds is not MISSING:
-        payload["embeds"] = [embed.json() for embed in embeds]
-    if components is not MISSING:
-        payload["components"] = components.json() if components else []
-    if files is not MISSING:
-        payload["attachments"] = files
-    if supress_embeds is not MISSING:
-        payload["flags"] = 1 << 2
-
-    return payload
 
 
 class CommandData:
@@ -102,172 +26,12 @@ class CommandData:
         self.options: Optional[List[Dict[str, Any]]] = data.get('options')
 
 
-class CommandInteraction:
-    def __init__(self, client: "Client", data: Dict[str, Any]):
-        self.client = client
-        self.interaction_id = data["id"]
-        self.interaction_token = data["token"]
-            
-    async def response(
-        self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
-        tts: Optional[bool] = False,
-        file: Optional[Dict[str, Any]] = None,
-        files: Optional[List[Dict[str, Any]]] = None,
-        ephemeral: Optional[bool] = False,
-        supress_embeds: Optional[bool] = False,
-    ) -> None:
-        data = handle_send_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            components=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            supress_embeds=supress_embeds
-        )
-        if view:
-            for component in view._children:  # noqa
-                self.client._load_component(component)  # noqa
-        self.client._load_inter_token(self.interaction_id, self.interaction_token)  # noqa
-        payload = {
-            "data": data,
-            "type": InteractionCallbackType.channel_message_with_source.value,
-        }
-        await request(
-            "POST",
-            path=f"/interactions/{self.interaction_id}/{self.interaction_token}/callback",
-            session=self.client._session,
-            json=payload,
-        )
-
-
-
-class ComponentInteraction:
-    def __init__(self, client: "Client", data: Dict[str, Any]):
-        self.client = client
-        self.interaction_id = data["id"]
-        self.interaction_token = data["token"]
-        self.application_id = data["application_id"]
-        self.message = data.get("message")
-
-    async def follow_up(
-        self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
-        tts: Optional[bool] = False,
-        file: Optional[Dict[str, Any]] = None,
-        files: Optional[List[Dict[str, Any]]] = None,
-        ephemeral: Optional[bool] = False,
-        supress_embeds: Optional[bool] = False,
-    ):
-        data = handle_send_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            components=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            supress_embeds=supress_embeds
-        )
-        if view:
-            for component in view._children:  # noqa
-                self.client._load_component(component)  # noqa
-        self.client._load_inter_token(self.interaction_id, self.interaction_token)  # noqa
-        payload = {
-            "data": data,
-            "type": InteractionCallbackType.channel_message_with_source.value,
-        }
-        return await request(
-            "POST",
-            path=f"/interactions/{self.interaction_id}/{self.interaction_token}/callback",
-            session=self.client._session, json=payload,
-        )
-
-    async def edit_original(
-        self,
-        content: Optional[str] = MISSING,
-        *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[Dict[str, Any]] = MISSING,
-        files: Optional[List[Dict[str, Any]]] = MISSING,
-        supress_embeds: Optional[bool] = MISSING,
-    ):
-        data = handle_edit_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            components=view,
-            tts=tts,
-            file=file,
-            files=files,
-            supress_embeds=supress_embeds
-        )
-        if view is not MISSING and view:
-            for component in view._children:  # noqa
-                self.client._load_component(component)  # noqa
-        self.client._load_inter_token(self.interaction_id, self.interaction_token)  # noqa
-        payload = {
-            "data": data,
-            "type": InteractionCallbackType.update_message.value,
-        }
-        return await request(
-            "POST",
-            path=f"/interactions/{self.interaction_id}/{self.interaction_token}/callback",
-            session=self.client._session, json=payload,
-        )
-
-    @property
-    def origin(self) -> str:
-        if self.message:
-            parent_id = self.message["interaction"]["id"]
-            return self.client.cached_inter_tokens.get(parent_id, '')
-        return ''
-
-    async def fetch_original(self):
-        if not self.origin:
-            return
-        self.client._populated_return = None
-        return await request(
-            path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
-            headers=NO_AUTH_HEADER,
-            session=self.client._session
-        )
-
-    async def delete_original(self):
-        if not self.origin:
-            return
-        self.client.cached_inter_tokens.pop(self.interaction_id, None)
-        self.client._populated_return = None
-        await request(
-            method="DELETE",
-            path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
-            session=self.client._session, 
-            headers=NO_AUTH_HEADER,
-        )
-
-
-
 class Interaction:
 
-    def __init__(self, data: Dict[str, Any]):
+    def __init__(self, data: Dict[str, Any], request: Request):
         self._payload = data
-        self.request: Optional[Request] = None
-        self.client: Optional['Client'] = None
+        self.request: Request = request
+        self.client: 'Client' = request.app
         self.id: str = data['id']
         self.type: int = data['type']
         self.token: str = data['token']
@@ -308,14 +72,6 @@ class Interaction:
             return CommandData(self.data)
         return None
 
-    @property
-    def component(self) -> ComponentInteraction:
-        return ComponentInteraction(self.client, self._payload)
-
-    @property
-    def command(self) -> CommandInteraction:
-        return CommandInteraction(self.client, self._payload)
-
     async def send_modal(self, modal: Modal):
         self.client.ui_factory[modal.custom_id] = modal
         payload = {
@@ -353,6 +109,46 @@ class Interaction:
             json=payload
         )
     
+    async def response(
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        view: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[Dict[str, Any]] = None,
+        files: Optional[List[Dict[str, Any]]] = None,
+        ephemeral: Optional[bool] = False,
+        supress_embeds: Optional[bool] = False,
+    ) -> None:
+        data = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            components=view,
+            tts=tts,
+            file=file,
+            files=files,
+            ephemeral=ephemeral,
+            supress_embeds=supress_embeds
+        )
+        if view:
+            for component in view._children:  # noqa
+                self.client._load_component(component)  # noqa
+        self.client._load_inter_token(self.id, self.token)  # noqa
+        payload = {
+            "data": data,
+            "type": InteractionCallbackType.channel_message_with_source.value,
+        }
+        await request(
+            "POST",
+            path=f"/interactions/{self.id}/{self.token}/callback",
+            session=self.client._session,
+            json=payload,
+        )
+
+    
     async def follow_up(
         self,
         content: Optional[str] = None,
@@ -365,7 +161,7 @@ class Interaction:
         files: Optional[List[Dict[str, Any]]] = None,
         ephemeral: Optional[bool] = False,
         supress_embeds: Optional[bool] = False,
-    ) -> JSONResponse:
+    ) -> FollowupMessage:
         payload = handle_send_params(
             content=content,
             embed=embed,
@@ -381,10 +177,170 @@ class Interaction:
             for component in components._children:
                 self.client._load_component(component)
         self.client._load_inter_token(self.id, self.token)
-        # TODO: parse the response as a message
-        return await request(
+        data  = await request(
             method="POST",
             path=f"/webhooks/{self.application_id}/{self.token}",
+            session=self.client._session,
+            json=payload,
+        )
+        return FollowupMessage(data, self)
+    
+    async def original_response(self) -> ResponseMessage:
+        resp = await request(
+            path=f"/webhooks/{self.application_id}/{self.token}/messages/@original",
+            session=self.client._session
+        )
+        return ResponseMessage(resp, self)
+
+
+class ComponetInteraction(Interaction):
+
+    def __init__(self, data: Dict[str, Any], request: Request):
+        super().__init__(data, request)
+
+    async def follow_up(
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        view: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[Dict[str, Any]] = None,
+        files: Optional[List[Dict[str, Any]]] = None,
+        ephemeral: Optional[bool] = False,
+        supress_embeds: Optional[bool] = False,
+    ) -> FollowupMessage:
+        data = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            components=view,
+            tts=tts,
+            file=file,
+            files=files,
+            ephemeral=ephemeral,
+            supress_embeds=supress_embeds
+        )
+        if view:
+            for component in view._children:  # noqa
+                self.client._load_component(component)  # noqa
+        self.client._load_inter_token(self.id, self.token)  # noqa
+        payload = {
+            "data": data,
+            "type": InteractionCallbackType.channel_message_with_source.value,
+        }
+        resp = await request(
+            "POST",
+            path=f"/interactions/{self.id}/{self.token}/callback",
+            session=self.client._session, json=payload,
+        )
+        return FollowupMessage(resp, self)
+
+    async def edit_original(
+        self,
+        content: Optional[str] = MISSING,
+        *,
+        embed: Optional[Embed] = MISSING,
+        embeds: Optional[List[Embed]] = MISSING,
+        view: Optional[View] = MISSING,
+        tts: Optional[bool] = MISSING,
+        file: Optional[Dict[str, Any]] = MISSING,
+        files: Optional[List[Dict[str, Any]]] = MISSING,
+        supress_embeds: Optional[bool] = MISSING,
+    ) -> Message:
+        data = handle_edit_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            components=view,
+            tts=tts,
+            file=file,
+            files=files,
+            supress_embeds=supress_embeds
+        )
+        if view is not MISSING and view:
+            for component in view._children:  # noqa
+                self.client._load_component(component)  # noqa
+        self.client._load_inter_token(self.id, self.token)  # noqa
+        payload = {
+            "data": data,
+            "type": InteractionCallbackType.update_message.value,
+        }
+        resp = await request(
+            "POST",
+            path=f"/interactions/{self.id}/{self.token}/callback",
+            session=self.client._session, json=payload,
+        )
+        return Message(resp)
+
+    @property
+    def origin(self) -> Optional[str]:
+        if not self.message:
+            return
+        parent_id = self.message["interaction"]["id"]
+        return self.client.cached_inter_tokens.get(parent_id, '')
+
+    async def fetch_original(self) -> Message:
+        if not self.origin:
+            return
+        resp = await request(
+            path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
+            session=self.client._session
+        )
+        return Message(resp)
+
+    async def delete_original(self):
+        if not self.origin:
+            return
+        self.client.cached_inter_tokens.pop(self.id, None)
+        await request(
+            method="DELETE",
+            path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
+            session=self.client._session, 
+        )
+    
+    
+class CommandInteraction(Interaction):
+
+    def __init__(self, data: Dict[str, Any], request: Request):
+        super().__init__(data, request)
+
+    async def response(
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        view: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[Dict[str, Any]] = None,
+        files: Optional[List[Dict[str, Any]]] = None,
+        ephemeral: Optional[bool] = False,
+        supress_embeds: Optional[bool] = False,
+    ) -> None:
+        data = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            components=view,
+            tts=tts,
+            file=file,
+            files=files,
+            ephemeral=ephemeral,
+            supress_embeds=supress_embeds
+        )
+        if view:
+            for component in view._children:  # noqa
+                self.client._load_component(component)  # noqa
+        self.client._load_inter_token(self.id, self.token)  # noqa
+        payload = {
+            "data": data,
+            "type": InteractionCallbackType.channel_message_with_source.value,
+        }
+        await request(
+            "POST",
+            path=f"/interactions/{self.id}/{self.token}/callback",
             session=self.client._session,
             json=payload,
         )
