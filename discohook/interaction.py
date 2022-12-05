@@ -155,7 +155,7 @@ class Interaction:
         *,
         embed: Optional[Embed] = None,
         embeds: Optional[List[Embed]] = None,
-        components: Optional[View] = None,
+        view: Optional[View] = None,
         tts: Optional[bool] = False,
         file: Optional[Dict[str, Any]] = None,
         files: Optional[List[Dict[str, Any]]] = None,
@@ -166,15 +166,15 @@ class Interaction:
             content=content,
             embed=embed,
             embeds=embeds,
-            components=components,
+            components=view,
             tts=tts,
             file=file,
             files=files,
             ephemeral=ephemeral,
             supress_embeds=supress_embeds
         )
-        if components:
-            for component in components._children:
+        if view:
+            for component in view._children:
                 self.client._load_component(component)
         self.client._load_inter_token(self.id, self.token)
         data  = await request(
