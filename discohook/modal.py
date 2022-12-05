@@ -57,5 +57,5 @@ class Modal:
             self._data['components'].append(self._row)
         return self._data
 
-    def on_submit(self, coro: Callable):
+    def onsubmit(self, coro: Callable):
         self._callback = coro
