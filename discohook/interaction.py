@@ -281,7 +281,7 @@ class ComponetInteraction(Interaction):
         parent_id = self.message["interaction"]["id"]
         return self.client.cached_inter_tokens.get(parent_id, '')
 
-    async def fetch_original(self) -> Message:
+    async def original_message(self) -> Message:
         if not self.origin:
             return
         resp = await request(
