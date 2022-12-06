@@ -36,6 +36,7 @@ class SubCommandGroup:
     pass
 
 
+# noinspection PyShadowingBuiltins
 class ApplicationCommand:
 
     def __init__(

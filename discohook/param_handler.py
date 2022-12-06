@@ -3,8 +3,8 @@ from .embed import Embed
 from .component import View
 
 
-
 MISSING = object()
+
 
 def handle_send_params(
     content: Optional[str] = None,

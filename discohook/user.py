@@ -18,7 +18,8 @@ class User:
     @property
     def discriminator(self) -> str:
         return self.data["discriminator"]
-    
+
+    # noinspection PyShadowingBuiltins
     @property
     def avatar(self) -> Asset:
         hash = self.data.get("avatar")

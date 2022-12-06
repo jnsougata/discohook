@@ -3,7 +3,7 @@ class Asset:
 
     base_url = "https://cdn.discordapp.com"
 
-    def __init__(self, *, hash: str, fragment: str) -> None:
+    def __init__(self, *, hash: str, fragment: str) -> None:  # noqa
         self._hash = hash
         self._fragment = fragment
     
@@ -20,5 +20,5 @@ class Asset:
     def url(self) -> str:
         return str(self)
     
-    def url_as(self, *, size: int = 1024, format: str = "png") -> str:
+    def url_as(self, *, size: int = 1024, format: str = "png") -> str:  # noqa
         return f"{self.base_url}/{self._fragment}.{format}?size={size}"

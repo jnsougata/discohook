@@ -9,7 +9,7 @@ from .modal import Modal
 from .https import request
 from .option import Choice
 from fastapi.requests import Request
-from .messgae import Message, ResponseMessage, FollowupMessage
+from .message import Message, ResponseMessage, FollowupMessage
 from .param_handler import handle_edit_params, handle_send_params, MISSING
 if TYPE_CHECKING:
     from .client import Client
@@ -63,7 +63,7 @@ class Interaction:
         await request(
             method="POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client._session, json=payload,
+            session=self.client._session, json=payload
         )
 
     async def send_autocomplete(self, choices: List[Choice]):

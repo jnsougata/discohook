@@ -24,4 +24,4 @@ class Attachment:
     async def iter(self) -> aiohttp.StreamReader:
         async with aiohttp.ClientSession() as session:
             resp = await session.get(self.url)
-            return await resp.content
+            return resp.content

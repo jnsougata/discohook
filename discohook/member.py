@@ -16,4 +16,3 @@ class Member(User):
     @property
     def mention(self) -> str:
         return f"<@!{self.id}>"
-

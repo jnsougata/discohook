@@ -23,7 +23,7 @@ class Cog(metaclass=type):
         name: str,
         description: str = None,
         *,
-        id: str = None,
+        id: str = None,  # noqa
         options: List[Option] = None,
         permissions: str = None,
         dm_access: bool = True,

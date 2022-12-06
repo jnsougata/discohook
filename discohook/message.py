@@ -3,13 +3,13 @@ from .role import Role
 from .https import request
 from .embed import Embed
 from .component import View
-from .param_handler import handle_edit_params, MISSING
 from typing import Optional, List, Dict, Any
-from .enums import InteractionCallbackType
 from typing import TYPE_CHECKING
+from .param_handler import handle_edit_params, MISSING
 
 if TYPE_CHECKING:
     from .interaction import Interaction
+
 
 class Message:
     def __init__(self, payload: dict) -> None:
@@ -45,29 +45,31 @@ class Message:
         self.stickers = payload.get("stickers")
         self.position = payload.get("position")
 
+
 class FollowupMessage(Message):
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
         super().__init__(payload)
         self.interaction = interaction
-    
+
     async def delete(self):
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
-            session=self.interaction.client._session
+            session=self.interaction.client._session  # noqa
         )
-    
+
+    # noinspection PyProtectedMember
     async def edit(
-        self,
-        content: Optional[str] = MISSING,
-        *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[Dict[str, Any]] = MISSING,
-        files: Optional[List[Dict[str, Any]]] = MISSING,
-        supress_embeds: Optional[bool] = MISSING,
+            self,
+            content: Optional[str] = MISSING,
+            *,
+            embed: Optional[Embed] = MISSING,
+            embeds: Optional[List[Embed]] = MISSING,
+            view: Optional[View] = MISSING,
+            tts: Optional[bool] = MISSING,
+            file: Optional[Dict[str, Any]] = MISSING,
+            files: Optional[List[Dict[str, Any]]] = MISSING,
+            supress_embeds: Optional[bool] = MISSING,
     ) -> Message:
         data = handle_edit_params(
             content=content,
@@ -90,29 +92,31 @@ class FollowupMessage(Message):
         )
         return Message(resp)
 
+
 class ResponseMessage(Message):
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
         super().__init__(payload)
         self.interaction = interaction
-    
+
     async def delete(self):
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client._session,
+            session=self.interaction.client._session  # noqa
         )
-    
+
+    # noinspection PyProtectedMember
     async def edit(
-        self,
-        content: Optional[str] = MISSING,
-        *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[Dict[str, Any]] = MISSING,
-        files: Optional[List[Dict[str, Any]]] = MISSING,
-        supress_embeds: Optional[bool] = MISSING,
+            self,
+            content: Optional[str] = MISSING,
+            *,
+            embed: Optional[Embed] = MISSING,
+            embeds: Optional[List[Embed]] = MISSING,
+            view: Optional[View] = MISSING,
+            tts: Optional[bool] = MISSING,
+            file: Optional[Dict[str, Any]] = MISSING,
+            files: Optional[List[Dict[str, Any]]] = MISSING,
+            supress_embeds: Optional[bool] = MISSING,
     ) -> Message:
         data = handle_edit_params(
             content=content,
@@ -131,6 +135,6 @@ class ResponseMessage(Message):
         resp = await request(
             "PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client._session, json=data,
+            session=self.interaction.client._session, json=data
         )
         return Message(resp)

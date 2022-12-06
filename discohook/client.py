@@ -1,5 +1,4 @@
 import aiohttp
-import asyncio
 from .cog import Cog
 from .command import *
 from .modal import Modal
@@ -13,14 +12,16 @@ from .command import ApplicationCommand
 from .component import Button, SelectMenu
 from fastapi.requests import Request
 from .dash import dashboard
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse
 from typing import Optional, List, Dict, Union, Callable
+
 
 async def del_cmd(request: Request, command_id: str):
     resp = await request.app.delete_command(command_id)
     if resp.status == 204:
         return JSONResponse({'success': True}, status_code=resp.status)
     return JSONResponse({'error': 'Failed to delete command'}, status_code=resp.status)
+
 
 async def sync(request: Request, secret: str = None):
     if secret == request.app.token:
@@ -73,7 +74,7 @@ class Client(FastAPI):
             name: str,
             description: str = None,
             *,
-            id: str = None,
+            id: str = None,  # noqa
             options: List[Option] = None,
             permissions: List[Permissions] = None,
             dm_access: bool = True,
@@ -131,7 +132,7 @@ class Client(FastAPI):
 
     async def sync(self):
         url = f"/api/v10/applications/{self.application_id}/commands"
-        payload  = [command.json() for command in self._sync_queue]
+        payload = [command.json() for command in self._sync_queue]
         resp = await self._session.put(url, json=payload)
         return await resp.json()
     
