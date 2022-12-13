@@ -132,7 +132,7 @@ class Client(FastAPI):
 
     async def sync(self):
         url = f"/api/v10/applications/{self.application_id}/commands"
-        payload = [command.json() for command in self._sync_queue]
-        resp = await self._session.put(url, json=payload)
+        payload = {command.name: command.json() for command in self._sync_queue}
+        resp = await self._session.put(url, json=list(payload.values()))
         return await resp.json()
     
