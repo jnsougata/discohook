@@ -38,7 +38,7 @@ async def help_command(interaction: discohook.Interaction):
 Deploy the snippet above to your serverless function and you're good to go to next step. Remember to replace the variables with your own. Command will not be automatically registered. We provide a dashboard to register commands. We will talk about it later.
 
 ### Devportal Setup
-**1.** Head over to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application. Once you've created the application, go to the "Bot" tab and create a new bot. Generate new token bu using `Reset Token` and copy the bot token and paste it in the `APPLICATION_TOKEN` variable.
+**1.** Head over to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application. Once you've created the application, go to the "Bot" tab and create a new bot. Generate new token by using `Reset Token` and copy the bot token and paste it in the `APPLICATION_TOKEN` variable.
 ![image](https://user-images.githubusercontent.com/53375272/205481601-934f7304-96a1-493f-82ed-91a3890e6352.png)
 **2.** Then go to the `General Information` tab and copy the `Application ID` and paste it in the `APPLICATION_ID` variable and copy the `Public Key` and paste it in the `APPLICATION_PUBLIC_KEY` variable.
 
