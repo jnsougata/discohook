@@ -50,7 +50,7 @@ Deploy the snippet above to your serverless function and you're good to go to ne
 
 
 #### Registering Commands
-You can sync commands by just visiting the dashbaord.
+You can sync commands by just visiting the dashboard.
 the dashboard will be available at `https://example.io/dh/dash/<bot_token_here> `. 
 
 ![image](https://user-images.githubusercontent.com/53375272/205497776-cb2c6653-5b3c-4b32-bbb3-d9be6278b466.png)
@@ -70,13 +70,13 @@ Now that you have registered the command, you can get the `id` of the command by
     description="basic help command for the bot"
 )
 async def help_command(interaction: discohook.Interaction):
-    await interaction.command.response(
+    await interaction.response(
         "Hello, World!",
         embed=discohook.Embed(title="Help", description="This is a help command"),
         ephemeral=True,
     )
 ```
-⚠️ Command withou the `id` will not work as the library will consider it as a non registered command.
+⚠️ Command without the `id` will not work as the library will consider it as a non registered command.
 
 ### 📕 Why we did not add auto registration?
 As this library is meant to be used in serverless functions, we did not add auto registration as at each invocation the scripts will be reloaded and the commands will be re-registered again. This will cause rate limit issues and also due to command registration being a slow process, it will cause a lot of latency.
