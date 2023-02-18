@@ -48,7 +48,7 @@ class Client(FastAPI):
         self.public_key = public_key
         self.application_id = application_id
         self.log_channel_id: Optional[int] = log_channel_id
-        self._session: Optional[aiohttp.ClientSession] = aiohttp.ClientSession(
+        self.session: Optional[aiohttp.ClientSession] = aiohttp.ClientSession(
             base_url="https://discord.com", 
             headers={"Authorization": f"Bot {self.token}", "Content-Type": "application/json"}
         )
@@ -108,7 +108,7 @@ class Client(FastAPI):
         self._sync_queue.extend(commands)
             
     async def delete_command(self, command_id: str):
-        return await self._session.delete(f"/api/v10/applications/{self.application_id}/commands/{command_id}")
+        return await self.session.delete(f"/api/v10/applications/{self.application_id}/commands/{command_id}")
              
     def add_cog(self, cog: Cog):
         if isinstance(cog, Cog):
@@ -124,15 +124,15 @@ class Client(FastAPI):
 
     async def send_message(self, channel_id: int, payload: Dict[str, Any]):
         url = f"/api/v10/channels/{channel_id}/messages"
-        await self._session.post(url, json=payload)
+        await self.session.post(url, json=payload)
 
     async def as_user(self) -> ClientUser:
-        data = await (await self._session.get(f"/api/v10/oauth2/applications/@me")).json()
+        data = await (await self.session.get(f"/api/v10/oauth2/applications/@me")).json()
         return ClientUser(data)
 
     async def sync(self):
         url = f"/api/v10/applications/{self.application_id}/commands"
-        payload = {command.name: command.json() for command in self._sync_queue}
-        resp = await self._session.put(url, json=list(payload.values()))
+        payload = {command.name: command.to_dict() for command in self._sync_queue}
+        resp = await self.session.put(url, json=list(payload.values()))
         return await resp.json()
     

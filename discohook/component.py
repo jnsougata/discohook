@@ -25,7 +25,7 @@ class Button:
     def onclick(self, coro: Callable):
         self._callback = coro
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         payload = {
             "type": MessageComponentType.button.value,
             "style": self.style.value,
@@ -35,7 +35,7 @@ class Button:
             payload["custom_id"] = self.custom_id
             payload["disabled"] = self.disabled
         if self.emoji:
-            payload["emoji"] = self.emoji.json()
+            payload["emoji"] = self.emoji.to_dict()
         if self.url and self.style == ButtonStyle.link:
             payload["url"] = self.url
         return payload
@@ -57,7 +57,7 @@ class SelectOption:
         self.emoji = emoji
         self.default = default
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         payload = {
             "label": self.label,
             "value": self.value,
@@ -65,7 +65,7 @@ class SelectOption:
             "default": self.default,
         }
         if self.emoji:
-            payload["emoji"] = self.emoji.json()
+            payload["emoji"] = self.emoji.to_dict()
         return payload
 
 
@@ -88,7 +88,7 @@ class SelectMenu:
             "custom_id": self.custom_id,
         }
         if (type == SelectMenuType.text) and (options is not None):
-            self.data["options"] = [option.json() for option in options]
+            self.data["options"] = [option.to_dict() for option in options]
         if (type == SelectMenuType.channel) and (channel_types is not None):
             self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
         if placeholder:
@@ -103,7 +103,7 @@ class SelectMenu:
     def onselection(self, coro: Callable):
         self._callback = coro
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -115,16 +115,16 @@ class View:
     def add_button_row(self, *buttons: Button):
         self._structure.append({
             "type": MessageComponentType.action_row.value,
-            "components": [button.json() for button in buttons[:5]],
+            "components": [button.to_dict() for button in buttons[:5]],
         })
         self._children.extend(buttons[:5])
 
     def add_select_menu(self, select_menu: SelectMenu):
         self._structure.append({
             "type": MessageComponentType.action_row.value,
-            "components": [select_menu.json()],
+            "components": [select_menu.to_dict()],
         })
         self._children.append(select_menu)
 
-    def json(self) -> List[Dict[str, Any]]:
+    def to_dict(self) -> List[Dict[str, Any]]:
         return self._structure

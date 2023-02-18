@@ -46,7 +46,7 @@ class Embed:
     def add_field(self, *, name: str, value: str, inline: bool = False):
         self._fields_container.append({"name": name, "value": value, "inline": inline})
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         if self._fields_container:
             self._data["fields"] = self._fields_container
         return self._data

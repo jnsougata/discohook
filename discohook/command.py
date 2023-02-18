@@ -28,7 +28,7 @@ class SubCommand:
             "description": self.description,
         }
         if self.options:
-            payload["options"] = [option.json() for option in self.options]
+            payload["options"] = [option.to_dict() for option in self.options]
         return payload
 
 
@@ -91,13 +91,13 @@ class ApplicationCommand:
             return wrapper()
         return decorator  # type: ignore
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         self._payload["type"] = self.category.value
         if self.category is AppCmdType.slash:
             if self.description:
                 self._payload["description"] = self.description
             if self.options:
-                self._payload["options"] = [option.json() for option in self.options]
+                self._payload["options"] = [option.to_dict() for option in self.options]
         self._payload["name"] = self.name
         if not self.dm_access:
             self._payload["dm_permission"] = self.dm_access

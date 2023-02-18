@@ -55,7 +55,7 @@ class FollowupMessage(Message):
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
-            session=self.interaction.client._session  # noqa
+            session=self.interaction.client.session  # noqa
         )
 
     # noinspection PyProtectedMember
@@ -88,7 +88,7 @@ class FollowupMessage(Message):
         resp = await request(
             "PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
-            session=self.interaction.client._session, json=data,
+            session=self.interaction.client.session, json=data,
         )
         return Message(resp)
 
@@ -102,7 +102,7 @@ class ResponseMessage(Message):
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client._session  # noqa
+            session=self.interaction.client.session  # noqa
         )
 
     # noinspection PyProtectedMember
@@ -135,6 +135,6 @@ class ResponseMessage(Message):
         resp = await request(
             "PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client._session, json=data
+            session=self.interaction.client.session, json=data
         )
         return Message(resp)

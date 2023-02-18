@@ -37,9 +37,9 @@ def handle_send_params(
     if tts:
         payload["tts"] = True
     if embeds:
-        payload["embeds"] = [embed.json() for embed in embeds]
+        payload["embeds"] = [embed.to_dict() for embed in embeds]
     if components:
-        payload["components"] = components.json()
+        payload["components"] = components.to_dict()
     if files:
         payload["attachments"] = files
     if flag_value:
@@ -71,9 +71,9 @@ def handle_edit_params(
     if tts is not MISSING:
         payload["tts"] = tts
     if embeds is not MISSING:
-        payload["embeds"] = [embed.json() for embed in embeds]
+        payload["embeds"] = [embed.to_dict() for embed in embeds]
     if components is not MISSING:
-        payload["components"] = components.json() if components else []
+        payload["components"] = components.to_dict() if components else []
     if files is not MISSING:
         payload["attachments"] = files
     if supress_embeds is not MISSING:

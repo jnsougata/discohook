@@ -1,6 +1,5 @@
 from .enums import InteractionType, InteractionCallbackType
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
-from fastapi.responses import JSONResponse
 from .embed import Embed
 from .user import User
 from .member import Member
@@ -28,10 +27,10 @@ class CommandData:
 
 class Interaction:
 
-    def __init__(self, data: Dict[str, Any], request: Request):
+    def __init__(self, data: Dict[str, Any], req: Request):
         self._payload = data
-        self.request: Request = request
-        self.client: 'Client' = request.app
+        self.request: Request = req
+        self.client: 'Client' = req.app
         self.id: str = data['id']
         self.type: int = data['type']
         self.token: str = data['token']
@@ -63,18 +62,18 @@ class Interaction:
         await request(
             method="POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client._session, json=payload
+            session=self.client.session, json=payload
         )
 
     async def send_autocomplete(self, choices: List[Choice]):
         payload = {
             "type": InteractionCallbackType.autocomplete_result.value,
-            "data": {"choices": [choice.json() for choice in choices]}
+            "data": {"choices": [choice.to_dict() for choice in choices]}
         }
         await request(
             method="POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client._session,
+            session=self.client.session,
             json=payload
         )
 
@@ -87,7 +86,7 @@ class Interaction:
         await request(
             method="POST", 
             path=f"/interactions/{self.id}/{self.token}/callback", 
-            session=self.client._session, 
+            session=self.client.session,
             json=payload
         )
     
@@ -126,11 +125,10 @@ class Interaction:
         await request(
             "POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client._session,
+            session=self.client.session,
             json=payload,
         )
 
-    
     async def follow_up(
         self,
         content: Optional[str] = None,
@@ -156,13 +154,13 @@ class Interaction:
             supress_embeds=supress_embeds
         )
         if view:
-            for component in view._children:
-                self.client._load_component(component)
-        self.client._load_inter_token(self.id, self.token)
-        data  = await request(
+            self.client._load_inter_token(self.id, self.token)  # noqa
+            for component in view._children:  # noqa
+                self.client._load_component(component)  # noqa
+        data = await request(
             method="POST",
             path=f"/webhooks/{self.application_id}/{self.token}",
-            session=self.client._session,
+            session=self.client.session,
             json=payload,
         )
         return FollowupMessage(data, self)
@@ -170,15 +168,15 @@ class Interaction:
     async def original_response(self) -> ResponseMessage:
         resp = await request(
             path=f"/webhooks/{self.application_id}/{self.token}/messages/@original",
-            session=self.client._session
+            session=self.client.session
         )
         return ResponseMessage(resp, self)
 
 
 class ComponentInteraction(Interaction):
 
-    def __init__(self, data: Dict[str, Any], request: Request):
-        super().__init__(data, request)
+    def __init__(self, data: Dict[str, Any], req: Request):
+        super().__init__(data, req)
     
     @property
     def message(self) -> Optional[Message]:
@@ -217,9 +215,9 @@ class ComponentInteraction(Interaction):
             supress_embeds=supress_embeds
         )
         if view:
+            self.client._load_inter_token(self.id, self.token)  # noqa
             for component in view._children:  # noqa
                 self.client._load_component(component)  # noqa
-        self.client._load_inter_token(self.id, self.token)  # noqa
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
@@ -227,7 +225,7 @@ class ComponentInteraction(Interaction):
         resp = await request(
             "POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client._session, json=payload,
+            session=self.client.session, json=payload,
         )
         return FollowupMessage(resp, self)
 
@@ -265,22 +263,22 @@ class ComponentInteraction(Interaction):
         await request(
             "POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client._session, json=payload,
+            session=self.client.session, json=payload,
         )
 
     @property
     def origin(self) -> Optional[str]:
         if not self.message:
             return
-        parent_id = self.message["interaction"]["id"]
+        parent_id = self.message.interaction["id"]
         return self.client.cached_inter_tokens.get(parent_id, '')
 
-    async def original_message(self) -> Message:
+    async def original_message(self) -> Optional[Message]:
         if not self.origin:
             return
         resp = await request(
             path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
-            session=self.client._session
+            session=self.client.session
         )
         return Message(resp)
 
@@ -291,14 +289,14 @@ class ComponentInteraction(Interaction):
         await request(
             method="DELETE",
             path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
-            session=self.client._session, 
+            session=self.client.session,
         )
     
     
 class CommandInteraction(Interaction):
 
-    def __init__(self, data: Dict[str, Any], request: Request):
-        super().__init__(data, request)
+    def __init__(self, data: Dict[str, Any], req: Request):
+        super().__init__(data, req)
     
     @property
     def command_data(self) -> Optional[CommandData]:
@@ -341,6 +339,6 @@ class CommandInteraction(Interaction):
         await request(
             "POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client._session,
+            session=self.client.session,
             json=payload,
         )

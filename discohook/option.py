@@ -7,7 +7,7 @@ class Choice:
         self.name = name
         self.value = value
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
             "name": self.name,
             "value": self.value
@@ -26,6 +26,9 @@ class Option:
             "required": self.required,
             "type": self.type
         }
+
+    def to_dict(self) -> Dict[str, Any]:
+        ...
 
 
 class StringOption(Option):
@@ -46,9 +49,9 @@ class StringOption(Option):
         self.min_length = min_length
         super().__init__(name, description, required, type_=AppCmdOptionType.string)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.json() for choice in self.choices]
+            self.data["choices"] = [choice.to_dict() for choice in self.choices]
         if self.auto_complete:
             self.data["autocomplete"] = self.auto_complete
         if self.max_length:
@@ -76,9 +79,9 @@ class IntegerOption(Option):
         self.min_value = min_value
         super().__init__(name, description, required, type_=AppCmdOptionType.integer)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.json() for choice in self.choices]
+            self.data["choices"] = [choice.to_dict() for choice in self.choices]
         if self.auto_complete:
             self.data["autocomplete"] = self.auto_complete
         if self.max_value is not None:
@@ -106,9 +109,9 @@ class NumberOption(Option):
         self.min_value = min_value
         super().__init__(name, description, required, type_=AppCmdOptionType.number)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.json() for choice in self.choices]
+            self.data["choices"] = [choice.to_dict() for choice in self.choices]
         if self.auto_complete:
             self.data["autocomplete"] = self.auto_complete
         if self.max_value is not None:
@@ -128,7 +131,7 @@ class BooleanOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.boolean)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -142,7 +145,7 @@ class UserOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.user)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -158,7 +161,7 @@ class ChannelOption(Option):
         self.channel_types = channel_types  
         super().__init__(name, description, required, type_=AppCmdOptionType.channel)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         if self.channel_types:
             self.data["channel_types"] = [ct.value for ct in self.channel_types]
         return self.data
@@ -174,7 +177,7 @@ class RoleOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.role)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -188,7 +191,7 @@ class MentionableOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.mentionable)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return self.data
 
 
@@ -202,5 +205,5 @@ class AttachmentOption(Option):
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.attachment)
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return self.data

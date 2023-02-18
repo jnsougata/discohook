@@ -7,5 +7,5 @@ class PartialEmoji:
         self.id = id
         self.animated = animated
 
-    def json(self):
+    def to_dict(self):
         return {"name": self.name, "id": self.id, "animated": self.animated}
