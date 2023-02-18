@@ -1,11 +1,11 @@
 import secrets
 from typing import Callable
 from .enums import MessageComponentType, TextInputFieldLength
+
 # from .component import Button, SelectMenu
 
 
 class Modal:
-
     def __init__(self, title: str):
         self.title = title
         self._callback = None
@@ -22,16 +22,16 @@ class Modal:
     #    )
 
     def add_field(
-            self,
-            label: str,
-            field_id: str,
-            *,
-            required: bool = False,
-            hint: str = None,
-            default_text: str = None,
-            min_length: int = 0,
-            max_length: int = 4000,
-            style: TextInputFieldLength = TextInputFieldLength.short,
+        self,
+        label: str,
+        field_id: str,
+        *,
+        required: bool = False,
+        hint: str = None,
+        default_text: str = None,
+        min_length: int = 0,
+        max_length: int = 4000,
+        style: TextInputFieldLength = TextInputFieldLength.short,
     ):
         self._data["components"].append(
             {
@@ -48,13 +48,13 @@ class Modal:
                         "placeholder": hint or "",
                         "required": required,
                     }
-                ]
+                ],
             }
         )
 
     def json(self):
         if self._row["components"]:
-            self._data['components'].append(self._row)
+            self._data["components"].append(self._row)
         return self._data
 
     def onsubmit(self, coro: Callable):

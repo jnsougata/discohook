@@ -3,13 +3,13 @@ from typing import Any, Dict, Optional, List
 
 class Embed:
     def __init__(
-            self,
-            *,
-            title: Optional[str] = None,
-            description: Optional[str] = None,
-            url: Optional[str] = None,
-            color: Optional[int] = None,
-            timestamp: Optional[str] = None
+        self,
+        *,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        url: Optional[str] = None,
+        color: Optional[int] = None,
+        timestamp: Optional[str] = None
     ):
         self._data: Dict[str, Any] = {}
         if title:
@@ -25,7 +25,9 @@ class Embed:
 
         self._fields_container: List[Dict[str, Any]] = []
 
-    def author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
+    def author(
+        self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None
+    ):
         self._data["author"] = {"name": name}
         if url:
             self._data["author"]["url"] = url

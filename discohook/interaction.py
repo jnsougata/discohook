@@ -10,45 +10,45 @@ from .option import Choice
 from fastapi.requests import Request
 from .message import Message, ResponseMessage, FollowupMessage
 from .param_handler import handle_edit_params, handle_send_params, MISSING
+
 if TYPE_CHECKING:
     from .client import Client
 
 
 class CommandData:
     def __init__(self, data: Dict[str, Any]):
-        self.id: str = data['id']
-        self.name: str = data['name']
-        self.type: int = data['type']
-        self.guild_id: Optional[str] = data.get('guild_id')
-        self.target_id: Optional[str] = data.get('target_id')
-        self.resolved: Optional[Dict[str, Any]] = data.get('resolved')
-        self.options: Optional[List[Dict[str, Any]]] = data.get('options')
+        self.id: str = data["id"]
+        self.name: str = data["name"]
+        self.type: int = data["type"]
+        self.guild_id: Optional[str] = data.get("guild_id")
+        self.target_id: Optional[str] = data.get("target_id")
+        self.resolved: Optional[Dict[str, Any]] = data.get("resolved")
+        self.options: Optional[List[Dict[str, Any]]] = data.get("options")
 
 
 class Interaction:
-
     def __init__(self, data: Dict[str, Any], req: Request):
         self._payload = data
         self.request: Request = req
-        self.client: 'Client' = req.app
-        self.id: str = data['id']
-        self.type: int = data['type']
-        self.token: str = data['token']
-        self.version: int = data['version']
-        self.application_id: str = data['application_id']
-        self.data: Optional[Dict[str, Any]] = data.get('data')
-        self.guild_id: Optional[str] = data.get('guild_id')
-        self.channel_id: Optional[str] = data.get('channel_id')
-        self.app_permissions: Optional[int] = data.get('app_permissions')
-        self.locale: Optional[str] = data.get('locale')
-        self.guild_locale: Optional[str] = data.get('guild_locale')
-    
+        self.client: "Client" = req.app
+        self.id: str = data["id"]
+        self.type: int = data["type"]
+        self.token: str = data["token"]
+        self.version: int = data["version"]
+        self.application_id: str = data["application_id"]
+        self.data: Optional[Dict[str, Any]] = data.get("data")
+        self.guild_id: Optional[str] = data.get("guild_id")
+        self.channel_id: Optional[str] = data.get("channel_id")
+        self.app_permissions: Optional[int] = data.get("app_permissions")
+        self.locale: Optional[str] = data.get("locale")
+        self.guild_locale: Optional[str] = data.get("guild_locale")
+
     @property
     def author(self) -> Optional[Union[User, Member]]:
-        member = self._payload.get('member')
-        user = self._payload.get('user')
+        member = self._payload.get("member")
+        user = self._payload.get("user")
         if member:
-            member.update(member.pop('user', {}))
+            member.update(member.pop("user", {}))
             return Member(member)
         else:
             return User(user)
@@ -62,19 +62,20 @@ class Interaction:
         await request(
             method="POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session, json=payload
+            session=self.client.session,
+            json=payload,
         )
 
     async def send_autocomplete(self, choices: List[Choice]):
         payload = {
             "type": InteractionCallbackType.autocomplete_result.value,
-            "data": {"choices": [choice.to_dict() for choice in choices]}
+            "data": {"choices": [choice.to_dict() for choice in choices]},
         }
         await request(
             method="POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
             session=self.client.session,
-            json=payload
+            json=payload,
         )
 
     async def defer(self, ephemeral: bool = False):
@@ -84,12 +85,12 @@ class Interaction:
         if ephemeral:
             payload["data"] = {"flags": 64}
         await request(
-            method="POST", 
-            path=f"/interactions/{self.id}/{self.token}/callback", 
+            method="POST",
+            path=f"/interactions/{self.id}/{self.token}/callback",
             session=self.client.session,
-            json=payload
+            json=payload,
         )
-    
+
     async def response(
         self,
         content: Optional[str] = None,
@@ -112,7 +113,7 @@ class Interaction:
             file=file,
             files=files,
             ephemeral=ephemeral,
-            supress_embeds=supress_embeds
+            supress_embeds=supress_embeds,
         )
         if view:
             for component in view._children:  # noqa
@@ -151,7 +152,7 @@ class Interaction:
             file=file,
             files=files,
             ephemeral=ephemeral,
-            supress_embeds=supress_embeds
+            supress_embeds=supress_embeds,
         )
         if view:
             self.client._load_inter_token(self.id, self.token)  # noqa
@@ -164,20 +165,19 @@ class Interaction:
             json=payload,
         )
         return FollowupMessage(data, self)
-    
+
     async def original_response(self) -> ResponseMessage:
         resp = await request(
             path=f"/webhooks/{self.application_id}/{self.token}/messages/@original",
-            session=self.client.session
+            session=self.client.session,
         )
         return ResponseMessage(resp, self)
 
 
 class ComponentInteraction(Interaction):
-
     def __init__(self, data: Dict[str, Any], req: Request):
         super().__init__(data, req)
-    
+
     @property
     def message(self) -> Optional[Message]:
         return Message(self._payload["message"])
@@ -212,7 +212,7 @@ class ComponentInteraction(Interaction):
             file=file,
             files=files,
             ephemeral=ephemeral,
-            supress_embeds=supress_embeds
+            supress_embeds=supress_embeds,
         )
         if view:
             self.client._load_inter_token(self.id, self.token)  # noqa
@@ -225,7 +225,8 @@ class ComponentInteraction(Interaction):
         resp = await request(
             "POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session, json=payload,
+            session=self.client.session,
+            json=payload,
         )
         return FollowupMessage(resp, self)
 
@@ -249,7 +250,7 @@ class ComponentInteraction(Interaction):
             tts=tts,
             file=file,
             files=files,
-            supress_embeds=supress_embeds
+            supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
             for component in view._children:  # noqa
@@ -259,11 +260,12 @@ class ComponentInteraction(Interaction):
             "data": data,
             "type": InteractionCallbackType.update_message.value,
         }
-        
+
         await request(
             "POST",
             path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session, json=payload,
+            session=self.client.session,
+            json=payload,
         )
 
     @property
@@ -271,14 +273,14 @@ class ComponentInteraction(Interaction):
         if not self.message:
             return
         parent_id = self.message.interaction["id"]
-        return self.client.cached_inter_tokens.get(parent_id, '')
+        return self.client.cached_inter_tokens.get(parent_id, "")
 
     async def original_message(self) -> Optional[Message]:
         if not self.origin:
             return
         resp = await request(
             path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
-            session=self.client.session
+            session=self.client.session,
         )
         return Message(resp)
 
@@ -291,13 +293,12 @@ class ComponentInteraction(Interaction):
             path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
             session=self.client.session,
         )
-    
-    
-class CommandInteraction(Interaction):
 
+
+class CommandInteraction(Interaction):
     def __init__(self, data: Dict[str, Any], req: Request):
         super().__init__(data, req)
-    
+
     @property
     def command_data(self) -> Optional[CommandData]:
         if self.type == InteractionType.app_command.value:
@@ -326,7 +327,7 @@ class CommandInteraction(Interaction):
             file=file,
             files=files,
             ephemeral=ephemeral,
-            supress_embeds=supress_embeds
+            supress_embeds=supress_embeds,
         )
         if view:
             for component in view._children:  # noqa

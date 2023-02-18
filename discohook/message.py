@@ -55,21 +55,21 @@ class FollowupMessage(Message):
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
-            session=self.interaction.client.session  # noqa
+            session=self.interaction.client.session,  # noqa
         )
 
     # noinspection PyProtectedMember
     async def edit(
-            self,
-            content: Optional[str] = MISSING,
-            *,
-            embed: Optional[Embed] = MISSING,
-            embeds: Optional[List[Embed]] = MISSING,
-            view: Optional[View] = MISSING,
-            tts: Optional[bool] = MISSING,
-            file: Optional[Dict[str, Any]] = MISSING,
-            files: Optional[List[Dict[str, Any]]] = MISSING,
-            supress_embeds: Optional[bool] = MISSING,
+        self,
+        content: Optional[str] = MISSING,
+        *,
+        embed: Optional[Embed] = MISSING,
+        embeds: Optional[List[Embed]] = MISSING,
+        view: Optional[View] = MISSING,
+        tts: Optional[bool] = MISSING,
+        file: Optional[Dict[str, Any]] = MISSING,
+        files: Optional[List[Dict[str, Any]]] = MISSING,
+        supress_embeds: Optional[bool] = MISSING,
     ) -> Message:
         data = handle_edit_params(
             content=content,
@@ -79,16 +79,19 @@ class FollowupMessage(Message):
             tts=tts,
             file=file,
             files=files,
-            supress_embeds=supress_embeds
+            supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
             for component in view._children:  # noqa
                 self.interaction.client._load_component(component)  # noqa
-        self.interaction.client._load_inter_token(self.interaction.id, self.interaction.token)  # noqa
+        self.interaction.client._load_inter_token(
+            self.interaction.id, self.interaction.token
+        )  # noqa
         resp = await request(
             "PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
-            session=self.interaction.client.session, json=data,
+            session=self.interaction.client.session,
+            json=data,
         )
         return Message(resp)
 
@@ -102,21 +105,21 @@ class ResponseMessage(Message):
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client.session  # noqa
+            session=self.interaction.client.session,  # noqa
         )
 
     # noinspection PyProtectedMember
     async def edit(
-            self,
-            content: Optional[str] = MISSING,
-            *,
-            embed: Optional[Embed] = MISSING,
-            embeds: Optional[List[Embed]] = MISSING,
-            view: Optional[View] = MISSING,
-            tts: Optional[bool] = MISSING,
-            file: Optional[Dict[str, Any]] = MISSING,
-            files: Optional[List[Dict[str, Any]]] = MISSING,
-            supress_embeds: Optional[bool] = MISSING,
+        self,
+        content: Optional[str] = MISSING,
+        *,
+        embed: Optional[Embed] = MISSING,
+        embeds: Optional[List[Embed]] = MISSING,
+        view: Optional[View] = MISSING,
+        tts: Optional[bool] = MISSING,
+        file: Optional[Dict[str, Any]] = MISSING,
+        files: Optional[List[Dict[str, Any]]] = MISSING,
+        supress_embeds: Optional[bool] = MISSING,
     ) -> Message:
         data = handle_edit_params(
             content=content,
@@ -126,15 +129,18 @@ class ResponseMessage(Message):
             tts=tts,
             file=file,
             files=files,
-            supress_embeds=supress_embeds
+            supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
             for component in view._children:  # noqa
                 self.interaction.client._load_component(component)  # noqa
-        self.interaction.client._load_inter_token(self.interaction.id, self.interaction.token)  # noqa
+        self.interaction.client._load_inter_token(
+            self.interaction.id, self.interaction.token
+        )  # noqa
         resp = await request(
             "PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client.session, json=data
+            session=self.interaction.client.session,
+            json=data,
         )
         return Message(resp)

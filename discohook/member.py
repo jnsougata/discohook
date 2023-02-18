@@ -12,7 +12,7 @@ class Member(User):
         self.is_pending = data.get("is_pending")
         self.communication_disabled_until = data.get("communication_disabled_until")
         self.flags = data.get("flags")
-    
+
     @property
     def mention(self) -> str:
         return f"<@!{self.id}>"

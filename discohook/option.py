@@ -8,14 +8,18 @@ class Choice:
         self.value = value
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
-            "name": self.name,
-            "value": self.value
-        }
+        return {"name": self.name, "value": self.value}
 
 
 class Option:
-    def __init__(self, name: str, description: str, required: bool = False, *, type_: AppCmdOptionType):
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        required: bool = False,
+        *,
+        type_: AppCmdOptionType,
+    ):
         self.name = name
         self.description = description
         self.required = required
@@ -24,7 +28,7 @@ class Option:
             "name": self.name,
             "description": self.description,
             "required": self.required,
-            "type": self.type
+            "type": self.type,
         }
 
     def to_dict(self) -> Dict[str, Any]:
@@ -33,15 +37,15 @@ class Option:
 
 class StringOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
-            max_length: Optional[int] = 100,
-            min_length: Optional[int] = 1,
-            choices: Optional[List[Choice]] = None,
-            auto_complete: Optional[bool] = False,
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+        max_length: Optional[int] = 100,
+        min_length: Optional[int] = 1,
+        choices: Optional[List[Choice]] = None,
+        auto_complete: Optional[bool] = False,
     ):
         self.choices = choices
         self.auto_complete = auto_complete
@@ -63,15 +67,15 @@ class StringOption(Option):
 
 class IntegerOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
-            max_value: Optional[int] = None,
-            min_value: Optional[int] = None,
-            choices: Optional[List[Choice]] = None,
-            auto_complete: Optional[bool] = False,
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+        max_value: Optional[int] = None,
+        min_value: Optional[int] = None,
+        choices: Optional[List[Choice]] = None,
+        auto_complete: Optional[bool] = False,
     ):
         self.choices = choices
         self.auto_complete = auto_complete
@@ -93,16 +97,16 @@ class IntegerOption(Option):
 
 class NumberOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
-            max_value: Optional[float] = None,
-            min_value: Optional[float] = None,
-            choices: Optional[List[Choice]] = None,
-            auto_complete: Optional[bool] = False,
-    ):  
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+        max_value: Optional[float] = None,
+        min_value: Optional[float] = None,
+        choices: Optional[List[Choice]] = None,
+        auto_complete: Optional[bool] = False,
+    ):
         self.choices = choices
         self.auto_complete = auto_complete
         self.max_value = max_value
@@ -123,11 +127,11 @@ class NumberOption(Option):
 
 class BooleanOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.boolean)
 
@@ -137,11 +141,11 @@ class BooleanOption(Option):
 
 class UserOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.user)
 
@@ -151,14 +155,14 @@ class UserOption(Option):
 
 class ChannelOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
-            channel_types: Optional[List[ChannelType]] = None,
-    ):  
-        self.channel_types = channel_types  
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+        channel_types: Optional[List[ChannelType]] = None,
+    ):
+        self.channel_types = channel_types
         super().__init__(name, description, required, type_=AppCmdOptionType.channel)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -169,11 +173,11 @@ class ChannelOption(Option):
 
 class RoleOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.role)
 
@@ -183,13 +187,15 @@ class RoleOption(Option):
 
 class MentionableOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type_=AppCmdOptionType.mentionable)
+        super().__init__(
+            name, description, required, type_=AppCmdOptionType.mentionable
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
@@ -197,11 +203,11 @@ class MentionableOption(Option):
 
 class AttachmentOption(Option):
     def __init__(
-            self,
-            name: str,
-            description: str,
-            *,
-            required: Optional[bool] = False,
+        self,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
     ):
         super().__init__(name, description, required, type_=AppCmdOptionType.attachment)
 

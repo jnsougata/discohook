@@ -45,5 +45,7 @@ class Cog(metaclass=type):
                     command._callback = func
                     cls.commands.append(command)
                     return command
+
             return wrapper()
+
         return decorator

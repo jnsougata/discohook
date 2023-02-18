@@ -16,7 +16,7 @@ def handle_send_params(
     file: Optional[Dict[str, Any]] = None,
     files: Optional[List[Dict[str, Any]]] = None,
     ephemeral: Optional[bool] = False,
-    supress_embeds: Optional[bool] = False
+    supress_embeds: Optional[bool] = False,
 ):
     payload = {}
     flag_value = 0

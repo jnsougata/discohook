@@ -19,27 +19,26 @@ from typing import Optional, List, Dict, Union, Callable
 async def del_cmd(request: Request, command_id: str):
     resp = await request.app.delete_command(command_id)
     if resp.status == 204:
-        return JSONResponse({'success': True}, status_code=resp.status)
-    return JSONResponse({'error': 'Failed to delete command'}, status_code=resp.status)
+        return JSONResponse({"success": True}, status_code=resp.status)
+    return JSONResponse({"error": "Failed to delete command"}, status_code=resp.status)
 
 
 async def sync(request: Request, secret: str = None):
     if secret == request.app.token:
         return JSONResponse(await request.app.sync())
-    return JSONResponse({'error': 'Unauthorized'}, status_code=401)
+    return JSONResponse({"error": "Unauthorized"}, status_code=401)
 
 
 class Client(FastAPI):
-
     def __init__(
         self,
         application_id: Union[int, str],
         public_key: str,
         token: str,
         *,
-        route: str = '/interactions',
+        route: str = "/interactions",
         log_channel_id: int = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.redoc_url = None
@@ -49,18 +48,27 @@ class Client(FastAPI):
         self.application_id = application_id
         self.log_channel_id: Optional[int] = log_channel_id
         self.session: Optional[aiohttp.ClientSession] = aiohttp.ClientSession(
-            base_url="https://discord.com", 
-            headers={"Authorization": f"Bot {self.token}", "Content-Type": "application/json"}
+            base_url="https://discord.com",
+            headers={
+                "Authorization": f"Bot {self.token}",
+                "Content-Type": "application/json",
+            },
         )
         self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
         self._populated_return: Optional[JSONResponse] = None
-        self.add_route(route, handler, methods=['POST'], include_in_schema=False)
-        self.add_api_route('/dh/sync/{secret}', sync, methods=['GET'], include_in_schema=False)
-        self.add_api_route('/dh/dash/{secret}', dashboard, methods=['GET'], include_in_schema=False)
-        self.add_api_route('/dh/delete/{command_id}', del_cmd, methods=['GET'], include_in_schema=False)
+        self.add_route(route, handler, methods=["POST"], include_in_schema=False)
+        self.add_api_route(
+            "/dh/sync/{secret}", sync, methods=["GET"], include_in_schema=False
+        )
+        self.add_api_route(
+            "/dh/dash/{secret}", dashboard, methods=["GET"], include_in_schema=False
+        )
+        self.add_api_route(
+            "/dh/delete/{command_id}", del_cmd, methods=["GET"], include_in_schema=False
+        )
         self._global_error_handler: Optional[Callable] = None
 
     def _load_component(self, component: Union[Button, Modal, SelectMenu]):
@@ -70,15 +78,15 @@ class Client(FastAPI):
         self.cached_inter_tokens[interaction_id] = token
 
     def command(
-            self,
-            name: str,
-            description: str = None,
-            *,
-            id: str = None,  # noqa
-            options: List[Option] = None,
-            permissions: List[Permissions] = None,
-            dm_access: bool = True,
-            category: AppCmdType = AppCmdType.slash,
+        self,
+        name: str,
+        description: str = None,
+        *,
+        id: str = None,  # noqa
+        options: List[Option] = None,
+        permissions: List[Permissions] = None,
+        dm_access: bool = True,
+        category: AppCmdType = AppCmdType.slash,
     ):
         command = ApplicationCommand(
             name=name,
@@ -87,7 +95,7 @@ class Client(FastAPI):
             permissions=permissions,
             dm_access=dm_access,
             category=category,
-            id=id
+            id=id,
         )
 
         def decorator(coro: Callable):
@@ -99,23 +107,28 @@ class Client(FastAPI):
                         self.application_commands[command.id] = command
                     self._sync_queue.append(command)
                     return command
+
             return wrapper()
+
         return decorator
-    
+
     def load_commands(self, *commands: ApplicationCommand):
         static_commands = {command.id: command for command in commands if command.id}
         self.application_commands.update(static_commands)
         self._sync_queue.extend(commands)
-            
+
     async def delete_command(self, command_id: str):
-        return await self.session.delete(f"/api/v10/applications/{self.application_id}/commands/{command_id}")
-             
+        return await self.session.delete(
+            f"/api/v10/applications/{self.application_id}/commands/{command_id}"
+        )
+
     def add_cog(self, cog: Cog):
         if isinstance(cog, Cog):
             self.load_commands(*cog.private_commands)
 
     def load_cogs(self, *paths: str):
         import importlib
+
         for path in paths:
             importlib.import_module(path).setup(self)
 
@@ -127,7 +140,9 @@ class Client(FastAPI):
         await self.session.post(url, json=payload)
 
     async def as_user(self) -> ClientUser:
-        data = await (await self.session.get(f"/api/v10/oauth2/applications/@me")).json()
+        data = await (
+            await self.session.get(f"/api/v10/oauth2/applications/@me")
+        ).json()
         return ClientUser(data)
 
     async def sync(self):
@@ -135,4 +150,3 @@ class Client(FastAPI):
         payload = {command.name: command.to_dict() for command in self._sync_queue}
         resp = await self.session.put(url, json=list(payload.values()))
         return await resp.json()
-    

@@ -13,7 +13,7 @@ class SubCommand:
         description: str,
         options: List[Option] = None,
         *,
-        callback: Callable = None
+        callback: Callable = None,
     ):
         self.name = name
         self.options = options
@@ -38,7 +38,6 @@ class SubCommandGroup:
 
 # noinspection PyShadowingBuiltins
 class ApplicationCommand:
-
     def __init__(
         self,
         name: str,
@@ -65,16 +64,16 @@ class ApplicationCommand:
 
     def callback(self, coro: Callable):
         self._callback = coro
-    
+
     def autocomplete(self, coro: Callable):
         self._autocomplete_callback = coro
 
     def subcommand(
-            self,
-            name: str,
-            description: str,
-            *,
-            options: List[Option] = None,
+        self,
+        name: str,
+        description: str,
+        *,
+        options: List[Option] = None,
     ):
         subcommand = SubCommand(name, description, options)
         if self.options:
@@ -88,7 +87,9 @@ class ApplicationCommand:
                 if asyncio.iscoroutinefunction(coro):
                     self._subcommand_callbacks[name] = coro
                     return coro
+
             return wrapper()
+
         return decorator  # type: ignore
 
     def to_dict(self) -> Dict[str, Any]:

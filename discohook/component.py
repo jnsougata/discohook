@@ -6,13 +6,13 @@ from .enums import ButtonStyle, MessageComponentType, SelectMenuType, ChannelTyp
 
 class Button:
     def __init__(
-            self,
-            label: str,
-            *,
-            url: Optional[str] = None,
-            style: ButtonStyle = ButtonStyle.blurple,
-            disabled: Optional[bool] = False,
-            emoji: Optional[PartialEmoji] = None,
+        self,
+        label: str,
+        *,
+        url: Optional[str] = None,
+        style: ButtonStyle = ButtonStyle.blurple,
+        disabled: Optional[bool] = False,
+        emoji: Optional[PartialEmoji] = None,
     ):
         self.url = url
         self.label = label
@@ -43,13 +43,13 @@ class Button:
 
 class SelectOption:
     def __init__(
-            self,
-            label: str,
-            value: str,
-            *,
-            description: Optional[str] = None,
-            emoji: Optional[PartialEmoji] = None,
-            default: Optional[bool] = False,
+        self,
+        label: str,
+        value: str,
+        *,
+        description: Optional[str] = None,
+        emoji: Optional[PartialEmoji] = None,
+        default: Optional[bool] = False,
     ):
         self.label = label
         self.value = value
@@ -71,15 +71,15 @@ class SelectOption:
 
 class SelectMenu:
     def __init__(
-            self,
-            options: Optional[List[SelectOption]] = None,
-            *,
-            channel_types: Optional[List[ChannelType]] = None,
-            placeholder: Optional[str] = None,
-            min_values: Optional[int] = None,
-            max_values: Optional[int] = None,
-            disabled: Optional[bool] = False,
-            type: SelectMenuType = SelectMenuType.text,  # noqa
+        self,
+        options: Optional[List[SelectOption]] = None,
+        *,
+        channel_types: Optional[List[ChannelType]] = None,
+        placeholder: Optional[str] = None,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        type: SelectMenuType = SelectMenuType.text,  # noqa
     ):
         self._callback: Optional[Callable] = None
         self.custom_id = secrets.token_urlsafe(16)
@@ -90,7 +90,9 @@ class SelectMenu:
         if (type == SelectMenuType.text) and (options is not None):
             self.data["options"] = [option.to_dict() for option in options]
         if (type == SelectMenuType.channel) and (channel_types is not None):
-            self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
+            self.data["channel_types"] = [
+                channel_type.value for channel_type in channel_types
+            ]
         if placeholder:
             self.data["placeholder"] = placeholder
         if min_values:
@@ -111,19 +113,23 @@ class View:
     def __init__(self):
         self._children = []
         self._structure: List[Dict[str, Any]] = []
-        
+
     def add_button_row(self, *buttons: Button):
-        self._structure.append({
-            "type": MessageComponentType.action_row.value,
-            "components": [button.to_dict() for button in buttons[:5]],
-        })
+        self._structure.append(
+            {
+                "type": MessageComponentType.action_row.value,
+                "components": [button.to_dict() for button in buttons[:5]],
+            }
+        )
         self._children.extend(buttons[:5])
 
     def add_select_menu(self, select_menu: SelectMenu):
-        self._structure.append({
-            "type": MessageComponentType.action_row.value,
-            "components": [select_menu.to_dict()],
-        })
+        self._structure.append(
+            {
+                "type": MessageComponentType.action_row.value,
+                "components": [select_menu.to_dict()],
+            }
+        )
         self._children.append(select_menu)
 
     def to_dict(self) -> List[Dict[str, Any]]:

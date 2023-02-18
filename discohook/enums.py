@@ -90,4 +90,3 @@ class SelectMenuType(Enum):
     role = 6
     mentionable = 7
     channel = 8
-

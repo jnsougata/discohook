@@ -8,7 +8,7 @@ class Permissions(Enum):
     administrator = 1 << 3
     manage_channels = 1 << 4
     manage_guild = 1 << 5
-    add_reactions = 1 << 6  
+    add_reactions = 1 << 6
     view_audit_log = 1 << 7
     priority_speaker = 1 << 8
     stream = 1 << 9
