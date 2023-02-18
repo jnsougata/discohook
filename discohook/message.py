@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class Message:
-    def __init__(self, payload: dict) -> None:
+    def __init__(self, payload: Dict[str, Any]) -> None:
         self.data = payload
         self.id = payload["id"]
         self.channel_id = payload["channel_id"]
