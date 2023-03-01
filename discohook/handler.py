@@ -35,15 +35,11 @@ async def handler(request: Request):
     data = await request.json()
     try:
         if data["type"] == InteractionType.ping.value:
-            return JSONResponse(
-                {"type": InteractionCallbackType.pong.value}, status_code=200
-            )
+            return JSONResponse({"type": InteractionCallbackType.pong.value}, status_code=200)
 
         elif data["type"] == InteractionType.app_command.value:
             interaction = CommandInteraction(data, request)
-            command: ApplicationCommand = request.app.application_commands.get(
-                interaction.command_data.id
-            )
+            command: ApplicationCommand = request.app.application_commands.get(interaction.command_data.id)
             if not command:
                 raise NotImplemented(data)
 
@@ -55,12 +51,9 @@ async def handler(request: Request):
                     await command._callback(interaction, target_object)
 
             elif interaction.data.get("options") and (
-                interaction.data["options"][0].get("type")
-                == AppCmdOptionType.subcommand.value
+                interaction.data["options"][0].get("type") == AppCmdOptionType.subcommand.value
             ):
-                subcommand = command._subcommand_callbacks.get(
-                    interaction.data["options"][0]["name"]
-                )
+                subcommand = command._subcommand_callbacks.get(interaction.data["options"][0]["name"])
                 if command.cog:
                     args, kwargs = build_slash_command_prams(subcommand, interaction, 2)
                     await subcommand(command.cog, interaction, *args, **kwargs)
@@ -69,9 +62,7 @@ async def handler(request: Request):
                     await subcommand(interaction, *args, **kwargs)
 
             elif command.cog:
-                args, kwargs = build_slash_command_prams(
-                    command._callback, interaction, 2
-                )
+                args, kwargs = build_slash_command_prams(command._callback, interaction, 2)
                 await command._callback(command.cog, interaction, *args, **kwargs)
 
             else:
@@ -86,13 +77,8 @@ async def handler(request: Request):
                 return JSONResponse({"error": "component not found!"}, status_code=404)
             if interaction.data["component_type"] == MessageComponentType.button.value:
                 await component._callback(interaction)
-            if (
-                interaction.data["component_type"]
-                == MessageComponentType.select_menu.value
-            ):
-                await component._callback(
-                    interaction, build_select_menu_values(interaction)
-                )
+            if interaction.data["component_type"] == MessageComponentType.select_menu.value:
+                await component._callback(interaction, build_select_menu_values(interaction))
 
         elif data["type"] == InteractionType.modal_submit.value:
             interaction = Interaction(data, request)
@@ -104,9 +90,7 @@ async def handler(request: Request):
 
         elif data["type"] == InteractionType.autocomplete.value:
             interaction = Interaction(data, request)
-            command: ApplicationCommand = request.app.application_commands.get(
-                interaction.data["id"]
-            )
+            command: ApplicationCommand = request.app.application_commands.get(interaction.data["id"])
             if not command:
                 return JSONResponse({"error": "command not found!"}, status_code=404)
             callback = command._autocomplete_callback
@@ -116,10 +100,10 @@ async def handler(request: Request):
                 await callback(interaction, option_name, option_value)
 
         else:
-            return JSONResponse(
-                {"message": "unhandled interaction type"}, status_code=300
-            )
+            return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
 
     except Exception as e:
         if request.app._global_error_handler:
             await request.app._global_error_handler(e, data)
+
+    return JSONResponse({"ack": 1}, status_code=200)
