@@ -106,20 +106,18 @@ class Client(FastAPI):
 
         return decorator
 
-    def load_commands(self, *commands: ApplicationCommand):
-        static_commands = {command.id: command for command in commands if command.id}
-        self.application_commands.update(static_commands)
+    def add_commands(self, *commands: ApplicationCommand):
+        self.application_commands.update({command.id: command for command in commands if command.id})
         self._sync_queue.extend(commands)
 
     async def delete_command(self, command_id: str):
-        return await self.session.delete(
-            f"/api/v10/applications/{self.application_id}/commands/{command_id}"
-        )
+        return await self.session.delete(f"/api/v10/applications/{self.application_id}/commands/{command_id}")
 
-    def load_scripts(self, *paths: str):
+    def load(self, *scripts: str):
         import importlib
 
-        for path in paths:
+        scripts = [script.replace(".py", "") for script in scripts]
+        for path in scripts:
             importlib.import_module(path).setup(self)
 
     def on_error(self, coro: Callable):
