@@ -138,3 +138,4 @@ Spacefile
 requirements.txt
 bot/
 webhook.png
+ping.py
