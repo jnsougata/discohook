@@ -9,7 +9,7 @@ from .https import request
 from .option import Choice
 from fastapi.requests import Request
 from .message import Message, ResponseMessage, FollowupMessage
-from .param_handler import handle_edit_params, handle_send_params, MISSING
+from .params import handle_edit_params, handle_send_params, MISSING
 
 if TYPE_CHECKING:
     from .client import Client
@@ -108,7 +108,7 @@ class Interaction:
             content=content,
             embed=embed,
             embeds=embeds,
-            components=view,
+            view=view,
             tts=tts,
             file=file,
             files=files,
@@ -116,7 +116,7 @@ class Interaction:
             supress_embeds=supress_embeds,
         )
         if view:
-            for component in view._children:  # noqa
+            for component in view.children:  # noqa
                 self.client._load_component(component)  # noqa
         self.client._load_inter_token(self.id, self.token)  # noqa
         payload = {
@@ -147,7 +147,7 @@ class Interaction:
             content=content,
             embed=embed,
             embeds=embeds,
-            components=view,
+            view=view,
             tts=tts,
             file=file,
             files=files,
@@ -156,7 +156,7 @@ class Interaction:
         )
         if view:
             self.client._load_inter_token(self.id, self.token)  # noqa
-            for component in view._children:  # noqa
+            for component in view.children:  # noqa
                 self.client._load_component(component)  # noqa
         data = await request(
             method="POST",
@@ -207,7 +207,7 @@ class ComponentInteraction(Interaction):
             content=content,
             embed=embed,
             embeds=embeds,
-            components=view,
+            view=view,
             tts=tts,
             file=file,
             files=files,
@@ -216,7 +216,7 @@ class ComponentInteraction(Interaction):
         )
         if view:
             self.client._load_inter_token(self.id, self.token)  # noqa
-            for component in view._children:  # noqa
+            for component in view.children:  # noqa
                 self.client._load_component(component)  # noqa
         payload = {
             "data": data,
@@ -246,14 +246,14 @@ class ComponentInteraction(Interaction):
             content=content,
             embed=embed,
             embeds=embeds,
-            components=view,
+            view=view,
             tts=tts,
             file=file,
             files=files,
             supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
-            for component in view._children:  # noqa
+            for component in view.children:  # noqa
                 self.client._load_component(component)  # noqa
         self.client._load_inter_token(self.id, self.token)  # noqa
         payload = {
@@ -322,7 +322,7 @@ class CommandInteraction(Interaction):
             content=content,
             embed=embed,
             embeds=embeds,
-            components=view,
+            view=view,
             tts=tts,
             file=file,
             files=files,
@@ -330,7 +330,7 @@ class CommandInteraction(Interaction):
             supress_embeds=supress_embeds,
         )
         if view:
-            for component in view._children:  # noqa
+            for component in view.children:  # noqa
                 self.client._load_component(component)  # noqa
         self.client._load_inter_token(self.id, self.token)  # noqa
         payload = {

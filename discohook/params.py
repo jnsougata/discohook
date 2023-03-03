@@ -11,7 +11,7 @@ def handle_send_params(
     *,
     embed: Optional[Embed] = None,
     embeds: Optional[List[Embed]] = None,
-    components: Optional[View] = None,
+    view: Optional[View] = None,
     tts: Optional[bool] = False,
     file: Optional[Dict[str, Any]] = None,
     files: Optional[List[Dict[str, Any]]] = None,
@@ -38,8 +38,8 @@ def handle_send_params(
         payload["tts"] = True
     if embeds:
         payload["embeds"] = [embed.to_dict() for embed in embeds]
-    if components:
-        payload["components"] = components.to_dict()
+    if view:
+        payload["components"] = view.components
     if files:
         payload["attachments"] = files
     if flag_value:
@@ -53,7 +53,7 @@ def handle_edit_params(
     *,
     embed: Optional[Embed] = MISSING,
     embeds: Optional[List[Embed]] = MISSING,
-    components: Optional[View] = MISSING,
+    view: Optional[View] = MISSING,
     tts: Optional[bool] = MISSING,
     file: Optional[Dict[str, Any]] = MISSING,
     files: Optional[List[Dict[str, Any]]] = MISSING,
@@ -64,16 +64,16 @@ def handle_edit_params(
         embeds = []
     if file is None:
         files = []
-    if components is None:
-        components = []
+    if view is None:
+        view = []
     if content is not MISSING:
         payload["content"] = str(content)
     if tts is not MISSING:
         payload["tts"] = tts
     if embeds is not MISSING:
         payload["embeds"] = [embed.to_dict() for embed in embeds]
-    if components is not MISSING:
-        payload["components"] = components.to_dict() if components else []
+    if view is not MISSING:
+        payload["components"] = view.components if view else []
     if files is not MISSING:
         payload["attachments"] = files
     if supress_embeds is not MISSING:

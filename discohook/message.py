@@ -5,7 +5,7 @@ from .embed import Embed
 from .component import View
 from typing import Optional, List, Dict, Any
 from typing import TYPE_CHECKING
-from .param_handler import handle_edit_params, MISSING
+from .params import handle_edit_params, MISSING
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -75,14 +75,14 @@ class FollowupMessage(Message):
             content=content,
             embed=embed,
             embeds=embeds,
-            components=view,
+            view=view,
             tts=tts,
             file=file,
             files=files,
             supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
-            for component in view._children:  # noqa
+            for component in view.children:  # noqa
                 self.interaction.client._load_component(component)  # noqa
         self.interaction.client._load_inter_token(
             self.interaction.id, self.interaction.token
@@ -125,14 +125,14 @@ class ResponseMessage(Message):
             content=content,
             embed=embed,
             embeds=embeds,
-            components=view,
+            view=view,
             tts=tts,
             file=file,
             files=files,
             supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
-            for component in view._children:  # noqa
+            for component in view.children:  # noqa
                 self.interaction.client._load_component(component)  # noqa
         self.interaction.client._load_inter_token(
             self.interaction.id, self.interaction.token

@@ -1,5 +1,4 @@
 import aiohttp
-from .cog import Cog
 from .command import *
 from .modal import Modal
 from fastapi import FastAPI
@@ -16,7 +15,7 @@ from fastapi.responses import JSONResponse
 from typing import Optional, List, Dict, Union, Callable
 
 
-async def del_cmd(request: Request, command_id: str):
+async def delete_cmd(request: Request, command_id: str):
     resp = await request.app.delete_command(command_id)
     if resp.status == 204:
         return JSONResponse({"success": True}, status_code=resp.status)
@@ -62,7 +61,7 @@ class Client(FastAPI):
             "/dh/dash/{secret}", dashboard, methods=["GET"], include_in_schema=False
         )
         self.add_api_route(
-            "/dh/delete/{command_id}", del_cmd, methods=["GET"], include_in_schema=False
+            "/dh/delete/{command_id}", delete_cmd, methods=["GET"], include_in_schema=False
         )
         self._global_error_handler: Optional[Callable] = None
 
@@ -117,11 +116,7 @@ class Client(FastAPI):
             f"/api/v10/applications/{self.application_id}/commands/{command_id}"
         )
 
-    def add_cog(self, cog: Cog):
-        if isinstance(cog, Cog):
-            self.load_commands(*cog.private_commands)
-
-    def load_cogs(self, *paths: str):
+    def load_scripts(self, *paths: str):
         import importlib
 
         for path in paths:

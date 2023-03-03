@@ -1,4 +1,3 @@
-from .cog import Cog
 from .enums import *
 from .option import *
 from .user import User

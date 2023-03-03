@@ -1,6 +1,6 @@
 import secrets
 from .emoji import PartialEmoji
-from typing import Optional, List, Dict, Any, Callable
+from typing import Optional, List, Dict, Any, Callable, Union
 from .enums import ButtonStyle, MessageComponentType, SelectMenuType, ChannelType
 
 
@@ -111,26 +111,23 @@ class SelectMenu:
 
 class View:
     def __init__(self):
-        self._children = []
-        self._structure: List[Dict[str, Any]] = []
+        self.components: List[Dict[str, Any]] = []
+        self.children: List[Union[Button, SelectMenu]] = []
 
     def add_button_row(self, *buttons: Button):
-        self._structure.append(
+        self.components.append(
             {
                 "type": MessageComponentType.action_row.value,
                 "components": [button.to_dict() for button in buttons[:5]],
             }
         )
-        self._children.extend(buttons[:5])
+        self.children.extend(buttons[:5])
 
     def add_select_menu(self, select_menu: SelectMenu):
-        self._structure.append(
+        self.components.append(
             {
                 "type": MessageComponentType.action_row.value,
                 "components": [select_menu.to_dict()],
             }
         )
-        self._children.append(select_menu)
-
-    def to_dict(self) -> List[Dict[str, Any]]:
-        return self._structure
+        self.children.append(select_menu)
