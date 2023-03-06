@@ -1,6 +1,6 @@
 from typing import Optional, List, Dict, Any
 from .embed import Embed
-from .component import View
+from .view import View
 
 
 MISSING = object()

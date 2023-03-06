@@ -72,9 +72,9 @@ async def handler(request: Request):
         elif data["type"] == InteractionType.component.value:
             interaction = ComponentInteraction(data, request)
             custom_id = interaction.data["custom_id"]
-            component = request.app.ui_factory.get(custom_id, None)
+            component = request.app.active_components.get(custom_id, None)
             if not component:
-                return JSONResponse({"error": "component not found!"}, status_code=404)
+                return JSONResponse({"error": "component not found"}, status_code=404)
             if interaction.data["component_type"] == MessageComponentType.button.value:
                 await component._callback(interaction)
             if interaction.data["component_type"] == MessageComponentType.select_menu.value:
@@ -82,7 +82,7 @@ async def handler(request: Request):
 
         elif data["type"] == InteractionType.modal_submit.value:
             interaction = Interaction(data, request)
-            component = request.app.ui_factory.get(interaction.data["custom_id"], None)
+            component = request.app.active_components.get(interaction.data["custom_id"], None)
             if not component:
                 return JSONResponse({"error": "component not found!"}, status_code=404)
             args, kwargs = build_modal_params(component._callback, interaction)

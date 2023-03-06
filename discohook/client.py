@@ -8,7 +8,7 @@ from .enums import AppCmdType
 from .user import ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand
-from .component import Button, SelectMenu
+from .view import Button, SelectMenu
 from fastapi.requests import Request
 from .dash import dashboard
 from fastapi.responses import JSONResponse
@@ -48,11 +48,10 @@ class Client(FastAPI):
             base_url="https://discord.com",
             headers={"Authorization": f"Bot {self.token}", "Content-Type": "application/json"}
         )
-        self.ui_factory: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
+        self.active_components: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
-        self._populated_return: Optional[JSONResponse] = None
         self.add_route(route, handler, methods=["POST"], include_in_schema=False)
         self.add_api_route(
             "/dh/sync/{secret}", sync, methods=["GET"], include_in_schema=False
@@ -65,10 +64,10 @@ class Client(FastAPI):
         )
         self._global_error_handler: Optional[Callable] = None
 
-    def _load_component(self, component: Union[Button, Modal, SelectMenu]):
-        self.ui_factory[component.custom_id] = component
+    def load_component(self, component: Union[Button, Modal, SelectMenu]):
+        self.active_components[component.custom_id] = component
 
-    def _load_inter_token(self, interaction_id: str, token: str):
+    def store_inter_token(self, interaction_id: str, token: str):
         self.cached_inter_tokens[interaction_id] = token
 
     def command(
@@ -113,10 +112,10 @@ class Client(FastAPI):
     async def delete_command(self, command_id: str):
         return await self.session.delete(f"/api/v10/applications/{self.application_id}/commands/{command_id}")
 
-    def load(self, *scripts: str):
+    def load_scripts(self, *scripts: str):
         import importlib
 
-        scripts = [script.replace(".py", "") for script in scripts]
+        scripts = [script.replace(".py", "") for script in scripts if script.endswith(".py")]
         for path in scripts:
             importlib.import_module(path).setup(self)
 
@@ -135,6 +134,5 @@ class Client(FastAPI):
 
     async def sync(self):
         url = f"/api/v10/applications/{self.application_id}/commands"
-        payload = {command.name: command.to_dict() for command in self._sync_queue}
-        resp = await self.session.put(url, json=list(payload.values()))
+        resp = await self.session.put(url, json=[command.to_dict() for command in self._sync_queue])
         return await resp.json()

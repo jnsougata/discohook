@@ -3,8 +3,9 @@ from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 from .embed import Embed
 from .user import User
 from .member import Member
-from .component import View
+from .view import View
 from .modal import Modal
+from .channel import PartialChannel
 from .https import request
 from .option import Choice
 from fastapi.requests import Request
@@ -44,6 +45,10 @@ class Interaction:
         self.guild_locale: Optional[str] = data.get("guild_locale")
 
     @property
+    def channel(self) -> PartialChannel:
+        return PartialChannel({"id": self.channel_id}, self.client)
+
+    @property
     def author(self) -> Optional[Union[User, Member]]:
         member = self._payload.get("member")
         user = self._payload.get("user")
@@ -54,7 +59,7 @@ class Interaction:
             return User(user)
 
     async def send_modal(self, modal: Modal):
-        self.client.ui_factory[modal.custom_id] = modal
+        self.client.active_components[modal.custom_id] = modal
         payload = {
             "data": modal.json(),
             "type": InteractionCallbackType.modal.value,
@@ -117,8 +122,8 @@ class Interaction:
         )
         if view:
             for component in view.children:  # noqa
-                self.client._load_component(component)  # noqa
-        self.client._load_inter_token(self.id, self.token)  # noqa
+                self.client.load_component(component)  # noqa
+        self.client.store_inter_token(self.id, self.token)  # noqa
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
@@ -155,9 +160,9 @@ class Interaction:
             supress_embeds=supress_embeds,
         )
         if view:
-            self.client._load_inter_token(self.id, self.token)  # noqa
+            self.client.store_inter_token(self.id, self.token)  # noqa
             for component in view.children:  # noqa
-                self.client._load_component(component)  # noqa
+                self.client.load_component(component)  # noqa
         data = await request(
             method="POST",
             path=f"/webhooks/{self.application_id}/{self.token}",
@@ -215,9 +220,9 @@ class ComponentInteraction(Interaction):
             supress_embeds=supress_embeds,
         )
         if view:
-            self.client._load_inter_token(self.id, self.token)  # noqa
+            self.client.store_inter_token(self.id, self.token)  # noqa
             for component in view.children:  # noqa
-                self.client._load_component(component)  # noqa
+                self.client.load_component(component)  # noqa
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
@@ -254,8 +259,8 @@ class ComponentInteraction(Interaction):
         )
         if view is not MISSING and view:
             for component in view.children:  # noqa
-                self.client._load_component(component)  # noqa
-        self.client._load_inter_token(self.id, self.token)  # noqa
+                self.client.load_component(component)  # noqa
+        self.client.store_inter_token(self.id, self.token)  # noqa
         payload = {
             "data": data,
             "type": InteractionCallbackType.update_message.value,
@@ -331,8 +336,8 @@ class CommandInteraction(Interaction):
         )
         if view:
             for component in view.children:  # noqa
-                self.client._load_component(component)  # noqa
-        self.client._load_inter_token(self.id, self.token)  # noqa
+                self.client.load_component(component)  # noqa
+        self.client.store_inter_token(self.id, self.token)  # noqa
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,

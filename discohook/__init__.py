@@ -1,3 +1,6 @@
+__version__ = "0.0.4"
+__author__ = "jnsougata"
+
 from .enums import *
 from .option import *
 from .user import User
@@ -11,7 +14,7 @@ from .emoji import PartialEmoji
 from .client import Client
 from .permissions import Permissions
 from .command import ApplicationCommand
-from .component import View, Button, SelectOption, SelectMenu
+from .view import View, Button, SelectOption, SelectMenu
 from .interaction import Interaction, ComponentInteraction, CommandInteraction
 
 user_command = AppCmdType.user

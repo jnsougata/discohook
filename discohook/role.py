@@ -1,4 +1,5 @@
 from typing import Optional
+from .permissions import Permissions
 
 
 class Role:
@@ -22,3 +23,7 @@ class Role:
     @property
     def mention(self) -> str:
         return f"<@&{self.id}>"
+
+    def has_permission(self, permissions: Permissions) -> bool:
+        return int(self.permissions) & permissions.value == permissions.value
+

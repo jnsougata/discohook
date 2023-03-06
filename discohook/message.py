@@ -2,7 +2,7 @@ from .user import User
 from .role import Role
 from .https import request
 from .embed import Embed
-from .component import View
+from .view import View
 from typing import Optional, List, Dict, Any
 from typing import TYPE_CHECKING
 from .params import handle_edit_params, MISSING
@@ -83,8 +83,8 @@ class FollowupMessage(Message):
         )
         if view is not MISSING and view:
             for component in view.children:  # noqa
-                self.interaction.client._load_component(component)  # noqa
-        self.interaction.client._load_inter_token(
+                self.interaction.client.load_component(component)  # noqa
+        self.interaction.client.store_inter_token(
             self.interaction.id, self.interaction.token
         )  # noqa
         resp = await request(
@@ -133,8 +133,8 @@ class ResponseMessage(Message):
         )
         if view is not MISSING and view:
             for component in view.children:  # noqa
-                self.interaction.client._load_component(component)  # noqa
-        self.interaction.client._load_inter_token(
+                self.interaction.client.load_component(component)  # noqa
+        self.interaction.client.store_inter_token(
             self.interaction.id, self.interaction.token
         )  # noqa
         resp = await request(

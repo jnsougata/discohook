@@ -4,7 +4,7 @@ from .role import Role
 from .member import Member
 from .channel import Channel
 from .attachment import Attachment
-from .interaction import Interaction
+from .interaction import Interaction, CommandData
 from typing import List, Dict, Any, Callable, Tuple
 from .enums import AppCmdOptionType, SelectMenuType, AppCmdType
 
@@ -68,11 +68,11 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
             else:
                 options[name] = User(user_data)
         elif option_type == AppCmdOptionType.channel.value:
-            options[name] = Channel(interaction.data["resolved"]["channels"][value])
+            options[name] = Channel(interaction.data["resolved"]["channels"][value], interaction.client)
         elif option_type == AppCmdOptionType.role.value:
             options[name] = Role(interaction.data["resolved"]["roles"][value])
         elif option_type == AppCmdOptionType.mentionable.value:
-            # TODO: this is a shit option
+            # TODO: this is a shit option type, not enough motivation to implement it
             pass
         elif option_type == AppCmdOptionType.attachment.value:
             options[name] = Attachment(
@@ -82,15 +82,14 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
 
 
 def resolve_command_options(interaction: Interaction):
-    if not interaction.command_data.options:  # noqa
+    data = CommandData(interaction.data)
+    if not data.options:
         return {}
-    for option in interaction.command_data.options:  # noqa
+    for option in data.options:
         if option["type"] == AppCmdOptionType.subcommand.value:
             return parse_generic_options(option["options"], interaction)
         else:
-            return parse_generic_options(
-                interaction.command_data.options, interaction
-            )  # noqa
+            return parse_generic_options(data.options, interaction)
 
 
 def build_slash_command_prams(func: Callable, interaction: Interaction, skips: int = 1):
@@ -136,7 +135,7 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
     if interaction.data["component_type"] == SelectMenuType.channel.value:
         resolved = interaction.data["resolved"]["channels"]
         return [
-            Channel(resolved.pop(channel_id))
+            Channel(resolved.pop(channel_id), interaction.client)
             for channel_id in interaction.data["values"]
         ]
     if interaction.data["component_type"] == SelectMenuType.user.value:
