@@ -6,7 +6,6 @@ from .view import View
 from typing import Optional, List, Dict, Any
 from typing import TYPE_CHECKING
 from .params import handle_edit_params, MISSING
-
 if TYPE_CHECKING:
     from .client import Client
     from .interaction import Interaction
@@ -86,14 +85,12 @@ class Message:
                 path=f"/channels/{self.channel_id}/messages/{self.id}",
                 session=self._client.session,
                 json=data,
-            ),
-            self._client,
-        )
+            ), self._client)
 
 
 class FollowupMessage(Message):
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
-        super().__init__(payload)
+        super().__init__(payload, interaction.client)
         self.interaction = interaction
 
     async def delete(self):
@@ -103,7 +100,6 @@ class FollowupMessage(Message):
             session=self.interaction.client.session,  # noqa
         )
 
-    # noinspection PyProtectedMember
     async def edit(
         self,
         content: Optional[str] = MISSING,
@@ -127,33 +123,30 @@ class FollowupMessage(Message):
             supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
-            for component in view.children:  # noqa
-                self.interaction.client.load_component(component)  # noqa
-        self.interaction.client.store_inter_token(
-            self.interaction.id, self.interaction.token
-        )  # noqa
+            for component in view.children:
+                self.interaction.client.load_component(component)
+        self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = await request(
             "PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
             session=self.interaction.client.session,
             json=data,
         )
-        return Message(resp)
+        return Message(resp, self.interaction.client)
 
 
 class ResponseMessage(Message):
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
-        super().__init__(payload)
+        super().__init__(payload, interaction.client)
         self.interaction = interaction
 
     async def delete(self):
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client.session,  # noqa
+            session=self.interaction.client.session,
         )
 
-    # noinspection PyProtectedMember
     async def edit(
         self,
         content: Optional[str] = MISSING,
@@ -177,15 +170,13 @@ class ResponseMessage(Message):
             supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
-            for component in view.children:  # noqa
-                self.interaction.client.load_component(component)  # noqa
-        self.interaction.client.store_inter_token(
-            self.interaction.id, self.interaction.token
-        )  # noqa
+            for component in view.children:
+                self.interaction.client.load_component(component)
+        self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = await request(
             "PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
             session=self.interaction.client.session,
             json=data,
         )
-        return Message(resp)
+        return Message(resp, self.interaction.client)
