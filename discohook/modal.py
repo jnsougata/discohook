@@ -52,7 +52,7 @@ class Modal:
             }
         )
 
-    def json(self):
+    def to_dict(self):
         if self._row["components"]:
             self._data["components"].append(self._row)
         return self._data

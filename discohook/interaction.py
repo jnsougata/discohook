@@ -61,7 +61,7 @@ class Interaction:
     async def send_modal(self, modal: Modal):
         self.client.active_components[modal.custom_id] = modal
         payload = {
-            "data": modal.json(),
+            "data": modal.to_dict(),
             "type": InteractionCallbackType.modal.value,
         }
         await request(
@@ -121,9 +121,9 @@ class Interaction:
             supress_embeds=supress_embeds,
         )
         if view:
-            for component in view.children:  # noqa
-                self.client.load_component(component)  # noqa
-        self.client.store_inter_token(self.id, self.token)  # noqa
+            for component in view.children:
+                self.client.load_component(component)
+        self.client.store_inter_token(self.id, self.token)
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
@@ -160,9 +160,9 @@ class Interaction:
             supress_embeds=supress_embeds,
         )
         if view:
-            self.client.store_inter_token(self.id, self.token)  # noqa
-            for component in view.children:  # noqa
-                self.client.load_component(component)  # noqa
+            self.client.store_inter_token(self.id, self.token)
+            for component in view.children:
+                self.client.load_component(component)
         data = await request(
             method="POST",
             path=f"/webhooks/{self.application_id}/{self.token}",
@@ -220,9 +220,9 @@ class ComponentInteraction(Interaction):
             supress_embeds=supress_embeds,
         )
         if view:
-            self.client.store_inter_token(self.id, self.token)  # noqa
-            for component in view.children:  # noqa
-                self.client.load_component(component)  # noqa
+            self.client.store_inter_token(self.id, self.token)
+            for component in view.children:
+                self.client.load_component(component)
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
@@ -258,9 +258,9 @@ class ComponentInteraction(Interaction):
             supress_embeds=supress_embeds,
         )
         if view is not MISSING and view:
-            for component in view.children:  # noqa
-                self.client.load_component(component)  # noqa
-        self.client.store_inter_token(self.id, self.token)  # noqa
+            for component in view.children:
+                self.client.load_component(component)
+        self.client.store_inter_token(self.id, self.token)
         payload = {
             "data": data,
             "type": InteractionCallbackType.update_message.value,
@@ -287,7 +287,7 @@ class ComponentInteraction(Interaction):
             path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
             session=self.client.session,
         )
-        return Message(resp)
+        return Message(resp, self.client)
 
     async def delete_original(self):
         if not self.origin:
@@ -335,9 +335,9 @@ class CommandInteraction(Interaction):
             supress_embeds=supress_embeds,
         )
         if view:
-            for component in view.children:  # noqa
-                self.client.load_component(component)  # noqa
-        self.client.store_inter_token(self.id, self.token)  # noqa
+            for component in view.children:
+                self.client.load_component(component)
+        self.client.store_inter_token(self.id, self.token)
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,

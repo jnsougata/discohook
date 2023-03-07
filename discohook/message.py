@@ -97,7 +97,7 @@ class FollowupMessage(Message):
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
-            session=self.interaction.client.session,  # noqa
+            session=self.interaction.client.session
         )
 
     async def edit(
