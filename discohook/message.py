@@ -8,11 +8,14 @@ from typing import TYPE_CHECKING
 from .params import handle_edit_params, MISSING
 
 if TYPE_CHECKING:
+    from .client import Client
     from .interaction import Interaction
 
 
 class Message:
-    def __init__(self, payload: Dict[str, Any]) -> None:
+
+    def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
+        self._client = client
         self.data = payload
         self.id = payload["id"]
         self.channel_id = payload["channel_id"]
@@ -44,6 +47,48 @@ class Message:
         self.sticker_items = payload.get("sticker_items")
         self.stickers = payload.get("stickers")
         self.position = payload.get("position")
+    
+    async def delete(self):
+        await request(
+            "DELETE",
+            path=f"/channels/{self.channel_id}/messages/{self.id}",
+            session=self._client.session,
+        )
+    
+    async def edit(
+        self,
+        content: Optional[str] = MISSING,
+        *,
+        embed: Optional[Embed] = MISSING,
+        embeds: Optional[List[Embed]] = MISSING,
+        view: Optional[View] = MISSING,
+        tts: Optional[bool] = MISSING,
+        file: Optional[Dict[str, Any]] = MISSING,
+        files: Optional[List[Dict[str, Any]]] = MISSING,
+        supress_embeds: Optional[bool] = MISSING,
+    ) -> "Message":
+        data = handle_edit_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            view=view,
+            tts=tts,
+            file=file,
+            files=files,
+            supress_embeds=supress_embeds,
+        )
+        if view:
+            for component in view.children:
+                self._client.load_component(component)
+        return Message(
+            await request(
+                "PATCH",
+                path=f"/channels/{self.channel_id}/messages/{self.id}",
+                session=self._client.session,
+                json=data,
+            ),
+            self._client,
+        )
 
 
 class FollowupMessage(Message):

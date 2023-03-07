@@ -185,7 +185,7 @@ class ComponentInteraction(Interaction):
 
     @property
     def message(self) -> Optional[Message]:
-        return Message(self._payload["message"])
+        return Message(self._payload["message"], self.client)
 
     @property
     def originator(self) -> User:

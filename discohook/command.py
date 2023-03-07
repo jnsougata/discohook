@@ -49,7 +49,6 @@ class ApplicationCommand:
         category: AppCmdType = AppCmdType.slash,
     ):
         self.id = id
-        self.cog = None
         self.name = name
         self.description = description
         self.options: List[Option] = options

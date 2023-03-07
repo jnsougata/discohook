@@ -27,8 +27,8 @@ class PartialChannel:
             supress_embeds: Optional[bool] = False,
     ):
         if view:
-            for component in view.children:  # noqa
-                self.client.load_component(component)  # noqa
+            for component in view.children:
+                self.client.load_component(component)
         return await request(
             "POST",
             path=f"/channels/{self.id}/messages",

@@ -54,17 +54,8 @@ async def handler(request: Request):
                 interaction.data["options"][0].get("type") == AppCmdOptionType.subcommand.value
             ):
                 subcommand = command._subcommand_callbacks.get(interaction.data["options"][0]["name"])
-                if command.cog:
-                    args, kwargs = build_slash_command_prams(subcommand, interaction, 2)
-                    await subcommand(command.cog, interaction, *args, **kwargs)
-                else:
-                    args, kwargs = build_slash_command_prams(subcommand, interaction)
-                    await subcommand(interaction, *args, **kwargs)
-
-            elif command.cog:
-                args, kwargs = build_slash_command_prams(command._callback, interaction, 2)
-                await command._callback(command.cog, interaction, *args, **kwargs)
-
+                args, kwargs = build_slash_command_prams(subcommand, interaction)
+                await subcommand(interaction, *args, **kwargs)
             else:
                 args, kwargs = build_slash_command_prams(command._callback, interaction)
                 await command._callback(interaction, *args, **kwargs)
