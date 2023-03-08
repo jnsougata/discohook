@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Message:
 
     def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
-        self._client = client
+        self.client = client
         self.data = payload
         self.id = payload["id"]
         self.channel_id = payload["channel_id"]
@@ -51,9 +51,9 @@ class Message:
         await request(
             "DELETE",
             path=f"/channels/{self.channel_id}/messages/{self.id}",
-            session=self._client.session,
+            session=self.client.session,
         )
-    
+
     async def edit(
         self,
         content: Optional[str] = MISSING,
@@ -65,7 +65,7 @@ class Message:
         file: Optional[Dict[str, Any]] = MISSING,
         files: Optional[List[Dict[str, Any]]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
-    ) -> "Message":
+    ):
         data = handle_edit_params(
             content=content,
             embed=embed,
@@ -78,14 +78,15 @@ class Message:
         )
         if view:
             for component in view.children:
-                self._client.load_component(component)
+                self.client.load_component(component)
         return Message(
             await request(
                 "PATCH",
                 path=f"/channels/{self.channel_id}/messages/{self.id}",
-                session=self._client.session,
+                session=self.client.session,
                 json=data,
-            ), self._client)
+            ), self.client
+        )
 
 
 class FollowupMessage(Message):
