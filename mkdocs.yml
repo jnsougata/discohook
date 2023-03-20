@@ -1,0 +1,100 @@
+site_name: Discohook
+site_url: https://discohook.neobrains.dev
+site_description: Documentation for the Discohook library
+repo_url: https://github.com/jnsougata/discohook
+edit_uri: "tree/main/docs/"
+repo_name: jnsougata/discohook
+copyright: Copyright &copy; 2022 Discohook
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+  features:
+    - announce.dismiss
+    - header.autohide
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - search.share
+    - toc.follow
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - meta
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      linenums: false
+      anchor_linenums: true
+      auto_title: true
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink:
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      user: Duplexes
+      repo: pyco
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - tags
+  - git-revision-date-localized:
+      enable_creation_date: true
+  - mkdocstrings:
+      handlers:
+        python:
+          rendering:
+            heading_level: 2
+            show_root_heading: true
+            show_root_toc_entry: false
+            show_root_full_path: true
+            show_object_full_path: true
+            show_if_no_docstring: true
+            show_source: false
+            show_signature: false
+            members_order: "source"
+          selection:
+            filters:
+              - "!^_"
+extra:
+  homepage: https://discohook.neobrains.dev
+  generator: false
+
+nav:
+  - Home: index.md
+  - API Reference:
+      - "API Reference/index.md"
+      - Interaction: "API Reference/interaction.md"
