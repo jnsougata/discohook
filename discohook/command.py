@@ -2,11 +2,25 @@ import asyncio
 from functools import wraps
 from .option import Option
 from .permissions import Permissions
-from .enums import ApplicaionCommandType, ApplicationCommandOptionType
+from .enums import ApplicationCommandType, ApplicationCommandOptionType
 from typing import Callable, Dict, List, Optional, Any
 
 
 class SubCommand:
+    """
+    A class representing a discord application command subcommand.
+
+    Parameters
+    ----------
+    name: str
+        The name of the subcommand.
+    description: str
+        The description of the subcommand.
+    options: Optional[List[Option]]
+        The options of the subcommand.
+    callback: Optional[Callable]
+        The callback of the subcommand.
+    """
     def __init__(
         self,
         name: str,
@@ -21,7 +35,7 @@ class SubCommand:
         self.description = description
         self._component_callback: Optional[Callable] = None
 
-    def json(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         payload = {
             "type": ApplicationCommandOptionType.subcommand.value,
             "name": self.name,
@@ -66,7 +80,7 @@ class ApplicationCommand:
         options: List[Option] = None,
         dm_access: bool = True,
         permissions: List[Permissions] = None,
-        category: ApplicaionCommandType = ApplicaionCommandType.slash,
+        category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
         self.id = id
         self.name = name
@@ -150,7 +164,7 @@ class ApplicationCommand:
         Dict[str, Any]
         """
         self._payload["type"] = self.category.value
-        if self.category is ApplicaionCommandType.slash:
+        if self.category is ApplicationCommandType.slash:
             if self.description:
                 self._payload["description"] = self.description
             if self.options:

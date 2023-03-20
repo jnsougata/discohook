@@ -4,7 +4,7 @@ from .modal import Modal
 from fastapi import FastAPI
 from functools import wraps
 from .handler import handler
-from .enums import ApplicaionCommandType
+from .enums import ApplicationCommandType
 from .user import ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand
@@ -92,7 +92,7 @@ class Client(FastAPI):
         options: Optional[List[Option]] = None,
         permissions: Optional[List[Permissions]] = None,
         dm_access: bool = True,
-        category: ApplicaionCommandType = ApplicaionCommandType.slash,
+        category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
         """
         A decorator to register a command.

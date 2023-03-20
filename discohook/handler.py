@@ -11,7 +11,7 @@ from .resolver import (
     build_select_menu_values,
 )
 from .enums import (
-    ApplicaionCommandType,
+    ApplicationCommandType,
     InteractionType,
     MessageComponentType,
     InteractionCallbackType,
@@ -48,7 +48,7 @@ async def handler(request: Request):
             if not command:
                 raise NotImplemented(data)
 
-            elif not (interaction.data["type"] == ApplicaionCommandType.slash.value):
+            elif not (interaction.data["type"] == ApplicationCommandType.slash.value):
                 target_object = build_context_menu_param(interaction)
                 if command.cog:
                     await command._callback(command.cog, interaction, target_object)

@@ -6,7 +6,7 @@ from .channel import Channel
 from .attachment import Attachment
 from .interaction import Interaction, CommandData
 from typing import List, Dict, Any, Callable, Tuple
-from .enums import ApplicationCommandOptionType, SelectMenuType, ApplicaionCommandType
+from .enums import ApplicationCommandOptionType, SelectMenuType, ApplicationCommandType
 
 
 def handle_params_by_signature(
@@ -100,7 +100,7 @@ def build_slash_command_prams(func: Callable, interaction: Interaction, skips: i
 
 
 def build_context_menu_param(interaction: Interaction):
-    if interaction.data["type"] == ApplicaionCommandType.user.value:
+    if interaction.data["type"] == ApplicationCommandType.user.value:
         user_id = interaction.data["target_id"]
         user_resolved = interaction.data["resolved"]["users"][user_id]
         member_resolved = (
@@ -113,7 +113,7 @@ def build_context_menu_param(interaction: Interaction):
             user_resolved.update(member_resolved)
         return User(user_resolved)
 
-    if interaction.data["type"] == ApplicaionCommandType.message.value:
+    if interaction.data["type"] == ApplicationCommandType.message.value:
         message_id = interaction.data["target_id"]
         message_dict = interaction.data["resolved"]["messages"][message_id]
         # TODO: objectify

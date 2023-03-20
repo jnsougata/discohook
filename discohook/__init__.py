@@ -17,6 +17,6 @@ from .command import ApplicationCommand
 from .view import View, Button, SelectOption, SelectMenu
 from .interaction import Interaction, ComponentInteraction, CommandInteraction
 
-user_command = ApplicaionCommandType.user
-slash_command = ApplicaionCommandType.slash
-message_command = ApplicaionCommandType.message
+user_command = ApplicationCommandType.user
+slash_command = ApplicationCommandType.slash
+message_command = ApplicationCommandType.message

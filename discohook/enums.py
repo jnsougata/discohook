@@ -37,7 +37,7 @@ class ModalFieldType(Enum):
     text_input = 4
 
 
-class ApplicaionCommandType(Enum):
+class ApplicationCommandType(Enum):
     """
     The type of an application command.
 

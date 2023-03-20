@@ -3,7 +3,7 @@ from .user import User
 
 class Member(User):
     """
-    Represents a member of a guild sent with an interaction.
+    Represents a member of a guild sent with an interaction, subclassed from :class:`User`.
     """
     def __init__(self, data):
         super().__init__(data)
