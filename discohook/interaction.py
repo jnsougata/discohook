@@ -17,6 +17,11 @@ if TYPE_CHECKING:
 
 
 class CommandData:
+    """
+    Represents the data of a command interaction
+
+    This is used internally by the library and should not be used by the user.
+    """
     def __init__(self, data: Dict[str, Any]):
         self.id: str = data["id"]
         self.name: str = data["name"]
@@ -30,6 +35,38 @@ class CommandData:
 class Interaction:
     """
     Base interaction class for all interactions
+
+    Attributes
+    ----------
+    id: str
+        The unique id of the interaction
+    type: int
+        The type of the interaction
+    token: str
+        The token of the interaction
+    version: int
+        The version of the interaction
+    application_id: str
+        The id of the application that the interaction was triggered for
+    data: Optional[Dict[str, Any]]
+        The command data payload (if the interaction is a command)
+    guild_id: Optional[str]
+        The guild id of the interaction
+    channel_id: Optional[str]
+        The channel id of the interaction
+    app_permissions: Optional[int]
+        The permissions of the application
+    locale: Optional[str]
+        The locale of the interaction
+    guild_locale: Optional[str]
+        The guild locale of the interaction
+    
+    Parameters
+    ----------
+    data: Dict[str, Any]
+        The interaction data payload
+    req: Request
+        The request object from fastapi
     """
     def __init__(self, data: Dict[str, Any], req: Request):
         """
@@ -403,12 +440,26 @@ class ComponentInteraction(Interaction):
 
     @property
     def origin(self) -> Optional[str]:
+        """
+        The original token of the interaction (if it is a follow up)
+
+        Returns
+        -------
+        Optional[str]
+        """
         if not self.message:
             return
         parent_id = self.message.interaction["id"]
         return self.client.cached_inter_tokens.get(parent_id, "")
 
     async def original_message(self) -> Optional[Message]:
+        """
+        Gets the original message of the interaction
+
+        Returns
+        -------
+        Optional[Message]
+        """
         if not self.origin:
             return
         resp = await request(
@@ -418,6 +469,9 @@ class ComponentInteraction(Interaction):
         return Message(resp, self.client)
 
     async def delete_original(self):
+        """
+        Deletes the original message of the interaction
+        """
         if not self.origin:
             return
         self.client.cached_inter_tokens.pop(self.id, None)
@@ -429,6 +483,14 @@ class ComponentInteraction(Interaction):
 
 
 class CommandInteraction(Interaction):
+    """
+    Represents a command interaction, subclass from Interaction
+
+    Attributes
+    ----------
+    command_data: Optional[CommandData]
+        Raw data of the command
+    """
     def __init__(self, data: Dict[str, Any], req: Request):
         super().__init__(data, req)
 
@@ -451,6 +513,30 @@ class CommandInteraction(Interaction):
         ephemeral: Optional[bool] = False,
         supress_embeds: Optional[bool] = False,
     ) -> None:
+        """
+        Sends a response to the interaction
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The content of the message
+        embed: Optional[Embed]
+            The embed of the message
+        embeds: Optional[List[Embed]]
+            The list of embeds of the message
+        view: Optional[View]
+            The view of the message
+        tts: Optional[bool]
+            Whether the message should be sent as tts or not
+        file: Optional[Dict[str, Any]]
+            The file of the message
+        files: Optional[List[Dict[str, Any]]]
+            The list of files of the message
+        ephemeral: Optional[bool]
+            Whether the message should be ephemeral or not
+        supress_embeds: Optional[bool]
+            Whether the message should supress embeds or not
+        """
         data = handle_send_params(
             content=content,
             embed=embed,

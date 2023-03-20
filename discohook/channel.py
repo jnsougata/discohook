@@ -9,6 +9,16 @@ if TYPE_CHECKING:
 
 
 class PartialChannel:
+    """
+    Represents a partial discord channel object.
+
+    Parameters
+    ----------
+    data: :class:`dict`
+        The data of the channel.
+    client: :class:`Client`
+        The client that the channel belongs to.
+    """
     def __init__(self, data: dict, client: "Client"):
         self.client = client
         self.id: str = data.get("id")
@@ -26,6 +36,30 @@ class PartialChannel:
             ephemeral: Optional[bool] = False,
             supress_embeds: Optional[bool] = False,
     ):
+        """
+        Sends a message to the channel.
+
+        Parameters
+        ----------
+        content: Optional[:class:`str`]
+            The content of the message.
+        embed: Optional[:class:`Embed`]
+            The embed to send with the message.
+        embeds: Optional[List[:class:`Embed`]]
+            A list of embeds to send with the message.
+        view: Optional[:class:`View`]
+            The view to send with the message.
+        tts: Optional[:class:`bool`]
+            Whether the message should be sent with text-to-speech.
+        file: Optional[Dict[str, Any]]
+            A file to send with the message.
+        files: Optional[List[Dict[str, Any]]]
+            A list of files to send with the message.
+        ephemeral: Optional[:class:`bool`]
+            Whether the message should be ephemeral.
+        supress_embeds: Optional[:class:`bool`]
+            Whether the embeds should be supressed.
+        """
         if view:
             for component in view.children:
                 self.client.load_component(component)
@@ -48,6 +82,16 @@ class PartialChannel:
 
 
 class Channel(PartialChannel):
+    """
+    Represents a discord channel object.
+
+    Parameters
+    ----------
+    data: :class:`dict`
+        The data of the channel.
+    client: :class:`Client`
+        The client that the channel belongs to.
+    """
     def __init__(self, data: dict, client: "Client"):
         super().__init__(data, client)
         self.id: str = data.get("id")
@@ -64,4 +108,11 @@ class Channel(PartialChannel):
 
     @property
     def mention(self) -> str:
+        """
+        Returns the channel mentionable string.
+
+        Returns
+        -------
+        :class:`str`
+        """
         return f"<#{self.id}>"

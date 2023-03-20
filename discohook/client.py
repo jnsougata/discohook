@@ -4,7 +4,7 @@ from .modal import Modal
 from fastapi import FastAPI
 from functools import wraps
 from .handler import handler
-from .enums import AppCmdType
+from .enums import ApplicaionCommandType
 from .user import ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand
@@ -31,20 +31,6 @@ async def sync(request: Request, secret: str = None):
 class Client(FastAPI):
     """
     The main client class for Discohook.
-
-    Parameters
-    ----------
-    application_id: Union[int, str]
-        The application ID of your bot.
-    public_key: str
-        The public key of your bot.
-    token: str
-        The bot token of your bot.
-    route: str
-        The route to listen for interactions on. Defaults to `/interactions`.
-    **kwargs
-        Any additional kwargs to pass to the FastAPI instance.
-
     """
     def __init__(
         self,
@@ -106,7 +92,7 @@ class Client(FastAPI):
         options: Optional[List[Option]] = None,
         permissions: Optional[List[Permissions]] = None,
         dm_access: bool = True,
-        category: AppCmdType = AppCmdType.slash,
+        category: ApplicaionCommandType = ApplicaionCommandType.slash,
     ):
         """
         A decorator to register a command.

@@ -4,7 +4,7 @@ from .permissions import Permissions
 
 class Role:
     """
-    Represents a role.
+    Represents a discord Role.
 
     Attributes
     ----------

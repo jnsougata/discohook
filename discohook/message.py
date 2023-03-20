@@ -14,6 +14,45 @@ if TYPE_CHECKING:
 class Message:
     """
     Represents a Discord message.
+
+    Parameters
+    ----------
+    payload: :class:`dict`
+        The payload of the message.
+    client: :class:`Client`
+        The client that the message belongs to.
+
+    Attributes
+    ----------
+    id: :class:`str`
+        The id of the message.
+    channel_id: :class:`str`
+        The id of the channel the message was sent in.
+    author: :class:`User`
+        The author of the message.
+    content: :class:`str`
+        The content of the message.
+    timestamp: :class:`str`
+        The timestamp of the message.
+    edited_timestamp: Optional[:class:`str`]
+        The timestamp of when the message was last edited.
+    tts: :class:`bool`
+        Whether the message was sent using text-to-speech.
+    mention_everyone: :class:`bool`
+        Whether the message mentions everyone.
+    mentions: List[:class:`User`]
+        The users mentioned in the message.
+    mention_roles: List[:class:`Role`]
+        The roles mentioned in the message.
+    mention_channels: Optional[:class:`dict`]
+        The channels mentioned in the message.
+    attachments: :class:`dict`
+        The attachments in the message.
+    embeds: :class:`list`
+        The embeds in the message.
+    reactions: Optional[:class:`list`]
+        The reactions in the message.
+        ...
     """
     def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
         self.client = client
@@ -117,11 +156,17 @@ class Message:
 
 
 class FollowupMessage(Message):
+    """
+    Represents a followup message sent by an interaction, subclass of :class:`Message`.
+    """
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
         super().__init__(payload, interaction.client)
         self.interaction = interaction
 
     async def delete(self):
+        """
+        Deletes the followup message.
+        """
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
@@ -140,6 +185,13 @@ class FollowupMessage(Message):
         files: Optional[List[Dict[str, Any]]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
     ) -> Message:
+        """
+        Edits the followup message.
+
+        Parameters
+        ----------
+        same as :meth:`Message.edit`
+        """
         data = handle_edit_params(
             content=content,
             embed=embed,
@@ -164,11 +216,17 @@ class FollowupMessage(Message):
 
 
 class ResponseMessage(Message):
+    """
+    Represents a response message sent by an interaction, subclass of :class:`Message`.
+    """
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
         super().__init__(payload, interaction.client)
         self.interaction = interaction
 
     async def delete(self):
+        """
+        Deletes the response message.
+        """
         await request(
             "DELETE",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
@@ -187,6 +245,13 @@ class ResponseMessage(Message):
         files: Optional[List[Dict[str, Any]]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
     ) -> Message:
+        """
+        Edits the response message.
+
+        Parameters
+        ----------
+        same as :meth:`Message.edit`
+        """
         data = handle_edit_params(
             content=content,
             embed=embed,
