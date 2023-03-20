@@ -135,7 +135,6 @@ check.py
 .detaignore
 .space/
 Spacefile
-requirements.txt
 bot/
 webhook.png
 ping.py
