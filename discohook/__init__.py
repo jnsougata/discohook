@@ -1,5 +1,5 @@
-__version__ = "0.0.4"
-__author__ = "jnsougata"
+__version__ = "0.0.5"
+__author__ = "Sougata Jana"
 
 from .enums import *
 from .option import *
