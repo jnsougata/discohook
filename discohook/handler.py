@@ -21,6 +21,11 @@ from .errors import NotImplemented
 
 # noinspection PyProtectedMember
 async def handler(request: Request):
+    """
+    Handles all interactions from discord
+
+    Note: This is not a public API and should not be used outside of the library
+    """
     signature = request.headers.get("X-Signature-Ed25519")
     timestamp = request.headers.get("X-Signature-Timestamp")
     try:

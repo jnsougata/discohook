@@ -28,7 +28,18 @@ class CommandData:
 
 
 class Interaction:
+    """
+    Base interaction class for all interactions
+    """
     def __init__(self, data: Dict[str, Any], req: Request):
+        """
+        Parameters
+        ----------
+        data: Dict[str, Any]
+            The interaction data
+        req: Request
+            The request object from fastapi
+        """
         self._payload = data
         self.request: Request = req
         self.client: "Client" = req.app
@@ -46,10 +57,26 @@ class Interaction:
 
     @property
     def channel(self) -> PartialChannel:
+        """
+        The channel where the interaction was triggered
+
+        Returns
+        -------
+        PartialChannel
+        """
         return PartialChannel({"id": self.channel_id}, self.client)
 
     @property
     def author(self) -> Optional[Union[User, Member]]:
+        """
+        The author of the interaction
+
+        If the interaction was triggered in a guild, this will return a member object else it will return user object.
+
+        Returns
+        -------
+        Optional[Union[User, Member]]
+        """
         member = self._payload.get("member")
         user = self._payload.get("user")
         if member:
@@ -59,6 +86,14 @@ class Interaction:
             return User(user)
 
     async def send_modal(self, modal: Modal):
+        """
+        Sends a modal to the interaction
+
+        Parameters
+        ----------
+        modal: Modal
+            The modal to send
+        """
         self.client.active_components[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
@@ -72,6 +107,14 @@ class Interaction:
         )
 
     async def send_autocomplete(self, choices: List[Choice]):
+        """
+        Sends autocomplete choices to the interaction
+
+        Parameters
+        ----------
+        choices: List[Choice]
+            The choices to send
+        """
         payload = {
             "type": InteractionCallbackType.autocomplete_result.value,
             "data": {"choices": [choice.to_dict() for choice in choices]},
@@ -84,6 +127,14 @@ class Interaction:
         )
 
     async def defer(self, ephemeral: bool = False):
+        """
+        Defers the interaction
+
+        Parameters
+        ----------
+        ephemeral: bool
+            Whether the successive responses should be ephemeral or not
+        """
         payload = {
             "type": InteractionCallbackType.deferred_channel_message_with_source.value,
         }
@@ -109,6 +160,34 @@ class Interaction:
         ephemeral: Optional[bool] = False,
         supress_embeds: Optional[bool] = False,
     ) -> None:
+        """
+        Sends a response to the interaction
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The content of the message to send
+        embed: Optional[Embed]
+            The embed to send with the message
+        embeds: Optional[List[Embed]]
+            The list of embeds to send with the message (max 10)
+        view: Optional[View]
+            The view to send with the message
+        tts: Optional[bool]
+            Whether the message should be sent as tts or not
+        file: Optional[Dict[str, Any]]
+            The file to send with the message
+        files: Optional[List[Dict[str, Any]]]
+            The list of files to send with the message
+        ephemeral: Optional[bool]
+            Whether the message should be ephemeral or not
+        supress_embeds: Optional[bool]
+            Whether the embeds should be supressed or not
+
+        Notes
+        -----
+        Multipart files are not supported yet, will be added in the future.
+        """
         data = handle_send_params(
             content=content,
             embed=embed,
@@ -148,6 +227,34 @@ class Interaction:
         ephemeral: Optional[bool] = False,
         supress_embeds: Optional[bool] = False,
     ) -> FollowupMessage:
+        """
+        Sends a follow up message to a deferred interaction
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The content of the message to send
+        embed: Optional[Embed]
+            The embed to send with the message
+        embeds: Optional[List[Embed]]
+            The list of embeds to send with the message (max 10)
+        view: Optional[View]
+            The view to send with the message
+        tts: Optional[bool]
+            Whether the message should be sent as tts or not
+        file: Optional[Dict[str, Any]]
+            The file to send with the message
+        files: Optional[List[Dict[str, Any]]]
+            The list of files to send with the message
+        ephemeral: Optional[bool]
+            Whether the message should be ephemeral or not
+        supress_embeds: Optional[bool]
+            Whether the message should supress embeds or not
+
+        Notes
+        -----
+        Multipart files are not supported yet, will be added in the future.
+        """
         payload = handle_send_params(
             content=content,
             embed=embed,
@@ -172,6 +279,14 @@ class Interaction:
         return FollowupMessage(data, self)
 
     async def original_response(self) -> ResponseMessage:
+        """
+        Gets the original response mssage of the interaction
+
+        Returns
+        -------
+        ResponseMessage
+            The original response message
+        """
         resp = await request(
             path=f"/webhooks/{self.application_id}/{self.token}/messages/@original",
             session=self.client.session,
@@ -180,19 +295,44 @@ class Interaction:
 
 
 class ComponentInteraction(Interaction):
+    """
+    Represents a component interaction subclassed from :class:`Interaction`
+    """
     def __init__(self, data: Dict[str, Any], req: Request):
         super().__init__(data, req)
 
     @property
     def message(self) -> Optional[Message]:
+        """
+        The message that the component was clicked on
+
+        Returns
+        -------
+        Optional[Message]
+            The message that the component was clicked on
+        """
         return Message(self._payload["message"], self.client)
 
     @property
     def originator(self) -> User:
+        """
+        The user that used the component
+
+        Returns
+        -------
+        User
+        """
         return User(self.message.interaction["user"])
 
     @property
     def from_originator(self) -> bool:
+        """
+        Whether the interaction was from the original author of the message
+
+        Returns
+        -------
+        bool
+        """
         return self.originator == self.author
 
     async def follow_up(
@@ -208,6 +348,30 @@ class ComponentInteraction(Interaction):
         ephemeral: Optional[bool] = False,
         supress_embeds: Optional[bool] = False,
     ) -> FollowupMessage:
+        """
+        Sends a follow up message to a deferred interaction
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The content of the message to send
+        embed: Optional[Embed]
+            The embed to send with the message
+        embeds: Optional[List[Embed]]
+            The list of embeds to send with the message (max 10)
+        view: Optional[View]
+            The view to send with the message
+        tts: Optional[bool]
+            Whether the message should be sent as tts or not
+        file: Optional[Dict[str, Any]]
+            The file to send with the message
+        files: Optional[List[Dict[str, Any]]]
+            The list of files to send with the message
+        ephemeral: Optional[bool]
+            Whether the message should be ephemeral or not
+        supress_embeds: Optional[bool]
+            Whether the message should supress embeds or not
+        """
         data = handle_send_params(
             content=content,
             embed=embed,
@@ -247,6 +411,28 @@ class ComponentInteraction(Interaction):
         files: Optional[List[Dict[str, Any]]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
     ):
+        """
+        Edits the original response message of the interaction
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The edited content of the message
+        embed: Optional[Embed]
+            The edited embed of the message
+        embeds: Optional[List[Embed]]
+            The edited list of embeds of the message
+        view: Optional[View]
+            The edited view of the message
+        tts: Optional[bool]
+            Whether the message should be sent as tts or not
+        file: Optional[Dict[str, Any]]
+            The edited file of the message
+        files: Optional[List[Dict[str, Any]]]
+            The edited list of files of the message
+        supress_embeds: Optional[bool]
+            Whether the message should supress embeds or not
+        """
         data = handle_edit_params(
             content=content,
             embed=embed,

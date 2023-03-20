@@ -6,6 +6,9 @@ from .enums import MessageComponentType, TextInputFieldLength
 
 
 class Modal:
+    """
+    A modal for discord.
+    """
     def __init__(self, title: str):
         self.title = title
         self._callback = None
@@ -33,6 +36,16 @@ class Modal:
         max_length: int = 4000,
         style: TextInputFieldLength = TextInputFieldLength.short,
     ):
+        """
+        Add a text input field to the modal.
+
+        Parameters
+        ----------
+        label: str
+            The label of the field.
+        field_id: str
+            The dev defined ID of the field to be used in the callback.
+        """
         self._data["components"].append(
             {
                 "type": MessageComponentType.action_row.value,
@@ -53,9 +66,15 @@ class Modal:
         )
 
     def to_dict(self):
+        """
+        Convert the modal to a dict to be sent to discord.
+        """
         if self._row["components"]:
             self._data["components"].append(self._row)
         return self._data
 
     def onsubmit(self, coro: Callable):
+        """
+        A decorator to register a callback for the modal.
+        """
         self._callback = coro

@@ -12,7 +12,9 @@ if TYPE_CHECKING:
 
 
 class Message:
-
+    """
+    Represents a Discord message.
+    """
     def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
         self.client = client
         self.data = payload
@@ -48,6 +50,9 @@ class Message:
         self.position = payload.get("position")
     
     async def delete(self):
+        """
+        Deletes the message.
+        """
         await request(
             "DELETE",
             path=f"/channels/{self.channel_id}/messages/{self.id}",
@@ -66,6 +71,28 @@ class Message:
         files: Optional[List[Dict[str, Any]]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
     ):
+        """
+        Edits the message.
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The new content of the message.
+        embed: Optional[Embed]
+            The new embed of the message.
+        embeds: Optional[List[Embed]]
+            The new embeds of the message.
+        view: Optional[View]
+            The new view of the message.
+        tts: Optional[bool]
+            Whether the message should be sent with text-to-speech.
+        file: Optional[Dict[str, Any]]
+            A file to send with the message.
+        files: Optional[List[Dict[str, Any]]]
+            A list of files to send with the message.
+        supress_embeds: Optional[bool]
+            Whether the embeds should be supressed.
+        """
         data = handle_edit_params(
             content=content,
             embed=embed,
