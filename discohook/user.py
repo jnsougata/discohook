@@ -4,6 +4,38 @@ from .permissions import Permissions
 
 
 class User:
+    """
+    Represents a discord user.
+
+    Attributes
+    ----------
+    id: :class:`str`
+        The unique ID of the user.
+    name: :class:`str`
+        The name of the user.
+    discriminator: :class:`str`
+        The discriminator of the user.
+    avatar: :class:`Asset`
+        The avatar of the user.
+    system: :class:`bool`
+        Whether the user is a system user.
+    bot: :class:`bool`
+        Whether the user is a bot.
+    mfa_enabled: :class:`bool`
+        Whether the user has MFA enabled.
+    locale: Optional[:class:`str`]
+        The locale of the user.
+    verified: :class:`bool`
+        Whether the user is verified.
+    email: Optional[:class:`str`]
+        The email of the user.
+    premium_type: Optional[:class:`int`]
+        The premium type of the user.
+    public_flags: Optional[:class:`int`]
+        The public flags of the user.
+    mention: :class:`str`
+        Returns a string that allows you to mention the user.
+    """
     def __init__(self, data: dict):
         self.data = data
 
@@ -19,7 +51,6 @@ class User:
     def discriminator(self) -> str:
         return self.data["discriminator"]
 
-    # noinspection PyShadowingBuiltins
     @property
     def avatar(self) -> Asset:
         hash = self.data.get("avatar")
@@ -73,6 +104,32 @@ class User:
 
 
 class ClientUser:
+    """
+    Represents a discord client user.
+
+    Attributes
+    ----------
+    id: :class:`str`
+        The unique ID of the user.
+    name: :class:`str`
+        The name of the user.
+    icon_hash: Optional[:class:`str`]
+        The hash of the client user's icon.
+    icon_url: Optional[:class:`str`]
+        The URL of the client user's icon.
+    public: :class:`bool`
+        Whether the client user is public.
+    require_code_grant: :class:`bool`
+        Whether the client user requires code grant.
+    permissions: :class:`str`
+        The permissions of the client user.
+    scopes: :class:`str`
+        The scopes of the client user.
+    owner: :class:`User`
+        The owner of the client user.
+    flags: :class:`int`
+        The flags of the client user.
+    """
     def __init__(self, data: dict) -> None:
         self._data = data
 
@@ -117,4 +174,12 @@ class ClientUser:
         return self._data["flags"]
 
     def has_permission(self, permission: Permissions) -> bool:
+        """
+        Checks if the client user has a permission.
+
+        Parameters
+        ----------
+        permission: :class:`Permissions`
+            The permission to check.
+        """
         return permission.value & int(self.permissions) == permission.value

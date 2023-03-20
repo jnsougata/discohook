@@ -2,7 +2,7 @@ import asyncio
 from functools import wraps
 from .option import Option
 from .permissions import Permissions
-from .enums import AppCmdType, AppCmdOptionType
+from .enums import ApplicaionCommandType, ApplicationCommandOptionType
 from typing import Callable, Dict, List, Optional, Any
 
 
@@ -23,7 +23,7 @@ class SubCommand:
 
     def json(self) -> Dict[str, Any]:
         payload = {
-            "type": AppCmdOptionType.subcommand.value,
+            "type": ApplicationCommandOptionType.subcommand.value,
             "name": self.name,
             "description": self.description,
         }
@@ -38,6 +38,26 @@ class SubCommandGroup:
 
 # noinspection PyShadowingBuiltins
 class ApplicationCommand:
+    """
+    A class representing a discord application command.
+        
+    Parameters
+    ----------
+    name: str
+        The name of the command.
+    id: Optional[str]
+        The ID of the command. If not provided, the command will not be synced.
+    description: Optional[str]
+        The description of the command. Does not apply to user & message commands.
+    options: Optional[List[Option]]
+        The options of the command. Does not apply to user & message commands.
+    dm_access: bool
+        Whether the command can be used in DMs. Defaults to True.
+    permissions: Optional[List[Permissions]]
+        The default permissions of the command.
+    category: AppCmdType
+        The category of the command. Defaults to slash commands.
+    """
     def __init__(
         self,
         name: str,
@@ -46,7 +66,7 @@ class ApplicationCommand:
         options: List[Option] = None,
         dm_access: bool = True,
         permissions: List[Permissions] = None,
-        category: AppCmdType = AppCmdType.slash,
+        category: ApplicaionCommandType = ApplicaionCommandType.slash,
     ):
         self.id = id
         self.name = name
@@ -62,9 +82,25 @@ class ApplicationCommand:
         self._subcommand_callbacks: Dict[str, Callable] = {}
 
     def callback(self, coro: Callable):
+        """
+        A decorator to register a callback for the command.
+
+        Parameters
+        ----------
+        coro: Callable
+            The callback to register.
+        """
         self._callback = coro
 
     def autocomplete(self, coro: Callable):
+        """
+        A decorator to register a callback for the command's autocomplete.
+
+        Parameters
+        ----------
+        coro: Callable
+            The callback to register.
+        """
         self._autocomplete_callback = coro
 
     def subcommand(
@@ -74,6 +110,18 @@ class ApplicationCommand:
         *,
         options: List[Option] = None,
     ):
+        """
+        A decorator to register a subcommand for the command.
+
+        Parameters
+        ----------
+        name: str
+            The name of the subcommand.
+        description: str
+            The description of the subcommand.
+        options: Optional[List[Option]]
+            The options of the subcommand.
+        """
         subcommand = SubCommand(name, description, options)
         if self.options:
             self.options.append(subcommand)
@@ -92,8 +140,17 @@ class ApplicationCommand:
         return decorator  # type: ignore
 
     def to_dict(self) -> Dict[str, Any]:
+        """
+        Converts the command to a dictionary.
+
+        This is used to send the command to the Discord API. Not intended for use by end-users.
+
+        Returns
+        -------
+        Dict[str, Any]
+        """
         self._payload["type"] = self.category.value
-        if self.category is AppCmdType.slash:
+        if self.category is ApplicaionCommandType.slash:
             if self.description:
                 self._payload["description"] = self.description
             if self.options:

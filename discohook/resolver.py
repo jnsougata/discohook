@@ -6,7 +6,7 @@ from .channel import Channel
 from .attachment import Attachment
 from .interaction import Interaction, CommandData
 from typing import List, Dict, Any, Callable, Tuple
-from .enums import AppCmdOptionType, SelectMenuType, AppCmdType
+from .enums import ApplicationCommandOptionType, SelectMenuType, ApplicaionCommandType
 
 
 def handle_params_by_signature(
@@ -51,13 +51,13 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
         name = option["name"]
         value = option["value"]
         option_type = option["type"]
-        if option_type == AppCmdOptionType.string.value:
+        if option_type == ApplicationCommandOptionType.string.value:
             options[name] = value
-        elif option_type == AppCmdOptionType.integer.value:
+        elif option_type == ApplicationCommandOptionType.integer.value:
             options[name] = int(value)
-        elif option_type == AppCmdOptionType.boolean.value:
+        elif option_type == ApplicationCommandOptionType.boolean.value:
             options[name] = bool(value)
-        elif option_type == AppCmdOptionType.user.value:
+        elif option_type == ApplicationCommandOptionType.user.value:
             user_data = interaction.data["resolved"]["users"][value]
             if interaction.guild_id:
                 member_data = interaction.data["resolved"]["members"][value]
@@ -67,14 +67,14 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
                 options[name] = Member(user_data)
             else:
                 options[name] = User(user_data)
-        elif option_type == AppCmdOptionType.channel.value:
+        elif option_type == ApplicationCommandOptionType.channel.value:
             options[name] = Channel(interaction.data["resolved"]["channels"][value], interaction.client)
-        elif option_type == AppCmdOptionType.role.value:
+        elif option_type == ApplicationCommandOptionType.role.value:
             options[name] = Role(interaction.data["resolved"]["roles"][value])
-        elif option_type == AppCmdOptionType.mentionable.value:
+        elif option_type == ApplicationCommandOptionType.mentionable.value:
             # TODO: this is a shit option type, not enough motivation to implement it
             pass
-        elif option_type == AppCmdOptionType.attachment.value:
+        elif option_type == ApplicationCommandOptionType.attachment.value:
             options[name] = Attachment(
                 interaction.data["resolved"]["attachments"][value]
             )
@@ -86,7 +86,7 @@ def resolve_command_options(interaction: Interaction):
     if not data.options:
         return {}
     for option in data.options:
-        if option["type"] == AppCmdOptionType.subcommand.value:
+        if option["type"] == ApplicationCommandOptionType.subcommand.value:
             return parse_generic_options(option["options"], interaction)
         else:
             return parse_generic_options(data.options, interaction)
@@ -100,7 +100,7 @@ def build_slash_command_prams(func: Callable, interaction: Interaction, skips: i
 
 
 def build_context_menu_param(interaction: Interaction):
-    if interaction.data["type"] == AppCmdType.user.value:
+    if interaction.data["type"] == ApplicaionCommandType.user.value:
         user_id = interaction.data["target_id"]
         user_resolved = interaction.data["resolved"]["users"][user_id]
         member_resolved = (
@@ -113,7 +113,7 @@ def build_context_menu_param(interaction: Interaction):
             user_resolved.update(member_resolved)
         return User(user_resolved)
 
-    if interaction.data["type"] == AppCmdType.message.value:
+    if interaction.data["type"] == ApplicaionCommandType.message.value:
         message_id = interaction.data["target_id"]
         message_dict = interaction.data["resolved"]["messages"][message_id]
         # TODO: objectify

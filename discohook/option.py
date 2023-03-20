@@ -1,10 +1,21 @@
-from .enums import AppCmdOptionType, ChannelType
+from .enums import ApplicationCommandOptionType, ChannelType
 from typing import Optional, List, Dict, Any, Union
 
 
 class Choice:
     """
     Represents a choice for a string, integer, or number option.
+
+    Parameters
+    ----------
+    name: str
+        The name of the choice.
+    value: Union[str, int, float]
+        The value of the choice.
+    
+    Notes
+    -----
+    The value of the choice must be of the same type as the option.
     """
     def __init__(self, name: str, value: Union[str, int, float]):
         self.name = name
@@ -17,6 +28,17 @@ class Choice:
 class Option:
     """
     Represents an base option for an application command.
+
+    Parameters
+    ----------
+    name: str
+        The name of the option.
+    description: str
+        The description of the option.
+    required: bool
+        Whether the option is required or not.
+    type: AppCmdOptionType
+        The type of the option.
     """
     def __init__(
         self,
@@ -24,20 +46,8 @@ class Option:
         description: str,
         required: bool = False,
         *,
-        type: AppCmdOptionType,
+        type: ApplicationCommandOptionType,
     ):
-        """
-        Parameters
-        ----------
-        name: str
-            The name of the option.
-        description: str
-            The description of the option.
-        required: bool
-            Whether the option is required or not.
-        type: AppCmdOptionType
-            The type of the option.
-        """
         self.name = name
         self.description = description
         self.required = required
@@ -56,6 +66,23 @@ class Option:
 class StringOption(Option):
     """
     Represents a string type option for an application command, subclassed from `Option`
+
+    Parameters
+    ----------
+    name: str
+        The name of the option.
+    description: str
+        The description of the option.
+    required: bool
+        Whether the option is required or not.
+    max_length: int
+        The maximum length of the string.
+    min_length: int         
+        The minimum length of the string.
+    choices: List[Choice]
+        The choices for the string.
+    auto_complete: bool
+        Whether the string should be auto completed or not.
     """
     def __init__(
         self,
@@ -68,29 +95,11 @@ class StringOption(Option):
         choices: Optional[List[Choice]] = None,
         auto_complete: Optional[bool] = False,
     ):
-        """
-        Parameters
-        ----------
-        name: str
-            The name of the option.
-        description: str
-            The description of the option.
-        required: bool
-            Whether the option is required or not.
-        max_length: int
-            The maximum length of the string.
-        min_length: int         
-            The minimum length of the string.
-        choices: List[Choice]
-            The choices for the string.
-        auto_complete: bool
-            Whether the string should be auto completed or not.
-        """
         self.choices = choices
         self.auto_complete = auto_complete
         self.max_length = max_length
         self.min_length = min_length
-        super().__init__(name, description, required, type=AppCmdOptionType.string)
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.string)
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
@@ -107,6 +116,23 @@ class StringOption(Option):
 class IntegerOption(Option):
     """
     Represents an integer type option for an application command, subclassed from `Option`
+
+    Parameters
+    ----------
+    name: str
+        The name of the option.
+    description: str
+        The description of the option.
+    required: bool
+        Whether the option is required or not.
+    max_value: int
+        The maximum value of the integer.
+    min_value: int
+        The minimum value of the integer.
+    choices: List[Choice]
+        The choices for the integer.
+    auto_complete: bool
+        Whether the integer should be auto completed or not.
     """
     def __init__(
         self,
@@ -119,29 +145,11 @@ class IntegerOption(Option):
         choices: Optional[List[Choice]] = None,
         auto_complete: Optional[bool] = False,
     ):
-        """
-        Parameters
-        ----------
-        name: str
-            The name of the option.
-        description: str
-            The description of the option.
-        required: bool
-            Whether the option is required or not.
-        max_value: int
-            The maximum value of the integer.
-        min_value: int
-            The minimum value of the integer.
-        choices: List[Choice]
-            The choices for the integer.
-        auto_complete: bool
-            Whether the integer should be auto completed or not.
-        """
         self.choices = choices
         self.auto_complete = auto_complete
         self.max_value = max_value
         self.min_value = min_value
-        super().__init__(name, description, required, type=AppCmdOptionType.integer)
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.integer)
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
@@ -158,6 +166,23 @@ class IntegerOption(Option):
 class NumberOption(Option):
     """
     Represents a number type option for an application command, subclassed from `Option`
+
+    Parameters
+    ----------
+    name: str
+        The name of the option.
+    description: str
+        The description of the option.
+    required: bool
+        Whether the option is required or not.
+    max_value: float
+        The maximum value of the number.
+    min_value: float
+        The minimum value of the number.
+    choices: List[Choice]
+        The choices for the number.
+    auto_complete: bool
+        Whether the number should be auto completed or not.
     """
     def __init__(
         self,
@@ -170,29 +195,11 @@ class NumberOption(Option):
         choices: Optional[List[Choice]] = None,
         auto_complete: Optional[bool] = False,
     ):
-        """
-        Parameters
-        ----------
-        name: str
-            The name of the option.
-        description: str
-            The description of the option.
-        required: bool
-            Whether the option is required or not.
-        max_value: float
-            The maximum value of the number.
-        min_value: float
-            The minimum value of the number.
-        choices: List[Choice]
-            The choices for the number.
-        auto_complete: bool
-            Whether the number should be auto completed or not.
-        """
         self.choices = choices
         self.auto_complete = auto_complete
         self.max_value = max_value
         self.min_value = min_value
-        super().__init__(name, description, required, type=AppCmdOptionType.number)
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.number)
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
@@ -227,7 +234,7 @@ class BooleanOption(Option):
         required: bool
             Whether the option is required or not.
         """
-        super().__init__(name, description, required, type=AppCmdOptionType.boolean)
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.boolean)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
@@ -254,7 +261,7 @@ class UserOption(Option):
         required: bool
             Whether the option is required or not.
         """
-        super().__init__(name, description, required, type=AppCmdOptionType.user)
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.user)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
@@ -263,6 +270,17 @@ class UserOption(Option):
 class ChannelOption(Option):
     """
     Represents a channel type option for an application command, subclassed from `Option`
+
+    Parameters
+    ----------
+    name: str
+        The name of the option.
+    description: str
+        The description of the option.
+    required: bool
+        Whether the option is required or not.
+    channel_types: List[ChannelType]
+        The channel types that are allowed for this option.
     """
     def __init__(
         self,
@@ -273,7 +291,7 @@ class ChannelOption(Option):
         channel_types: Optional[List[ChannelType]] = None,
     ):
         self.channel_types = channel_types
-        super().__init__(name, description, required, type=AppCmdOptionType.channel)
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.channel)
 
     def to_dict(self) -> Dict[str, Any]:
         if self.channel_types:
@@ -292,7 +310,7 @@ class RoleOption(Option):
         *,
         required: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type=AppCmdOptionType.role)
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.role)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
@@ -301,6 +319,15 @@ class RoleOption(Option):
 class MentionableOption(Option):
     """
     Represents a mentionable type option for an application command, subclassed from `Option`
+
+    Parameters
+    ----------
+    name: str
+        The name of the option.
+    description: str
+        The description of the option.
+    required: bool
+        Whether the option is required or not.
     """
     def __init__(
         self,
@@ -310,7 +337,7 @@ class MentionableOption(Option):
         required: Optional[bool] = False,
     ):
         super().__init__(
-            name, description, required, type=AppCmdOptionType.mentionable
+            name, description, required, type=ApplicationCommandOptionType.mentionable
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -320,6 +347,15 @@ class MentionableOption(Option):
 class AttachmentOption(Option):
     """
     Represents an attachment type option for an application command, subclassed from `Option`
+
+    Parameters
+    ----------
+    name: str
+        The name of the option.
+    description: str
+        The description of the option.
+    required: bool
+        Whether the option is required or not.
     """
     def __init__(
         self,
@@ -328,7 +364,7 @@ class AttachmentOption(Option):
         *,
         required: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type=AppCmdOptionType.attachment)
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.attachment)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
