@@ -1,1 +1,3 @@
 furo
+aiohttp
+fastapi
