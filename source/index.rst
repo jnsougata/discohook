@@ -1,7 +1,7 @@
 Documentation
 =============
 
-.. autoclass:: discohook.client.Client
+.. autoclass:: discohook.Client
    :members:
    :show-inheritance:
 
