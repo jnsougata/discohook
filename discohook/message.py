@@ -157,7 +157,7 @@ class Message:
 
 class FollowupMessage(Message):
     """
-    Represents a followup message sent by an interaction, subclass of :class:`Message`.
+    Represents a followup message sent by an interaction, subclassed from :class:`Message`.
     """
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
         super().__init__(payload, interaction.client)
@@ -217,7 +217,7 @@ class FollowupMessage(Message):
 
 class ResponseMessage(Message):
     """
-    Represents a response message sent by an interaction, subclass of :class:`Message`.
+    Represents a response message sent by an interaction, subclassed from :class:`Message`.
     """
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
         super().__init__(payload, interaction.client)

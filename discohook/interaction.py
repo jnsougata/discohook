@@ -534,7 +534,7 @@ class ComponentInteraction(Interaction):
 
 class CommandInteraction(Interaction):
     """
-    Represents a command interaction, subclass from Interaction
+    Represents a command interaction, subclassed from :class:`Interaction`
 
     Attributes
     ----------

@@ -1,154 +1,134 @@
-Welcome to Discohook's documentation!
-=====================================
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-.. autoclass:: discohook.asset.Asset
+Documentation
+=============
+.. autoclass:: discohook.Client
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.attachment.Attachment
+.. autoclass:: discohook.User
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.channel.Channel
+.. autoclass:: discohook.Member
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.channel.PartialChannel
+.. autoclass:: discohook.PartialChannel
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.client.Client
+.. autoclass:: discohook.Channel
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.command.ApplicationCommand
+.. autoclass:: discohook.ApplicationCommand
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.command.SubCommand
+.. autoclass:: discohook.SubCommand
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.embed.Embed
+.. autoclass:: discohook.Embed
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.emoji.PartialEmoji
+.. autoclass:: discohook.PartialEmoji
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.enums.TextInputFieldLength
+.. autoclass:: discohook.TextInputFieldLength
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.enums.ModalFieldType
+.. autoclass:: discohook.ApplicationCommandType
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.enums.ApplicationCommandType
+.. autoclass:: discohook.ChannelType
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.enums.ApplicationCommandOptionType
+.. autoclass:: discohook.ButtonStyle
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.enums.ChannelType
+.. autoclass:: discohook.SelectMenuType
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.enums.ButtonStyle
+.. autoclass:: discohook.Interaction
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.enums.SelectMenuType
+.. autoclass:: discohook.CommandInteraction
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.interaction.Interaction
+.. autoclass:: discohook.ComponentInteraction
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.interaction.CommandInteraction
+.. autoclass:: discohook.Message
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.interaction.ComponentInteraction
+.. autoclass:: discohook.FollowupMessage
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.message.Message
+.. autoclass:: discohook.ResponseMessage
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.message.FollowupMessage
+.. autoclass:: discohook.Modal
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.message.ResponseMessage
+.. autoclass:: discohook.StringOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.user.User
+.. autoclass:: discohook.IntegerOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.member.Member
+.. autoclass:: discohook.BooleanOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.modal.Modal
+.. autoclass:: discohook.UserOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.option.StringOption
+.. autoclass:: discohook.ChannelOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.option.IntegerOption
+.. autoclass:: discohook.RoleOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.option.BooleanOption
+.. autoclass:: discohook.MentionableOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.option.UserOption
+.. autoclass:: discohook.NumberOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.option.ChannelOption
+.. autoclass:: discohook.SelectOption
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.option.RoleOption
+.. autoclass:: discohook.SelectMenu
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.option.MentionableOption
+.. autoclass:: discohook.Button
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.option.NumberOption
-   :members:
-   :show-inheritance:
-
-.. autoclass:: discohook.view.SelectOption
-   :members:
-   :show-inheritance:
-
-.. autoclass:: discohook.view.SelectMenu
-   :members:
-   :show-inheritance:
-
-.. autoclass:: discohook.view.Button
-   :members:
-   :show-inheritance:
-
-.. autoclass:: discohook.view.View
+.. autoclass:: discohook.View
    :members:
    :show-inheritance:
 

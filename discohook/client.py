@@ -30,7 +30,7 @@ async def sync(request: Request, secret: str = None):
 
 class Client(FastAPI):
     """
-    The main client class for Discohook.
+    The main client class for discohook.
     """
     def __init__(
         self,

@@ -108,7 +108,7 @@ class ApplicationCommand:
 
     def autocomplete(self, coro: Callable):
         """
-        A decorator to register a callback for the command's autocomplete.
+        A decorator to register a callback for the command's autocomplete choices.
 
         Parameters
         ----------

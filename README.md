@@ -82,4 +82,4 @@ async def help_command(interaction: discohook.Interaction):
 As this library is meant to be used in serverless functions, we did not add auto registration as at each invocation the scripts will be reloaded and the commands will be re-registered again. This will cause rate limit issues and also due to command registration being a slow process, it will cause a lot of latency.
 So we decided to add a dashboard to register commands. Which is a lot faster and also does not cause any rate limit issues if used properly. Through the dashboard, you can also delete commands and sync the edited commands.
 
-####  📕 Documentation: https://discohook.readthedocs.io/en/latest/
+##  [📕 Read documentation](https://discohook.readthedocs.io/en/latest/)

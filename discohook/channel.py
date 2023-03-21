@@ -83,7 +83,7 @@ class PartialChannel:
 
 class Channel(PartialChannel):
     """
-    Represents a discord channel object.
+    Represents a discord channel object subclassed from :class:`PartialChannel`.
 
     Parameters
     ----------
