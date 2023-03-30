@@ -1,7 +1,9 @@
 from .view import View
 from .embed import Embed
-from .https import request
-from .params import handle_send_params
+from .file import File
+from .https import multipart_request
+from .multipart import create_form
+from .params import handle_send_params, merge_fields
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -31,8 +33,8 @@ class PartialChannel:
             embeds: Optional[List[Embed]] = None,
             view: Optional[View] = None,
             tts: Optional[bool] = False,
-            file: Optional[Dict[str, Any]] = None,
-            files: Optional[List[Dict[str, Any]]] = None,
+            file: Optional[File] = None,
+            files: Optional[List[File]] = None,
             ephemeral: Optional[bool] = False,
             supress_embeds: Optional[bool] = False,
     ):
@@ -51,9 +53,9 @@ class PartialChannel:
             The view to send with the message.
         tts: Optional[:class:`bool`]
             Whether the message should be sent with text-to-speech.
-        file: Optional[Dict[str, Any]]
+        file: Optional[File]
             A file to send with the message.
-        files: Optional[List[Dict[str, Any]]]
+        files: Optional[List[File]]
             A list of files to send with the message.
         ephemeral: Optional[:class:`bool`]
             Whether the message should be ephemeral.
@@ -63,21 +65,21 @@ class PartialChannel:
         if view:
             for component in view.children:
                 self.client.load_component(component)
-        return await request(
-            "POST",
+        payload = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            view=view,
+            tts=tts,
+            file=file,
+            files=files,
+            ephemeral=ephemeral,
+            supress_embeds=supress_embeds,
+        )
+        return await multipart_request(
             path=f"/channels/{self.id}/messages",
             session=self.client.session,
-            json=handle_send_params(
-                content=content,
-                embed=embed,
-                embeds=embeds,
-                view=view,
-                tts=tts,
-                file=file,
-                files=files,
-                ephemeral=ephemeral,
-                supress_embeds=supress_embeds,
-            ),
+            form=create_form(payload, merge_fields(file, files)),
         )
 
 
