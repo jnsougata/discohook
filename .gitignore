@@ -133,6 +133,7 @@ check.py
 .idea/
 .deta/
 .detaignore
+.spaceignore
 .space/
 Spacefile
 bot/

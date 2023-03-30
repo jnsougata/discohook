@@ -1,11 +1,13 @@
 from .user import User
 from .role import Role
-from .https import request
 from .embed import Embed
 from .view import View
-from typing import Optional, List, Dict, Any
-from typing import TYPE_CHECKING
-from .params import handle_edit_params, MISSING
+from .file import File
+from .multipart import create_form
+from .https import multipart_request, request
+from .params import handle_edit_params, MISSING, merge_fields
+from typing import Optional, List, Dict, Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .client import Client
     from .interaction import Interaction
@@ -125,9 +127,9 @@ class Message:
             The new view of the message.
         tts: Optional[bool]
             Whether the message should be sent with text-to-speech.
-        file: Optional[Dict[str, Any]]
+        file: Optional[File]
             A file to send with the message.
-        files: Optional[List[Dict[str, Any]]]
+        files: Optional[List[File]]
             A list of files to send with the message.
         supress_embeds: Optional[bool]
             Whether the embeds should be supressed.
@@ -146,12 +148,13 @@ class Message:
             for component in view.children:
                 self.client.load_component(component)
         return Message(
-            await request(
-                "PATCH",
+            await multipart_request(
+                method="PATCH",
                 path=f"/channels/{self.channel_id}/messages/{self.id}",
                 session=self.client.session,
-                json=data,
-            ), self.client
+                form=create_form(data, merge_fields(file, files)),
+            ), 
+            self.client
         )
 
 
@@ -181,8 +184,8 @@ class FollowupMessage(Message):
         embeds: Optional[List[Embed]] = MISSING,
         view: Optional[View] = MISSING,
         tts: Optional[bool] = MISSING,
-        file: Optional[Dict[str, Any]] = MISSING,
-        files: Optional[List[Dict[str, Any]]] = MISSING,
+        file: Optional[File] = MISSING,
+        files: Optional[List[File]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
     ) -> Message:
         """
@@ -206,11 +209,11 @@ class FollowupMessage(Message):
             for component in view.children:
                 self.interaction.client.load_component(component)
         self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
-        resp = await request(
-            "PATCH",
+        resp = await multipart_request(
+            method="PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
             session=self.interaction.client.session,
-            json=data,
+            form=create_form(data, merge_fields(file, files)),
         )
         return Message(resp, self.interaction.client)
 
@@ -241,8 +244,8 @@ class ResponseMessage(Message):
         embeds: Optional[List[Embed]] = MISSING,
         view: Optional[View] = MISSING,
         tts: Optional[bool] = MISSING,
-        file: Optional[Dict[str, Any]] = MISSING,
-        files: Optional[List[Dict[str, Any]]] = MISSING,
+        file: Optional[File] = MISSING,
+        files: Optional[List[File]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
     ) -> Message:
         """
@@ -266,10 +269,10 @@ class ResponseMessage(Message):
             for component in view.children:
                 self.interaction.client.load_component(component)
         self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
-        resp = await request(
-            "PATCH",
+        resp = await multipart_request(
+            method="PATCH",
             path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
             session=self.interaction.client.session,
-            json=data,
+            form=create_form(data, merge_fields(file, files)),
         )
         return Message(resp, self.interaction.client)

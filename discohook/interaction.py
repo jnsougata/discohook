@@ -1,16 +1,19 @@
-from .enums import InteractionType, InteractionCallbackType
-from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
+
 from .embed import Embed
+from .file import File
 from .user import User
 from .member import Member
 from .view import View
 from .modal import Modal
 from .channel import PartialChannel
-from .https import request
+from .https import request, multipart_request
 from .option import Choice
 from fastapi.requests import Request
+from .multipart import create_form
 from .message import Message, ResponseMessage, FollowupMessage
-from .params import handle_edit_params, handle_send_params, MISSING
+from .enums import InteractionType, InteractionCallbackType
+from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
+from .params import handle_edit_params, handle_send_params, MISSING, merge_fields
 
 if TYPE_CHECKING:
     from .client import Client
@@ -184,8 +187,8 @@ class Interaction:
         embeds: Optional[List[Embed]] = None,
         view: Optional[View] = None,
         tts: Optional[bool] = False,
-        file: Optional[Dict[str, Any]] = None,
-        files: Optional[List[Dict[str, Any]]] = None,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
         supress_embeds: Optional[bool] = False,
     ) -> None:
@@ -204,9 +207,9 @@ class Interaction:
             The view to send with the message
         tts: Optional[bool]
             Whether the message should be sent as tts or not
-        file: Optional[Dict[str, Any]]
+        file: Optional[File]
             The file to send with the message
-        files: Optional[List[Dict[str, Any]]]
+        files: Optional[List[File]]
             The list of files to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
@@ -236,11 +239,12 @@ class Interaction:
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
-        await request(
-            "POST",
+        files = merge_fields(file, files)
+        form = create_form(payload, files)
+        await multipart_request(
             path=f"/interactions/{self.id}/{self.token}/callback",
             session=self.client.session,
-            json=payload,
+            form=form,
         )
 
     async def follow_up(
@@ -251,8 +255,8 @@ class Interaction:
         embeds: Optional[List[Embed]] = None,
         view: Optional[View] = None,
         tts: Optional[bool] = False,
-        file: Optional[Dict[str, Any]] = None,
-        files: Optional[List[Dict[str, Any]]] = None,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
         supress_embeds: Optional[bool] = False,
     ) -> FollowupMessage:
@@ -271,9 +275,9 @@ class Interaction:
             The view to send with the message
         tts: Optional[bool]
             Whether the message should be sent as tts or not
-        file: Optional[Dict[str, Any]]
+        file: Optional[File]
             The file to send with the message
-        files: Optional[List[Dict[str, Any]]]
+        files: Optional[List[File]]
             The list of files to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
@@ -299,11 +303,10 @@ class Interaction:
             self.client.store_inter_token(self.id, self.token)
             for component in view.children:
                 self.client.load_component(component)
-        data = await request(
-            method="POST",
+        data = await multipart_request(
             path=f"/webhooks/{self.application_id}/{self.token}",
             session=self.client.session,
-            json=payload,
+            form=create_form(payload, merge_fields(file, files)),
         )
         return FollowupMessage(data, self)
 
@@ -392,9 +395,9 @@ class ComponentInteraction(Interaction):
             The view to send with the message
         tts: Optional[bool]
             Whether the message should be sent as tts or not
-        file: Optional[Dict[str, Any]]
+        file: Optional[File]
             The file to send with the message
-        files: Optional[List[Dict[str, Any]]]
+        files: Optional[List[File]]
             The list of files to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
@@ -420,11 +423,10 @@ class ComponentInteraction(Interaction):
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
-        resp = await request(
-            "POST",
+        resp = await multipart_request(
             path=f"/interactions/{self.id}/{self.token}/callback",
             session=self.client.session,
-            json=payload,
+            form=create_form(payload, merge_fields(file, files)),
         )
         return FollowupMessage(resp, self)
 
@@ -436,8 +438,8 @@ class ComponentInteraction(Interaction):
         embeds: Optional[List[Embed]] = MISSING,
         view: Optional[View] = MISSING,
         tts: Optional[bool] = MISSING,
-        file: Optional[Dict[str, Any]] = MISSING,
-        files: Optional[List[Dict[str, Any]]] = MISSING,
+        file: Optional[File] = MISSING,
+        files: Optional[List[File]] = MISSING,
         supress_embeds: Optional[bool] = MISSING,
     ):
         """
@@ -455,9 +457,9 @@ class ComponentInteraction(Interaction):
             The edited view of the message
         tts: Optional[bool]
             Whether the message should be sent as tts or not
-        file: Optional[Dict[str, Any]]
+        file: Optional[File]
             The edited file of the message
-        files: Optional[List[Dict[str, Any]]]
+        files: Optional[List[File]]
             The edited list of files of the message
         supress_embeds: Optional[bool]
             Whether the message should supress embeds or not
@@ -480,12 +482,11 @@ class ComponentInteraction(Interaction):
             "data": data,
             "type": InteractionCallbackType.update_message.value,
         }
-
-        await request(
-            "POST",
+        await multipart_request(
+            method="PATCH",
             path=f"/interactions/{self.id}/{self.token}/callback",
             session=self.client.session,
-            json=payload,
+            form=create_form(payload, merge_fields(file, files)),
         )
 
     @property
@@ -558,8 +559,8 @@ class CommandInteraction(Interaction):
         embeds: Optional[List[Embed]] = None,
         view: Optional[View] = None,
         tts: Optional[bool] = False,
-        file: Optional[Dict[str, Any]] = None,
-        files: Optional[List[Dict[str, Any]]] = None,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
         supress_embeds: Optional[bool] = False,
     ) -> None:
@@ -578,9 +579,9 @@ class CommandInteraction(Interaction):
             The view of the message
         tts: Optional[bool]
             Whether the message should be sent as tts or not
-        file: Optional[Dict[str, Any]]
+        file: Optional[File]
             The file of the message
-        files: Optional[List[Dict[str, Any]]]
+        files: Optional[List[File]]
             The list of files of the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
@@ -606,9 +607,9 @@ class CommandInteraction(Interaction):
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
-        await request(
-            "POST",
+        await multipart_request(
             path=f"/interactions/{self.id}/{self.token}/callback",
             session=self.client.session,
-            json=payload,
+            form=create_form(payload, merge_fields(file, files)),
         )
+

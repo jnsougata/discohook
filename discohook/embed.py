@@ -87,6 +87,16 @@ class Embed:
             The url of the image.
         """
         self.data["image"] = {"url": url}
+    
+    def image_from_attachment(self, name: str):
+        """
+        Sets the image of the embed from a file attachment.
+
+        Parameters
+        ----------
+        name: :class:`str`
+        """
+        self.data["image"] = {"url": f"attachment://{name}"}
 
     def thumbnail(self, url: str):
         """
@@ -98,6 +108,16 @@ class Embed:
             The url of the thumbnail.
         """
         self.data["thumbnail"] = {"url": url}
+    
+    def thumbnail_from_attachment(self, name: str):
+        """
+        Sets the thumbnail of the embed from a file attachment.
+
+        Parameters
+        ----------
+        name: :class:`str`
+        """
+        self.data["thumbnail"] = {"url": f"attachment://{name}"}
 
     def add_field(self, name: str, value: str, *, inline: bool = False):
         """

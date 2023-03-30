@@ -3,16 +3,17 @@ __author__ = "Sougata Jana"
 
 from .enums import *
 from .option import *
+from .file import File
 from .user import User
-from .member import Member
-from .channel import Channel, PartialChannel
 from .role import Role
 from .modal import Modal
 from .embed import Embed
-from .attachment import Attachment
-from .emoji import PartialEmoji
+from .member import Member
 from .client import Client
+from .emoji import PartialEmoji
+from .attachment import Attachment
 from .permissions import Permissions
+from .channel import Channel, PartialChannel
 from .command import ApplicationCommand, SubCommand
 from .view import View, Button, SelectOption, SelectMenu
 from .message import Message, FollowupMessage, ResponseMessage

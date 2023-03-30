@@ -1,6 +1,8 @@
 import aiohttp
 from .command import *
 from .modal import Modal
+from .embed import Embed
+from .file import File
 from fastapi import FastAPI
 from functools import wraps
 from .handler import handler
@@ -11,7 +13,10 @@ from .command import ApplicationCommand
 from .view import Button, SelectMenu
 from fastapi.requests import Request
 from .dash import dashboard
+from .params import handle_send_params, merge_fields
 from fastapi.responses import JSONResponse
+from .multipart import create_form
+from .https import multipart_request
 from typing import Optional, List, Dict, Union, Callable
 
 
@@ -183,21 +188,37 @@ class Client(FastAPI):
         """
         self._global_error_handler = coro
 
-    async def send_message(self, channel_id: int, payload: Dict[str, Any]):
+    async def send_message(
+            self, 
+            channel_id: int, 
+            content: Optional[str] = None,
+            *,
+            tts: bool = False,
+            embed: Optional[Embed] = None,
+            embeds: Optional[List[Embed]] = None,
+            file: Optional[File] = None,
+            files: Optional[List[File]] = None,
+        ):
         """
-        Send a message to a channel.
-
-        This method is used internally by the client. You should not use this method unless you know what you are doing.
+        Send a message to a channel using the ID of the channel.
 
         Parameters
         ----------
         channel_id: int
             The ID of the channel to send the message to.
-        payload: Dict[str, Any]
-            The payload to send to the channel.
+        content: Optional[str]
+            The content of the message.
+        tts: bool
+            Whether the message should be sent using text-to-speech. Defaults to False.
+        embed: Optional[Embed]
+            The embed to send with the message.
+        embeds: Optional[List[Embed]]
+            A list of embeds to send with the message. Maximum of 10.
         """
-        url = f"/api/v10/channels/{channel_id}/messages"
-        await self.session.post(url, json=payload)
+        payload = handle_send_params(content, tts=tts, embed=embed, embeds=embeds, file=file, files=files)
+        files = merge_fields(file, files)
+        form = create_form(payload, files)
+        return await multipart_request(path=f"/channels/{channel_id}/messages", session=self.session, form=form)
 
     async def as_user(self) -> ClientUser:
         """
