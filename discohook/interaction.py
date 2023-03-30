@@ -113,6 +113,7 @@ class Interaction:
         user = self._payload.get("user")
         if member:
             member.update(member.pop("user", {}))
+            member["guild_id"] = self.guild_id
             return Member(member)
         else:
             return User(user)

@@ -1,6 +1,10 @@
-from typing import Optional
 from .asset import Asset
+from typing import Optional
 from .permissions import Permissions
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .client import Client
 
 
 class User:
@@ -36,8 +40,9 @@ class User:
     mention: :class:`str`
         Returns a string that allows you to mention the user.
     """
-    def __init__(self, data: dict):
+    def __init__(self, data: dict, client: "Client"):
         self.data = data
+        self.state = client
 
     @property
     def id(self) -> str:
