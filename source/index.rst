@@ -33,6 +33,10 @@ Documentation
    :members:
    :show-inheritance:
 
+.. autoclass:: discohook.File
+   :members:
+   :show-inheritance:
+
 .. autoclass:: discohook.PartialEmoji
    :members:
    :show-inheritance:
