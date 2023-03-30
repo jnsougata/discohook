@@ -37,7 +37,7 @@ class Member(User):
         role_id : str
             The ID of the role.
         """
-        return await self.client.session.put(f"/api/v10/guilds/{self.guild_id}/members/{self.id}/roles/{role_id}")
+        return await self.state.session.put(f"/api/v10/guilds/{self.guild_id}/members/{self.id}/roles/{role_id}")
 
     async def remove_role(self, role_id: str) -> None:
         """
@@ -48,13 +48,13 @@ class Member(User):
         role_id : str
             The ID of the role.
         """
-        return await self.client.session.delete(f"/api/v10/guilds/{self.guild_id}/members/{self.id}/roles/{role_id}")
+        return await self.state.session.delete(f"/api/v10/guilds/{self.guild_id}/members/{self.id}/roles/{role_id}")
     
     async def kick(self) -> None:
         """
         Kick the member.
         """
-        return await self.client.session.delete(f"/api/v10/guilds/{self.guild_id}/members/{self.id}")
+        return await self.state.session.delete(f"/api/v10/guilds/{self.guild_id}/members/{self.id}")
 
     async def ban(self, *, delete_message_seconds: int = 0) -> None:
         """
@@ -69,7 +69,7 @@ class Member(User):
         """
         if delete_message_seconds > 604800:
             raise ValueError("You can only delete messages for up to last 7 days.")
-        return await self.client.session.put(
+        return await self.state.session.put(
             f"/api/v10/guilds/{self.guild_id}/bans/{self.id}", 
             json={"delete_message_seconds": delete_message_seconds}
         )

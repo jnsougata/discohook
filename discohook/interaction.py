@@ -114,7 +114,7 @@ class Interaction:
         if member:
             member.update(member.pop("user", {}))
             member["guild_id"] = self.guild_id
-            return Member(member)
+            return Member(member, self.client)
         else:
             return User(user)
 
