@@ -48,7 +48,7 @@ class Message:
         The reactions in the message.
         ...
     """
-    def __init__(self, payload: Dict[str, Any], client: Client) -> None:
+    def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
         self.client = client
         self.data = payload
         self.id = payload["id"]
@@ -135,11 +135,13 @@ class Message:
         if view:
             for component in view.children:
                 self.client.load_component(component)
-        return await self.client.http.edit_channel_message(
+        resp = await self.client.http.edit_channel_message(
             self.channel_id, 
             self.id, 
             create_form(data, merge_fields(file, files))
         )
+        data = await resp.json()
+        return Message(data, self.client)
 
 
 class FollowupMessage(Message):
@@ -199,7 +201,8 @@ class FollowupMessage(Message):
             self.id,
             create_form(data, merge_fields(file, files))
         )
-        return Message(resp, self.interaction.client)
+        data = await resp.json()
+        return Message(data, self.interaction.client)
 
 
 class ResponseMessage(Message):
@@ -259,4 +262,5 @@ class ResponseMessage(Message):
             "@original",
             create_form(data, merge_fields(file, files))
         )
-        return Message(resp, self.client)
+        data = await resp.json()
+        return Message(data, self.client)

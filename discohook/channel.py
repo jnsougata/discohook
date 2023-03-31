@@ -1,10 +1,10 @@
+from .file import File
 from .view import View
 from .embed import Embed
-from .file import File
-from .https import multipart_request
+from .message import Message
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
-from typing import Optional, List, Dict, Any, TYPE_CHECKING
+from typing import Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .client import Client
@@ -55,10 +55,6 @@ class PartialChannel:
             A file to send with the message.
         files: Optional[List[File]]
             A list of files to send with the message.
-        ephemeral: Optional[:class:`bool`]
-            Whether the message should be ephemeral.
-        supress_embeds: Optional[:class:`bool`]
-            Whether the embeds should be supressed.
         """
         if view:
             for component in view.children:
@@ -72,11 +68,9 @@ class PartialChannel:
             file=file,
             files=files,
         )
-        return await multipart_request(
-            path=f"/channels/{self.id}/messages",
-            session=self.client.session,
-            form=create_form(payload, merge_fields(file, files)),
-        )
+        resp = await self.client.http.send_message(self.id, create_form(payload, merge_fields(file, files)))
+        data = await resp.json()
+        return Message(data, self.client)
 
 
 class Channel(PartialChannel):

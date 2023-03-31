@@ -52,11 +52,7 @@ class Client(FastAPI):
         self.token = token
         self.public_key = public_key
         self.application_id = application_id
-        self.http = HTTPClient(token)
-        self.session: Optional[aiohttp.ClientSession] = aiohttp.ClientSession(
-            base_url="https://discord.com",
-            headers={"Authorization": f"Bot {self.token}", "Content-Type": "application/json"}
-        )
+        self.http = HTTPClient(token, self)
         self.active_components: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
@@ -164,7 +160,7 @@ class Client(FastAPI):
         ----------
         command_id: str
         """
-        return await self.session.delete(f"/api/v10/applications/{self.application_id}/commands/{command_id}")
+        return await self.http.delete_command(self.application_id, command_id)
 
     def load_scripts(self, *scripts: str):
         """
@@ -235,9 +231,8 @@ class Client(FastAPI):
         ClientUser
             The client as partial user.
         """
-        data = await (
-            await self.session.get(f"/api/v10/oauth2/applications/@me")
-        ).json()
+        resp = await self.http.fetch_client_info()
+        data = await resp.json()
         return ClientUser(data, self)
 
     async def sync(self):
@@ -246,6 +241,5 @@ class Client(FastAPI):
 
         This method is used internally by the client. You should not use this method.
         """
-        url = f"/api/v10/applications/{self.application_id}/commands"
-        resp = await self.session.put(url, json=[command.to_dict() for command in self._sync_queue])
+        resp = await self.http.sync_commands(self.application_id, [command.to_dict() for command in self._sync_queue])
         return await resp.json()

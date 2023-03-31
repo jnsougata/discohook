@@ -1,6 +1,5 @@
 import aiohttp
-from .message import Message
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Dict, Any
 
 if TYPE_CHECKING:
     from .client import Client
@@ -63,23 +62,26 @@ class HTTPClient:
             form.headers.add("Authorization", f"Bot {self.token}")
         return await self.session.request(method, f"/api/v10{path}", data=form, headers=form.headers)
 
+    async def sync_commands(self, application_id: str, commands: List[Dict[str, Any]]):
+        return await self.request("PUT", f"/applications/{application_id}/commands", json=commands, use_auth=True)
+
+    async def fetch_client_info(self):
+        return await self.request("GET", "/oauth2/applications/@me", use_auth=True)
+
+    async def delete_command(self, application_id: str, command_id: str):
+        return await self.request("DELETE", f"/applications/{application_id}/commands/{command_id}")
+
     async def send_message(self, channel_id: str, form: aiohttp.MultipartWriter):
-        r = await self.multipart("POST", f"/channels/{channel_id}/messages", form=form, use_auth=True)
-        data = await r.json()
-        return Message(data, self.client)
+        return await self.multipart("POST", f"/channels/{channel_id}/messages", form=form, use_auth=True)
     
     async def delete_message(self, channel_id: str, message_id: str):
         await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
     
     async def edit_channel_message(self, channel_id: str, message_id: str, form: aiohttp.MultipartWriter):
-        r = await self.multipart("PATCH", f"/channels/{channel_id}/messages/{message_id}", form=form, use_auth=True)
-        data = await r.json()
-        return Message(data, self.client)
+        return await self.multipart("PATCH", f"/channels/{channel_id}/messages/{message_id}", form=form, use_auth=True)
 
     async def send_webhook_message(self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter):
-        r = await self.multipart("POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form)
-        data = await r.json()
-        return Message(data, self.client)
+        return await self.multipart("POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form)
     
     async def delete_webhook_message(self, webhook_id: str, webhook_token: str, message_id: str):
         await self.request("DELETE", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}")
@@ -91,9 +93,7 @@ class HTTPClient:
         message_id: str,
         form: aiohttp.MultipartWriter
     ):
-        r = await self.multipart("PATCH", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}", form=form)
-        data = await r.json()
-        return Message(data, self.client)
+        return await self.multipart("PATCH", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}", form=form)
 
     async def fetch_original_webhook_message(self, webhook_id: str, webhook_token: str):
         return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original")
