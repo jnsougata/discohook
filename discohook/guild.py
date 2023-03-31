@@ -1,4 +1,5 @@
-from typing import Dict, Any, TYPE_CHECKING
+from .channel import Channel
+from typing import Dict, Any, TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from .client import Client
@@ -6,7 +7,7 @@ if TYPE_CHECKING:
 
 class Guild:
 
-    def __init__(self, data: Dict[str, Any], state: "Client") -> None:
+    def __init__(self, data: Dict[str, Any], client: "Client") -> None:
         self.id = data["id"]
         self.name = data["name"]
         self.icon = data.get("icon")
@@ -47,5 +48,17 @@ class Guild:
         self.nsfw_level = data["nsfw_level"]
         self.stickers = data.get("stickers")
         self.premium_progress_bar_enabled = data["premium_progress_bar_enabled"]
-        self.state = state
+        self.client = client
+
+    async def fetch_channels(self) -> List[Channel]:
+        """
+        Fetches all channels in the guild.
+
+        Returns
+        -------
+        List[Channel]
+        """
+        resp = await self.client.http.fetch_guild_channels(self.id)
+        data = await resp.json()
+        return [Channel(c, self.client) for c in data]
 

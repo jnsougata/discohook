@@ -37,7 +37,7 @@ class Member(User):
         role_id : str
             The ID of the role.
         """
-        return await self.http.add_role(self.guild_id, self.id, role_id)
+        return await self.client.http.add_role(self.guild_id, self.id, role_id)
 
     async def remove_role(self, role_id: str) -> None:
         """
@@ -48,13 +48,13 @@ class Member(User):
         role_id : str
             The ID of the role.
         """
-        return await self.http.remove_role(self.guild_id, self.id, role_id)
+        return await self.client.http.remove_role(self.guild_id, self.id, role_id)
     
     async def kick(self) -> None:
         """
         Kick the member.
         """
-        return await self.http.kick_user(self.guild_id, self.id)
+        return await self.client.http.kick_user(self.guild_id, self.id)
 
     async def ban(self, *, delete_message_seconds: int = 0) -> None:
         """
@@ -67,4 +67,4 @@ class Member(User):
         """
         if delete_message_seconds > 604800:
             raise ValueError("You can only delete messages for up to last 7 days.")
-        return await self.http.ban_user(self.guild_id, self.id, delete_message_seconds)
+        return await self.client.http.ban_user(self.guild_id, self.id, delete_message_seconds)

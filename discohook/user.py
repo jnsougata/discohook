@@ -1,7 +1,11 @@
 from .asset import Asset
+from .file import File
 from typing import Optional
 from .permissions import Permissions
-from typing import TYPE_CHECKING, Dict, Any
+from .embed import Embed
+from .multipart import create_form
+from .params import handle_send_params, merge_fields
+from typing import TYPE_CHECKING, Dict, Any, List
 
 if TYPE_CHECKING:
     from .client import Client
@@ -42,7 +46,7 @@ class User:
     """
     def __init__(self, data: dict, client: "Client"):
         self.data = data
-        self.http = client.http
+        self.client = client
 
     @property
     def id(self) -> str:
@@ -107,6 +111,48 @@ class User:
     def mention(self) -> str:
         return f"<@{self.id}>"
 
+    async def send(
+        self,
+        content: str,
+        *,
+        tts: bool = False,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Sends a message to the user.
+
+        Parameters
+        ----------
+        content: :class:`str`
+            The content of the message.
+        tts: :class:`bool`
+            Whether the message should be sent using text-to-speech.
+        embed: Optional[:class:`Embed`]
+            The embed to be sent with the message.
+        embeds: Optional[:class:`List`[:class:`Embed`]`]
+            The embeds to be sent with the message.
+        file: Optional[:class:`File`]
+            The file to be sent with the message.
+        files: Optional[:class:`List`[:class:`File`]`]
+            The files to be sent with the message.
+        """
+        payload = handle_send_params(
+            content=content,
+            tts=tts,
+            embed=embed,
+            embeds=embeds,
+            file=file,
+            files=files,
+        )
+        resp = await self.client.http.create_dm_channel({"recipient_id": self.id})
+        data = await resp.json()
+        channel_id = data["id"]
+        resp = await self.client.http.send_message(channel_id, create_form(payload, merge_fields(file, files)))
+        return await resp.json()
+
 
 class ClientUser:
     """
@@ -124,7 +170,7 @@ class ClientUser:
         The URL of the client user's icon.
     public: :class:`bool`
         Whether the client user is public.
-    require_code_grant: :class:`bool`
+    Require_code_grant: :class:`bool`
         Whether the client user requires code grant.
     permissions: :class:`str`
         The permissions of the client user.
@@ -136,20 +182,20 @@ class ClientUser:
         The flags of the client user.
     """
     def __init__(self, data: Dict[str, Any], client: "Client") -> None:
-        self._data = data
-        self.__client = client
+        self.data = data
+        self.client = client
 
     @property
     def id(self) -> str:
-        return self._data["id"]
+        return self.data["id"]
 
     @property
     def name(self) -> str:
-        return self._data["name"]
+        return self.data["name"]
 
     @property
     def icon_hash(self) -> Optional[str]:
-        return self._data.get("icon")
+        return self.data.get("icon")
 
     @property
     def icon_url(self) -> Optional[str]:
@@ -157,27 +203,27 @@ class ClientUser:
 
     @property
     def public(self) -> bool:
-        return self._data["bot_public"]
+        return self.data["bot_public"]
 
     @property
     def require_code_grant(self) -> bool:
-        return self._data["bot_require_code_grant"]
+        return self.data["bot_require_code_grant"]
 
     @property
     def permissions(self) -> str:
-        return self._data["install_params"]["permissions"]
+        return self.data["install_params"]["permissions"]
 
     @property
     def scopes(self) -> str:
-        return self._data["install_params"]["scopes"]
+        return self.data["install_params"]["scopes"]
 
     @property
     def owner(self) -> User:
-        return User(self._data["owner"], self.__client)
+        return User(self.data["owner"], self.client)
 
     @property
     def flags(self) -> int:
-        return self._data["flags"]
+        return self.data["flags"]
 
     def has_permission(self, permission: Permissions) -> bool:
         """
