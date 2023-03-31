@@ -95,6 +95,7 @@ class Embed:
         Parameters
         ----------
         name: :class:`str`
+            name of the file attachment.
         """
         self.data["image"] = {"url": f"attachment://{name}"}
 
@@ -116,6 +117,7 @@ class Embed:
         Parameters
         ----------
         name: :class:`str`
+            name of the file attachment.
         """
         self.data["thumbnail"] = {"url": f"attachment://{name}"}
 

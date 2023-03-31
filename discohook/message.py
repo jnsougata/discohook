@@ -4,7 +4,6 @@ from .embed import Embed
 from .view import View
 from .file import File
 from .multipart import create_form
-from .https import multipart_request, request
 from .params import handle_edit_params, MISSING, merge_fields
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
 
@@ -16,13 +15,6 @@ if TYPE_CHECKING:
 class Message:
     """
     Represents a Discord message.
-
-    Parameters
-    ----------
-    payload: :class:`dict`
-        The payload of the message.
-    client: :class:`Client`
-        The client that the message belongs to.
 
     Attributes
     ----------
@@ -56,18 +48,18 @@ class Message:
         The reactions in the message.
         ...
     """
-    def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
+    def __init__(self, payload: Dict[str, Any], client: Client) -> None:
         self.client = client
         self.data = payload
         self.id = payload["id"]
         self.channel_id = payload["channel_id"]
-        self.author = User(payload["author"])
+        self.author = User(payload["author"], self.client)
         self.content = payload["content"]
         self.timestamp = payload["timestamp"]
         self.edited_timestamp = payload.get("edited_timestamp")
         self.tts = payload["tts"]
         self.mention_everyone = payload["mention_everyone"]
-        self.mentions = [User(x) for x in payload["mentions"]]
+        self.mentions = [User(x, self.client) for x in payload["mentions"]]
         self.mention_roles = [Role(x) for x in payload["mention_roles"]]
         self.mention_channels = payload.get("mention_channels")
         self.attachments = payload["attachments"]
@@ -94,11 +86,7 @@ class Message:
         """
         Deletes the message.
         """
-        await request(
-            "DELETE",
-            path=f"/channels/{self.channel_id}/messages/{self.id}",
-            session=self.client.session,
-        )
+        return await self.client.http.delete_message(self.channel_id, self.id)
 
     async def edit(
         self,
@@ -110,7 +98,7 @@ class Message:
         tts: Optional[bool] = MISSING,
         file: Optional[Dict[str, Any]] = MISSING,
         files: Optional[List[Dict[str, Any]]] = MISSING,
-        supress_embeds: Optional[bool] = MISSING,
+        suppress_embeds: Optional[bool] = MISSING,
     ):
         """
         Edits the message.
@@ -131,8 +119,8 @@ class Message:
             A file to send with the message.
         files: Optional[List[File]]
             A list of files to send with the message.
-        supress_embeds: Optional[bool]
-            Whether the embeds should be supressed.
+        suppress_embeds: Optional[bool]
+            Whether the embeds should be suppressed.
         """
         data = handle_edit_params(
             content=content,
@@ -142,19 +130,15 @@ class Message:
             tts=tts,
             file=file,
             files=files,
-            supress_embeds=supress_embeds,
+            suppress_embeds=suppress_embeds,
         )
         if view:
             for component in view.children:
                 self.client.load_component(component)
-        return Message(
-            await multipart_request(
-                method="PATCH",
-                path=f"/channels/{self.channel_id}/messages/{self.id}",
-                session=self.client.session,
-                form=create_form(data, merge_fields(file, files)),
-            ), 
-            self.client
+        return await self.client.http.edit_channel_message(
+            self.channel_id, 
+            self.id, 
+            create_form(data, merge_fields(file, files))
         )
 
 
@@ -170,10 +154,10 @@ class FollowupMessage(Message):
         """
         Deletes the followup message.
         """
-        await request(
-            "DELETE",
-            path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
-            session=self.interaction.client.session
+        return await self.interaction.client.http.delete_webhook_message(
+            self.interaction.application_id,
+            self.interaction.token,
+            self.id
         )
 
     async def edit(
@@ -186,7 +170,7 @@ class FollowupMessage(Message):
         tts: Optional[bool] = MISSING,
         file: Optional[File] = MISSING,
         files: Optional[List[File]] = MISSING,
-        supress_embeds: Optional[bool] = MISSING,
+        suppress_embeds: Optional[bool] = MISSING,
     ) -> Message:
         """
         Edits the followup message.
@@ -203,17 +187,17 @@ class FollowupMessage(Message):
             tts=tts,
             file=file,
             files=files,
-            supress_embeds=supress_embeds,
+            suppress_embeds=suppress_embeds,
         )
         if view is not MISSING and view:
             for component in view.children:
                 self.interaction.client.load_component(component)
         self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
-        resp = await multipart_request(
-            method="PATCH",
-            path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/{self.id}",
-            session=self.interaction.client.session,
-            form=create_form(data, merge_fields(file, files)),
+        resp = await self.client.http.edit_webhook_message(
+            self.interaction.application_id,
+            self.interaction.token,
+            self.id,
+            create_form(data, merge_fields(file, files))
         )
         return Message(resp, self.interaction.client)
 
@@ -230,10 +214,10 @@ class ResponseMessage(Message):
         """
         Deletes the response message.
         """
-        await request(
-            "DELETE",
-            path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client.session,
+        return self.client.http.delete_webhook_message(
+            self.interaction.application_id,
+            self.interaction.token,
+            "@original"
         )
 
     async def edit(
@@ -246,7 +230,7 @@ class ResponseMessage(Message):
         tts: Optional[bool] = MISSING,
         file: Optional[File] = MISSING,
         files: Optional[List[File]] = MISSING,
-        supress_embeds: Optional[bool] = MISSING,
+        suppress_embeds: Optional[bool] = MISSING,
     ) -> Message:
         """
         Edits the response message.
@@ -263,16 +247,16 @@ class ResponseMessage(Message):
             tts=tts,
             file=file,
             files=files,
-            supress_embeds=supress_embeds,
+            suppress_embeds=suppress_embeds,
         )
         if view is not MISSING and view:
             for component in view.children:
-                self.interaction.client.load_component(component)
-        self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
-        resp = await multipart_request(
-            method="PATCH",
-            path=f"/webhooks/{self.interaction.application_id}/{self.interaction.token}/messages/@original",
-            session=self.interaction.client.session,
-            form=create_form(data, merge_fields(file, files)),
+                self.client.load_component(component)
+        self.client.store_inter_token(self.interaction.id, self.interaction.token)
+        resp = self.client.http.edit_webhook_message(
+            self.interaction.application_id,
+            self.interaction.token,
+            "@original",
+            create_form(data, merge_fields(file, files))
         )
-        return Message(resp, self.interaction.client)
+        return Message(resp, self.client)

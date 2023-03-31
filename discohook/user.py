@@ -1,7 +1,7 @@
 from .asset import Asset
 from typing import Optional
 from .permissions import Permissions
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Any
 
 if TYPE_CHECKING:
     from .client import Client
@@ -11,7 +11,7 @@ class User:
     """
     Represents a discord user.
 
-    Attributes
+    Properties
     ----------
     id: :class:`str`
         The unique ID of the user.
@@ -42,7 +42,7 @@ class User:
     """
     def __init__(self, data: dict, client: "Client"):
         self.data = data
-        self.state = client
+        self.http = client.http
 
     @property
     def id(self) -> str:
@@ -58,12 +58,12 @@ class User:
 
     @property
     def avatar(self) -> Asset:
-        hash = self.data.get("avatar")
-        if not hash:
+        av_hash = self.data.get("avatar")
+        if not av_hash:
             fragment = f"embed/avatars/"
-            hash = str({int(self.discriminator) % 5})
-            return Asset(hash=hash, fragment=fragment)
-        return Asset(hash=hash, fragment=f"avatars/{self.id}")
+            av_hash = str({int(self.discriminator) % 5})
+            return Asset(hash=av_hash, fragment=fragment)
+        return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
 
     @property
     def system(self) -> bool:
@@ -112,7 +112,7 @@ class ClientUser:
     """
     Represents a discord client user.
 
-    Attributes
+    Properties
     ----------
     id: :class:`str`
         The unique ID of the user.
@@ -135,8 +135,9 @@ class ClientUser:
     flags: :class:`int`
         The flags of the client user.
     """
-    def __init__(self, data: dict) -> None:
+    def __init__(self, data: Dict[str, Any], client: "Client") -> None:
         self._data = data
+        self.__client = client
 
     @property
     def id(self) -> str:
@@ -172,7 +173,7 @@ class ClientUser:
 
     @property
     def owner(self) -> User:
-        return User(self._data["owner"])
+        return User(self._data["owner"], self.__client)
 
     @property
     def flags(self) -> int:

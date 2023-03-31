@@ -25,13 +25,13 @@ class SubCommand:
         self,
         name: str,
         description: str,
-        options: List[Option] = None,
+        options: Optional[List[Option]] = None,
         *,
-        callback: Callable = None,
+        callback: Optional[Callable] = None,
     ):
         self.name = name
-        self.options = options
-        self.callback = callback
+        self.options = options  # type: ignore
+        self.callback = callback  # type: ignore
         self.description = description
         self._component_callback: Optional[Callable] = None
 
@@ -42,7 +42,7 @@ class SubCommand:
             "description": self.description,
         }
         if self.options:
-            payload["options"] = [option.to_dict() for option in self.options]
+            payload["options"] = [option.to_dict() for option in self.options]  # type: ignore
         return payload
 
 
@@ -75,21 +75,21 @@ class ApplicationCommand:
     def __init__(
         self,
         name: str,
-        id: str = None,
-        description: str = None,
+        id: Optional[str] = None,
+        description: Optional[str] = None,
         options: List[Option] = None,
         dm_access: bool = True,
-        permissions: List[Permissions] = None,
+        permissions: Optional[List[Permissions]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
-        self.id = id
+        self.id = id  # type: ignore
         self.name = name
-        self.description = description
+        self.description = description  # type: ignore
         self.options: List[Option] = options
         self.dm_access = dm_access
         self.application_id = None
         self.category = category
-        self.permissions = permissions
+        self.permissions = permissions  # type: ignore
         self._callback = None
         self._payload: Dict[str, Any] = {}
         self._autocomplete_callback = None
@@ -140,7 +140,7 @@ class ApplicationCommand:
         if self.options:
             self.options.append(subcommand)
         else:
-            self.options = [subcommand]
+            self.options = [subcommand]  # type: ignore
 
         def decorator(coro: Callable):
             @wraps(coro)

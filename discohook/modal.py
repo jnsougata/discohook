@@ -1,8 +1,7 @@
 import secrets
 from typing import Callable
-from .enums import MessageComponentType, TextInputFieldLength
-
 # from .component import Button, SelectMenu
+from .enums import MessageComponentType, TextInputFieldLength
 
 
 class Modal:
@@ -45,6 +44,18 @@ class Modal:
             The label of the field.
         field_id: str
             The dev defined ID of the field to be used in the callback.
+        required: bool
+            Whether the field is required or not.
+        hint: str
+            The hint to be displayed on the field.
+        default_text: str
+            The default text to be displayed on the field.
+        min_length: int
+            The minimum length of the field.
+        max_length: int
+            The maximum length of the field.
+        style: TextInputFieldLength
+            The style of the field.
         """
         self._data["components"].append(
             {
@@ -67,7 +78,7 @@ class Modal:
 
     def to_dict(self):
         """
-        Convert the modal to a dict to be sent to discord.
+        Convert the modal to a dict to be sent to discord. For internal use only.
         """
         if self._row["components"]:
             self._data["components"].append(self._row)

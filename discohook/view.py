@@ -30,11 +30,11 @@ class Button:
         disabled: Optional[bool] = False,
         emoji: Optional[PartialEmoji] = None,
     ):
-        self.url = url
+        self.url = url  # type: ignore
         self.label = label
-        self.emoji = emoji
+        self.emoji = emoji  # type: ignore
         self.style = style
-        self.disabled = disabled
+        self.disabled = disabled  # type: ignore
         self.custom_id = secrets.token_urlsafe(16)
         self._callback: Optional[Callable] = None
 
@@ -77,7 +77,7 @@ class Button:
 
 class SelectOption:
     """
-    Represents a disocrd select menu option object.
+    Represents a discord select menu option object.
 
     Parameters
     ----------
@@ -103,9 +103,9 @@ class SelectOption:
     ):
         self.label = label
         self.value = value
-        self.description = description
-        self.emoji = emoji
-        self.default = default
+        self.description = description  # type: ignore
+        self.emoji = emoji  # type: ignore
+        self.default = default  # type: ignore
 
     def to_dict(self) -> Dict[str, Any]:
         """

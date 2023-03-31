@@ -1,18 +1,20 @@
 from .file import File
 from .view import View
 from .embed import Embed
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Any
 
 
 MISSING = object()
 
-def merge_fields(filed: Optional[Any] , fileds: Optional[List[Any]]) -> List[Any]:
+
+def merge_fields(filed: Optional[Any], fields: Optional[List[Any]]) -> List[Any]:
     tmp = []
     if filed:
         tmp.append(filed)
-    if fileds:
-        tmp.extend(fileds)
+    if fields:
+        tmp.extend(fields)
     return tmp
+
 
 def handle_send_params(
     content: Optional[str] = None,
@@ -24,7 +26,7 @@ def handle_send_params(
     file: Optional[File] = None,
     files: Optional[List[File]] = None,
     ephemeral: Optional[bool] = False,
-    supress_embeds: Optional[bool] = False,
+    suppress_embeds: Optional[bool] = False,
 ):
     payload = {}
     flag_value = 0
@@ -32,7 +34,7 @@ def handle_send_params(
     files = merge_fields(file, files)
     if ephemeral:
         flag_value |= 1 << 6
-    if supress_embeds:
+    if suppress_embeds:
         flag_value |= 1 << 2
     if content:
         payload["content"] = str(content)
@@ -66,7 +68,7 @@ def handle_edit_params(
     tts: Optional[bool] = MISSING,
     file: Optional[File] = MISSING,
     files: Optional[List[File]] = MISSING,
-    supress_embeds: Optional[bool] = MISSING,
+    suppress_embeds: Optional[bool] = MISSING,
 ):
     payload = {}
     embeds = merge_fields(embed, embeds)
@@ -89,7 +91,7 @@ def handle_edit_params(
             }
             for i, file in enumerate(files)
         ] if files else []
-    if supress_embeds is not MISSING:
+    if suppress_embeds is not MISSING:
         payload["flags"] = 1 << 2
 
     return payload

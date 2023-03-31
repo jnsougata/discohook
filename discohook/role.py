@@ -15,7 +15,7 @@ class Role:
     color: :class:`int`
         The color of the role.
     hoist: :class:`bool`
-        Whether the role is separelty displayed in the member list.
+        Whether the role has separability in the member list.
     position: :class:`int`
         The position of the role.
     permissions: :class:`str`
@@ -75,4 +75,3 @@ class Role:
         :class:`bool`
         """
         return int(self.permissions) & permissions.value == permissions.value
-

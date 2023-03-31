@@ -26,17 +26,15 @@ class PartialChannel:
         self.id: str = data.get("id")
 
     async def send(
-            self,
-            content: Optional[str] = None,
-            *,
-            embed: Optional[Embed] = None,
-            embeds: Optional[List[Embed]] = None,
-            view: Optional[View] = None,
-            tts: Optional[bool] = False,
-            file: Optional[File] = None,
-            files: Optional[List[File]] = None,
-            ephemeral: Optional[bool] = False,
-            supress_embeds: Optional[bool] = False,
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        view: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
     ):
         """
         Sends a message to the channel.
@@ -73,8 +71,6 @@ class PartialChannel:
             tts=tts,
             file=file,
             files=files,
-            ephemeral=ephemeral,
-            supress_embeds=supress_embeds,
         )
         return await multipart_request(
             path=f"/channels/{self.id}/messages",

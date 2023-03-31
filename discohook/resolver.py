@@ -64,9 +64,9 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
                 if not member_data["avatar"]:
                     member_data["avatar"] = user_data["avatar"]
                 user_data.update(member_data)
-                options[name] = Member(user_data)
+                options[name] = Member(user_data, interaction.client)
             else:
-                options[name] = User(user_data)
+                options[name] = User(user_data, interaction.client)
         elif option_type == ApplicationCommandOptionType.channel.value:
             options[name] = Channel(interaction.data["resolved"]["channels"][value], interaction.client)
         elif option_type == ApplicationCommandOptionType.role.value:
@@ -111,7 +111,7 @@ def build_context_menu_param(interaction: Interaction):
         if member_resolved:
             member_resolved["avatar"] = user_resolved["avatar"]
             user_resolved.update(member_resolved)
-        return User(user_resolved)
+        return User(user_resolved, interaction.client)
 
     if interaction.data["type"] == ApplicationCommandType.message.value:
         message_id = interaction.data["target_id"]
@@ -140,7 +140,7 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         ]
     if interaction.data["component_type"] == SelectMenuType.user.value:
         resolved = interaction.data["resolved"]["users"]
-        return [User(resolved.pop(user_id)) for user_id in interaction.data["values"]]
+        return [User(resolved.pop(user_id), interaction.client) for user_id in interaction.data["values"]]
     if interaction.data["component_type"] == SelectMenuType.role.value:
         resolved = interaction.data["resolved"]["roles"]
         return [Role(resolved.pop(role_id)) for role_id in interaction.data["values"]]
@@ -149,7 +149,7 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})
         users = [
-            User(resolved_users.pop(user_id))
+            User(resolved_users.pop(user_id), interaction.client)
             for user_id in raw_values
             if user_id in resolved_users
         ]

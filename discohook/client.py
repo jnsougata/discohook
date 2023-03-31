@@ -6,6 +6,7 @@ from .file import File
 from fastapi import FastAPI
 from functools import wraps
 from .handler import handler
+from .https import HTTPClient
 from .enums import ApplicationCommandType
 from .user import ClientUser
 from .permissions import Permissions
@@ -16,7 +17,6 @@ from .dash import dashboard
 from .params import handle_send_params, merge_fields
 from fastapi.responses import JSONResponse
 from .multipart import create_form
-from .https import multipart_request
 from typing import Optional, List, Dict, Union, Callable
 
 
@@ -52,6 +52,7 @@ class Client(FastAPI):
         self.token = token
         self.public_key = public_key
         self.application_id = application_id
+        self.http = HTTPClient(token)
         self.session: Optional[aiohttp.ClientSession] = aiohttp.ClientSession(
             base_url="https://discord.com",
             headers={"Authorization": f"Bot {self.token}", "Content-Type": "application/json"}
@@ -135,7 +136,7 @@ class Client(FastAPI):
                 if asyncio.iscoroutinefunction(coro):
                     command._callback = coro
                     if command.id:
-                        self.application_commands[command.id] = command
+                        self.application_commands[command.id] = command  # noqa
                     self._sync_queue.append(command)
                     return command
 
@@ -189,16 +190,16 @@ class Client(FastAPI):
         self._global_error_handler = coro
 
     async def send_message(
-            self, 
-            channel_id: int, 
-            content: Optional[str] = None,
-            *,
-            tts: bool = False,
-            embed: Optional[Embed] = None,
-            embeds: Optional[List[Embed]] = None,
-            file: Optional[File] = None,
-            files: Optional[List[File]] = None,
-        ):
+        self,
+        channel_id: str,
+        content: Optional[str] = None,
+        *,
+        tts: bool = False,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
+    ):
         """
         Send a message to a channel using the ID of the channel.
 
@@ -214,11 +215,16 @@ class Client(FastAPI):
             The embed to send with the message.
         embeds: Optional[List[Embed]]
             A list of embeds to send with the message. Maximum of 10.
+        file: Optional[File]
+            A file to be sent with the message
+        files: Optional[List[File]]
+            A list of files to be sent with message.
         """
+        if not channel_id.isdigit():
+            raise TypeError("Channel ID must be a snowflake.")
         payload = handle_send_params(content, tts=tts, embed=embed, embeds=embeds, file=file, files=files)
-        files = merge_fields(file, files)
-        form = create_form(payload, files)
-        return await multipart_request(path=f"/channels/{channel_id}/messages", session=self.session, form=form)
+        form = create_form(payload, merge_fields(file, files))
+        return await self.http.send_message(channel_id, form)
 
     async def as_user(self) -> ClientUser:
         """
@@ -232,7 +238,7 @@ class Client(FastAPI):
         data = await (
             await self.session.get(f"/api/v10/oauth2/applications/@me")
         ).json()
-        return ClientUser(data)
+        return ClientUser(data, self)
 
     async def sync(self):
         """

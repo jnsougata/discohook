@@ -1,17 +1,16 @@
-
+from .guild import Guild
 from .embed import Embed
 from .file import File
 from .user import User
 from .member import Member
 from .view import View
 from .modal import Modal
-from .channel import PartialChannel
-from .https import request, multipart_request
 from .option import Choice
+from .channel import PartialChannel
 from fastapi.requests import Request
 from .multipart import create_form
-from .message import Message, ResponseMessage, FollowupMessage
 from .enums import InteractionType, InteractionCallbackType
+from .message import Message, ResponseMessage, FollowupMessage
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 from .params import handle_edit_params, handle_send_params, MISSING, merge_fields
 
@@ -116,7 +115,20 @@ class Interaction:
             member["guild_id"] = self.guild_id
             return Member(member, self.client)
         else:
-            return User(user)
+            return User(user, self.client)
+    
+    async def fetch_guild(self) -> Optional[Guild]:
+        """
+        Fetches the guild of the interaction
+
+        Returns
+        -------
+        Guild
+        """
+        if self.guild_id:
+            resp = await self.client.http.fetch_guild(self.guild_id)
+            data = await resp.json()
+            return Guild(data, self.client)
 
     async def send_modal(self, modal: Modal):
         """
@@ -132,12 +144,7 @@ class Interaction:
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal.value,
         }
-        await request(
-            method="POST",
-            path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session,
-            json=payload,
-        )
+        await self.client.http.send_modal(self.id, self.token, payload)
 
     async def send_autocomplete(self, choices: List[Choice]):
         """
@@ -152,12 +159,7 @@ class Interaction:
             "type": InteractionCallbackType.autocomplete_result.value,
             "data": {"choices": [choice.to_dict() for choice in choices]},
         }
-        await request(
-            method="POST",
-            path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session,
-            json=payload,
-        )
+        await self.client.http.send_interaction_callback(self.id, self.token, payload)
 
     async def defer(self, ephemeral: bool = False):
         """
@@ -173,12 +175,7 @@ class Interaction:
         }
         if ephemeral:
             payload["data"] = {"flags": 64}
-        await request(
-            method="POST",
-            path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session,
-            json=payload,
-        )
+        await self.client.http.send_interaction_callback(self.id, self.token, payload)
 
     async def response(
         self,
@@ -191,7 +188,7 @@ class Interaction:
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
-        supress_embeds: Optional[bool] = False,
+        suppress_embeds: Optional[bool] = False,
     ) -> None:
         """
         Sends a response to the interaction
@@ -214,8 +211,8 @@ class Interaction:
             The list of files to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
-        supress_embeds: Optional[bool]
-            Whether the embeds should be supressed or not
+        suppress_embeds: Optional[bool]
+            Whether the embeds should be suppressed or not
 
         Notes
         -----
@@ -230,7 +227,7 @@ class Interaction:
             file=file,
             files=files,
             ephemeral=ephemeral,
-            supress_embeds=supress_embeds,
+            suppress_embeds=suppress_embeds,
         )
         if view:
             for component in view.children:
@@ -241,12 +238,7 @@ class Interaction:
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
         files = merge_fields(file, files)
-        form = create_form(payload, files)
-        await multipart_request(
-            path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session,
-            form=form,
-        )
+        await self.client.http.send_interaction_mp_callback(self.id, self.token, create_form(payload, files))
 
     async def follow_up(
         self,
@@ -259,10 +251,10 @@ class Interaction:
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
-        supress_embeds: Optional[bool] = False,
+        suppress_embeds: Optional[bool] = False,
     ) -> FollowupMessage:
         """
-        Sends a follow up message to a deferred interaction
+        Sends a follow-up message to a deferred interaction
 
         Parameters
         ----------
@@ -282,8 +274,8 @@ class Interaction:
             The list of files to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
-        supress_embeds: Optional[bool]
-            Whether the message should supress embeds or not
+        suppress_embeds: Optional[bool]
+            Whether the message should suppress embeds or not
 
         Notes
         -----
@@ -298,33 +290,30 @@ class Interaction:
             file=file,
             files=files,
             ephemeral=ephemeral,
-            supress_embeds=supress_embeds,
+            suppress_embeds=suppress_embeds,
         )
         if view:
             self.client.store_inter_token(self.id, self.token)
             for component in view.children:
                 self.client.load_component(component)
-        data = await multipart_request(
-            path=f"/webhooks/{self.application_id}/{self.token}",
-            session=self.client.session,
-            form=create_form(payload, merge_fields(file, files)),
+        resp = await self.client.http.send_webhook_message(
+            self.application_id, self.token, create_form(payload, merge_fields(file, files))
         )
+        data = await resp.json()
         return FollowupMessage(data, self)
 
     async def original_response(self) -> ResponseMessage:
         """
-        Gets the original response mssage of the interaction
+        Gets the original response message of the interaction
 
         Returns
         -------
         ResponseMessage
             The original response message
         """
-        resp = await request(
-            path=f"/webhooks/{self.application_id}/{self.token}/messages/@original",
-            session=self.client.session,
-        )
-        return ResponseMessage(resp, self)
+        resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
+        data = await resp.json()
+        return ResponseMessage(data, self)
 
 
 class ComponentInteraction(Interaction):
@@ -355,7 +344,7 @@ class ComponentInteraction(Interaction):
         -------
         User
         """
-        return User(self.message.interaction["user"])
+        return User(self.message.interaction["user"], self.client)
 
     @property
     def from_originator(self) -> bool:
@@ -379,10 +368,10 @@ class ComponentInteraction(Interaction):
         file: Optional[Dict[str, Any]] = None,
         files: Optional[List[Dict[str, Any]]] = None,
         ephemeral: Optional[bool] = False,
-        supress_embeds: Optional[bool] = False,
+        suppress_embeds: Optional[bool] = False,
     ) -> FollowupMessage:
         """
-        Sends a follow up message to a deferred interaction
+        Sends a follow-up message to a deferred interaction
 
         Parameters
         ----------
@@ -402,8 +391,8 @@ class ComponentInteraction(Interaction):
             The list of files to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
-        supress_embeds: Optional[bool]
-            Whether the message should supress embeds or not
+        suppress_embeds: Optional[bool]
+            Whether the message should suppress embeds or not
         """
         data = handle_send_params(
             content=content,
@@ -414,7 +403,7 @@ class ComponentInteraction(Interaction):
             file=file,
             files=files,
             ephemeral=ephemeral,
-            supress_embeds=supress_embeds,
+            suppress_embeds=suppress_embeds,
         )
         if view:
             self.client.store_inter_token(self.id, self.token)
@@ -424,12 +413,11 @@ class ComponentInteraction(Interaction):
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
-        resp = await multipart_request(
-            path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session,
-            form=create_form(payload, merge_fields(file, files)),
+        resp = await self.client.http.send_interaction_mp_callback(
+            self.id, self.token, create_form(payload, merge_fields(file, files))
         )
-        return FollowupMessage(resp, self)
+        data = await resp.json()
+        return FollowupMessage(data, self)
 
     async def edit_original(
         self,
@@ -441,7 +429,7 @@ class ComponentInteraction(Interaction):
         tts: Optional[bool] = MISSING,
         file: Optional[File] = MISSING,
         files: Optional[List[File]] = MISSING,
-        supress_embeds: Optional[bool] = MISSING,
+        suppress_embeds: Optional[bool] = MISSING,
     ):
         """
         Edits the original response message of the interaction
@@ -462,8 +450,8 @@ class ComponentInteraction(Interaction):
             The edited file of the message
         files: Optional[List[File]]
             The edited list of files of the message
-        supress_embeds: Optional[bool]
-            Whether the message should supress embeds or not
+        suppress_embeds: Optional[bool]
+            Whether the message should suppress embeds or not
         """
         data = handle_edit_params(
             content=content,
@@ -473,7 +461,7 @@ class ComponentInteraction(Interaction):
             tts=tts,
             file=file,
             files=files,
-            supress_embeds=supress_embeds,
+            suppress_embeds=suppress_embeds,
         )
         if view is not MISSING and view:
             for component in view.children:
@@ -483,11 +471,8 @@ class ComponentInteraction(Interaction):
             "data": data,
             "type": InteractionCallbackType.update_message.value,
         }
-        await multipart_request(
-            method="PATCH",
-            path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session,
-            form=create_form(payload, merge_fields(file, files)),
+        await self.client.http.edit_interaction_mp_callback(
+            self.id, self.token, create_form(payload, merge_fields(file, files))
         )
 
     @property
@@ -514,11 +499,9 @@ class ComponentInteraction(Interaction):
         """
         if not self.origin:
             return
-        resp = await request(
-            path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
-            session=self.client.session,
-        )
-        return Message(resp, self.client)
+        resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.origin)
+        data = await resp.json()
+        return Message(data, self.client)
 
     async def delete_original(self):
         """
@@ -527,11 +510,7 @@ class ComponentInteraction(Interaction):
         if not self.origin:
             return
         self.client.cached_inter_tokens.pop(self.id, None)
-        await request(
-            method="DELETE",
-            path=f"/webhooks/{self.application_id}/{self.origin}/messages/@original",
-            session=self.client.session,
-        )
+        await self.client.http.delete_webhook_message(self.application_id, self.origin, "@original")
 
 
 class CommandInteraction(Interaction):
@@ -540,7 +519,7 @@ class CommandInteraction(Interaction):
 
     Attributes
     ----------
-    command_data: Optional[CommandData]
+    data: Optional[CommandData]
         Raw data of the command
     """
     def __init__(self, data: Dict[str, Any], req: Request):
@@ -563,7 +542,7 @@ class CommandInteraction(Interaction):
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
-        supress_embeds: Optional[bool] = False,
+        suppress_embeds: Optional[bool] = False,
     ) -> None:
         """
         Sends a response to the interaction
@@ -586,8 +565,8 @@ class CommandInteraction(Interaction):
             The list of files of the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
-        supress_embeds: Optional[bool]
-            Whether the message should supress embeds or not
+        suppress_embeds: Optional[bool]
+            Whether the message should suppress embeds or not
         """
         data = handle_send_params(
             content=content,
@@ -598,7 +577,7 @@ class CommandInteraction(Interaction):
             file=file,
             files=files,
             ephemeral=ephemeral,
-            supress_embeds=supress_embeds,
+            suppress_embeds=suppress_embeds,
         )
         if view:
             for component in view.children:
@@ -608,9 +587,6 @@ class CommandInteraction(Interaction):
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
-        await multipart_request(
-            path=f"/interactions/{self.id}/{self.token}/callback",
-            session=self.client.session,
-            form=create_form(payload, merge_fields(file, files)),
+        await self.client.http.send_interaction_mp_callback(
+            self.id, self.token, create_form(payload, merge_fields(file, files))
         )
-
