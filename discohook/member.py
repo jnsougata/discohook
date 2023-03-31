@@ -17,9 +17,9 @@ class Member(User):
         self.premium_since = data.get("premium_since")
         self.pending = data.get("pending")
         self.is_pending = data.get("is_pending")
-        self.communication_disabled_until = data.get("communication_disabled_until")
         self.flags = data.get("flags")
         self.guild_id = data.get("guild_id")
+        self.communication_disabled_until = data.get("communication_disabled_until")
 
     @property
     def mention(self) -> str:
