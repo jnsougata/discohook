@@ -51,14 +51,14 @@ Deploy the snippet above to your serverless function and you're good to go to ne
 
 #### Registering Commands
 You can sync commands by just visiting the dashboard.
-the dashboard will be available at `https://example.io/dh/dash/<bot_token_here> `. 
+the dashboard will be available at `https://example.io/api/dash/<bot_token_here> `. 
 
 ![image](https://user-images.githubusercontent.com/53375272/205497776-cb2c6653-5b3c-4b32-bbb3-d9be6278b466.png)
 
 Once you visit the dashboard, it will automatically register all the commands. 
 You can also register commands manually by using the bash command below.   
 ```bash
-curl -X GET https://example.io/dh/sync/<bot_token_here>
+curl -X GET https://example.io/api/sync/<bot_token_here>
 ```
 
 ### Adding the `id` to the local command

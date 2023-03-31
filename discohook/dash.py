@@ -1,7 +1,8 @@
-from fastapi.responses import HTMLResponse
+from fastapi import Request
+from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
 
 
-async def dashboard():
+def dashboard():
     content = """
 <!DOCTYPE html>
 <html lang="en">
@@ -153,21 +154,17 @@ async def dashboard():
                 window.location.reload();
             });
             
-            window.addEventListener("DOMContentLoaded", () => {
-                fetch(`/dh/sync/${token}`)
-                .then((res) => {
-                    if (res.status === 200) {
-                        return res.json();
-                    } else {
-                        alert(JSON.stringify(res.json()));
-                        return {};
-                    }
-                })
-                .then((data) => {
+            window.addEventListener("DOMContentLoaded", async () => {
+                resp = await fetch(`/api/sync/${token}`)
+                if (resp.status === 200) {
+                    data = await resp.json();
                     data.forEach(element => {
                         appendCommand(element);
                     });
-                });
+                } else {
+                    msg = await resp.json();
+                    alert(msg.error);
+                }
             });
 
             function appendCommand(data) {
@@ -199,15 +196,14 @@ async def dashboard():
                 let del = document.createElement("i");
                 del.className = "fas fa-trash";
                 del.style.marginLeft = "2px";
-                del.addEventListener("click", () => {
-                    fetch(`/dh/delete/${data.id}`)
-                    .then((res) => {
-                        if (res.status === 204) {
-                            document.getElementById(data.id).remove();
-                        } else {
-                            alert(JSON.stringify(res.json()));
-                        }
-                    });
+                del.addEventListener("click", async () => {
+                    resp = await fetch(`/api/commands/${data.id}/${token}`, {method: "DELETE"})
+                    if (resp.status === 204) {
+                        document.getElementById(data.id).remove();
+                    } else {
+                        msg = await resp.json();
+                        alert(msg.error);
+                    }
                 });
                 options.appendChild(copy);
                 options.appendChild(del);

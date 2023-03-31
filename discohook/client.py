@@ -1,4 +1,3 @@
-import aiohttp
 from .command import *
 from .modal import Modal
 from .embed import Embed
@@ -20,29 +19,46 @@ from .multipart import create_form
 from typing import Optional, List, Dict, Union, Callable
 
 
-async def delete_cmd(request: Request, command_id: str):
+async def delete_cmd(request: Request, command_id: str, token: str):
+    if token != request.app.token:
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
     resp = await request.app.delete_command(command_id)
     if resp.status == 204:
         return JSONResponse({"success": True}, status_code=resp.status)
     return JSONResponse({"error": "Failed to delete command"}, status_code=resp.status)
 
 
-async def sync(request: Request, secret: str = None):
-    if secret == request.app.token:
-        return JSONResponse(await request.app.sync())
-    return JSONResponse({"error": "Unauthorized"}, status_code=401)
+async def sync(request: Request, token: str):
+    if token != request.app.token:
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    return JSONResponse(await request.app.sync())
 
 
 class Client(FastAPI):
     """
     The base client class for discohook.
+
+    Parameters
+    ----------
+    application_id: Union[int, str]
+        The application ID of the bot.
+    public_key: str
+        The public key of the bot.
+    token: str
+        The token of the bot.
+    client_secret: Optional[str]
+        The client secret of the bot. Used for OAuth2.
+    route: str
+        The route to listen for interactions on.
+    **kwargs
+        Keyword arguments to pass to the FastAPI instance.
     """
     def __init__(
         self,
+        *,
         application_id: Union[int, str],
         public_key: str,
         token: str,
-        *,
         route: str = "/interactions",
         **kwargs,
     ):
@@ -51,22 +67,16 @@ class Client(FastAPI):
         self.docs_url = None
         self.token = token
         self.public_key = public_key
-        self.application_id = application_id
+        self.application_id = application_id  # type: ignore
         self.http = HTTPClient(token, self)
         self.active_components: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
         self.add_route(route, handler, methods=["POST"], include_in_schema=False)
-        self.add_api_route(
-            "/dh/sync/{secret}", sync, methods=["GET"], include_in_schema=False
-        )
-        self.add_api_route(
-            "/dh/dash/{secret}", dashboard, methods=["GET"], include_in_schema=False
-        )
-        self.add_api_route(
-            "/dh/delete/{command_id}", delete_cmd, methods=["GET"], include_in_schema=False
-        )
+        self.add_api_route("/api/sync/{token}", sync, methods=["GET"], include_in_schema=False)
+        self.add_api_route("/api/dash/{token}", dashboard, methods=["GET"], include_in_schema=False)
+        self.add_api_route("/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False)
         self._global_error_handler: Optional[Callable] = None
 
     def load_component(self, component: Union[Button, Modal, SelectMenu]):
@@ -160,7 +170,7 @@ class Client(FastAPI):
         ----------
         command_id: str
         """
-        return await self.http.delete_command(self.application_id, command_id)
+        return await self.http.delete_command(str(self.application_id), command_id)
 
     def load_scripts(self, *scripts: str):
         """
@@ -241,5 +251,6 @@ class Client(FastAPI):
 
         This method is used internally by the client. You should not use this method.
         """
-        resp = await self.http.sync_commands(self.application_id, [command.to_dict() for command in self._sync_queue])
+        resp = await self.http.sync_commands(
+            str(self.application_id), [command.to_dict() for command in self._sync_queue])
         return await resp.json()

@@ -69,7 +69,7 @@ class HTTPClient:
         return await self.request("GET", "/oauth2/applications/@me", use_auth=True)
 
     async def delete_command(self, application_id: str, command_id: str):
-        return await self.request("DELETE", f"/applications/{application_id}/commands/{command_id}")
+        return await self.request("DELETE", f"/applications/{application_id}/commands/{command_id}", use_auth=True)
 
     async def send_message(self, channel_id: str, form: aiohttp.MultipartWriter):
         return await self.multipart("POST", f"/channels/{channel_id}/messages", form=form, use_auth=True)
