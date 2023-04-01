@@ -33,7 +33,7 @@ class PartialRole:
         description: Optional[str] = None,
         unicode_emoji: Optional[str] = None,
         icon_data_uri: Optional[str] = None,
-    ):
+    ) -> "Role":
         """
         Edits the role.
         Parameters
@@ -88,7 +88,7 @@ class PartialRole:
         role_id: str,
         *,
         position: int
-    ):
+    ) -> List["Role"]:
         """
         Changes the position of the role.
         Parameters
@@ -97,9 +97,15 @@ class PartialRole:
             The id of the role to move.
         position: :class:`int`
             The new position of the role.
+
+        Returns
+        -------
+        :class:`Role`
         """
         payload = {"id": role_id, "position": position}
-        await self.client.http.edit_guild_role_position(self.guild_id, payload)
+        resp = await self.client.http.edit_guild_role_position(self.guild_id, payload)
+        data = await resp.json()
+        return [Role(role, self.client) for role in data]
 
 
 class Role(PartialRole):

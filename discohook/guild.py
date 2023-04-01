@@ -104,7 +104,7 @@ class PartialGuild:
 
         Returns
         -------
-        Channel
+        :class:`Channel`
         """
         payload = {"name": name, "type": type.value}
         if topic:
@@ -205,7 +205,86 @@ class Guild(PartialGuild):
 
     Attributes
     ----------
-    ...
+    id: :class:`str`
+        The id of the guild.
+    name: :class:`str`
+        The name of the guild.
+    icon: Optional[:class:`str`]
+        The icon hash of the guild.
+    icon_hash: Optional[:class:`str`]
+        The icon hash of the guild.
+    splash: Optional[:class:`str`]
+        The splash hash of the guild.
+    discovery_splash: Optional[:class:`str`]
+        The discovery splash hash of the guild.
+    owner: Optional[:class:`bool`]
+        Whether the user is the owner of the guild.
+    owner_id: :class:`str`
+        The id of the owner of the guild.
+    permissions: Optional[:class:`int`]
+        The total permissions of the user in the guild (does not include channel overrides).
+    afk_channel_id: Optional[:class:`str`]
+        The id of the afk channel.
+    afk_timeout: :class:`int`
+        The afk timeout in seconds.
+    widget_enabled: Optional[:class:`bool`]
+        Whether the widget is enabled.
+    widget_channel_id: Optional[:class:`str`]
+        The id of the channel for the widget.
+    verification_level: :class:`int`
+        The verification level required for the guild.
+    default_message_notifications: :class:`int`
+        The default message notifications level.
+    explicit_content_filter: :class:`int`
+        The explicit content filter level.
+    roles: List[:class:`Role`]
+        The roles in the guild.
+    emojis: List[:class:`Emoji`]
+        The emojis in the guild.
+    features: List[:class:`str`]
+        The features of the guild.
+    mfa_level: :class:`int`
+        The mfa level required for the guild.
+    application_id: Optional[:class:`str`]
+        The application id of the guild creator if it is bot-created.
+    system_channel_id: Optional[:class:`str`]
+        The id of the system channel.
+    system_channel_flags: :class:`int`
+        The system channel flags.
+    rules_channel_id: Optional[:class:`str`]
+        The id of the rules channel.
+    max_presences: Optional[:class:`int`]
+        The maximum number of presences for the guild.
+    max_members: :class:`int`
+        The maximum number of members for the guild.
+    vanity_url_code: Optional[:class:`str`]
+        The vanity url code of the guild.
+    description: Optional[:class:`str`]
+        The description of the guild.
+    banner: Optional[:class:`str`]
+        The banner hash of the guild.
+    premium_tier: :class:`int`
+        The premium tier of the guild.
+    premium_subscription_count: :class:`int`
+        The number of boosts of the guild.
+    preferred_locale: :class:`str`
+        The preferred locale of the guild.
+    public_updates_channel_id: Optional[:class:`str`]
+        The id of the public updates channel.
+    max_video_channel_users: Optional[:class:`int`]
+        The maximum number of users in a video channel.
+    approximate_member_count: Optional[:class:`int`]
+        The approximate number of members in the guild.
+    approximate_presence_count: Optional[:class:`int`]
+        The approximate number of presences in the guild.
+    welcome_screen: Optional[:class:`dict`]
+        The welcome screen object of the guild.
+    nsfw_level: :class:`int`
+        The nsfw level of the guild.
+    stickers: List[:class:`Sticker`]
+        The stickers in the guild.
+    premium_progress_bar_enabled: Optional[:class:`bool`]
+        Whether the premium progress bar is enabled.
     """
 
     def __init__(self, data: Dict[str, Any], client: "Client"):
@@ -249,4 +328,3 @@ class Guild(PartialGuild):
         self.nsfw_level = data["nsfw_level"]
         self.stickers = data.get("stickers")
         self.premium_progress_bar_enabled = data["premium_progress_bar_enabled"]
-        self.client = client

@@ -13,6 +13,14 @@ Documentation
    :members:
    :show-inheritance:
 
+.. autoclass:: discohook.PartialGuild
+   :members:
+   :show-inheritance:
+
+.. autoclass:: discohook.Guild
+    :members:
+    :show-inheritance:
+
 .. autoclass:: discohook.PartialChannel
    :members:
    :show-inheritance:
@@ -20,6 +28,14 @@ Documentation
 .. autoclass:: discohook.Channel
    :members:
    :show-inheritance:
+
+.. autoclass:: discohook.PartialRole
+    :members:
+    :show-inheritance:
+
+.. autoclass:: discohook.Role
+    :members:
+    :show-inheritance:
 
 .. autoclass:: discohook.ApplicationCommand
    :members:

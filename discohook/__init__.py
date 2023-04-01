@@ -5,7 +5,6 @@ from .enums import *
 from .option import *
 from .file import File
 from .user import User
-from .role import Role
 from .modal import Modal
 from .embed import Embed
 from .member import Member
@@ -14,6 +13,8 @@ from .emoji import PartialEmoji
 from .attachment import Attachment
 from .permissions import Permissions
 from .channel import Channel, PartialChannel
+from .guild import Guild, PartialGuild
+from .role import Role, PartialRole
 from .command import ApplicationCommand, SubCommand
 from .view import View, Button, SelectOption, SelectMenu
 from .message import Message, FollowupMessage, ResponseMessage

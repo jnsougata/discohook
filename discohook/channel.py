@@ -112,7 +112,7 @@ class PartialChannel:
         default_thread_rate_limit_per_user: Optional[int] = None,
         default_sort_order: Optional[int] = None,
         default_forum_layout: Optional[int] = None,
-    ):
+    ) -> "Channel":
         """
         Edits all kinds of channels.
 
