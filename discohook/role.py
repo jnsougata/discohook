@@ -7,9 +7,9 @@ if TYPE_CHECKING:
 
 class PartialRole:
     def __init__(self, data: Dict[str, Any], client: "Client"):
-        self.id = data["id"]
-        self.guild_id = data["guild_id"]
         self.client = client
+        self.id = data["id"]
+        self.guild_id = data.get("guild_id")
 
     @property
     def mention(self) -> str:

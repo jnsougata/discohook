@@ -1,7 +1,7 @@
 import secrets
 from .emoji import PartialEmoji
 from typing import Optional, List, Dict, Any, Callable, Union
-from .enums import ButtonStyle, MessageComponentType, ChannelType
+from .enums import ButtonStyle, MessageComponentType, ChannelType, SelectMenuType
 
 
 class Component:
@@ -175,12 +175,12 @@ class SelectMenu(Component):
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         channel_types: Optional[List[ChannelType]] = None,
-        type: MessageComponentType = MessageComponentType.text_select_menu,
+        type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select_menu,
         disabled: Optional[bool] = False,
     ):
         super().__init__(type)
         self.data = {"type": type.value, "custom_id": self.custom_id}
-        if (type == MessageComponentType.text_select_menu) and (options is not None):
+        if (type.value == MessageComponentType.text_select_menu.value) and (options is not None):
             self.data["options"] = [option.to_dict() for option in options]
         if (type == MessageComponentType.channel_select_menu) and (channel_types is not None):
             self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
@@ -315,7 +315,7 @@ def select_menu(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     channel_types: Optional[List[ChannelType]] = None,
-    type: MessageComponentType = MessageComponentType.text_select_menu,
+    type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select_menu,
     disabled: Optional[bool] = False
 ):
     """

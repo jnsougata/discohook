@@ -69,9 +69,16 @@ async def handler(request: Request):
             if not component:
                 return JSONResponse({"error": "component not found"}, status_code=404)
             if interaction.data["component_type"] == MessageComponentType.button.value:
-                await component._callback(interaction)
-            if interaction.data["component_type"] == MessageComponentType.select_menu.value:
-                await component._callback(interaction, build_select_menu_values(interaction))
+                await component.callback(interaction)
+            menu_types = [
+                MessageComponentType.text_select_menu.value,
+                MessageComponentType.user_select_menu.value,
+                MessageComponentType.role_select_menu.value,
+                MessageComponentType.mentionable_select_menu.value,
+                MessageComponentType.channel_select_menu.value,
+            ]
+            if interaction.data["component_type"] in menu_types:
+                await component.callback(interaction, build_select_menu_values(interaction))
 
         elif data["type"] == InteractionType.modal_submit.value:
             interaction = Interaction(data, request)

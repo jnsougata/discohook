@@ -160,6 +160,18 @@ class MessageComponentType(Enum):
     channel_select_menu = 8
 
 
+class SelectMenuType(Enum):
+    """
+    The type of select menu.
+
+    """
+    text = 3
+    user = 5
+    role = 6
+    mentionable = 7
+    channel = 8
+
+
 class ButtonStyle(Enum):
     """
     Represents the style of a button.

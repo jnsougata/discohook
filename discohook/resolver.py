@@ -7,7 +7,7 @@ from .message import Message
 from .attachment import Attachment
 from .interaction import Interaction, CommandData
 from typing import List, Dict, Any, Callable, Tuple
-from .enums import ApplicationCommandOptionType, SelectMenuType, ApplicationCommandType
+from .enums import ApplicationCommandOptionType, ApplicationCommandType, MessageComponentType
 
 
 def handle_params_by_signature(
@@ -130,18 +130,21 @@ def build_modal_params(func: Callable, interaction: Interaction):
 
 
 def build_select_menu_values(interaction: Interaction) -> List[Any]:
-    if interaction.data["component_type"] == SelectMenuType.text.value:
+    if interaction.data["component_type"] == MessageComponentType.text_select_menu.value:
         return interaction.data["values"]
-    if interaction.data["component_type"] == SelectMenuType.channel.value:
+    if interaction.data["component_type"] == MessageComponentType.channel_select_menu.value:
         resolved = interaction.data["resolved"]["channels"]
         return [Channel(resolved.pop(channel_id), interaction.client) for channel_id in interaction.data["values"]]
-    if interaction.data["component_type"] == SelectMenuType.user.value:
+    if interaction.data["component_type"] == MessageComponentType.user_select_menu.value:
         resolved = interaction.data["resolved"]["users"]
         return [User(resolved.pop(user_id), interaction.client) for user_id in interaction.data["values"]]
-    if interaction.data["component_type"] == SelectMenuType.role.value:
+    if interaction.data["component_type"] == MessageComponentType.role_select_menu.value:
         resolved = interaction.data["resolved"]["roles"]
-        return [Role(resolved.pop(role_id), interaction.client) for role_id in interaction.data["values"]]
-    if interaction.data["component_type"] == SelectMenuType.mentionable.value:
+        roles = [resolved.pop(role_id) for role_id in interaction.data["values"]]
+        for role in roles:
+            role["guild_id"] = interaction.guild_id
+        return [Role(role, interaction.client) for role in roles]
+    if interaction.data["component_type"] == MessageComponentType.mentionable_select_menu.value:
         raw_values = interaction.data["values"]
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})
