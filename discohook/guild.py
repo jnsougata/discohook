@@ -1,14 +1,215 @@
 from .channel import Channel
-from typing import Dict, Any, TYPE_CHECKING, List
+from .enums import ChannelType
+from .emoji import PartialEmoji
+from .role import Role
+from .permissions import Permissions
+from typing import Dict, Any, TYPE_CHECKING, List, Optional
 
 if TYPE_CHECKING:
     from .client import Client
 
 
-class Guild:
+class PartialGuild:
+    """
+    Represents a partial guild.
+    """
 
-    def __init__(self, data: Dict[str, Any], client: "Client") -> None:
-        self.id = data["id"]
+    def __init__(self, guild_id: str, client: "Client"):
+        self.id = guild_id
+        self.client = client
+
+    async def fetch_channels(self) -> List[Channel]:
+        """
+        Fetches all channels in the guild.
+
+        Returns
+        -------
+        List[Channel]
+        """
+        resp = await self.client.http.fetch_guild_channels(self.id)
+        data = await resp.json()
+        return [Channel(c, self.client) for c in data]
+
+    async def fetch_roles(self) -> List[Role]:
+        """
+        Fetches all roles in the guild.
+
+        Returns
+        -------
+        List[Role]
+        """
+        resp = await self.client.http.fetch_guild_roles(self.id)
+        data = await resp.json()
+        return [Role(r, self.client) for r in data]
+
+    async def create_channel(
+        self,
+        name: str,
+        *,
+        type: ChannelType = ChannelType.guild_text,
+        topic: str = None,
+        bitrate: int = None,
+        user_limit: int = None,
+        rate_limit_per_user: int = None,
+        position: int = None,
+        permission_overwrites: List[Dict[str, Any]] = None,
+        parent_id: str = None,
+        nsfw: bool = None,
+        rtc_region: str = None,
+        video_quality_mode: int = None,
+        default_auto_archive_duration: int = None,
+        default_reaction_emoji: PartialEmoji = None,
+        available_tags: List[Dict[str, Any]] = None,
+        default_sort_order: int = None,
+    ) -> Channel:
+        """
+        Creates a channel in the guild. Requires the MANAGE_CHANNELS permission.
+
+        Parameters
+        ----------
+        name: str
+            Name of the channel (2-100 characters)
+        type: ChannelType
+            The type of channel
+        topic: str
+            Channel topic (0-1024 characters)
+        bitrate: int
+            The bitrate (in bits) of the voice channel (voice only)
+        user_limit: int
+            The user limit of the voice channel (voice only)
+        rate_limit_per_user: int
+            Amount of seconds a user has to wait before sending another message (0-21600)
+            bots, as well as users with the permission manage_messages or manage_channel, are unaffected
+        position: int
+            Sorting position of the channel
+        permission_overwrites: List[Dict[str, Any]]
+            The channel's permission overwrites
+        parent_id: str
+            The id of the parent category for a channel (each parent category can contain up to 50 channels)
+        nsfw: bool
+            Whether the channel is nsfw
+        rtc_region: str
+            The id of the voice region
+        video_quality_mode: int
+            The camera video quality mode of the voice channel, 1 when not present
+        default_auto_archive_duration: int
+            The default duration for newly created threads, in minutes, to automatically archive the thread
+            after recent activity, can be set to: 60, 1440, 4320, 10080
+        default_reaction_emoji: PartialEmoji
+            The default auto-emoji for newly created threads, custom guild emojis must be enabled
+        available_tags: List[Dict[str, Any]]
+            The channel tags used for public guilds
+        default_sort_order: int
+            The default sorting order for posts in a forum channel
+
+        Returns
+        -------
+        Channel
+        """
+        payload = {"name": name, "type": type.value}
+        if topic:
+            payload["topic"] = topic
+        if bitrate:
+            payload["bitrate"] = bitrate
+        if user_limit:
+            payload["user_limit"] = user_limit
+        if rate_limit_per_user:
+            payload["rate_limit_per_user"] = rate_limit_per_user
+        if position:
+            payload["position"] = position
+        if permission_overwrites:
+            payload["permission_overwrites"] = permission_overwrites
+        if parent_id:
+            payload["parent_id"] = parent_id
+        if nsfw:
+            payload["nsfw"] = nsfw
+        if rtc_region:
+            payload["rtc_region"] = rtc_region
+        if video_quality_mode:
+            payload["video_quality_mode"] = video_quality_mode
+        if default_auto_archive_duration:
+            payload["default_auto_archive_duration"] = default_auto_archive_duration
+        if default_reaction_emoji:
+            payload["default_reaction_emoji"] = default_reaction_emoji
+        if available_tags:
+            payload["available_tags"] = available_tags
+        if default_sort_order:
+            payload["default_sort_order"] = default_sort_order
+        resp = await self.client.http.create_guild_channel(self.id, payload)
+        data = await resp.json()
+        return Channel(data, self.client)
+
+    async def edit_channel_position(
+        self,
+        channel_id: str,
+        *,
+        position: int,
+        lock_permissions: bool = False,
+        parent_id: Optional[str] = None,
+    ):
+        """
+        Changes the position of the channel. Only available for guild channels.
+        Parameters
+        ----------
+        channel_id: :class:`str`
+            The id of the channel to move.
+        position: :class:`int`
+            The new position of the channel.
+        lock_permissions:
+            Whether to sync the permissions of the channel with the parent category.
+        parent_id: Optional[:class:`str`]
+            The id of the parent category to move the channel to.
+            If not provided, the channel will be moved to the root.
+        """
+        payload = {"id": channel_id, "position": position, "lock_permissions": lock_permissions}
+        if parent_id:
+            payload["parent_id"] = parent_id
+        await self.client.http.edit_guild_channel_position(self.id, payload)
+
+    async def create_role(
+            self,
+            name: str,
+            *,
+            permissions: Optional[List[Permissions]] = None,
+            color: int = 0,
+            hoist: bool = False,
+            mentionable: bool = False,
+            icon_data_uri: str = None,
+            unicode_emoji: str = None,
+
+    ):
+        payload = {"name": name}
+        base_permissions = 0
+        if permissions:
+            for permission in permissions:
+                base_permissions |= permission.value
+        payload["permissions"] = base_permissions
+        if color:
+            payload["color"] = color
+        if hoist:
+            payload["hoist"] = hoist
+        if mentionable:
+            payload["mentionable"] = mentionable
+        if icon_data_uri:
+            payload["icon"] = icon_data_uri
+        if unicode_emoji:
+            payload["unicode_emoji"] = unicode_emoji
+        resp = await self.client.http.create_guild_role(self.id, payload)
+        data = await resp.json()
+        return Role(data, self.client)
+
+
+class Guild(PartialGuild):
+    """
+    Represents a Discord guild. Subclass of :class:`PartialGuild`.
+
+    Attributes
+    ----------
+    ...
+    """
+
+    def __init__(self, data: Dict[str, Any], client: "Client"):
+        super().__init__(data["id"], client)
         self.name = data["name"]
         self.icon = data.get("icon")
         self.icon_hash = data.get("icon_hash")
@@ -49,16 +250,3 @@ class Guild:
         self.stickers = data.get("stickers")
         self.premium_progress_bar_enabled = data["premium_progress_bar_enabled"]
         self.client = client
-
-    async def fetch_channels(self) -> List[Channel]:
-        """
-        Fetches all channels in the guild.
-
-        Returns
-        -------
-        List[Channel]
-        """
-        resp = await self.client.http.fetch_guild_channels(self.id)
-        data = await resp.json()
-        return [Channel(c, self.client) for c in data]
-

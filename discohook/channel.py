@@ -2,9 +2,11 @@ from .file import File
 from .view import View
 from .embed import Embed
 from .message import Message
+from .emoji import PartialEmoji
+from .enums import ChannelType
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List, TYPE_CHECKING, Dict, Any
 
 if TYPE_CHECKING:
     from .client import Client
@@ -17,13 +19,28 @@ class PartialChannel:
     Parameters
     ----------
     data: :class:`dict`
-        The data of the channel.
+        The partial channel data which must contain the id.
     client: :class:`Client`
         The client that the channel belongs to.
     """
-    def __init__(self, data: dict, client: "Client"):
+    def __init__(self, data, client: "Client"):
         self.client = client
-        self.id: str = data.get("id")
+        self.id: str = data["id"]
+        self.guild_id: Optional[str] = data.get("guild_id")
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    @property
+    def mention(self) -> str:
+        """
+        Returns the channel-mentionable string.
+
+        Returns
+        -------
+        :class:`str`
+        """
+        return f"<#{self.id}>"
 
     async def send(
         self,
@@ -71,6 +88,127 @@ class PartialChannel:
         resp = await self.client.http.send_message(self.id, create_form(payload, merge_fields(file, files)))
         data = await resp.json()
         return Message(data, self.client)
+
+    async def edit(
+        self,
+        *,
+        name: Optional[str] = None,
+        type: Optional[ChannelType] = None,
+        position: Optional[int] = None,
+        topic: Optional[str] = None,
+        nsfw: Optional[bool] = None,
+        rate_limit_per_user: Optional[int] = None,
+        bitrate: Optional[int] = None,
+        user_limit: Optional[int] = None,
+        permission_overwrites: Optional[List[Dict[str, Any]]] = None,
+        parent_id: Optional[str] = None,
+        rtc_region: Optional[str] = None,
+        video_quality_mode: Optional[int] = None,
+        default_auto_archive_duration: Optional[int] = None,
+        flags: Optional[int] = None,
+        available_tags: Optional[List[Dict[str, Any]]] = None,
+        icon: Optional[str] = None,
+        default_reaction_emoji: Optional[PartialEmoji] = None,
+        default_thread_rate_limit_per_user: Optional[int] = None,
+        default_sort_order: Optional[int] = None,
+        default_forum_layout: Optional[int] = None,
+    ):
+        """
+        Edits all kinds of channels.
+
+        Parameters
+        ----------
+        name: Optional[:class:`str`]
+            The new name of the channel.
+        type: Optional[:class:`ChannelType`]
+            The new type of the channel.
+        position: Optional[:class:`int`]
+            The new position of the channel.
+        topic: Optional[:class:`str`]
+            The new topic of the channel.
+        nsfw: Optional[:class:`bool`]
+            Whether the channel should be marked as nsfw.
+        rate_limit_per_user: Optional[:class:`int`]
+            The duration of the slowmode in seconds. Must be between 0 and 21600. Applies to text and forum channels.
+        bitrate: Optional[:class:`int`]
+            The new bitrate of the channel. Must be between 8000 and 96000. Applies to voice channels.
+        user_limit: Optional[:class:`int`]
+            The new user limit of the channel. Must be between 0 and 99. Applies to voice channels.
+        permission_overwrites: Optional[List[:class:`dict`]]
+            A list of permission overwrites to apply to the channel. Applies to all channel types.
+        parent_id: Optional[:class:`str`]
+            The id of the parent category to move the channel to. Applies to all channel types.
+        rtc_region: Optional[:class:`str`]
+            The new region of the channel. Applies to voice channels.
+        video_quality_mode: Optional[:class:`int`]
+            The new video quality mode of the channel. Applies to voice channels.
+        default_auto_archive_duration: Optional[:class:`int`]
+            The new default auto archive duration of the channel. Applies to text and forum channels.
+        flags: Optional[:class:`int`]
+            The new flags of the channel. Applies to all channel types.
+        available_tags: Optional[List[:class:`dict`]]
+            The new available tags of the channel. Applies to text and forum channels.
+        icon: Optional[:class:`str`]
+            The new icon of the channel. Applies to Group DMs. Must be a base64 encoded string.
+        default_reaction_emoji: Optional[:class:`PartialEmoji`]
+            The new default reaction emoji of the channel. Applies to text and forum channels.
+        default_thread_rate_limit_per_user: Optional[:class:`int`]
+            The new default thread rate limit per user of the channel. Applies to text and forum channels.
+        default_sort_order: Optional[:class:`int`]
+            The new default sort order of the channel. Applies to text and forum channels.
+        default_forum_layout: Optional[:class:`int`]
+            The new default forum layout of the channel. Applies to text and forum channels.
+        Returns
+        -------
+        :class:`Channel`
+        """
+        payload = {}
+        if name:
+            payload["name"] = name
+        if type:
+            payload["type"] = type
+        if position:
+            payload["position"] = position
+        if topic:
+            payload["topic"] = topic
+        if nsfw:
+            payload["nsfw"] = nsfw
+        if rate_limit_per_user:
+            payload["rate_limit_per_user"] = rate_limit_per_user
+        if bitrate:
+            payload["bitrate"] = bitrate
+        if user_limit:
+            payload["user_limit"] = user_limit
+        if permission_overwrites:
+            payload["permission_overwrites"] = permission_overwrites
+        if parent_id:
+            payload["parent_id"] = parent_id
+        if rtc_region:
+            payload["rtc_region"] = rtc_region
+        if video_quality_mode:
+            payload["video_quality_mode"] = video_quality_mode
+        if default_auto_archive_duration:
+            payload["default_auto_archive_duration"] = default_auto_archive_duration
+        if flags:
+            payload["flags"] = flags
+        if available_tags:
+            payload["available_tags"] = available_tags
+        if icon:
+            payload["icon"] = icon
+        if default_reaction_emoji:
+            payload["default_reaction_emoji"] = default_reaction_emoji.to_dict()
+        if default_thread_rate_limit_per_user:
+            payload["default_thread_rate_limit_per_user"] = default_thread_rate_limit_per_user
+        if default_sort_order:
+            payload["default_sort_order"] = default_sort_order
+        if default_forum_layout:
+            payload["default_forum_layout"] = default_forum_layout
+        resp = await self.client.http.edit_channel(self.id, payload)
+        data = await resp.json()
+        return Channel(data, self.client)
+
+    async def delete(self):
+        await self.client.http.delete_channel(self.id)
 
 
 class Channel(PartialChannel):
@@ -183,17 +321,3 @@ class Channel(PartialChannel):
         self.default_thread_rate_limit_per_user = data.get("default_thread_rate_limit_per_user")
         self.default_sort_order = data.get("default_sort_order")
         self.default_forum_layout = data.get("default_forum_layout")
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    @property
-    def mention(self) -> str:
-        """
-        Returns the channel-mentionable string.
-
-        Returns
-        -------
-        :class:`str`
-        """
-        return f"<#{self.id}>"

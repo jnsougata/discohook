@@ -1,4 +1,3 @@
-from .guild import Guild
 from .embed import Embed
 from .file import File
 from .user import User
@@ -9,6 +8,7 @@ from .option import Choice
 from .channel import PartialChannel
 from fastapi.requests import Request
 from .multipart import create_form
+from .guild import Guild, PartialGuild
 from .enums import InteractionType, InteractionCallbackType
 from .message import Message, ResponseMessage, FollowupMessage
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
@@ -116,6 +116,12 @@ class Interaction:
             return Member(member, self.client)
         else:
             return User(user, self.client)
+
+    @property
+    def partial_guild(self) -> Optional[PartialGuild]:
+        if not self.guild_id:
+            return
+        return PartialGuild(self.guild_id, self.client)
     
     async def fetch_guild(self) -> Optional[Guild]:
         """

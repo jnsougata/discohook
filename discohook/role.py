@@ -1,8 +1,108 @@
-from typing import Optional
 from .permissions import Permissions
+from typing import Optional, TYPE_CHECKING, Dict, Any, List
+
+if TYPE_CHECKING:
+    from .client import Client
 
 
-class Role:
+class PartialRole:
+    def __init__(self, data: Dict[str, Any], client: "Client"):
+        self.id = data["id"]
+        self.guild_id = data["guild_id"]
+        self.client = client
+
+    @property
+    def mention(self) -> str:
+        """
+        Returns a string that allows you to mention the role.
+
+        Returns
+        -------
+        :class:`str`
+        """
+        return f"<@&{self.id}>"
+
+    async def edit(
+        self,
+        *,
+        name: Optional[str] = None,
+        permissions: Optional[List[Permissions]] = None,
+        color: Optional[int] = None,
+        hoist: Optional[bool] = None,
+        mentionable: Optional[bool] = None,
+        description: Optional[str] = None,
+        unicode_emoji: Optional[str] = None,
+        icon_data_uri: Optional[str] = None,
+    ):
+        """
+        Edits the role.
+        Parameters
+        ----------
+        name: Optional[:class:`str`]
+            The name of the role.
+        permissions: Optional[:class:`Permissions`]
+            The permissions of the role.
+        color: Optional[:class:`int`]
+            The color of the role.
+        hoist: Optional[:class:`bool`]
+            Whether the role has separability in the member list.
+        mentionable: Optional[:class:`bool`]
+            Whether the role is mentionable.
+        description: Optional[:class:`str`]
+            The description of the role.
+        unicode_emoji: Optional[:class:`str`]
+            The unicode emoji of the role.
+        icon_data_uri: Optional[:class:`str`]
+            The icon of the role. Must be a data URI (base64 encoded).
+
+        Returns
+        -------
+        :class:`Role`
+        """
+        payload = {}
+        if name:
+            payload["name"] = name
+        if permissions:
+            base = 0
+            for permission in permissions:
+                base |= permission.value
+            payload["permissions"] = str(base)
+        if color:
+            payload["color"] = color
+        if hoist:
+            payload["hoist"] = hoist
+        if mentionable:
+            payload["mentionable"] = mentionable
+        if description:
+            payload["description"] = description
+        if unicode_emoji:
+            payload["unicode_emoji"] = unicode_emoji
+        if icon_data_uri:
+            payload["icon"] = icon_data_uri
+        resp = await self.client.http.edit_guild_role(self.guild_id, self.id, payload)
+        data = await resp.json()
+        return Role(data, self.client)
+
+    async def edit_position(
+        self,
+        role_id: str,
+        *,
+        position: int
+    ):
+        """
+        Changes the position of the role.
+        Parameters
+        ----------
+        role_id: :class:`str`
+            The id of the role to move.
+        position: :class:`int`
+            The new position of the role.
+        """
+        payload = {"id": role_id, "position": position}
+        await self.client.http.edit_guild_role_position(self.guild_id, payload)
+
+
+class Role(PartialRole):
     """
     Represents a discord Role.
 
@@ -33,7 +133,8 @@ class Role:
     flags: :class:`int`
         The flags of the role.
     """
-    def __init__(self, data: dict):
+    def __init__(self, data: dict, client: "Client"):
+        super().__init__(data, client)
         self.id: str = data.get("id")
         self.name: str = data.get("name")
         self.color: int = data.get("color")
@@ -49,17 +150,6 @@ class Role:
 
     def __eq__(self, other):
         return self.id == other.id
-
-    @property
-    def mention(self) -> str:
-        """
-        Returns a string that allows you to mention the role.
-
-        Returns
-        -------
-        :class:`str`
-        """
-        return f"<@&{self.id}>"
 
     def has_permission(self, permissions: Permissions) -> bool:
         """

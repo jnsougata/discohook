@@ -52,6 +52,9 @@ class HTTPClient:
 
     async def create_dm_channel(self, payload: Dict[str, Any]):
         return await self.request("POST", f"/users/@me/channels", json=payload, use_auth=True)
+
+    async def delete_channel(self, channel_id: str):
+        return await self.request("DELETE", f"/channels/{channel_id}", use_auth=True)
     
     async def delete_message(self, channel_id: str, message_id: str):
         await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
@@ -88,9 +91,6 @@ class HTTPClient:
             json={"delete_message_seconds": delete_message_seconds}
         )
 
-    async def fetch_guild(self, guild_id: str):
-        return await self.request("GET", f"/guilds/{guild_id}?with_counts=true", use_auth=True)
-
     async def send_interaction_callback(self, interaction_id: str, interaction_token: str, data: dict):
         return await self.request("POST", f"/interactions/{interaction_id}/{interaction_token}/callback", json=data)
 
@@ -104,5 +104,29 @@ class HTTPClient:
     ):
         return await self.multipart("PATCH", f"/interactions/{interaction_id}/{interaction_token}/callback", form=form)
 
+    async def fetch_guild(self, guild_id: str):
+        return await self.request("GET", f"/guilds/{guild_id}?with_counts=true", use_auth=True)
+
     async def fetch_guild_channels(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}/channels", use_auth=True)
+
+    async def fetch_guild_roles(self, guild_id: str):
+        return await self.request("GET", f"/guilds/{guild_id}/roles", use_auth=True)
+
+    async def create_guild_channel(self, guild_id: str, payload: Dict[str, Any]):
+        return await self.request("POST", f"/guilds/{guild_id}/channels", json=payload, use_auth=True)
+
+    async def edit_channel(self, channel_id: str, payload: Dict[str, Any]):
+        return await self.request("PATCH", f"/channels/{channel_id}", json=payload, use_auth=True)
+
+    async def edit_guild_channel_position(self, guild_id: str, payload: Dict[str, Any]):
+        return await self.request("PATCH", f"/guilds/{guild_id}/channels", json=payload, use_auth=True)
+
+    async def create_guild_role(self, guild_id: str):
+        return await self.request("POST", f"/guilds/{guild_id}/roles", use_auth=True)
+
+    async def edit_guild_role_position(self, guild_id: str, payload: Dict[str, Any]):
+        return await self.request("PATCH", f"/guilds/{guild_id}/roles", json=payload, use_auth=True)
+
+    async def edit_guild_role(self, guild_id: str, role_id: str, payload: Dict[str, Any]):
+        return await self.request("PATCH", f"/guilds/{guild_id}/roles/{role_id}", json=payload, use_auth=True)

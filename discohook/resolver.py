@@ -70,7 +70,7 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
         elif option_type == ApplicationCommandOptionType.channel.value:
             options[name] = Channel(interaction.data["resolved"]["channels"][value], interaction.client)
         elif option_type == ApplicationCommandOptionType.role.value:
-            options[name] = Role(interaction.data["resolved"]["roles"][value])
+            options[name] = Role(interaction.data["resolved"]["roles"][value], interaction.client)
         elif option_type == ApplicationCommandOptionType.mentionable.value:
             # TODO: this is a shit option type, not enough motivation to implement it
             pass
@@ -143,7 +143,7 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         return [User(resolved.pop(user_id), interaction.client) for user_id in interaction.data["values"]]
     if interaction.data["component_type"] == SelectMenuType.role.value:
         resolved = interaction.data["resolved"]["roles"]
-        return [Role(resolved.pop(role_id)) for role_id in interaction.data["values"]]
+        return [Role(resolved.pop(role_id), interaction.client) for role_id in interaction.data["values"]]
     if interaction.data["component_type"] == SelectMenuType.mentionable.value:
         raw_values = interaction.data["values"]
         resolved_roles = interaction.data["resolved"].get("roles", {})
@@ -154,7 +154,7 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
             if user_id in resolved_users
         ]
         roles = [
-            Role(resolved_roles.pop(role_id))
+            Role(resolved_roles.pop(role_id), interaction.client)
             for role_id in raw_values
             if role_id in resolved_roles
         ]
