@@ -163,16 +163,11 @@ class SelectMenu:
     ):
         self._callback: Optional[Callable] = None
         self.custom_id = secrets.token_urlsafe(16)
-        self.data = {
-            "type": type.value,
-            "custom_id": self.custom_id,
-        }
+        self.data = {"type": type.value, "custom_id": self.custom_id}
         if (type == SelectMenuType.text) and (options is not None):
             self.data["options"] = [option.to_dict() for option in options]
         if (type == SelectMenuType.channel) and (channel_types is not None):
-            self.data["channel_types"] = [
-                channel_type.value for channel_type in channel_types
-            ]
+            self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
         if placeholder:
             self.data["placeholder"] = placeholder
         if min_values:
@@ -224,7 +219,7 @@ class View:
         self.components: List[Dict[str, Any]] = []
         self.children: List[Union[Button, SelectMenu]] = []
 
-    def add_button_row(self, *buttons: Button):
+    def add_button_row(self, *buttons: Union[Button, Any]):
         """
         Adds a row of buttons to the view.
 
@@ -238,12 +233,12 @@ class View:
         self.components.append(
             {
                 "type": MessageComponentType.action_row.value,
-                "components": [button.to_dict() for button in buttons[:5]],
+                "components": [btn.to_dict() for btn in buttons[:5]],
             }
         )
         self.children.extend(buttons[:5])
 
-    def add_select_menu(self, select_menu: SelectMenu):
+    def add_select_menu(self, menu: Union[SelectMenu, Any]):
         """
         Adds a select menu to the view.
 
@@ -252,7 +247,92 @@ class View:
         self.components.append(
             {
                 "type": MessageComponentType.action_row.value,
-                "components": [select_menu.to_dict()],
+                "components": [menu.to_dict()],
             }
         )
-        self.children.append(select_menu)
+        self.children.append(menu)
+
+
+def button(
+    label: str,
+    *,
+    url: Optional[str] = None,
+    style: ButtonStyle = ButtonStyle.blurple,
+    disabled: Optional[bool] = False,
+    emoji: Optional[PartialEmoji] = None
+):
+    """
+    A decorator that creates a button and registers a callback to be called when the button is clicked.
+
+    Parameters
+    ----------
+    label: :class:`str`
+        The label of the button.
+    url: Optional[:class:`str`]
+        The url of the button. This is only used if the style is set to :attr:`ButtonStyle.link`.
+    style: :class:`ButtonStyle`
+        The style of the button.
+    disabled: Optional[:class:`bool`]
+        Whether the button is disabled or not.
+    emoji: Optional[:class:`PartialEmoji`]
+        The emoji of the button.
+
+    Returns
+    -------
+    :class:`Button`
+    """
+
+    def decorator(func: Callable):
+        btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji)
+        btn.onclick(func)
+        return btn
+    return decorator
+
+
+def select_menu(
+    options: Optional[List[SelectOption]] = None,
+    *,
+    placeholder: Optional[str] = None,
+    min_values: Optional[int] = None,
+    max_values: Optional[int] = None,
+    channel_types: Optional[List[ChannelType]] = None,
+    type: SelectMenuType = SelectMenuType.text,
+    disabled: Optional[bool] = False
+):
+    """
+    A decorator that creates a select menu and registers a callback to be called when the select menu is selected.
+
+    Parameters
+    ----------
+    options: Optional[List[:class:`SelectOption`]]
+        The options to be displayed on the select menu.
+    placeholder: Optional[:class:`str`]
+        The placeholder to be displayed on the select menu.
+    min_values: Optional[:class:`int`]
+        The minimum number of options that can be selected.
+    max_values: Optional[:class:`int`]
+        The maximum number of options that can be selected.
+    channel_types: Optional[List[:class:`ChannelType`]]
+        The channel types to be displayed on the select menu. Used only for channel select menus.
+    disabled: Optional[:class:`bool`]
+        Whether the select menu is disabled or not.
+    type: :class:`SelectMenuType`
+        The type of the select menu.
+
+    Returns
+    -------
+    :class:`SelectMenu`
+    """
+    def decorator(func: Callable):
+        menu = SelectMenu(
+            options=options,
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            channel_types=channel_types,
+            type=type,
+            disabled=disabled
+        )
+        menu.onselection(func)
+        return menu
+    return decorator

@@ -60,7 +60,7 @@ class Message:
         self.tts = payload["tts"]
         self.mention_everyone = payload["mention_everyone"]
         self.mentions = [User(x, self.client) for x in payload["mentions"]]
-        self.mention_roles = [Role(x) for x in payload["mention_roles"]]
+        self.mention_roles = [Role(x, self.client) for x in payload["mention_roles"]]
         self.mention_channels = payload.get("mention_channels")
         self.attachments = payload["attachments"]
         self.embeds = payload["embeds"]
@@ -133,8 +133,7 @@ class Message:
             suppress_embeds=suppress_embeds,
         )
         if view:
-            for component in view.children:
-                self.client.load_component(component)
+            self.client.load_components(view)
         resp = await self.client.http.edit_channel_message(
             self.channel_id, 
             self.id, 
@@ -192,8 +191,7 @@ class FollowupMessage(Message):
             suppress_embeds=suppress_embeds,
         )
         if view is not MISSING and view:
-            for component in view.children:
-                self.interaction.client.load_component(component)
+            self.interaction.client.load_components(view)
         self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = await self.client.http.edit_webhook_message(
             self.interaction.application_id,
@@ -253,8 +251,7 @@ class ResponseMessage(Message):
             suppress_embeds=suppress_embeds,
         )
         if view is not MISSING and view:
-            for component in view.children:
-                self.client.load_component(component)
+            self.client.load_components(view)
         self.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = self.client.http.edit_webhook_message(
             self.interaction.application_id,

@@ -3,6 +3,7 @@ from .user import User
 from .role import Role
 from .member import Member
 from .channel import Channel
+from .message import Message
 from .attachment import Attachment
 from .interaction import Interaction, CommandData
 from typing import List, Dict, Any, Callable, Tuple
@@ -115,9 +116,8 @@ def build_context_menu_param(interaction: Interaction):
 
     if interaction.data["type"] == ApplicationCommandType.message.value:
         message_id = interaction.data["target_id"]
-        message_dict = interaction.data["resolved"]["messages"][message_id]
-        # TODO: objectify
-        return message_dict
+        message_data = interaction.data["resolved"]["messages"][message_id]
+        return Message(message_data, interaction.client)
 
 
 def build_modal_params(func: Callable, interaction: Interaction):
@@ -134,10 +134,7 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         return interaction.data["values"]
     if interaction.data["component_type"] == SelectMenuType.channel.value:
         resolved = interaction.data["resolved"]["channels"]
-        return [
-            Channel(resolved.pop(channel_id), interaction.client)
-            for channel_id in interaction.data["values"]
-        ]
+        return [Channel(resolved.pop(channel_id), interaction.client) for channel_id in interaction.data["values"]]
     if interaction.data["component_type"] == SelectMenuType.user.value:
         resolved = interaction.data["resolved"]["users"]
         return [User(resolved.pop(user_id), interaction.client) for user_id in interaction.data["values"]]
@@ -149,14 +146,10 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})
         users = [
-            User(resolved_users.pop(user_id), interaction.client)
-            for user_id in raw_values
-            if user_id in resolved_users
+            User(resolved_users.pop(user_id), interaction.client) for user_id in raw_values if user_id in resolved_users
         ]
         roles = [
-            Role(resolved_roles.pop(role_id), interaction.client)
-            for role_id in raw_values
-            if role_id in resolved_roles
+            Role(resolved_roles.pop(role_id), interaction.client) for role_id in raw_values if role_id in resolved_roles
         ]
         return users + roles  # type: ignore
     return []

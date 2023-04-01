@@ -74,8 +74,8 @@ class PartialChannel:
             A list of files to send with the message.
         """
         if view:
-            for component in view.children:
-                self.client.load_component(component)
+            self.client.load_components(view)
+
         payload = handle_send_params(
             content=content,
             embed=embed,
@@ -85,6 +85,7 @@ class PartialChannel:
             file=file,
             files=files,
         )
+
         resp = await self.client.http.send_message(self.id, create_form(payload, merge_fields(file, files)))
         data = await resp.json()
         return Message(data, self.client)

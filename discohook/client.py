@@ -10,7 +10,7 @@ from .enums import ApplicationCommandType
 from .user import ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand
-from .view import Button, SelectMenu
+from .view import View, SelectMenu, Button
 from fastapi.requests import Request
 from .dash import dashboard
 from .params import handle_send_params, merge_fields
@@ -76,21 +76,22 @@ class Client(FastAPI):
         self.add_route(route, handler, methods=["POST"], include_in_schema=False)
         self.add_api_route("/api/sync/{token}", sync, methods=["GET"], include_in_schema=False)
         self.add_api_route("/api/dash/{token}", dashboard, methods=["GET"], include_in_schema=False)
-        self.add_api_route("/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False)
+        self.add_api_route(
+            "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False)
         self._global_error_handler: Optional[Callable] = None
 
-    def load_component(self, component: Union[Button, Modal, SelectMenu]):
+    def load_components(self, view: View):
         """
-        Load a component into the client.
-
+        Loads multiple components into the client.
         Do not use this method unless you know what you are doing.
 
         Parameters
         ----------
-        component: Union[Button, Modal, SelectMenu]
-            The component to load into the client.
+        view: View
+            The view to load components from.
         """
-        self.active_components[component.custom_id] = component
+        for component in view.children:
+            self.active_components[component.custom_id] = component
 
     def store_inter_token(self, interaction_id: str, token: str):
         self.cached_inter_tokens[interaction_id] = token

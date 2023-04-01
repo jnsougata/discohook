@@ -236,9 +236,9 @@ class Interaction:
             suppress_embeds=suppress_embeds,
         )
         if view:
-            for component in view.children:
-                self.client.load_component(component)
-        self.client.store_inter_token(self.id, self.token)
+            self.client.store_inter_token(self.id, self.token)
+            self.client.load_components(view)
+
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
@@ -300,8 +300,7 @@ class Interaction:
         )
         if view:
             self.client.store_inter_token(self.id, self.token)
-            for component in view.children:
-                self.client.load_component(component)
+            self.client.load_components(view)
         resp = await self.client.http.send_webhook_message(
             self.application_id, self.token, create_form(payload, merge_fields(file, files))
         )
@@ -413,8 +412,8 @@ class ComponentInteraction(Interaction):
         )
         if view:
             self.client.store_inter_token(self.id, self.token)
-            for component in view.children:
-                self.client.load_component(component)
+            self.client.load_components(view)
+
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
@@ -470,9 +469,9 @@ class ComponentInteraction(Interaction):
             suppress_embeds=suppress_embeds,
         )
         if view is not MISSING and view:
-            for component in view.children:
-                self.client.load_component(component)
-        self.client.store_inter_token(self.id, self.token)
+            self.client.store_inter_token(self.id, self.token)
+            self.client.load_components(view)
+
         payload = {
             "data": data,
             "type": InteractionCallbackType.update_message.value,
@@ -586,9 +585,8 @@ class CommandInteraction(Interaction):
             suppress_embeds=suppress_embeds,
         )
         if view:
-            for component in view.children:
-                self.client.load_component(component)
-        self.client.store_inter_token(self.id, self.token)
+            self.client.store_inter_token(self.id, self.token)
+            self.client.load_components(view)
         payload = {
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,

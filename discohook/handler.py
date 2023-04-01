@@ -24,7 +24,7 @@ async def handler(request: Request):
     """
     Handles all interactions from discord
 
-    Note: This is not a public API and should not be used outside of the library
+    Note: This is not a public API and should not be used outside the library
     """
     signature = request.headers.get("X-Signature-Ed25519")
     timestamp = request.headers.get("X-Signature-Timestamp")
@@ -50,10 +50,7 @@ async def handler(request: Request):
 
             elif not (interaction.data["type"] == ApplicationCommandType.slash.value):
                 target_object = build_context_menu_param(interaction)
-                if command.cog:
-                    await command._callback(command.cog, interaction, target_object)
-                else:
-                    await command._callback(interaction, target_object)
+                await command._callback(interaction, target_object)
 
             elif interaction.data.get("options") and (
                 interaction.data["options"][0].get("type") == ApplicationCommandOptionType.subcommand.value
