@@ -1,10 +1,25 @@
 import secrets
 from .emoji import PartialEmoji
 from typing import Optional, List, Dict, Any, Callable, Union
-from .enums import ButtonStyle, MessageComponentType, SelectMenuType, ChannelType
+from .enums import ButtonStyle, MessageComponentType, ChannelType
 
 
-class Button:
+class Component:
+    """
+    Represents a discord component.
+
+    Parameters
+    ----------
+    type: :class:`MessageComponentType`
+        The type of the component.
+    """
+    def __init__(self, type: MessageComponentType):
+        self.type = type
+        self.custom_id = secrets.token_urlsafe(16)
+        self.callback: Optional[Callable] = None
+
+
+class Button(Component):
     """
     Represents a discord button type component.
 
@@ -30,13 +45,15 @@ class Button:
         disabled: Optional[bool] = False,
         emoji: Optional[PartialEmoji] = None,
     ):
+        super().__init__(MessageComponentType.button)
         self.url = url  # type: ignore
         self.label = label
         self.emoji = emoji  # type: ignore
         self.style = style
         self.disabled = disabled  # type: ignore
-        self.custom_id = secrets.token_urlsafe(16)
-        self._callback: Optional[Callable] = None
+
+    def __call__(self, *args, **kwargs):
+        return self
 
     def onclick(self, coro: Callable):
         """
@@ -47,7 +64,7 @@ class Button:
         coro: :class:`Callable`
             The callback to be called when the button is clicked.
         """
-        self._callback = coro
+        self.callback = coro
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -61,7 +78,7 @@ class Button:
             The dictionary representation of the button.
         """
         payload = {
-            "type": MessageComponentType.button.value,
+            "type": self.type.value,
             "style": self.style.value,
             "label": self.label,
         }
@@ -129,7 +146,7 @@ class SelectOption:
         return payload
 
 
-class SelectMenu:
+class SelectMenu(Component):
     """
     Represents a discord select menu component.
 
@@ -158,15 +175,14 @@ class SelectMenu:
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         channel_types: Optional[List[ChannelType]] = None,
-        type: SelectMenuType = SelectMenuType.text,  # noqa
+        type: MessageComponentType = MessageComponentType.text_select_menu,
         disabled: Optional[bool] = False,
     ):
-        self._callback: Optional[Callable] = None
-        self.custom_id = secrets.token_urlsafe(16)
+        super().__init__(type)
         self.data = {"type": type.value, "custom_id": self.custom_id}
-        if (type == SelectMenuType.text) and (options is not None):
+        if (type == MessageComponentType.text_select_menu) and (options is not None):
             self.data["options"] = [option.to_dict() for option in options]
-        if (type == SelectMenuType.channel) and (channel_types is not None):
+        if (type == MessageComponentType.channel_select_menu) and (channel_types is not None):
             self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
         if placeholder:
             self.data["placeholder"] = placeholder
@@ -177,6 +193,9 @@ class SelectMenu:
         if disabled:
             self.data["disabled"] = disabled
 
+    def __call__(self, *args, **kwargs):
+        return self
+
     def onselection(self, coro: Callable):
         """
         Registers a callback to be called when the select menu is selected.
@@ -186,7 +205,7 @@ class SelectMenu:
         coro: :class:`Callable`
             The callback to be called when the select menu is selected.
         """
-        self._callback = coro
+        self.callback = coro
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -282,9 +301,9 @@ def button(
     :class:`Button`
     """
 
-    def decorator(func: Callable):
+    def decorator(coro: Callable):
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji)
-        btn.onclick(func)
+        btn.onclick(coro)
         return btn
     return decorator
 
@@ -296,7 +315,7 @@ def select_menu(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     channel_types: Optional[List[ChannelType]] = None,
-    type: SelectMenuType = SelectMenuType.text,
+    type: MessageComponentType = MessageComponentType.text_select_menu,
     disabled: Optional[bool] = False
 ):
     """

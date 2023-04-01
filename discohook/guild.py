@@ -1,7 +1,7 @@
+from .role import Role
 from .channel import Channel
 from .enums import ChannelType
 from .emoji import PartialEmoji
-from .role import Role
 from .permissions import Permissions
 from typing import Dict, Any, TYPE_CHECKING, List, Optional
 

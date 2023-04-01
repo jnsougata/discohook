@@ -25,7 +25,7 @@ class TextInputFieldLength(Enum):
 
 class ModalFieldType(Enum):
     """
-    The type of a field in a modal.
+    The type of field in a modal.
 
     Used internally by the library. You should not need to use this.
 
@@ -39,7 +39,7 @@ class ModalFieldType(Enum):
 
 class ApplicationCommandType(Enum):
     """
-    The type of an application command.
+    The type of application command.
 
     Attributes
     ----------
@@ -57,7 +57,7 @@ class ApplicationCommandType(Enum):
 
 class ApplicationCommandOptionType(Enum):
     """
-    The type of an application command option.
+    The type of application command option.
 
     Used internally by the library. You should not need to use this.
     """
@@ -118,7 +118,7 @@ class ChannelType(Enum):
 
 class InteractionType(Enum):
     """
-    The type of an interaction received from discord.
+    The type of interaction received from discord.
 
     Used internally by the library. You should not need to use this.
     """
@@ -131,7 +131,7 @@ class InteractionType(Enum):
 
 class InteractionCallbackType(Enum):
     """
-    The type of an interaction callback.
+    The type of interaction callback.
 
     Used internally by the library. You should not need to use this.
     """
@@ -146,14 +146,18 @@ class InteractionCallbackType(Enum):
 
 class MessageComponentType(Enum):
     """
-    The type of a message component.
+    The type of message component.
 
     Used internally by the library. You should not need to use this.
     """
     action_row = 1
     button = 2
-    select_menu = 3
+    text_select_menu = 3
     text_input = 4
+    user_select_menu = 5
+    role_select_menu = 6
+    mentionable_select_menu = 7
+    channel_select_menu = 8
 
 
 class ButtonStyle(Enum):
@@ -178,27 +182,3 @@ class ButtonStyle(Enum):
     green = 3
     red = 4
     link = 5
-
-
-class SelectMenuType(Enum):
-    """
-    Represents the type of a select menu.
-
-    Attributes
-    ----------
-    text: :class:`int`
-        Used to specify a text type select menu.
-    user: :class:`int`
-        Used to specify a user type select menu.
-    channel: :class:`int`
-        Used to specify a channel type select menu.
-    role: :class:`int`
-        Used to specify a role type select menu.
-    mentionable: :class:`int`
-        Used to specify a mentionable type select menu.
-    """
-    text = 3
-    user = 5
-    role = 6
-    mentionable = 7
-    channel = 8
