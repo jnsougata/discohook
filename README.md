@@ -27,7 +27,7 @@ app = discohook.Client(
     name="help", 
     description="basic help command for the bot"
 )
-async def help_command(interaction: discohook.Interaction):
+async def help_command(interaction: discohook.CommandInteraction):
     await interaction.response(
         "Hello, World!",
         embed=discohook.Embed(title="Help", description="This is a help command"),
@@ -76,7 +76,7 @@ Then your command should look like this
     name="help", 
     description="basic help command for the bot"
 )
-async def help_command(interaction: discohook.Interaction):
+async def help_command(interaction: discohook.CommandInteraction):
     await interaction.response(
         "Hello, World!",
         embed=discohook.Embed(title="Help", description="This is a help command"),
