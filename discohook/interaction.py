@@ -1,13 +1,12 @@
-from .embed import Embed
-from .file import File
 from .user import User
-from .member import Member
+from .file import File
 from .view import View
+from .embed import Embed
 from .modal import Modal
+from .member import Member
 from .option import Choice
-from .channel import PartialChannel
-from fastapi.requests import Request
 from .multipart import create_form
+from .channel import PartialChannel
 from .guild import Guild, PartialGuild
 from .enums import InteractionCallbackType
 from .message import Message, ResponseMessage, FollowupMessage
@@ -16,22 +15,6 @@ from .params import handle_edit_params, handle_send_params, MISSING, merge_field
 
 if TYPE_CHECKING:
     from .client import Client
-
-
-class CommandData:
-    """
-    Represents the data of a command interaction
-
-    This is used internally by the library and should not be used by the user.
-    """
-    def __init__(self, data: Dict[str, Any]):
-        self.id: str = data["id"]
-        self.name: str = data["name"]
-        self.type: int = data["type"]
-        self.guild_id: Optional[str] = data.get("guild_id")
-        self.target_id: Optional[str] = data.get("target_id")
-        self.resolved: Optional[Dict[str, Any]] = data.get("resolved")
-        self.options: Optional[List[Dict[str, Any]]] = data.get("options")
 
 
 class Interaction:
@@ -67,7 +50,7 @@ class Interaction:
     ----------
     data: Dict[str, Any]
         The interaction data payload
-    client: Request
+    client: Client
         The request object from fastapi
     """
     def __init__(self, data: Dict[str, Any], client: "Client"):

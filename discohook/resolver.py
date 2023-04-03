@@ -5,7 +5,7 @@ from .member import Member
 from .channel import Channel
 from .message import Message
 from .attachment import Attachment
-from .interaction import Interaction, CommandData
+from .interaction import Interaction
 from typing import List, Dict, Any, Callable, Tuple
 from .enums import ApplicationCommandOptionType, ApplicationCommandType, MessageComponentType
 
@@ -83,14 +83,13 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
 
 
 def resolve_command_options(interaction: Interaction):
-    data = CommandData(interaction.data)
-    if not data.options:
+    if not interaction.data.get("options"):
         return {}
-    for option in data.options:
-        if option["type"] == ApplicationCommandOptionType.subcommand.value:
-            return parse_generic_options(option["options"], interaction)
-        else:
-            return parse_generic_options(data.options, interaction)
+    first_option = interaction.data["options"][0]
+    if first_option["type"] == ApplicationCommandOptionType.subcommand.value:
+        return parse_generic_options(first_option["options"], interaction)
+    else:
+        return parse_generic_options(interaction.data["options"], interaction)
 
 
 def build_slash_command_prams(func: Callable, interaction: Interaction, skips: int = 1):
