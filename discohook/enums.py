@@ -194,3 +194,13 @@ class ButtonStyle(Enum):
     green = 3
     red = 4
     link = 5
+
+class WebhookType(Enum):
+    """
+    The type of webhook.
+
+    Used internally by the library. You should not need to use this.
+    """
+    incoming = 1
+    channel_follower = 2
+    application = 3

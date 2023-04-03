@@ -17,6 +17,8 @@ from .params import handle_send_params, merge_fields
 from fastapi.responses import JSONResponse
 from .multipart import create_form
 from typing import Optional, List, Dict, Union, Callable
+from .channel import PartialChannel
+from .webhook import Webhook
 
 
 async def delete_cmd(request: Request, command_id: str, token: str):
@@ -255,3 +257,13 @@ class Client(FastAPI):
         resp = await self.http.sync_commands(
             str(self.application_id), [command.to_dict() for command in self._sync_queue])
         return await resp.json()
+
+    async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
+        resp = await self.http.create_webhook(channel_id, {"name": name, "avatar": image_base64})
+        data = await resp.json()
+        return Webhook(data, self)
+
+    async def fetch_webhook(self, webhook_id: str, *, webhook_token: Optional[str] = None):
+        resp = await self.http.fetch_webhook(webhook_id, webhook_token=webhook_token)
+        data = await resp.json()
+        return Webhook(data, self)

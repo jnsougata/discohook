@@ -1,5 +1,5 @@
 from fastapi import Request
-from .interaction import Interaction, ComponentInteraction, CommandInteraction
+from .interaction import Interaction, ComponentInteraction
 from .command import *
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
@@ -43,8 +43,8 @@ async def handler(request: Request):
             return JSONResponse({"type": InteractionCallbackType.pong.value}, status_code=200)
 
         elif data["type"] == InteractionType.app_command.value:
-            interaction = CommandInteraction(data, request)
-            command: ApplicationCommand = request.app.application_commands.get(interaction.command_data.id)
+            interaction = Interaction(data, request.app)
+            command: ApplicationCommand = request.app.application_commands.get(interaction.data["id"])
             if not command:
                 raise NotImplemented(data)
 
@@ -63,7 +63,7 @@ async def handler(request: Request):
                 await command._callback(interaction, *args, **kwargs)
 
         elif data["type"] == InteractionType.component.value:
-            interaction = ComponentInteraction(data, request)
+            interaction = ComponentInteraction(data, request.app)
             custom_id = interaction.data["custom_id"]
             component = request.app.active_components.get(custom_id, None)
             if not component:
@@ -81,7 +81,7 @@ async def handler(request: Request):
                 await component.callback(interaction, build_select_menu_values(interaction))
 
         elif data["type"] == InteractionType.modal_submit.value:
-            interaction = Interaction(data, request)
+            interaction = Interaction(data, request.app)
             component = request.app.active_components.get(interaction.data["custom_id"], None)
             if not component:
                 return JSONResponse({"error": "component not found!"}, status_code=404)
@@ -89,7 +89,7 @@ async def handler(request: Request):
             await component._callback(interaction, *args, **kwargs)
 
         elif data["type"] == InteractionType.autocomplete.value:
-            interaction = Interaction(data, request)
+            interaction = Interaction(data, request.app)
             command: ApplicationCommand = request.app.application_commands.get(interaction.data["id"])
             if not command:
                 return JSONResponse({"error": "command not found!"}, status_code=404)

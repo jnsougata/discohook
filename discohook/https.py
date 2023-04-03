@@ -69,7 +69,7 @@ class HTTPClient:
         await self.request("DELETE", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}")
     
     async def edit_webhook_message(
-            self, webhook_id: str, webhook_token: str, message_id: str, form: aiohttp.MultipartWriter
+        self, webhook_id: str, webhook_token: str, message_id: str, form: aiohttp.MultipartWriter
     ):
         return await self.multipart("PATCH", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}", form=form)
 
@@ -130,3 +130,17 @@ class HTTPClient:
 
     async def edit_guild_role(self, guild_id: str, role_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/guilds/{guild_id}/roles/{role_id}", json=payload, use_auth=True)
+    
+    async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
+        return await self.request("POST", f"/channels/{channel_id}/webhooks", json=payload, use_auth=True)
+
+    async def delete_webhook(self, webhook_id: str):
+        return await self.request("DELETE", f"/webhooks/{webhook_id}", use_auth=True)
+
+    async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any]):
+        return await self.request("PATCH", f"/webhooks/{webhook_id}", json=payload, use_auth=True)
+
+    async def fetch_webhook(self, webhook_id: str, webhook_token: str = None):
+        if webhook_token:
+            return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
+        return await self.request("GET", f"/webhooks/{webhook_id}", use_auth=True)

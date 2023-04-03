@@ -12,9 +12,9 @@ pip install git+https://github.com/jnsougata/discohook
 import discohook
 
 
-APPLICATION_ID = <YOUR_APPLICATION_ID>
-APPLICATION_TOKEN = <YOUR_APPLICATION_TOKEN>
-APPLICATION_PUBLIC_KEY = <YOUR_APPLICATION_PUBLIC_KEY>
+APPLICATION_ID = "YOUR_APPLICATION_ID"
+APPLICATION_TOKEN = "YOUR_APPLICATION_TOKEN"
+APPLICATION_PUBLIC_KEY = "YOUR_APPLICATION_PUBLIC_KEY"
 
 app = discohook.Client(
     application_id=APPLICATION_ID,
@@ -27,7 +27,7 @@ app = discohook.Client(
     name="help", 
     description="basic help command for the bot"
 )
-async def help_command(interaction: discohook.CommandInteraction):
+async def help_command(interaction: discohook.Interaction):
     await interaction.response(
         "Hello, World!",
         embed=discohook.Embed(title="Help", description="This is a help command"),
@@ -76,7 +76,7 @@ Then your command should look like this
     name="help", 
     description="basic help command for the bot"
 )
-async def help_command(interaction: discohook.CommandInteraction):
+async def help_command(interaction: discohook.Interaction):
     await interaction.response(
         "Hello, World!",
         embed=discohook.Embed(title="Help", description="This is a help command"),

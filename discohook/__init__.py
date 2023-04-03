@@ -17,8 +17,9 @@ from .guild import Guild, PartialGuild
 from .role import Role, PartialRole
 from .command import ApplicationCommand, SubCommand
 from .message import Message, FollowupMessage, ResponseMessage
+from .interaction import Interaction, ComponentInteraction
 from .view import View, Button, SelectOption, SelectMenu, button, select_menu
-from .interaction import Interaction, ComponentInteraction, CommandInteraction
+
 
 user_command = ApplicationCommandType.user
 slash_command = ApplicationCommandType.slash

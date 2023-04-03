@@ -9,7 +9,7 @@ from .channel import PartialChannel
 from fastapi.requests import Request
 from .multipart import create_form
 from .guild import Guild, PartialGuild
-from .enums import InteractionType, InteractionCallbackType
+from .enums import InteractionCallbackType
 from .message import Message, ResponseMessage, FollowupMessage
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 from .params import handle_edit_params, handle_send_params, MISSING, merge_fields
@@ -38,7 +38,7 @@ class Interaction:
     """
     Base interaction class for all interactions
 
-    Attributes
+    Properties
     ----------
     id: str
         The unique id of the interaction
@@ -67,24 +67,123 @@ class Interaction:
     ----------
     data: Dict[str, Any]
         The interaction data payload
-    req: Request
+    client: Request
         The request object from fastapi
     """
-    def __init__(self, data: Dict[str, Any], req: Request):
-        self._payload = data
-        self.request: Request = req
-        self.client: "Client" = req.app
-        self.id: str = data["id"]
-        self.type: int = data["type"]
-        self.token: str = data["token"]
-        self.version: int = data["version"]
-        self.application_id: str = data["application_id"]
+    def __init__(self, data: Dict[str, Any], client: "Client"):
+        self.payload = data
+        self.client: "Client" = client
         self.data: Optional[Dict[str, Any]] = data.get("data")
-        self.guild_id: Optional[str] = data.get("guild_id")
-        self.channel_id: Optional[str] = data.get("channel_id")
-        self.app_permissions: Optional[int] = data.get("app_permissions")
-        self.locale: Optional[str] = data.get("locale")
-        self.guild_locale: Optional[str] = data.get("guild_locale")
+
+    @property
+    def id(self) -> str:
+        """
+        The unique id of the interaction
+
+        Returns
+        -------
+        str
+        """
+        return self.payload["id"]
+
+    @property
+    def type(self):
+        """
+        The type of the interaction
+
+        Returns
+        -------
+        int
+        """
+        return self.payload["type"]
+
+    @property
+    def token(self) -> str:
+        """
+        The token of the interaction
+
+        Returns
+        -------
+        str
+        """
+        return self.payload["token"]
+
+    @property
+    def version(self) -> int:
+        """
+        The version of the interaction
+
+        Returns
+        -------
+        int
+        """
+        return self.payload["version"]
+
+    @property
+    def application_id(self) -> str:
+        """
+        The id of the application that the interaction was triggered for
+
+        Returns
+        -------
+        str
+        """
+        return self.payload["application_id"]
+
+    @property
+    def guild_id(self) -> Optional[str]:
+        """
+        The guild id of the interaction
+
+        Returns
+        -------
+        Optional[str]
+        """
+        return self.payload.get("guild_id")
+
+    @property
+    def channel_id(self) -> str:
+        """
+        The channel id of the interaction
+
+        Returns
+        -------
+        Optional[str]
+        """
+        return self.payload["channel_id"]
+
+    @property
+    def app_permissions(self) -> Optional[int]:
+        """
+        The permissions of the application
+
+        Returns
+        -------
+        Optional[int]
+        """
+        return self.payload.get("app_permissions")
+
+    @property
+    def locale(self) -> Optional[str]:
+        """
+        The locale of the interaction
+
+        Returns
+        -------
+        Optional[str]
+        """
+        return self.payload.get("locale")
+
+    @property
+    def guild_locale(self) -> Optional[str]:
+        """
+        The guild locale of the interaction
+
+        Returns
+        -------
+        Optional[str]
+        """
+        return self.payload.get("guild_locale")
 
     @property
     def channel(self) -> PartialChannel:
@@ -108,8 +207,8 @@ class Interaction:
         -------
         Optional[Union[User, Member]]
         """
-        member = self._payload.get("member")
-        user = self._payload.get("user")
+        member = self.payload.get("member")
+        user = self.payload.get("user")
         if member:
             member.update(member.pop("user", {}))
             member["guild_id"] = self.guild_id
@@ -118,7 +217,7 @@ class Interaction:
             return User(user, self.client)
 
     @property
-    def partial_guild(self) -> Optional[PartialGuild]:
+    def guild(self) -> Optional[PartialGuild]:
         if not self.guild_id:
             return
         return PartialGuild(self.guild_id, self.client)
@@ -152,7 +251,7 @@ class Interaction:
         }
         await self.client.http.send_modal(self.id, self.token, payload)
 
-    async def send_autocomplete(self, choices: List[Choice]):
+    async def autocomplete(self, choices: List[Choice]):
         """
         Sends autocomplete choices to the interaction
 
@@ -243,10 +342,10 @@ class Interaction:
             "data": data,
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
-        files = merge_fields(file, files)
-        await self.client.http.send_interaction_mp_callback(self.id, self.token, create_form(payload, files))
+        await self.client.http.send_interaction_mp_callback(
+            self.id, self.token, create_form(payload, merge_fields(file, files)))
 
-    async def follow_up(
+    async def followup_response(
         self,
         content: Optional[str] = None,
         *,
@@ -325,8 +424,8 @@ class ComponentInteraction(Interaction):
     """
     Represents a component interaction subclassed from :class:`Interaction`
     """
-    def __init__(self, data: Dict[str, Any], req: Request):
-        super().__init__(data, req)
+    def __init__(self, data: Dict[str, Any], client: "Client"):
+        super().__init__(data, client)
 
     @property
     def message(self) -> Optional[Message]:
@@ -338,7 +437,7 @@ class ComponentInteraction(Interaction):
         Optional[Message]
             The message that the component was clicked on
         """
-        return Message(self._payload["message"], self.client)
+        return Message(self.payload["message"], self.client)
 
     @property
     def originator(self) -> User:
@@ -362,7 +461,7 @@ class ComponentInteraction(Interaction):
         """
         return self.originator == self.author
 
-    async def follow_up(
+    async def followup_response(
         self,
         content: Optional[str] = None,
         *,
@@ -516,81 +615,3 @@ class ComponentInteraction(Interaction):
             return
         self.client.cached_inter_tokens.pop(self.id, None)
         await self.client.http.delete_webhook_message(self.application_id, self.origin, "@original")
-
-
-class CommandInteraction(Interaction):
-    """
-    Represents a command interaction, subclassed from :class:`Interaction`
-
-    Attributes
-    ----------
-    data: Optional[CommandData]
-        Raw data of the command
-    """
-    def __init__(self, data: Dict[str, Any], req: Request):
-        super().__init__(data, req)
-
-    @property
-    def command_data(self) -> Optional[CommandData]:
-        if self.type == InteractionType.app_command.value:
-            return CommandData(self.data)
-        return None
-
-    async def response(
-        self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        ephemeral: Optional[bool] = False,
-        suppress_embeds: Optional[bool] = False,
-    ) -> None:
-        """
-        Sends a response to the interaction
-
-        Parameters
-        ----------
-        content: Optional[str]
-            The content of the message
-        embed: Optional[Embed]
-            The embed of the message
-        embeds: Optional[List[Embed]]
-            The list of embeds of the message
-        view: Optional[View]
-            The view of the message
-        tts: Optional[bool]
-            Whether the message should be sent as tts or not
-        file: Optional[File]
-            The file of the message
-        files: Optional[List[File]]
-            The list of files of the message
-        ephemeral: Optional[bool]
-            Whether the message should be ephemeral or not
-        suppress_embeds: Optional[bool]
-            Whether the message should suppress embeds or not
-        """
-        data = handle_send_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            suppress_embeds=suppress_embeds,
-        )
-        if view:
-            self.client.store_inter_token(self.id, self.token)
-            self.client.load_components(view)
-        payload = {
-            "data": data,
-            "type": InteractionCallbackType.channel_message_with_source.value,
-        }
-        await self.client.http.send_interaction_mp_callback(
-            self.id, self.token, create_form(payload, merge_fields(file, files))
-        )
