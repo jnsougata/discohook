@@ -134,9 +134,6 @@ class HTTPClient:
     async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
         return await self.request("POST", f"/channels/{channel_id}/webhooks", json=payload, use_auth=True)
 
-    async def delete_webhook(self, webhook_id: str):
-        return await self.request("DELETE", f"/webhooks/{webhook_id}", use_auth=True)
-
     async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/webhooks/{webhook_id}", json=payload, use_auth=True)
 
@@ -144,3 +141,6 @@ class HTTPClient:
         if webhook_token:
             return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
         return await self.request("GET", f"/webhooks/{webhook_id}", use_auth=True)
+
+    async def delete_webhook(self, webhook_id: str):
+        return await self.request("DELETE", f"/webhooks/{webhook_id}", use_auth=True)

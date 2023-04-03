@@ -6,8 +6,9 @@ from .asset import Asset
 from .guild import PartialGuild
 from .channel import PartialChannel
 from .multipart import create_form
+from .message import Message
 from typing import TYPE_CHECKING, Optional, List
-from .params import handle_send_params, merge_fields
+from .params import handle_send_params, merge_fields, handle_edit_params, MISSING
 
 if TYPE_CHECKING:
     from .client import Client
@@ -78,35 +79,7 @@ class Webhook:
     async def delete(self):
         await self.client.http.delete_webhook(self.id)
 
-    async def send(
-        self,
-        content: Optional[str] = None,
-        *,
-        username: Optional[str] = None,
-        avatar_url: Optional[str] = None,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        tts: bool = False,
-        view: Optional[View] = None,
-        thread_name: Optional[str] = None,
-    ):
-        payload = handle_send_params(content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
-        if username:
-            payload["username"] = username
-        if avatar_url:
-            payload["avatar_url"] = avatar_url
-        if thread_name:
-            payload["thread_name"] = thread_name
-        if view:
-            self.client.load_components(view)
-        form = create_form(payload, merge_fields(file, files))
-        resp = await self.client.http.send_webhook_message(self.id, self.token, form)
-        data = await resp.text()
-        return data
-
-    async def edit_webhook(
+    async def edit(
         self,
         name: Optional[str] = None,
         image_base64: Optional[str] = None,
@@ -122,3 +95,51 @@ class Webhook:
         resp = await self.client.http.edit_webhook(self.id, payload)
         data = await resp.json()
         return Webhook(data, self.client)
+
+    async def send_message(
+        self,
+        content: Optional[str] = None,
+        *,
+        username: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
+        tts: bool = False,
+        view: Optional[View] = None,
+        thread_name: Optional[str] = None,
+    ) -> None:
+        payload = handle_send_params(content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        if username:
+            payload["username"] = username
+        if avatar_url:
+            payload["avatar_url"] = avatar_url
+        if thread_name:
+            payload["thread_name"] = thread_name
+        if view:
+            self.client.load_components(view)
+        form = create_form(payload, merge_fields(file, files))
+        await self.client.http.send_webhook_message(self.id, self.token, form)
+
+    async def edit_message(
+        self,
+        message_id: str,
+        *,
+        content: Optional[str] = MISSING,
+        embed: Optional[Embed] = MISSING,
+        embeds: Optional[List[Embed]] = MISSING,
+        file: Optional[File] = MISSING,
+        files: Optional[List[File]] = MISSING,
+        view: Optional[View] = MISSING,
+    ) -> Message:
+        payload = handle_edit_params(content, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        if view:
+            self.client.load_components(view)
+        form = create_form(payload, merge_fields(file, files))
+        resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, form)
+        data = await resp.json()
+        return Message(data, self.client)
+
+    async def delete_message(self, message_id: str) -> None:
+        await self.client.http.delete_webhook_message(self.id, self.token, message_id)
