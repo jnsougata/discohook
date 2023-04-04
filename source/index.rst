@@ -89,11 +89,11 @@ Documentation
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.FollowupMessage
+.. autoclass:: discohook.FollowupResponse
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.ResponseMessage
+.. autoclass:: discohook.InteractionResponse
    :members:
    :show-inheritance:
 

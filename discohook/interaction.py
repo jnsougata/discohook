@@ -9,7 +9,7 @@ from .multipart import create_form
 from .channel import PartialChannel
 from .guild import Guild, PartialGuild
 from .enums import InteractionCallbackType
-from .message import Message, ResponseMessage, FollowupMessage
+from .message import Message, InteractionResponse, FollowupResponse
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 from .params import handle_edit_params, handle_send_params, MISSING, merge_fields
 
@@ -277,7 +277,7 @@ class Interaction:
         files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
-    ) -> None:
+    ) -> InteractionResponse:
         """
         Sends a response to the interaction
 
@@ -302,9 +302,9 @@ class Interaction:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed or not
 
-        Notes
-        -----
-        Multipart files are not supported yet, will be added in the future.
+        Returns
+        -------
+        InteractionResponse
         """
         data = handle_send_params(
             content=content,
@@ -327,6 +327,7 @@ class Interaction:
         }
         await self.client.http.send_interaction_mp_callback(
             self.id, self.token, create_form(payload, merge_fields(file, files)))
+        return InteractionResponse(self)
 
     async def followup_response(
         self,
@@ -340,7 +341,7 @@ class Interaction:
         files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
-    ) -> FollowupMessage:
+    ) -> FollowupResponse:
         """
         Sends a follow-up message to a deferred interaction
 
@@ -387,20 +388,20 @@ class Interaction:
             self.application_id, self.token, create_form(payload, merge_fields(file, files))
         )
         data = await resp.json()
-        return FollowupMessage(data, self)
+        return FollowupResponse(data, self)
 
-    async def original_response(self) -> ResponseMessage:
+    async def original_response(self) -> Message:
         """
         Gets the original response message of the interaction
 
         Returns
         -------
-        ResponseMessage
+        InteractionResponse
             The original response message
         """
         resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
         data = await resp.json()
-        return ResponseMessage(data, self)
+        return Message(data, self.client)
 
 
 class ComponentInteraction(Interaction):
@@ -431,7 +432,7 @@ class ComponentInteraction(Interaction):
         -------
         User
         """
-        return User(self.message.interaction["user"], self.client)
+        return User(self.message.interaction_data["user"], self.client)
 
     @property
     def from_originator(self) -> bool:
@@ -456,7 +457,7 @@ class ComponentInteraction(Interaction):
         files: Optional[List[Dict[str, Any]]] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
-    ) -> FollowupMessage:
+    ) -> FollowupResponse:
         """
         Sends a follow-up message to a deferred interaction
 
@@ -504,7 +505,7 @@ class ComponentInteraction(Interaction):
             self.id, self.token, create_form(payload, merge_fields(file, files))
         )
         data = await resp.json()
-        return FollowupMessage(data, self)
+        return FollowupResponse(data, self)
 
     async def edit_original(
         self,
@@ -573,7 +574,7 @@ class ComponentInteraction(Interaction):
         """
         if not self.message:
             return
-        parent_id = self.message.interaction["id"]
+        parent_id = self.message.interaction_data["id"]
         return self.client.cached_inter_tokens.get(parent_id, "")
 
     async def original_message(self) -> Optional[Message]:

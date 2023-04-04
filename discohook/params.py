@@ -7,11 +7,11 @@ from typing import Optional, List, Any
 MISSING = object()
 
 
-def merge_fields(filed: Optional[Any], fields: Optional[List[Any]]) -> List[Any]:
+def merge_fields(field: Optional[Any], fields: Optional[List[Any]]) -> List[Any]:
     tmp = []
-    if filed:
-        tmp.append(filed)
-    if fields:
+    if field and field is not MISSING:
+        tmp.append(field)
+    if fields and fields is not MISSING:
         tmp.extend(fields)
     return tmp
 

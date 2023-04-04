@@ -16,7 +16,7 @@ class Message:
     """
     Represents a Discord message.
 
-    Attributes
+    Properties
     ----------
     id: :class:`str`
         The id of the message.
@@ -51,37 +51,127 @@ class Message:
     def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
         self.client = client
         self.data = payload
-        self.id = payload.get("id")
-        self.type = payload.get("type")
-        self.channel_id = payload.get("channel_id")
-        self.author = User(payload.get("author"), self.client)
-        self.content = payload.get("content")
-        self.timestamp = payload.get("timestamp")
-        self.edited_timestamp = payload.get("edited_timestamp")
-        self.tts = payload.get("tts", False)
-        self.mention_everyone = payload.get("mention_everyone", False)
-        self.mentions = [User(x, self.client) for x in payload.get("mentions", [])]
-        self.mention_roles = [Role(x, self.client) for x in payload.get("mention_roles", [])]
-        self.mention_channels = payload.get("mention_channels")
-        self.attachments = payload.get("attachments")
-        self.embeds = payload.get("embeds")
-        self.reactions = payload.get("reactions")
-        self.nonce = payload.get("nonce")
-        self.pinned = payload.get("pinned", False)
-        self.webhook_id = payload.get("webhook_id")
-        self.activity = payload.get("activity")
-        self.application = payload.get("application")
-        self.application_id = payload.get("application_id")
-        self.message_reference = payload.get("message_reference")
-        self.flags = payload.get("flags")
-        self.referenced_message = payload.get("referenced_message")
-        self.interaction = payload.get("interaction")
-        self.thread = payload.get("thread")
-        self.components = payload.get("components")
-        self.sticker_items = payload.get("sticker_items")
-        self.stickers = payload.get("stickers")
-        self.position = payload.get("position")
-    
+
+    @property
+    def id(self) -> Optional[str]:
+        return self.data["id"]
+
+    @property
+    def type(self) -> int:
+        return self.data["type"]
+
+    @property
+    def channel_id(self) -> str:
+        return self.data["channel_id"]
+
+    @property
+    def author(self) -> User:
+        return User(self.data["author"], self.client)
+
+    @property
+    def content(self) -> Optional[str]:
+        return self.data["content"]
+
+    @property
+    def timestamp(self) -> str:
+        return self.data["timestamp"]
+
+    @property
+    def edited_timestamp(self) -> Optional[str]:
+        return self.data.get("edited_timestamp")
+
+    @property
+    def tts(self) -> bool:
+        return self.data.get("tts", False)
+
+    @property
+    def mention_everyone(self) -> bool:
+        return self.data.get("mention_everyone", False)
+
+    @property
+    def mentions(self) -> List[User]:
+        return [User(x, self.client) for x in self.data.get("mentions", [])]
+
+    @property
+    def mention_roles(self) -> List[Role]:
+        return [Role(x, self.client) for x in self.data.get("mention_roles", [])]
+
+    @property
+    def mention_channels(self) -> Optional[dict]:
+        return self.data.get("mention_channels")
+
+    @property
+    def attachments(self) -> Optional[dict]:
+        return self.data.get("attachments")
+
+    @property
+    def embeds(self) -> Optional[List[dict]]:
+        return self.data.get("embeds")
+
+    @property
+    def reactions(self) -> Optional[List[dict]]:
+        return self.data.get("reactions")
+
+    @property
+    def nonce(self) -> Optional[str]:
+        return self.data.get("nonce")
+
+    @property
+    def pinned(self) -> bool:
+        return self.data.get("pinned", False)
+
+    @property
+    def webhook_id(self) -> Optional[str]:
+        return self.data.get("webhook_id")
+
+    @property
+    def activity(self) -> Optional[dict]:
+        return self.data.get("activity")
+
+    @property
+    def application(self) -> Optional[dict]:
+        return self.data.get("application")
+
+    @property
+    def application_id(self) -> Optional[str]:
+        return self.data.get("application_id")
+
+    @property
+    def message_reference(self) -> Optional[dict]:
+        return self.data.get("message_reference")
+
+    @property
+    def flags(self) -> Optional[int]:
+        return self.data.get("flags")
+
+    @property
+    def referenced_message(self) -> Optional[dict]:
+        return self.data.get("referenced_message")
+
+    @property
+    def interaction_data(self) -> Optional[dict]:
+        return self.data.get("interaction")
+
+    @property
+    def thread(self) -> Optional[dict]:
+        return self.data.get("thread")
+
+    @property
+    def components(self) -> Optional[List[dict]]:
+        return self.data.get("components")
+
+    @property
+    def sticker_items(self) -> Optional[List[dict]]:
+        return self.data.get("sticker_items")
+
+    @property
+    def stickers(self) -> Optional[List[dict]]:
+        return self.data.get("stickers")
+
+    @property
+    def position(self) -> Optional[int]:
+        return self.data.get("position")
+
     async def delete(self):
         """
         Deletes the message.
@@ -143,12 +233,12 @@ class Message:
         return Message(data, self.client)
 
 
-class FollowupMessage(Message):
+class FollowupResponse:
     """
     Represents a followup message sent by an interaction, subclassed from :class:`Message`.
     """
     def __init__(self, payload: dict, interaction: "Interaction") -> None:
-        super().__init__(payload, interaction.client)
+        self.message = Message(payload, interaction.client)
         self.interaction = interaction
 
     async def delete(self):
@@ -158,7 +248,7 @@ class FollowupMessage(Message):
         return await self.interaction.client.http.delete_webhook_message(
             self.interaction.application_id,
             self.interaction.token,
-            self.id
+            self.message.id,
         )
 
     async def edit(
@@ -193,32 +283,29 @@ class FollowupMessage(Message):
         if view is not MISSING and view:
             self.interaction.client.load_components(view)
         self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
-        resp = await self.client.http.edit_webhook_message(
+        resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
             self.interaction.token,
-            self.id,
+            self.message.id,
             create_form(data, merge_fields(file, files))
         )
         data = await resp.json()
         return Message(data, self.interaction.client)
 
 
-class ResponseMessage(Message):
+class InteractionResponse:
     """
-    Represents a response message sent by an interaction, subclassed from :class:`Message`.
+    Represents a response message sent by an interaction
     """
-    def __init__(self, payload: dict, interaction: "Interaction") -> None:
-        super().__init__(payload, interaction.client)
+    def __init__(self, interaction: "Interaction") -> None:
         self.interaction = interaction
 
     async def delete(self):
         """
         Deletes the response message.
         """
-        return self.client.http.delete_webhook_message(
-            self.interaction.application_id,
-            self.interaction.token,
-            "@original"
+        await self.interaction.client.http.delete_webhook_message(
+            self.interaction.application_id, self.interaction.token, "@original"
         )
 
     async def edit(
@@ -251,13 +338,11 @@ class ResponseMessage(Message):
             suppress_embeds=suppress_embeds,
         )
         if view is not MISSING and view:
-            self.client.load_components(view)
-        self.client.store_inter_token(self.interaction.id, self.interaction.token)
-        resp = self.client.http.edit_webhook_message(
-            self.interaction.application_id,
-            self.interaction.token,
-            "@original",
+            self.interaction.client.load_components(view)
+        self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
+        resp = await self.interaction.client.http.edit_webhook_message(
+            self.interaction.application_id, self.interaction.token, "@original",
             create_form(data, merge_fields(file, files))
         )
         data = await resp.json()
-        return Message(data, self.client)
+        return Message(data, self.interaction.client)

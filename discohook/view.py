@@ -18,6 +18,20 @@ class Component:
         self.custom_id = secrets.token_urlsafe(16)
         self.callback: Optional[Callable] = None
 
+    def on_interaction(self, coro: Callable):
+        """
+        Decorator that registers a callback to be called when the component is interacted with.
+
+        Parameters
+        ----------
+        coro
+
+        Returns
+        -------
+
+        """
+        self.callback = coro
+
 
 class Button(Component):
     """
@@ -54,17 +68,6 @@ class Button(Component):
 
     def __call__(self, *args, **kwargs):
         return self
-
-    def onclick(self, coro: Callable):
-        """
-        Registers a callback to be called when the button is clicked.
-
-        Parameters
-        ----------
-        coro: :class:`Callable`
-            The callback to be called when the button is clicked.
-        """
-        self.callback = coro
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -196,17 +199,6 @@ class SelectMenu(Component):
     def __call__(self, *args, **kwargs):
         return self
 
-    def onselection(self, coro: Callable):
-        """
-        Registers a callback to be called when the select menu is selected.
-
-        Parameters
-        ----------
-        coro: :class:`Callable`
-            The callback to be called when the select menu is selected.
-        """
-        self.callback = coro
-
     def to_dict(self) -> Dict[str, Any]:
         """
         Returns a dictionary representation of the button.
@@ -303,7 +295,7 @@ def button(
 
     def decorator(coro: Callable):
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji)
-        btn.onclick(coro)
+        btn.on_interaction(coro)
         return btn
     return decorator
 
@@ -342,7 +334,7 @@ def select_menu(
     -------
     :class:`SelectMenu`
     """
-    def decorator(func: Callable):
+    def decorator(coro: Callable):
         menu = SelectMenu(
             options=options,
             placeholder=placeholder,
@@ -352,6 +344,6 @@ def select_menu(
             type=type,
             disabled=disabled
         )
-        menu.onselection(func)
+        menu.on_interaction(coro)
         return menu
     return decorator

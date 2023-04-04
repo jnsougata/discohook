@@ -16,7 +16,7 @@ from .channel import Channel, PartialChannel
 from .guild import Guild, PartialGuild
 from .role import Role, PartialRole
 from .command import ApplicationCommand, SubCommand
-from .message import Message, FollowupMessage, ResponseMessage
+from .message import Message, FollowupResponse, InteractionResponse
 from .interaction import Interaction, ComponentInteraction
 from .view import View, Button, SelectOption, SelectMenu, button, select_menu
 
