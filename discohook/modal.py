@@ -1,5 +1,5 @@
-from typing import Dict, Any, List
 from .view import Component
+from typing import Dict, Any, List
 from .enums import MessageComponentType, TextInputFieldLength
 
 
@@ -10,15 +10,12 @@ class Modal(Component):
     def __init__(self, title: str):
         super().__init__()
         self.title = title
+        # self.components: List[Component] = []
         self.rows: List[Dict[str, Any]] = []
 
-    # def add_select(self, select: SelectMenu):
-    #   self._data["components"].append(
-    #        {
-    #            "type": component_types.action_row.value,
-    #            "components": [select.json()]
-    #        }
-    #    )
+    # def add_select_menu(self, menu: SelectMenu):
+    #     self.components.append(menu)
+    #     self.rows.append(menu.to_dict())
 
     def add_field(
         self,

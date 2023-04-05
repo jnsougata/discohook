@@ -228,6 +228,8 @@ class Interaction:
             The modal to send
         """
         self.client.active_components[modal.custom_id] = modal
+        # for comp in modal.components:
+        #     self.client.active_components[comp.custom_id] = comp
         payload = {
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal.value,

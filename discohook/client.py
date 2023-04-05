@@ -1,5 +1,4 @@
 from .command import *
-from .modal import Modal
 from .embed import Embed
 from .file import File
 from fastapi import FastAPI
@@ -10,7 +9,7 @@ from .enums import ApplicationCommandType
 from .user import ClientUser
 from .permissions import Permissions
 from .command import ApplicationCommand
-from .view import View, SelectMenu, Button
+from .view import View, Component
 from fastapi.requests import Request
 from .dash import dashboard
 from .params import handle_send_params, merge_fields
@@ -64,13 +63,13 @@ class Client(FastAPI):
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.redoc_url = None
-        self.docs_url = None
         self.token = token
+        self.docs_url = None
+        self.redoc_url = None
         self.public_key = public_key
         self.application_id = application_id  # type: ignore
         self.http = HTTPClient(token, self)
-        self.active_components: Optional[Dict[str, Union[Button, Modal, SelectMenu]]] = {}
+        self.active_components: Optional[Dict[str, Component]] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
