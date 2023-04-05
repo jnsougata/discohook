@@ -4,7 +4,7 @@ from .embed import Embed
 from typing import Optional, List, Any
 
 
-MISSING = object()
+MISSING = Any
 
 
 def merge_fields(field: Optional[Any], fields: Optional[List[Any]]) -> List[Any]:

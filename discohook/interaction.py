@@ -331,67 +331,6 @@ class Interaction:
             self.id, self.token, create_form(payload, merge_fields(file, files)))
         return InteractionResponse(self)
 
-    async def followup_response(
-        self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        ephemeral: Optional[bool] = False,
-        suppress_embeds: Optional[bool] = False,
-    ) -> FollowupResponse:
-        """
-        Sends a follow-up message to a deferred interaction
-
-        Parameters
-        ----------
-        content: Optional[str]
-            The content of the message to send
-        embed: Optional[Embed]
-            The embed to send with the message
-        embeds: Optional[List[Embed]]
-            The list of embeds to send with the message (max 10)
-        view: Optional[View]
-            The view to send with the message
-        tts: Optional[bool]
-            Whether the message should be sent as tts or not
-        file: Optional[File]
-            The file to send with the message
-        files: Optional[List[File]]
-            The list of files to send with the message
-        ephemeral: Optional[bool]
-            Whether the message should be ephemeral or not
-        suppress_embeds: Optional[bool]
-            Whether the message should suppress embeds or not
-
-        Notes
-        -----
-        Multipart files are not supported yet, will be added in the future.
-        """
-        payload = handle_send_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            suppress_embeds=suppress_embeds,
-        )
-        if view:
-            self.client.store_inter_token(self.id, self.token)
-            self.client.load_components(view)
-        resp = await self.client.http.send_webhook_message(
-            self.application_id, self.token, create_form(payload, merge_fields(file, files))
-        )
-        data = await resp.json()
-        return FollowupResponse(data, self)
-
     async def original_response(self) -> Message:
         """
         Gets the original response message of the interaction
@@ -447,7 +386,7 @@ class ComponentInteraction(Interaction):
         """
         return self.originator == self.author
 
-    async def followup_response(
+    async def followup(
         self,
         content: Optional[str] = None,
         *,
@@ -455,13 +394,13 @@ class ComponentInteraction(Interaction):
         embeds: Optional[List[Embed]] = None,
         view: Optional[View] = None,
         tts: Optional[bool] = False,
-        file: Optional[Dict[str, Any]] = None,
-        files: Optional[List[Dict[str, Any]]] = None,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
     ) -> FollowupResponse:
         """
-        Sends a follow-up message to a deferred interaction
+        Sends a followup message to the interaction
 
         Parameters
         ----------
@@ -522,7 +461,7 @@ class ComponentInteraction(Interaction):
         suppress_embeds: Optional[bool] = MISSING,
     ):
         """
-        Edits the original response message of the interaction
+        Edits the original message of the interaction from which the component was interacted.
 
         Parameters
         ----------

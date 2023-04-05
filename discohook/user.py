@@ -44,7 +44,7 @@ class User:
     mention: :class:`str`
         Returns a string that allows you to mention the user.
     """
-    def __init__(self, data: dict, client: "Client"):
+    def __init__(self, data: Dict[str, Any], client: "Client"):
         self.data = data
         self.client = client
 

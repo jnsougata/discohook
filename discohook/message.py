@@ -4,8 +4,8 @@ from .embed import Embed
 from .view import View
 from .file import File
 from .multipart import create_form
-from .params import handle_edit_params, MISSING, merge_fields
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
+from .params import handle_edit_params, MISSING, merge_fields, handle_send_params
 
 if TYPE_CHECKING:
     from .client import Client
@@ -53,7 +53,7 @@ class Message:
         self.data = payload
 
     @property
-    def id(self) -> Optional[str]:
+    def id(self) -> str:
         return self.data["id"]
 
     @property
@@ -186,8 +186,8 @@ class Message:
         embeds: Optional[List[Embed]] = MISSING,
         view: Optional[View] = MISSING,
         tts: Optional[bool] = MISSING,
-        file: Optional[Dict[str, Any]] = MISSING,
-        files: Optional[List[Dict[str, Any]]] = MISSING,
+        file: Optional[File] = MISSING,
+        files: Optional[List[File]] = MISSING,
         suppress_embeds: Optional[bool] = MISSING,
     ):
         """
@@ -225,9 +225,7 @@ class Message:
         if view:
             self.client.load_components(view)
         resp = await self.client.http.edit_channel_message(
-            self.channel_id, 
-            self.id, 
-            create_form(data, merge_fields(file, files))
+            self.channel_id, self.id, create_form(data, merge_fields(file, files))
         )
         data = await resp.json()
         return Message(data, self.client)
@@ -237,7 +235,7 @@ class FollowupResponse:
     """
     Represents a followup message sent by an interaction, subclassed from :class:`Message`.
     """
-    def __init__(self, payload: dict, interaction: "Interaction") -> None:
+    def __init__(self, payload: Dict[str, Any], interaction: "Interaction") -> None:
         self.message = Message(payload, interaction.client)
         self.interaction = interaction
 
@@ -346,3 +344,66 @@ class InteractionResponse:
         )
         data = await resp.json()
         return Message(data, self.interaction.client)
+
+        
+    async def followup(
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        view: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
+        ephemeral: Optional[bool] = False,
+        suppress_embeds: Optional[bool] = False,
+    ) -> FollowupResponse:
+        """
+        Sends a follow-up message to a deferred interaction
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The content of the message to send
+        embed: Optional[Embed]
+            The embed to send with the message
+        embeds: Optional[List[Embed]]
+            The list of embeds to send with the message (max 10)
+        view: Optional[View]
+            The view to send with the message
+        tts: Optional[bool]
+            Whether the message should be sent as tts or not
+        file: Optional[File]
+            The file to send with the message
+        files: Optional[List[File]]
+            The list of files to send with the message
+        ephemeral: Optional[bool]
+            Whether the message should be ephemeral or not
+        suppress_embeds: Optional[bool]
+            Whether the message should suppress embeds or not
+
+        Notes
+        -----
+        Multipart files are not supported yet, will be added in the future.
+        """
+        payload = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            view=view,
+            tts=tts,
+            file=file,
+            files=files,
+            ephemeral=ephemeral,
+            suppress_embeds=suppress_embeds,
+        )
+        if view:
+            self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
+            self.interaction.client.load_components(view)
+        resp = await self.interaction.client.http.send_webhook_message(
+            self.interaction.application_id, self.interaction.token, create_form(payload, merge_fields(file, files))
+        )
+        data = await resp.json()
+        return FollowupResponse(data, self.interaction)
+    
