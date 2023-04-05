@@ -20,8 +20,8 @@ class Embed:
     """
     def __init__(
         self,
-        *,
         title: Optional[str] = None,
+        *,
         description: Optional[str] = None,
         url: Optional[str] = None,
         color: Optional[int] = None,
@@ -39,7 +39,7 @@ class Embed:
         if timestamp:
             self.data["timestamp"] = timestamp
 
-        self._fields_container: List[Dict[str, Any]] = []
+        self.fields: List[Dict[str, Any]] = []
 
     def author(
         self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None
@@ -134,7 +134,7 @@ class Embed:
         inline: :class:`bool`
             Whether the field is inline.
         """
-        self._fields_container.append({"name": name, "value": value, "inline": inline})
+        self.fields.append({"name": name, "value": value, "inline": inline})
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -145,6 +145,6 @@ class Embed:
         Returns
         -------
         """
-        if self._fields_container:
-            self.data["fields"] = self._fields_container
+        if self.fields:
+            self.data["fields"] = self.fields
         return self.data

@@ -139,3 +139,4 @@ Spacefile
 bot/
 webhook.png
 ping.py
+!examples/*
