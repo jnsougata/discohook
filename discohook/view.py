@@ -13,10 +13,10 @@ class Component:
     type: :class:`MessageComponentType`
         The type of the component.
     """
-    def __init__(self, type: MessageComponentType):
+    def __init__(self, type: Optional[MessageComponentType] = None):
         self.type = type
-        self.custom_id = secrets.token_urlsafe(16)
         self.callback: Optional[Callable] = None
+        self.custom_id = secrets.token_urlsafe(16)
 
     def on_interaction(self, coro: Callable):
         """
@@ -28,9 +28,14 @@ class Component:
 
         Returns
         -------
-
+        None
         """
         self.callback = coro
+
+    def __call__(self, *args, **kwargs):
+        if not self.callback:
+            raise RuntimeWarning("No callback registered for this component.")
+        return self.callback(*args, **kwargs)
 
 
 class Button(Component):
@@ -65,9 +70,6 @@ class Button(Component):
         self.emoji = emoji  # type: ignore
         self.style = style
         self.disabled = disabled  # type: ignore
-
-    def __call__(self, *args, **kwargs):
-        return self
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -195,9 +197,6 @@ class SelectMenu(Component):
             self.data["max_values"] = max_values
         if disabled:
             self.data["disabled"] = disabled
-
-    def __call__(self, *args, **kwargs):
-        return self
 
     def to_dict(self) -> Dict[str, Any]:
         """

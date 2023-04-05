@@ -232,7 +232,7 @@ class Interaction:
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal.value,
         }
-        await self.client.http.send_modal(self.id, self.token, payload)
+        await self.client.http.send_interaction_callback(self.id, self.token, payload)
 
     async def autocomplete(self, choices: List[Choice]):
         """

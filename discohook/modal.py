@@ -1,19 +1,16 @@
-import secrets
-from typing import Callable
-# from .component import Button, SelectMenu
+from typing import Dict, Any, List
+from .view import Component
 from .enums import MessageComponentType, TextInputFieldLength
 
 
-class Modal:
+class Modal(Component):
     """
     A modal for discord.
     """
     def __init__(self, title: str):
+        super().__init__()
         self.title = title
-        self._callback = None
-        self.custom_id = secrets.token_urlsafe(16)
-        self._row = {"type": MessageComponentType.action_row.value, "components": []}
-        self._data = {"title": title, "custom_id": self.custom_id, "components": []}
+        self.rows: List[Dict[str, Any]] = []
 
     # def add_select(self, select: SelectMenu):
     #   self._data["components"].append(
@@ -57,7 +54,7 @@ class Modal:
         style: TextInputFieldLength
             The style of the field.
         """
-        self._data["components"].append(
+        self.rows.append(
             {
                 "type": MessageComponentType.action_row.value,
                 "components": [
@@ -80,12 +77,7 @@ class Modal:
         """
         Convert the modal to a dict to be sent to discord. For internal use only.
         """
-        if self._row["components"]:
-            self._data["components"].append(self._row)
-        return self._data
-
-    def onsubmit(self, coro: Callable):
-        """
-        A decorator to register a callback for the modal.
-        """
-        self._callback = coro
+        data = {"title": self.title, "custom_id": self.custom_id, "components": []}
+        if self.rows:
+            data["components"].extend(self.rows)
+        return data

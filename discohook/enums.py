@@ -195,6 +195,7 @@ class ButtonStyle(Enum):
     red = 4
     link = 5
 
+
 class WebhookType(Enum):
     """
     The type of webhook.

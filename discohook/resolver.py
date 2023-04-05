@@ -13,6 +13,8 @@ from .enums import ApplicationCommandOptionType, ApplicationCommandType, Message
 def handle_params_by_signature(
     func: Callable, options: Dict[str, Any], skips: int = 1
 ) -> Tuple[List[Any], Dict[str, Any]]:
+    if not func:
+        return [], {}
     params = inspect.getfullargspec(func)
     default_args = params.defaults
     default_kwargs = params.kwonlydefaults

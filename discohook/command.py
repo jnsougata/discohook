@@ -2,8 +2,8 @@ import asyncio
 from functools import wraps
 from .option import Option
 from .permissions import Permissions
-from .enums import ApplicationCommandType, ApplicationCommandOptionType
 from typing import Callable, Dict, List, Optional, Any
+from .enums import ApplicationCommandType, ApplicationCommandOptionType
 
 
 class SubCommand:
@@ -31,9 +31,15 @@ class SubCommand:
     ):
         self.name = name
         self.options = options  # type: ignore
-        self.callback = callback  # type: ignore
+        self.callback: Optional[Callable] = callback  # type: ignore
         self.description = description
-        self._component_callback: Optional[Callable] = None
+
+    def __call__(self, *args, **kwargs):
+        if not self.callback:
+            raise RuntimeWarning(
+                f"subcommand `{self.name}` of command "
+                f"`{args[0].data['name']}` (id: {args[0].data['id']}) has no callback")
+        return self.callback(*args, **kwargs)
 
     def to_dict(self) -> Dict[str, Any]:
         payload = {
@@ -90,10 +96,15 @@ class ApplicationCommand:
         self.application_id = None
         self.category = category
         self.permissions = permissions  # type: ignore
-        self._callback = None
-        self._payload: Dict[str, Any] = {}
-        self._autocomplete_callback = None
-        self._subcommand_callbacks: Dict[str, Callable] = {}
+        self.callback: Optional[Callable] = None
+        self.data: Dict[str, Any] = {}
+        self.subcommands: Dict[str, SubCommand] = {}
+        self.autocomplete_callback: Optional[Callable] = None
+
+    def __call__(self, *args, **kwargs):
+        if not self.callback:
+            raise RuntimeWarning(f"command `{self.name}` (id: {self.id}) has no callback")
+        return self.callback(*args, **kwargs)
 
     def callback(self, coro: Callable):
         """
@@ -104,7 +115,7 @@ class ApplicationCommand:
         coro: Callable
             The callback to register.
         """
-        self._callback = coro
+        self.callback = coro
 
     def autocomplete(self, coro: Callable):
         """
@@ -115,7 +126,7 @@ class ApplicationCommand:
         coro: Callable
             The callback to register.
         """
-        self._autocomplete_callback = coro
+        self.autocomplete_callback = coro
 
     def subcommand(
         self,
@@ -146,9 +157,8 @@ class ApplicationCommand:
             @wraps(coro)
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
-                    self._subcommand_callbacks[name] = coro
+                    self.subcommands[name] = subcommand
                     return coro
-
             return wrapper()
 
         return decorator  # type: ignore
@@ -163,18 +173,18 @@ class ApplicationCommand:
         -------
         Dict[str, Any]
         """
-        self._payload["type"] = self.category.value
+        self.data["type"] = self.category.value
         if self.category is ApplicationCommandType.slash:
             if self.description:
-                self._payload["description"] = self.description
+                self.data["description"] = self.description
             if self.options:
-                self._payload["options"] = [option.to_dict() for option in self.options]
-        self._payload["name"] = self.name
+                self.data["options"] = [option.to_dict() for option in self.options]
+        self.data["name"] = self.name
         if not self.dm_access:
-            self._payload["dm_permission"] = self.dm_access
+            self.data["dm_permission"] = self.dm_access
         if self.permissions:
             base = 0
             for permission in self.permissions:
                 base |= permission.value
-            self._payload["default_member_permissions"] = str(base)
-        return self._payload
+            self.data["default_member_permissions"] = str(base)
+        return self.data

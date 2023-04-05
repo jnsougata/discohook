@@ -79,7 +79,7 @@ class Client(FastAPI):
         self.add_api_route("/api/dash/{token}", dashboard, methods=["GET"], include_in_schema=False)
         self.add_api_route(
             "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False)
-        self._global_error_handler: Optional[Callable] = None
+        self.error_handler: Optional[Callable] = None
 
     def load_components(self, view: View):
         """
@@ -142,7 +142,7 @@ class Client(FastAPI):
             @wraps(coro)
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
-                    command._callback = coro
+                    command.callback = coro
                     if command.id:
                         self.application_commands[command.id] = command  # noqa
                     self._sync_queue.append(command)
@@ -152,7 +152,7 @@ class Client(FastAPI):
 
         return decorator
 
-    def add_commands(self, *commands: ApplicationCommand):
+    def add_commands(self, *commands: Union[ApplicationCommand, Any]):
         """
         Add commands to the client.
 
@@ -195,7 +195,7 @@ class Client(FastAPI):
         coro: Callable
             The coroutine to register as the global error handler. Must take 2 parameters:`error` and `data`.
         """
-        self._global_error_handler = coro
+        self.error_handler = coro
 
     async def send_message(
         self,
