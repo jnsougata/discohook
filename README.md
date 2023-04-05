@@ -85,6 +85,8 @@ async def help_command(interaction: discohook.Interaction):
 ```
 ⚠️ Command without the `id` will not work as the library will consider it as a non-registered command.
 
+### 📚 Get more examples [here](examples/)
+
 ### 📕 Why we didn't add auto registration?
 As this library is meant to be used in serverless functions,
 we didn't add auto registration as at each invocation the scripts will be reloaded
