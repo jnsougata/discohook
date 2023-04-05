@@ -1,9 +1,5 @@
-from fastapi import Request
 from .command import *
-from nacl.signing import VerifyKey
-from nacl.exceptions import BadSignatureError
-from fastapi.responses import JSONResponse, Response
-from .interaction import Interaction, ComponentInteraction
+from fastapi import Request
 from .resolver import (
     build_modal_params,
     build_slash_command_prams,
@@ -16,6 +12,15 @@ from .enums import (
     MessageComponentType,
     InteractionCallbackType,
 )
+from nacl.signing import VerifyKey
+from nacl.exceptions import BadSignatureError
+from .interaction import Interaction, ComponentInteraction
+from fastapi.responses import JSONResponse, Response, PlainTextResponse
+
+
+async def poke(request: Request):
+    user = await request.app.as_user()
+    return PlainTextResponse(f"Logged in as {user.name} ({user.id})\n----------------\n", status_code=200)
 
 
 # noinspection PyProtectedMember

@@ -3,7 +3,7 @@ from .embed import Embed
 from .file import File
 from fastapi import FastAPI
 from functools import wraps
-from .handler import handler
+from .handler import handler, poke
 from .https import HTTPClient
 from .enums import ApplicationCommandType
 from .user import ClientUser
@@ -73,6 +73,7 @@ class Client(FastAPI):
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
+        self.add_route(route, poke, methods=["GET"], include_in_schema=False)
         self.add_route(route, handler, methods=["POST"], include_in_schema=False)
         self.add_api_route("/api/sync/{token}", sync, methods=["GET"], include_in_schema=False)
         self.add_api_route("/api/dash/{token}", dashboard, methods=["GET"], include_in_schema=False)
