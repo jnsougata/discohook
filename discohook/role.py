@@ -36,6 +36,7 @@ class PartialRole:
     ) -> "Role":
         """
         Edits the role.
+
         Parameters
         ----------
         name: Optional[:class:`str`]
