@@ -18,11 +18,6 @@ from .interaction import Interaction, ComponentInteraction
 from fastapi.responses import JSONResponse, Response, PlainTextResponse
 
 
-async def poke(request: Request):
-    user = await request.app.as_user()
-    return PlainTextResponse(f"Logged in as {user.name} ({user.id})\n----------------\n", status_code=200)
-
-
 # noinspection PyProtectedMember
 async def handler(request: Request):
     """
