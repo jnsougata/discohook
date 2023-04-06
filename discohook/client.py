@@ -1,3 +1,4 @@
+import aiohttp
 from .command import *
 from .embed import Embed
 from .file import File
@@ -68,7 +69,7 @@ class Client(FastAPI):
         self.redoc_url = None
         self.public_key = public_key
         self.application_id = application_id  # type: ignore
-        self.http = HTTPClient(token, self)
+        self.http = HTTPClient(token, self, aiohttp.ClientSession("https://discord.com"))
         self.active_components: Optional[Dict[str, Component]] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}

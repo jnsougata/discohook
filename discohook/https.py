@@ -7,10 +7,10 @@ if TYPE_CHECKING:
 
 class HTTPClient:
 
-    def __init__(self, token: str, client: "Client"):
+    def __init__(self, token: str, client: "Client", session: aiohttp.ClientSession):
         self.token = token
         self.client = client
-        self.session = aiohttp.ClientSession("https://discord.com")
+        self.session = session
     
     async def request(
             self, 

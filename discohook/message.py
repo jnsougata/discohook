@@ -382,10 +382,6 @@ class InteractionResponse:
             Whether the message should be ephemeral or not
         suppress_embeds: Optional[bool]
             Whether the message should suppress embeds or not
-
-        Notes
-        -----
-        Multipart files are not supported yet, will be added in the future.
         """
         payload = handle_send_params(
             content=content,

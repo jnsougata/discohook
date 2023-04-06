@@ -5,6 +5,7 @@ from .embed import Embed
 from .modal import Modal
 from .member import Member
 from .option import Choice
+from .errors import TokenError
 from .multipart import create_form
 from .channel import PartialChannel
 from .guild import Guild, PartialGuild
@@ -55,8 +56,20 @@ class Interaction:
     """
     def __init__(self, data: Dict[str, Any], client: "Client"):
         self.payload = data
+        self.__responded = False
         self.client: "Client" = client
         self.data: Optional[Dict[str, Any]] = data.get("data")
+
+    @property
+    def responded(self) -> bool:
+        """
+        Whether the interaction has been responded to
+
+        Returns
+        -------
+        bool
+        """
+        return self.__responded
 
     @property
     def id(self) -> str:
@@ -329,6 +342,7 @@ class Interaction:
         }
         await self.client.http.send_interaction_mp_callback(
             self.id, self.token, create_form(payload, merge_fields(file, files)))
+        self.__responded = True
         return InteractionResponse(self)
 
     async def original_response(self) -> Message:
@@ -351,6 +365,7 @@ class ComponentInteraction(Interaction):
     """
     def __init__(self, data: Dict[str, Any], client: "Client"):
         super().__init__(data, client)
+        self.__responded = True
 
     @property
     def message(self) -> Optional[Message]:
@@ -505,18 +520,14 @@ class ComponentInteraction(Interaction):
         )
 
     @property
-    def origin(self) -> Optional[str]:
-        """
-        The original token of the interaction (if it is a follow up)
-
-        Returns
-        -------
-        Optional[str]
-        """
+    def __original_token(self) -> Optional[str]:
         if not self.message:
             return
         parent_id = self.message.interaction_data["id"]
-        return self.client.cached_inter_tokens.get(parent_id, "")
+        try:
+            return self.client.cached_inter_tokens[parent_id]
+        except KeyError:
+            raise TokenError(f"No token found for the interaction (id: {self.id})") from None
 
     async def original_message(self) -> Optional[Message]:
         """
@@ -526,9 +537,7 @@ class ComponentInteraction(Interaction):
         -------
         Optional[Message]
         """
-        if not self.origin:
-            return
-        resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.origin)
+        resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.__original_token)
         data = await resp.json()
         return Message(data, self.client)
 
@@ -536,7 +545,5 @@ class ComponentInteraction(Interaction):
         """
         Deletes the original message of the interaction
         """
-        if not self.origin:
-            return
         self.client.cached_inter_tokens.pop(self.id, None)
-        await self.client.http.delete_webhook_message(self.application_id, self.origin, "@original")
+        await self.client.http.delete_webhook_message(self.application_id, self.__original_token, "@original")
