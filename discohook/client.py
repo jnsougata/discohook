@@ -214,7 +214,7 @@ class Client(FastAPI):
 
         Parameters
         ----------
-        channel_id: int
+        channel_id: str
             The ID of the channel to send the message to.
         content: Optional[str]
             The content of the message.
