@@ -1,3 +1,4 @@
+import traceback
 from .command import *
 from fastapi import Request
 from .resolver import (
@@ -15,7 +16,7 @@ from .enums import (
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from .interaction import Interaction, ComponentInteraction
-from fastapi.responses import JSONResponse, Response, PlainTextResponse
+from fastapi.responses import JSONResponse, Response
 
 
 # noinspection PyProtectedMember
@@ -97,5 +98,8 @@ async def handler(request: Request):
     except Exception as e:
         if request.app.error_handler:
             await request.app.error_handler(e, interaction)
+        else:
+            err = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
+            raise RuntimeError(err)
     else:
         return JSONResponse({"ack": 1}, status_code=200)
