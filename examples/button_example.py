@@ -7,7 +7,7 @@ async def delete(i: discohook.ComponentInteraction):
     if i.from_originator:
         await i.delete_original()
     else:
-        await i.followup_response("You can't delete this message!", ephemeral=True)
+        await i.response("You can't delete this message!", ephemeral=True)
 
 
 random_num = discohook.ApplicationCommand(
@@ -20,7 +20,7 @@ random_num = discohook.ApplicationCommand(
 )
 
 
-@random_num.callback
+@random_num.on_interaction
 async def randint_command(i: discohook.Interaction, min_num: int, max_num: int):
     num = random.randint(min_num, max_num)
     view = discohook.View()

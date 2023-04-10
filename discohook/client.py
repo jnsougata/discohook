@@ -174,11 +174,9 @@ class Client(FastAPI):
         """
         return await self.http.delete_command(str(self.application_id), command_id)
 
-    def load_scripts(self, *scripts: str):
+    def load_modules(self, *scripts: str):
         """
-        Load scripts into the client.
-
-        Scripts are modules that contain commands and a setup function.
+        Loads multiple command modules into the client.
         """
         import importlib
 

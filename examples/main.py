@@ -9,7 +9,7 @@ APPLICATION_ID = os.environ["APPLICATION_ID"]
 
 app = discohook.Client(application_id=APPLICATION_ID, public_key=PUBLIC_KEY, token=TOKEN)
 
-app.load_scripts("./modules/avatar.py")  # load a command from a file
+app.load_modules("./modules/avatar.py")  # load a command from a file
 
 app.add_commands(random_num)  # import a command from another file
 

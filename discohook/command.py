@@ -106,7 +106,7 @@ class ApplicationCommand:
             raise RuntimeWarning(f"command `{self.name}` (id: {self.id}) has no callback")
         return self.callback(*args, **kwargs)
 
-    def callback(self, coro: Callable):
+    def on_interaction(self, coro: Callable):
         """
         A decorator to register a callback for the command.
 

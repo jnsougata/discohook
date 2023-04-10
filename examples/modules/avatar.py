@@ -10,7 +10,7 @@ avatar_command = discohook.ApplicationCommand(
 )
 
 
-@avatar_command.callback
+@avatar_command.on_interaction
 async def callback(inter: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed(title=f"{user.name}#{user.discriminator}")
     embed.image(user.avatar.url)
