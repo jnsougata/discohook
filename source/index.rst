@@ -149,6 +149,9 @@ Documentation
    :members:
    :show-inheritance:
 
+.. autoclass:: discohook.Permissions
+   :members:
+   :show-inheritance:
 
 Indices and tables
 ==================

@@ -3,7 +3,7 @@ from enum import Enum
 
 class Permissions(Enum):
     """
-    Represents a permission.
+    Represents discord permission values.
     """
     create_instant_invite = 1 << 0
     kick_members = 1 << 1
