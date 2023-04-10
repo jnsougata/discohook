@@ -47,8 +47,6 @@ class Client(FastAPI):
         The public key of the bot.
     token: str
         The token of the bot.
-    client_secret: Optional[str]
-        The client secret of the bot. Used for OAuth2.
     route: str
         The route to listen for interactions on.
     **kwargs
