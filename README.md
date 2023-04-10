@@ -6,7 +6,12 @@
 pip install git+https://github.com/jnsougata/discohook
 ```
 
-### Quickstart
+### Links
+
+- [📕 Read documentation](https://discohook.readthedocs.io/en/latest/)
+- [💬 Discord Server](https://discord.gg/5PwqKbM7wu)
+
+## Quickstart
 
 ```python
 import discohook
