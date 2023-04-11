@@ -5,14 +5,14 @@ from .embed import Embed
 from .modal import Modal
 from .member import Member
 from .option import Choice
-from .errors import TokenError
 from .multipart import create_form
 from .channel import PartialChannel
 from .guild import Guild, PartialGuild
 from .enums import InteractionCallbackType
-from .message import Message, InteractionResponse, FollowupResponse
+from .message import Message, InteractionResponse
+from .params import handle_send_params, merge_fields
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
-from .params import handle_edit_params, handle_send_params, MISSING, merge_fields
+
 
 if TYPE_CHECKING:
     from .client import Client
@@ -171,6 +171,20 @@ class Interaction:
         return self.payload.get("locale")
 
     @property
+    def origin(self) -> Optional[Message]:
+        """
+        The message from which the interaction originated (valid only for component interactions)
+
+        Returns
+        -------
+        Optional[Message]
+        """
+        message = self.payload.get("message")
+        if message:
+            return Message(message, self.client)
+        return
+
+    @property
     def guild_locale(self) -> Optional[str]:
         """
         The guild locale of the interaction
@@ -264,7 +278,7 @@ class Interaction:
         }
         await self.client.http.send_interaction_callback(self.id, self.token, payload)
 
-    async def defer(self, ephemeral: bool = False):
+    async def defer(self, ephemeral: bool = False) -> InteractionResponse:
         """
         Defers the interaction
 
@@ -279,6 +293,7 @@ class Interaction:
         if ephemeral:
             payload["data"] = {"flags": 64}
         await self.client.http.send_interaction_callback(self.id, self.token, payload)
+        return InteractionResponse(self)
 
     async def response(
         self,
@@ -345,205 +360,17 @@ class Interaction:
         self.__responded = True
         return InteractionResponse(self)
 
-    async def original_response(self) -> Message:
+    async def original_response_message(self) -> Optional[Message]:
         """
-        Gets the original response message of the interaction
+        Gets the original response message of the interaction (valid only if the interaction has been responded to)
 
         Returns
         -------
         InteractionResponse
             The original response message
         """
+        if not self.__responded:
+            return
         resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
         data = await resp.json()
         return Message(data, self.client)
-
-
-class ComponentInteraction(Interaction):
-    """
-    Represents a component interaction subclassed from :class:`Interaction`
-    """
-    def __init__(self, data: Dict[str, Any], client: "Client"):
-        super().__init__(data, client)
-        self.__responded = True
-
-    @property
-    def message(self) -> Optional[Message]:
-        """
-        The message that the component was clicked on
-
-        Returns
-        -------
-        Optional[Message]
-            The message that the component was clicked on
-        """
-        return Message(self.payload["message"], self.client)
-
-    @property
-    def originator(self) -> User:
-        """
-        The user that used the component
-
-        Returns
-        -------
-        User
-        """
-        return User(self.message.interaction_data["user"], self.client)
-
-    @property
-    def from_originator(self) -> bool:
-        """
-        Whether the interaction was from the original author of the message
-
-        Returns
-        -------
-        bool
-        """
-        return self.originator == self.author
-
-    async def followup(
-        self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        ephemeral: Optional[bool] = False,
-        suppress_embeds: Optional[bool] = False,
-    ) -> FollowupResponse:
-        """
-        Sends a followup message to the interaction
-
-        Parameters
-        ----------
-        content: Optional[str]
-            The content of the message to send
-        embed: Optional[Embed]
-            The embed to send with the message
-        embeds: Optional[List[Embed]]
-            The list of embeds to send with the message (max 10)
-        view: Optional[View]
-            The view to send with the message
-        tts: Optional[bool]
-            Whether the message should be sent as tts or not
-        file: Optional[File]
-            The file to send with the message
-        files: Optional[List[File]]
-            The list of files to send with the message
-        ephemeral: Optional[bool]
-            Whether the message should be ephemeral or not
-        suppress_embeds: Optional[bool]
-            Whether the message should suppress embeds or not
-        """
-        data = handle_send_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            suppress_embeds=suppress_embeds,
-        )
-        if view:
-            self.client.store_inter_token(self.id, self.token)
-            self.client.load_components(view)
-
-        payload = {
-            "data": data,
-            "type": InteractionCallbackType.channel_message_with_source.value,
-        }
-        resp = await self.client.http.send_interaction_mp_callback(
-            self.id, self.token, create_form(payload, merge_fields(file, files))
-        )
-        data = await resp.json()
-        return FollowupResponse(data, self)
-
-    async def edit_original(
-        self,
-        content: Optional[str] = MISSING,
-        *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        suppress_embeds: Optional[bool] = MISSING,
-    ):
-        """
-        Edits the original message of the interaction from which the component was interacted.
-
-        Parameters
-        ----------
-        content: Optional[str]
-            The edited content of the message
-        embed: Optional[Embed]
-            The edited embed of the message
-        embeds: Optional[List[Embed]]
-            The edited list of embeds of the message
-        view: Optional[View]
-            The edited view of the message
-        tts: Optional[bool]
-            Whether the message should be sent as tts or not
-        file: Optional[File]
-            The edited file of the message
-        files: Optional[List[File]]
-            The edited list of files of the message
-        suppress_embeds: Optional[bool]
-            Whether the message should suppress embeds or not
-        """
-        data = handle_edit_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
-        )
-        if view is not MISSING and view:
-            self.client.store_inter_token(self.id, self.token)
-            self.client.load_components(view)
-
-        payload = {
-            "data": data,
-            "type": InteractionCallbackType.update_message.value,
-        }
-        await self.client.http.edit_interaction_mp_callback(
-            self.id, self.token, create_form(payload, merge_fields(file, files))
-        )
-
-    @property
-    def __original_token(self) -> Optional[str]:
-        if not self.message:
-            return
-        parent_id = self.message.interaction_data["id"]
-        try:
-            return self.client.cached_inter_tokens[parent_id]
-        except KeyError:
-            raise TokenError(f"No token found for the interaction (id: {self.id})") from None
-
-    async def original_message(self) -> Optional[Message]:
-        """
-        Gets the original message of the interaction
-
-        Returns
-        -------
-        Optional[Message]
-        """
-        resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.__original_token)
-        data = await resp.json()
-        return Message(data, self.client)
-
-    async def delete_original(self):
-        """
-        Deletes the original message of the interaction
-        """
-        self.client.cached_inter_tokens.pop(self.id, None)
-        await self.client.http.delete_webhook_message(self.application_id, self.__original_token, "@original")

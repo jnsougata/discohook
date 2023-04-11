@@ -222,7 +222,7 @@ class Message:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view:
+        if view is not MISSING:
             self.client.load_components(view)
         resp = await self.client.http.edit_channel_message(
             self.channel_id, self.id, create_form(data, merge_fields(file, files))
@@ -345,7 +345,6 @@ class InteractionResponse:
         data = await resp.json()
         return Message(data, self.interaction.client)
 
-        
     async def followup(
         self,
         content: Optional[str] = None,
