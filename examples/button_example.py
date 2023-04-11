@@ -4,7 +4,7 @@ import discohook
 
 @discohook.button("Delete", style=discohook.ButtonStyle.red)
 async def delete(i: discohook.Interaction):
-    if i.origin.author == i.author:
+    if i.from_originator:
         await i.origin.delete()
     else:
         await i.response("You can't delete this message!", ephemeral=True)
