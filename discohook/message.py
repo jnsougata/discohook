@@ -12,6 +12,43 @@ if TYPE_CHECKING:
     from .interaction import Interaction
 
 
+class MessageInteraction:
+    """
+    Represents a partial interaction received with message.
+    """
+    def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
+        self.client = client
+        self.data = payload
+
+    @property
+    def id(self) -> str:
+        """
+        The id of the interaction.
+        """
+        return self.data["id"]
+
+    @property
+    def name(self) -> str:
+        """
+        Name of the application command, including subcommands and subcommand groups
+        """
+        return self.data["name"]
+
+    @property
+    def type(self) -> int:
+        """
+        The type of interaction.
+        """
+        return self.data["type"]
+
+    @property
+    def user(self) -> User:
+        """
+        The user who invoked the interaction.
+        """
+        return User(self.data["user"], self.client)
+
+
 class Message:
     """
     Represents a Discord message.
@@ -149,8 +186,11 @@ class Message:
         return self.data.get("referenced_message")
 
     @property
-    def interaction_data(self) -> Optional[dict]:
-        return self.data.get("interaction")
+    def interaction(self) -> Optional[MessageInteraction]:
+        data = self.data.get("interaction")
+        if not data:
+            return
+        return MessageInteraction(data, self.client)
 
     @property
     def thread(self) -> Optional[dict]:

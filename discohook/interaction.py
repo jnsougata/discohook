@@ -180,9 +180,22 @@ class Interaction:
         Optional[Message]
         """
         message = self.payload.get("message")
-        if message:
-            return Message(message, self.client)
-        return
+        if not message:
+            return
+        return Message(message, self.client)
+
+    @property
+    def from_originator(self) -> bool:
+        """
+        Whether the interaction was triggered by the same user
+
+        Returns
+        -------
+        bool
+        """
+        if not self.origin:
+            return True
+        return self.origin.interaction.user == self.author
 
     @property
     def guild_locale(self) -> Optional[str]:
