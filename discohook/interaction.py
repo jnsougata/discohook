@@ -187,7 +187,7 @@ class Interaction:
     @property
     def from_originator(self) -> bool:
         """
-        Whether the interaction was triggered by the same user
+        Whether the interaction was triggered by the same user (for component interactions only)
 
         Returns
         -------
