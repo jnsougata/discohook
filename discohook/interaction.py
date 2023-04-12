@@ -389,19 +389,15 @@ class ComponentInteraction(Interaction):
         """
         return self.message.interaction.user == self.author
 
-    async def defer(self, **kwargs) -> InteractionResponse:
+    async def defer(self, **kwargs) -> None:
         """
         Defers the interaction
 
-        Returns
-        -------
-        InteractionResponse
         """
         payload = {
             "type": InteractionCallbackType.deferred_update_component_message.value,
         }
         await self.client.http.send_interaction_callback(self.id, self.token, payload)
-        return InteractionResponse(self)
 
     async def update_message(
             self,
@@ -414,7 +410,7 @@ class ComponentInteraction(Interaction):
             file: Optional[File] = MISSING,
             files: Optional[List[File]] = MISSING,
             suppress_embeds: Optional[bool] = MISSING,
-    ) -> Message:
+    ) -> None:
         """
         Edits the message, the component was attached to
 
@@ -455,5 +451,3 @@ class ComponentInteraction(Interaction):
         resp = await self.client.http.send_interaction_mp_callback(
             self.id, self.token, create_form(payload, merge_fields(file, files))
         )
-        data = await resp.json()
-        return Message(data, self.client)
