@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 class PartialEmoji:
     """
     Represents a discord PartialEmoji object.
@@ -9,12 +6,12 @@ class PartialEmoji:
     ----------
     name: :class:`str`
         The name of the emoji.
-    id: :class:`int`
-        The ID of the emoji.
-    animated: Optional[:class:`bool`]
+    id: :class:`str`
+        The unique id of the emoji.
+    animated: :class:`bool`
         Whether the emoji is animated.
     """
-    def __init__(self, name: str, id: int, animated: Optional[bool] = False):  # noqa
+    def __init__(self, name: str, id: str, animated: bool = False):  # noqa
         self.name = name
         self.id = id
         self.animated = animated
