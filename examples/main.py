@@ -1,6 +1,6 @@
 import os
 import discohook
-from button_example import random_num
+from button import random_num
 
 
 TOKEN = os.environ["TOKEN"]
@@ -17,8 +17,10 @@ app.add_commands(random_num)  # import a command from another file
 # adding a error handler
 @app.on_error
 async def on_error(err, i: discohook.Interaction):
-    await i.response(f"```py\nError: {err}\n```", ephemeral=True)
-    # or use followup if already responded
+    if i.responded:
+        await i.followup(f"```py\nError: {err}\n```", ephemeral=True)
+    else:
+        await i.response(f"```py\nError: {err}\n```", ephemeral=True)
     # the above is not recommended as it might leak secret tokens
     # you can get a logging channel and push the traceback there
 

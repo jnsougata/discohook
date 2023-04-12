@@ -97,7 +97,7 @@ async def handler(request: Request):
             return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
     except Exception as e:
         if request.app.error_handler:
-            await request.app.error_handler(e, interaction)
+            await request.app.error_handler(interaction, e)
         else:
             err = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
             raise RuntimeError(err) from None

@@ -9,7 +9,7 @@ from .multipart import create_form
 from .channel import PartialChannel
 from .guild import Guild, PartialGuild
 from .enums import InteractionCallbackType
-from .message import Message, InteractionResponse
+from .message import Message, InteractionResponse, FollowupResponse
 from .params import handle_send_params, handle_edit_params, merge_fields, MISSING
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 
@@ -231,6 +231,21 @@ class Interaction:
             data = await resp.json()
             return Guild(data, self.client)
 
+    async def original_response_message(self) -> Optional[Message]:
+        """
+        Gets the original response message of the interaction (valid only if the interaction has been responded to)
+
+        Returns
+        -------
+        InteractionResponse
+            The original response message
+        """
+        if not self.__responded:
+            return
+        resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
+        data = await resp.json()
+        return Message(data, self.client)
+
     async def send_modal(self, modal: Modal):
         """
         Sends a modal to the interaction
@@ -346,20 +361,62 @@ class Interaction:
         self.__responded = True
         return InteractionResponse(self)
 
-    async def original_response_message(self) -> Optional[Message]:
+    async def followup(
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        view: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
+        ephemeral: Optional[bool] = False,
+        suppress_embeds: Optional[bool] = False,
+    ) -> FollowupResponse:
         """
-        Gets the original response message of the interaction (valid only if the interaction has been responded to)
+        Sends a follow-up message to a deferred interaction
 
-        Returns
-        -------
-        InteractionResponse
-            The original response message
+        Parameters
+        ----------
+        content: Optional[str]
+            The content of the message to send
+        embed: Optional[Embed]
+            The embed to send with the message
+        embeds: Optional[List[Embed]]
+            The list of embeds to send with the message (max 10)
+        view: Optional[View]
+            The view to send with the message
+        tts: Optional[bool]
+            Whether the message should be sent as tts or not
+        file: Optional[File]
+            The file to send with the message
+        files: Optional[List[File]]
+            The list of files to send with the message
+        ephemeral: Optional[bool]
+            Whether the message should be ephemeral or not
+        suppress_embeds: Optional[bool]
+            Whether the message should suppress embeds or not
         """
-        if not self.__responded:
-            return
-        resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
+        payload = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            view=view,
+            tts=tts,
+            file=file,
+            files=files,
+            ephemeral=ephemeral,
+            suppress_embeds=suppress_embeds,
+        )
+        if view:
+            self.client.store_inter_token(self.id, self.token)
+            self.client.load_components(view)
+        resp = await self.client.http.send_webhook_message(
+            self.application_id, self.token, create_form(payload, merge_fields(file, files))
+        )
         data = await resp.json()
-        return Message(data, self.client)
+        return FollowupResponse(data, self)
 
 
 class ComponentInteraction(Interaction):

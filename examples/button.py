@@ -16,12 +16,14 @@ random_num = discohook.ApplicationCommand(
     options=[
         discohook.IntegerOption("min_num", "The minimum number", required=True),
         discohook.IntegerOption("max_num", "The maximum number", required=True),
-    ],
+    ]
 )
 
 
 @random_num.on_interaction
 async def randint_command(i: discohook.Interaction, min_num: int, max_num: int):
+    if min_num > max_num:
+        return await i.response("The minimum number cannot be greater than the maximum number!", ephemeral=True)
     num = random.randint(min_num, max_num)
     view = discohook.View()
     view.add_button_row(delete)
