@@ -25,7 +25,7 @@ async def on_error(err, i: discohook.Interaction):
     # you can get a logging channel and push the traceback there
 
 
-@app.command(name="help", description="sample help command", id="<command_id>")
+@app.command(name="help", description="sample help command")
 async def help_command(i: discohook.Interaction):
     embed = discohook.Embed("Help Command")
     embed.add_field("/help", "Shows this message", inline=True)

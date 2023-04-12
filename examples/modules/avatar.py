@@ -3,7 +3,6 @@ import discohook
 
 avatar_command = discohook.ApplicationCommand(
     name="avatar",
-    id="<command_id>",
     category=discohook.ApplicationCommandType.user,
     permissions=[discohook.Permissions.send_messages],
     dm_access=False,
