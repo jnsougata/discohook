@@ -10,7 +10,7 @@ from .channel import PartialChannel
 from .guild import Guild, PartialGuild
 from .enums import InteractionCallbackType
 from .message import Message, InteractionResponse
-from .params import handle_send_params, merge_fields
+from .params import handle_send_params, handle_edit_params, merge_fields, MISSING
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
 
 
@@ -171,33 +171,6 @@ class Interaction:
         return self.payload.get("locale")
 
     @property
-    def origin(self) -> Optional[Message]:
-        """
-        The message from which the interaction originated (valid only for component interactions)
-
-        Returns
-        -------
-        Optional[Message]
-        """
-        message = self.payload.get("message")
-        if not message:
-            return
-        return Message(message, self.client)
-
-    @property
-    def from_originator(self) -> bool:
-        """
-        Whether the interaction was triggered by the same user (for component interactions only)
-
-        Returns
-        -------
-        bool
-        """
-        if not self.origin:
-            return True
-        return self.origin.interaction.user == self.author
-
-    @property
     def guild_locale(self) -> Optional[str]:
         """
         The guild locale of the interaction
@@ -298,7 +271,7 @@ class Interaction:
         Parameters
         ----------
         ephemeral: bool
-            Whether the successive responses should be ephemeral or not
+            Whether the successive responses should be ephemeral or not (only for Application Commands)
         """
         payload = {
             "type": InteractionCallbackType.deferred_channel_message_with_source.value,
@@ -385,5 +358,102 @@ class Interaction:
         if not self.__responded:
             return
         resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
+        data = await resp.json()
+        return Message(data, self.client)
+
+
+class ComponentInteraction(Interaction):
+
+    def __init__(self, payload: dict, client: "Client"):
+        super().__init__(payload, client)
+
+    @property
+    def message(self) -> Message:
+        """
+        The message from which the component interaction was triggered
+
+        Returns
+        -------
+        Message
+        """
+        return Message(self.payload["message"], self.client)
+
+    @property
+    def from_originator(self) -> bool:
+        """
+        Whether the interaction was triggered by the same user who triggered the message
+
+        Returns
+        -------
+        bool
+        """
+        return self.message.interaction.user == self.author
+
+    async def defer(self, **kwargs) -> InteractionResponse:
+        """
+        Defers the interaction
+
+        Returns
+        -------
+        InteractionResponse
+        """
+        payload = {
+            "type": InteractionCallbackType.deferred_update_component_message.value,
+        }
+        await self.client.http.send_interaction_callback(self.id, self.token, payload)
+        return InteractionResponse(self)
+
+    async def update_message(
+            self,
+            content: Optional[str] = MISSING,
+            *,
+            embed: Optional[Embed] = MISSING,
+            embeds: Optional[List[Embed]] = MISSING,
+            view: Optional[View] = MISSING,
+            tts: Optional[bool] = MISSING,
+            file: Optional[File] = MISSING,
+            files: Optional[List[File]] = MISSING,
+            suppress_embeds: Optional[bool] = MISSING,
+    ) -> Message:
+        """
+        Edits the message, the component was attached to
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The new content of the message.
+        embed: Optional[Embed]
+            The new embed of the message.
+        embeds: Optional[List[Embed]]
+            The new embeds of the message.
+        view: Optional[View]
+            The new view of the message.
+        tts: Optional[bool]
+            Whether the message should be sent with text-to-speech.
+        file: Optional[File]
+            A file to send with the message.
+        files: Optional[List[File]]
+            A list of files to send with the message.
+        suppress_embeds: Optional[bool]
+            Whether the embeds should be suppressed.
+        """
+        data = handle_edit_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            view=view,
+            tts=tts,
+            file=file,
+            files=files,
+            suppress_embeds=suppress_embeds,
+        )
+        if view and view is not MISSING:
+            self.client.load_components(view)
+        self.client.store_inter_token(self.id, self.token)
+        payload = {
+            "type": InteractionCallbackType.update_component_message.value, "data": data}
+        resp = await self.client.http.send_interaction_mp_callback(
+            self.id, self.token, create_form(payload, merge_fields(file, files))
+        )
         data = await resp.json()
         return Message(data, self.client)

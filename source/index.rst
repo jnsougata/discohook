@@ -81,6 +81,10 @@ Documentation
    :members:
    :show-inheritance:
 
+.. autoclass:: discohook.ComponentInteraction
+   :members:
+   :show-inheritance:
+
 .. autoclass:: discohook.Message
    :members:
    :show-inheritance:

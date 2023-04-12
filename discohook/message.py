@@ -262,7 +262,7 @@ class Message:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view is not MISSING:
+        if view and view is not MISSING:
             self.client.load_components(view)
         resp = await self.client.http.edit_channel_message(
             self.channel_id, self.id, create_form(data, merge_fields(file, files))
@@ -318,7 +318,7 @@ class FollowupResponse:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view is not MISSING and view:
+        if view and view is not MISSING:
             self.interaction.client.load_components(view)
         self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = await self.interaction.client.http.edit_webhook_message(
@@ -375,7 +375,7 @@ class InteractionResponse:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view is not MISSING and view:
+        if view and view is not MISSING:
             self.interaction.client.load_components(view)
         self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = await self.interaction.client.http.edit_webhook_message(

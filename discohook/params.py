@@ -73,12 +73,14 @@ def handle_edit_params(
     payload = {}
     embeds = merge_fields(embed, embeds)
     files = merge_fields(file, files)
-    if content is not MISSING:
-        payload["content"] = str(content)
+    if content and content is not MISSING:
+        payload["content"] = content
     if tts is not MISSING:
         payload["tts"] = tts
-    if embeds is not MISSING:
+    if embeds:
         payload["embeds"] = [embed.to_dict() for embed in embeds]
+    else:
+        payload["embeds"] = []
     if view is not MISSING:
         payload["components"] = view.components if view else []
     if files is not MISSING:

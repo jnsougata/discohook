@@ -138,8 +138,8 @@ class InteractionCallbackType(Enum):
     pong = 1
     channel_message_with_source = 4
     deferred_channel_message_with_source = 5
-    deferred_update_message = 6
-    update_message = 7
+    deferred_update_component_message = 6
+    update_component_message = 7
     autocomplete_result = 8
     modal = 9
 
