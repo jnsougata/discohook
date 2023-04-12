@@ -448,6 +448,6 @@ class ComponentInteraction(Interaction):
         self.client.store_inter_token(self.id, self.token)
         payload = {
             "type": InteractionCallbackType.update_component_message.value, "data": data}
-        resp = await self.client.http.send_interaction_mp_callback(
+        await self.client.http.send_interaction_mp_callback(
             self.id, self.token, create_form(payload, merge_fields(file, files))
         )
