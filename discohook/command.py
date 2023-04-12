@@ -85,6 +85,7 @@ class ApplicationCommand:
         permissions: Optional[List[Permissions]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
+        self._id = f"{name}:{category.value}"
         self.name = name
         self.description = description  # type: ignore
         self.options: List[Option] = options
@@ -99,7 +100,7 @@ class ApplicationCommand:
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
-            raise RuntimeWarning(f"command `{self.name}:{self.category.value}` has no callback")
+            raise RuntimeWarning(f"command `{self._id}` has no callback")
         return self.callback(*args, **kwargs)
 
     def on_interaction(self, coro: Callable):

@@ -137,7 +137,7 @@ class Client(FastAPI):
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
                     command.callback = coro
-                    self.application_commands[f"{command.name}:{command.category.value}"] = command
+                    self.application_commands[command._id] = command  # noqa
                     self._sync_queue.append(command)
                     return command
             return wrapper()
@@ -153,7 +153,7 @@ class Client(FastAPI):
         *commands: ApplicationCommand
             The commands to add to the client.
         """
-        self.application_commands.update({command.id: command for command in commands if command.id})
+        self.application_commands.update({command._id: command for command in commands})  # noqa
         self._sync_queue.extend(commands)
 
     async def delete_command(self, command_id: str):

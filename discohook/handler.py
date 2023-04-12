@@ -41,8 +41,8 @@ async def handler(request: Request):
             return JSONResponse({"type": InteractionCallbackType.pong.value}, status_code=200)
 
         elif data["type"] == InteractionType.app_command.value:
-            command_key = f"{interaction.data['name']}:{interaction.data['type']}"
-            command: ApplicationCommand = request.app.application_commands.get(command_key)
+            key = f"{interaction.data['name']}:{interaction.data['type']}"
+            command: ApplicationCommand = request.app.application_commands.get(key)
             if not command:
                 raise RuntimeError(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
 
