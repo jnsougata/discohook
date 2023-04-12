@@ -100,7 +100,6 @@ class Client(FastAPI):
         name: str,
         description: Optional[str] = None,
         *,
-        id: str = None,  # noqa
         options: Optional[List[Option]] = None,
         permissions: Optional[List[Permissions]] = None,
         dm_access: bool = True,
@@ -115,8 +114,6 @@ class Client(FastAPI):
             The name of the command.
         description: Optional[str]
             The description of the command. Does not apply to user & message commands.
-        id: Optional[str]
-            The ID of the command. If not provided, the command will not be synced.
         options: Optional[List[Option]]
             The options of the command. Does not apply to user & message commands.
         permissions: Optional[List[Permissions]]
@@ -133,7 +130,6 @@ class Client(FastAPI):
             permissions=permissions,
             dm_access=dm_access,
             category=category,
-            id=id,
         )
 
         def decorator(coro: Callable):
@@ -141,11 +137,9 @@ class Client(FastAPI):
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
                     command.callback = coro
-                    if command.id:
-                        self.application_commands[command.id] = command  # noqa
+                    self.application_commands[f"{command.name}:{command.category.value}"] = command
                     self._sync_queue.append(command)
                     return command
-
             return wrapper()
 
         return decorator

@@ -65,8 +65,6 @@ class ApplicationCommand:
     ----------
     name: str
         The name of the command.
-    id: Optional[str]
-        The ID of the command. If not provided, the command will not be synced.
     description: Optional[str]
         The description of the command. Does not apply to user & message commands.
     options: Optional[List[Option]]
@@ -81,14 +79,12 @@ class ApplicationCommand:
     def __init__(
         self,
         name: str,
-        id: Optional[str] = None,
         description: Optional[str] = None,
         options: List[Option] = None,
         dm_access: bool = True,
         permissions: Optional[List[Permissions]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
-        self.id = id  # type: ignore
         self.name = name
         self.description = description  # type: ignore
         self.options: List[Option] = options
@@ -103,7 +99,7 @@ class ApplicationCommand:
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
-            raise RuntimeWarning(f"command `{self.name}` (id: {self.id}) has no callback")
+            raise RuntimeWarning(f"command `{self.name}:{self.category.value}` has no callback")
         return self.callback(*args, **kwargs)
 
     def on_interaction(self, coro: Callable):

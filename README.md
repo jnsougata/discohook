@@ -29,7 +29,6 @@ app = discohook.Client(
 )
 
 @app.command(
-    id="", # leave empty for now
     name="help", 
     description="basic help command for the bot"
 )
@@ -71,27 +70,9 @@ You can also register commands manually by using the bash command below.
 curl -X GET https://example.io/api/sync/<bot_token_here>
 ```
 
-### Adding the `id` to the local command
-Now that you've registered the command,
-you can get the `id` of the command by visiting the dashboard and clicking `Copy Id` button.
-Once you have the `id`, you can add it to the command in the code.
-Then your command should look like this
-```python
-@app.command(
-    id="1047575834602520586", # add id like this
-    name="help", 
-    description="basic help command for the bot"
-)
-async def help_command(interaction: discohook.Interaction):
-    await interaction.response(
-        "Hello, World!",
-        embed=discohook.Embed(title="Help", description="This is a help command"),
-        ephemeral=True,
-    )
-```
-⚠️ Command without the `id` will not work as the library will consider it as a non-registered command.
+**🎉 Boom!** You're done. Now you can test your bot by using ` /help ` command in your server.
 
-### 📚 Get more examples [here](examples/)
+### 📚 Get more examples [here](examples)
 
 ### 📕 Why we didn't add auto registration?
 As this library is meant to be used in serverless functions,

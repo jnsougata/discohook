@@ -1,5 +1,4 @@
-from fastapi import Request
-from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse
 
 
 def dashboard():
@@ -183,16 +182,6 @@ def dashboard():
                 type.innerText = data.type;
                 let options = document.createElement("p");
                 options.style.textAlign = "center";
-                let copy = document.createElement("i");
-                copy.className = "fas fa-copy";
-                copy.style.marginRight = "2px";
-                copy.addEventListener("click", () => {
-                    navigator.clipboard.writeText(data.id);
-                    copy.className = "fas fa-check";
-                    setTimeout(() => {
-                        copy.className = "fas fa-copy";
-                    }, 1000);
-                });
                 let del = document.createElement("i");
                 del.className = "fas fa-trash";
                 del.style.marginLeft = "2px";
@@ -205,7 +194,6 @@ def dashboard():
                         alert(msg.error);
                     }
                 });
-                options.appendChild(copy);
                 options.appendChild(del);
                 li.appendChild(name);
                 li.appendChild(id);
