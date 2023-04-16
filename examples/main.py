@@ -16,7 +16,7 @@ app.add_commands(random_num)  # import a command from another file
 
 # adding a error handler
 @app.on_error
-async def on_error(err, i: discohook.Interaction):
+async def on_error(i: discohook.Interaction, err: Exception):
     if i.responded:
         await i.followup(f"```py\nError: {err}\n```", ephemeral=True)
     else:

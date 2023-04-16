@@ -71,19 +71,27 @@ def handle_edit_params(
     suppress_embeds: Optional[bool] = MISSING,
 ):
     payload = {}
+    if embed is None:
+        payload["embeds"] = []
+    if embeds is None:
+        payload["embeds"] = []
+    if view is None:
+        payload["components"] = []
+    if file is None:
+        payload["attachments"] = []
+    if files is None:
+        payload["attachments"] = []
     embeds = merge_fields(embed, embeds)
     files = merge_fields(file, files)
-    if content and content is not MISSING:
+    if content is not MISSING:
         payload["content"] = content
     if tts is not MISSING:
         payload["tts"] = tts
     if embeds:
         payload["embeds"] = [embed.to_dict() for embed in embeds]
-    else:
-        payload["embeds"] = []
     if view is not MISSING:
         payload["components"] = view.components if view else []
-    if files is not MISSING:
+    if files:
         payload["attachments"] = [
             {
                 "id": i,
@@ -92,7 +100,7 @@ def handle_edit_params(
                 "description": file.description,
             }
             for i, file in enumerate(files)
-        ] if files else []
+        ]
     if suppress_embeds is not MISSING:
         payload["flags"] = 1 << 2
 
