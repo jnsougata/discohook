@@ -63,6 +63,8 @@ async def handler(request: Request):
         elif data["type"] == InteractionType.component.value:
             interaction = ComponentInteraction(data, request.app)
             custom_id = interaction.data["custom_id"]
+            if request.app.custom_id_parser:
+              custom_id = await request.app.custom_id_parser(custom_id)
             component = request.app.active_components.get(custom_id, None)
             if not component:
                 return JSONResponse({"error": "component not found"}, status_code=404)
