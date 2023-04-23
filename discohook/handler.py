@@ -63,8 +63,8 @@ async def handler(request: Request):
         elif data["type"] == InteractionType.component.value:
             interaction = ComponentInteraction(data, request.app)
             custom_id = interaction.data["custom_id"]
-            if request.app.custom_id_parser:
-              custom_id = await request.app.custom_id_parser(custom_id)
+            if request.app._custom_id_parser:
+                custom_id = await request.app._custom_id_parser(custom_id)
             component = request.app.active_components.get(custom_id, None)
             if not component:
                 return JSONResponse({"error": "component not found"}, status_code=404)
@@ -91,7 +91,7 @@ async def handler(request: Request):
             interaction = Interaction(data, request.app)
             command: ApplicationCommand = request.app.application_commands.get(interaction.data["id"])
             if not command:
-                return JSONResponse({"error": "command not found!"}, status_code=404)
+                return JSONResponse({"error": "command not found"}, status_code=404)
             option_name = interaction.data["options"][0]["name"]
             option_value = interaction.data["options"][0]["value"]
             if option_value:

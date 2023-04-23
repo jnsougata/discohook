@@ -78,7 +78,7 @@ class Client(FastAPI):
         self.add_api_route(
             "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False)
         self.error_handler: Optional[Callable] = None
-        self.custom_id_parser: Optional[Callable] = None
+        self._custom_id_parser: Optional[Callable] = None
 
     def load_components(self, view: View):
         """
@@ -95,6 +95,16 @@ class Client(FastAPI):
 
     def store_inter_token(self, interaction_id: str, token: str):
         self.cached_inter_tokens[interaction_id] = token
+
+    def custom_id_parser(self, coro: Callable):
+        """
+        A decorator to register a dev defined custom id parser.
+
+        Parameters
+        ----------
+        coro: Callable
+        """
+        self._custom_id_parser = coro
 
     def command(
         self,
