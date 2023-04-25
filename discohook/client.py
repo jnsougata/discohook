@@ -134,7 +134,7 @@ class Client(FastAPI):
         category: AppCmdType
             The category of the command. Defaults to slash commands.
         """
-        command = ApplicationCommand(
+        cmd = ApplicationCommand(
             name=name,
             description=description,
             options=options,
@@ -147,15 +147,15 @@ class Client(FastAPI):
             @wraps(coro)
             def wrapper(*_, **__):
                 if asyncio.iscoroutinefunction(coro):
-                    command.callback = coro
-                    self.application_commands[command._id] = command  # noqa
-                    self._sync_queue.append(command)
-                    return command
+                    cmd.callback = coro
+                    self.application_commands[cmd._id] = cmd  # noqa
+                    self._sync_queue.append(cmd)
+                    return cmd
             return wrapper()
 
         return decorator
 
-    def add_commands(self, *commands: Union[ApplicationCommand, Any]):
+    def load_commands(self, *commands: Union[ApplicationCommand, Any]):
         """
         Add commands to the client.
 

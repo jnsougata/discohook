@@ -185,3 +185,48 @@ class ApplicationCommand:
                 base |= permission.value
             self.data["default_member_permissions"] = str(base)
         return self.data
+
+
+def command(
+    name: str,
+    description: Optional[str] = None,
+    *,
+    options: Optional[List[Option]] = None,
+    permissions: Optional[List[Permissions]] = None,
+    dm_access: bool = True,
+    category: ApplicationCommandType = ApplicationCommandType.slash,
+) -> ApplicationCommand:
+    """
+    A decorator to register a command.
+
+    Parameters
+    ----------
+    name: str
+        The name of the command.
+    description: Optional[str]
+        The description of the command. Does not apply to user & message commands.
+    options: Optional[List[Option]]
+        The options of the command. Does not apply to user & message commands.
+    dm_access: bool
+        Whether the command can be used in DMs. Defaults to True.
+    permissions: Optional[List[Permissions]]
+        The default permissions of the command.
+    category: AppCmdType
+        The category of the command. Defaults to slash commands.
+    """
+    def decorator(coro: Callable):
+        @wraps(coro)
+        def wrapper(*_, **__):
+            cmd = ApplicationCommand(
+                name,
+                description,
+                options,
+                dm_access,
+                permissions,
+                category,
+            )
+            cmd.callback = coro
+            return cmd
+        return wrapper()
+
+    return decorator  # type: ignore
