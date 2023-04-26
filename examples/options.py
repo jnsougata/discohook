@@ -13,6 +13,7 @@ then rolls the dice and sends the result in an embed.
 Note: the IntegerOption parameter "name" must be in lowercase.
 '''
 
+
 @discohook.command(
     name="roll",
     description="Roll a dice",
@@ -57,18 +58,22 @@ how to use the Choice class.
 Note: the StringOption parameter "name" must be in lowercase.
 '''
 
+
 @discohook.command(
     name="gamechoice",
     description="Test command for string select options",
     options=[
-    discohook.StringOption(
-        name="videogame",
-        description="Choose a videogame",
-        required=True,
-        choices=[discohook.Choice(name="Persona 5", value="Persona 5"),
-                 discohook.Choice(name="Zero Escape", value="Zero Escape"),
-                 discohook.Choice(name="Danganronpa", value="Danganronpa")]
-    )]
+        discohook.StringOption(
+            name="videogame",
+            description="Choose a videogame",
+            required=True,
+            choices=[
+                discohook.Choice(name="Persona 5", value="Persona 5"),
+                discohook.Choice(name="Zero Escape", value="Zero Escape"),
+                discohook.Choice(name="Danganronpa", value="Danganronpa")
+            ]
+        )
+    ]
 )
 async def gamechoice(interaction: discohook.Interaction):
     choice = interaction.data['options'][0]['value']
@@ -83,6 +88,7 @@ Command that showcases how to use embeds and how to send them with the
 response method. It also shows how to use the random module. It doesn't
 take any options. It just flips a coin and sends the result in an embed.
 '''
+
 
 @discohook.command(
     name="coinflip",
