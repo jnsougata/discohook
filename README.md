@@ -9,7 +9,7 @@ pip install git+https://github.com/jnsougata/discohook
 
 ### Links
 
-- [📕 Read documentation](https://discohook.readthedocs.io/en/latest/)
+- [📕 Documentation](https://discohook.readthedocs.io/en/latest/)
 - [💬 Discord Server](https://discord.gg/5PwqKbM7wu)
 
 ## Quickstart
@@ -83,5 +83,3 @@ it will cause significant latency.
 So we decided to add a dashboard to register commands.
 Which is a lot faster and also doesn't cause any rate limit issues if used properly.
 Through the dashboard, you can also delete commands and sync the edited commands.
-
-##  [📕 Read documentation](https://discohook.readthedocs.io/en/latest/)
