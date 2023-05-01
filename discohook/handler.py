@@ -42,29 +42,27 @@ async def handler(request: Request):
 
         elif data["type"] == InteractionType.app_command.value:
             key = f"{interaction.data['name']}:{interaction.data['type']}"
-            command: ApplicationCommand = request.app.application_commands.get(key)
-            if not command:
+            cmd: ApplicationCommand = request.app.application_commands.get(key)
+            if not cmd:
                 raise RuntimeError(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
 
             elif not (interaction.data["type"] == ApplicationCommandType.slash.value):
                 target_object = build_context_menu_param(interaction)
-                await command.__call__(interaction, target_object)
+                await cmd.__call__(interaction, target_object)
 
             elif interaction.data.get("options") and (
                 interaction.data["options"][0].get("type") == ApplicationCommandOptionType.subcommand.value
             ):
-                subcommand = command.subcommands.get(interaction.data["options"][0]["name"])
+                subcommand = cmd.subcommands.get(interaction.data["options"][0]["name"])
                 args, kwargs = build_slash_command_prams(subcommand, interaction)
                 await subcommand.__call__(interaction, *args, **kwargs)
             else:
-                args, kwargs = build_slash_command_prams(command.callback, interaction)
-                await command.__call__(interaction, *args, **kwargs)
+                args, kwargs = build_slash_command_prams(cmd.callback, interaction)
+                await cmd.__call__(interaction, *args, **kwargs)
 
         elif data["type"] == InteractionType.component.value:
             interaction = ComponentInteraction(data, request.app)
             custom_id = interaction.data["custom_id"]
-            if request.app._custom_id_parser:
-                custom_id = await request.app._custom_id_parser(custom_id)
             component = request.app.active_components.get(custom_id, None)
             if not component:
                 return JSONResponse({"error": "component not found"}, status_code=404)
@@ -89,13 +87,13 @@ async def handler(request: Request):
 
         elif data["type"] == InteractionType.autocomplete.value:
             interaction = Interaction(data, request.app)
-            command: ApplicationCommand = request.app.application_commands.get(interaction.data["id"])
+            cmd: ApplicationCommand = request.app.application_commands.get(interaction.data["id"])
             if not command:
                 return JSONResponse({"error": "command not found"}, status_code=404)
             option_name = interaction.data["options"][0]["name"]
             option_value = interaction.data["options"][0]["value"]
             if option_value:
-                await command.autocomplete_callback(interaction, option_name, option_value)
+                await cmd.autocomplete_callback(interaction, option_name, option_value)
         else:
             return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
     except Exception as e:

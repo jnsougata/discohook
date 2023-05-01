@@ -13,10 +13,10 @@ class Component:
     type: :class:`MessageComponentType`
         The type of the component.
     """
-    def __init__(self, type: Optional[MessageComponentType] = None):
+    def __init__(self, type: Optional[MessageComponentType] = None, custom_id: Optional[str] = None):
         self.type = type
         self.callback: Optional[Callable] = None
-        self.custom_id = secrets.token_urlsafe(16)
+        self.custom_id = custom_id or secrets.token_urlsafe(16)
 
     def on_interaction(self, coro: Callable):
         """
@@ -63,8 +63,9 @@ class Button(Component):
         style: ButtonStyle = ButtonStyle.blurple,
         disabled: Optional[bool] = False,
         emoji: Optional[PartialEmoji] = None,
+        custom_id: Optional[str] = None,
     ):
-        super().__init__(MessageComponentType.button)
+        super().__init__(MessageComponentType.button, custom_id)
         self.url = url  # type: ignore
         self.label = label
         self.emoji = emoji  # type: ignore
@@ -182,8 +183,9 @@ class SelectMenu(Component):
         channel_types: Optional[List[ChannelType]] = None,
         type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select_menu,
         disabled: Optional[bool] = False,
+        custom_id: Optional[str] = None,
     ):
-        super().__init__(type)
+        super().__init__(type, custom_id)
         self.data = {"type": type.value, "custom_id": self.custom_id}
         if (type.value == MessageComponentType.text_select_menu.value) and (options is not None):
             self.data["options"] = [option.to_dict() for option in options]

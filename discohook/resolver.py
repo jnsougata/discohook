@@ -16,35 +16,26 @@ def handle_params_by_signature(
     if not func:
         return [], {}
     params = inspect.getfullargspec(func)
-    default_args = params.defaults
+    default_args = params.defaults or []
     default_kwargs = params.kwonlydefaults
+
     args = []
-    if default_args:
-        defaults = list(default_args)
-        for i in range(len(params.args[:skips]) - len(defaults)):
-            defaults.insert(i, None)  # noqa
-        for arg, value in zip(params.args[skips:], defaults):
-            option = options.get(arg)
-            if option:
-                args.append(option)
-            else:
-                args.append(value)
-    else:
-        for arg in params.args[skips:]:
-            option = options.get(arg)
-            if option:
-                args.append(option)
-            else:
-                args.append(None)
+    positional_args = [None for _ in range(len(params.args[skips:]) - len(default_args))]
+    positional_args.extend(default_args)
+    for param, default in zip(params.args[skips:], positional_args):
+        option = options.get(param)
+        if option is not None:
+            args.append(option)
+        else:
+            args.append(default)
+
     kwargs = {}
     for kw in params.kwonlyargs:
         option = options.get(kw)
-        if option:
+        if option is not None:
             kwargs[kw] = option
-        elif default_kwargs:
-            kwargs[kw] = default_kwargs.get(kw)
         else:
-            kwargs[kw] = None
+            kwargs[kw] = default_kwargs.get(kw)
     return args, kwargs
 
 

@@ -5,7 +5,7 @@ from .view import View
 from .file import File
 from .multipart import create_form
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
-from .params import handle_edit_params, MISSING, merge_fields, handle_send_params
+from .params import handle_edit_params, MISSING, merge_fields
 
 if TYPE_CHECKING:
     from .client import Client
