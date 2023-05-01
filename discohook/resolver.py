@@ -17,7 +17,7 @@ def handle_params_by_signature(
         return [], {}
     params = inspect.getfullargspec(func)
     default_args = params.defaults or []
-    default_kwargs = params.kwonlydefaults
+    default_kwargs = params.kwonlydefaults or {}
 
     args = []
     positional_args = [None for _ in range(len(params.args[skips:]) - len(default_args))]
