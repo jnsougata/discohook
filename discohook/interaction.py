@@ -46,7 +46,7 @@ class Interaction:
         The locale of the interaction
     guild_locale: Optional[str]
         The guild locale of the interaction
-    
+
     Parameters
     ----------
     data: Dict[str, Any]
@@ -217,7 +217,7 @@ class Interaction:
         if not self.guild_id:
             return
         return PartialGuild(self.guild_id, self.client)
-    
+
     async def fetch_guild(self) -> Optional[Guild]:
         """
         Fetches the guild of the interaction
@@ -448,7 +448,7 @@ class ComponentInteraction(Interaction):
 
     async def defer(self, **kwargs) -> None:
         """
-        Defers the interaction
+        Defers the interaction without showing a loading state
 
         """
         payload = {
