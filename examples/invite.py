@@ -1,3 +1,4 @@
+from typing import Union
 import discohook
 
 # invite command
@@ -28,14 +29,9 @@ duration: int
         discohook.Permissions.create_instant_invite
     ]
 )
-async def invite(interaction: discohook.Interaction):
-    # Get duration
-    duration = interaction.data.get('options')
-
-    # Check if duration was provided
-    if duration != None:
-        duration = duration[0].get('value')
-    else:
+async def invite(interaction: discohook.Interaction, duration: Union[int, None] = None):
+    # Get default duration (1 day) if not specified
+    if duration is None:
         duration = 1
 
     # Send request to Discord API to create a new invite to the current channel
@@ -43,6 +39,7 @@ async def invite(interaction: discohook.Interaction):
         "max_age": duration*86400,
         "unique": "true"
     }
+
     invite = await interaction.client.http.request(method="POST", path=f"/channels/{interaction.channel_id}/invites", use_auth=True, json=params)
     invite = await invite.json()
 
