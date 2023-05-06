@@ -266,15 +266,16 @@ class Interaction:
 
     async def autocomplete(self, choices: List[Choice]):
         """
-        Sends autocomplete choices to the interaction
+        Sends autocomplete choices to the interaction (max 25)
 
         Parameters
         ----------
         choices: List[Choice]
             The choices to send
         """
+        choices = choices[:25]
         payload = {
-            "type": InteractionCallbackType.autocomplete_result.value,
+            "type": InteractionCallbackType.autocomplete.value,
             "data": {"choices": [choice.to_dict() for choice in choices]},
         }
         await self.client.http.send_interaction_callback(self.id, self.token, payload)

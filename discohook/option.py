@@ -19,7 +19,7 @@ class Choice:
     """
     def __init__(self, name: str, value: Union[str, int, float]):
         self.name = name
-        self.value = value
+        self.value = value  # type: ignore
 
     def to_dict(self) -> Dict[str, Any]:
         return {"name": self.name, "value": self.value}
@@ -27,7 +27,7 @@ class Choice:
 
 class Option:
     """
-    Represents an base option for an application command.
+    Represents a base option for an application command.
 
     Parameters
     ----------
@@ -81,7 +81,7 @@ class StringOption(Option):
         The minimum length of the string.
     choices: List[Choice]
         The choices for the string.
-    auto_complete: bool
+    autocomplete: bool
         Whether the string should be auto completed or not.
     """
     def __init__(
@@ -93,19 +93,19 @@ class StringOption(Option):
         max_length: Optional[int] = 100,
         min_length: Optional[int] = 1,
         choices: Optional[List[Choice]] = None,
-        auto_complete: Optional[bool] = False,
+        autocomplete: Optional[bool] = False,
     ):
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.string)
         self.choices = choices
-        self.auto_complete = auto_complete
         self.max_length = max_length
         self.min_length = min_length
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.string)
+        self.autocomplete = autocomplete
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
             self.data["choices"] = [choice.to_dict() for choice in self.choices]
-        if self.auto_complete:
-            self.data["autocomplete"] = self.auto_complete
+        if self.autocomplete:
+            self.data["autocomplete"] = self.autocomplete
         if self.max_length:
             self.data["max_length"] = self.max_length
         if self.min_length:
@@ -131,7 +131,7 @@ class IntegerOption(Option):
         The minimum value of the integer.
     choices: List[Choice]
         The choices for the integer.
-    auto_complete: bool
+    autocomplete: bool
         Whether the integer should be auto completed or not.
     """
     def __init__(
@@ -143,19 +143,19 @@ class IntegerOption(Option):
         max_value: Optional[int] = None,
         min_value: Optional[int] = None,
         choices: Optional[List[Choice]] = None,
-        auto_complete: Optional[bool] = False,
+        autocomplete: Optional[bool] = False,
     ):
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.integer)
         self.choices = choices
-        self.auto_complete = auto_complete
+        self.autocomplete = autocomplete
         self.max_value = max_value
         self.min_value = min_value
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.integer)
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
             self.data["choices"] = [choice.to_dict() for choice in self.choices]
-        if self.auto_complete:
-            self.data["autocomplete"] = self.auto_complete
+        if self.autocomplete:
+            self.data["autocomplete"] = self.autocomplete
         if self.max_value is not None:
             self.data["max_value"] = self.max_value
         if self.min_value is not None:
@@ -181,7 +181,7 @@ class NumberOption(Option):
         The minimum value of the number.
     choices: List[Choice]
         The choices for the number.
-    auto_complete: bool
+    autocomplete: bool
         Whether the number should be auto completed or not.
     """
     def __init__(
@@ -193,19 +193,19 @@ class NumberOption(Option):
         max_value: Optional[float] = None,
         min_value: Optional[float] = None,
         choices: Optional[List[Choice]] = None,
-        auto_complete: Optional[bool] = False,
+        autocomplete: Optional[bool] = False,
     ):
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.number)
         self.choices = choices
-        self.auto_complete = auto_complete
         self.max_value = max_value
         self.min_value = min_value
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.number)
+        self.autocomplete = autocomplete
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
             self.data["choices"] = [choice.to_dict() for choice in self.choices]
-        if self.auto_complete:
-            self.data["autocomplete"] = self.auto_complete
+        if self.autocomplete:
+            self.data["autocomplete"] = self.autocomplete
         if self.max_value is not None:
             self.data["max_value"] = self.max_value
         if self.min_value is not None:
@@ -290,8 +290,8 @@ class ChannelOption(Option):
         required: Optional[bool] = False,
         channel_types: Optional[List[ChannelType]] = None,
     ):
-        self.channel_types = channel_types
         super().__init__(name, description, required, type=ApplicationCommandOptionType.channel)
+        self.channel_types = channel_types
 
     def to_dict(self) -> Dict[str, Any]:
         if self.channel_types:
@@ -336,9 +336,7 @@ class MentionableOption(Option):
         *,
         required: Optional[bool] = False,
     ):
-        super().__init__(
-            name, description, required, type=ApplicationCommandOptionType.mentionable
-        )
+        super().__init__(name, description, required, type=ApplicationCommandOptionType.mentionable)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data

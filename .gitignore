@@ -141,3 +141,5 @@ webhook.png
 ping.py
 !examples/*
 .vscode/
+requirements.txt
+cogs/

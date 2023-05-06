@@ -1,4 +1,0 @@
-furo
-PyNaCl
-aiohttp
-fastapi

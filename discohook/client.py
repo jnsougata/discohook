@@ -144,7 +144,7 @@ class Client(FastAPI):
 
         return decorator
 
-    def load_commands(self, *commands: Union[ApplicationCommand, Any]):
+    def add_commands(self, *commands: Union[ApplicationCommand, Any]):
         """
         Add commands to the client.
 
@@ -244,7 +244,7 @@ class Client(FastAPI):
         This method is used internally by the client. You should not use this method.
         """
         resp = await self.http.sync_commands(
-            str(self.application_id), [command.to_dict() for command in self._sync_queue])
+            str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
         return await resp.json()
 
     async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):

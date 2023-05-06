@@ -79,21 +79,23 @@ async def handler(request: Request):
                 await component.__call__(interaction, build_select_menu_values(interaction))
 
         elif data["type"] == InteractionType.modal_submit.value:
-            component = request.app.active_components.get(interaction.data["custom_id"], None)
+            component = request.app.active_components.get(interaction.data["custom_id"])
             if not component:
                 return JSONResponse({"error": "component not found!"}, status_code=404)
             args, kwargs = build_modal_params(component.callback, interaction)
             await component.__call__(interaction, *args, **kwargs)
 
         elif data["type"] == InteractionType.autocomplete.value:
-            interaction = Interaction(data, request.app)
-            cmd: ApplicationCommand = request.app.application_commands.get(interaction.data["id"])
-            if not command:
+            key = f"{interaction.data['name']}:{interaction.data['type']}"
+            cmd: ApplicationCommand = request.app.application_commands.get(key)
+            if not cmd:
                 return JSONResponse({"error": "command not found"}, status_code=404)
-            option_name = interaction.data["options"][0]["name"]
-            option_value = interaction.data["options"][0]["value"]
-            if option_value:
-                await cmd.autocomplete_callback(interaction, option_name, option_value)
+            name = interaction.data["options"][0]["name"]
+            value = interaction.data["options"][0]["value"]
+            callback = cmd.autocompletes.get(name)
+            if callback:
+                await callback(interaction, value)
+
         else:
             return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
     except Exception as e:

@@ -140,7 +140,7 @@ class InteractionCallbackType(Enum):
     deferred_channel_message_with_source = 5
     deferred_update_component_message = 6
     update_component_message = 7
-    autocomplete_result = 8
+    autocomplete = 8
     modal = 9
 
 

@@ -170,7 +170,7 @@ def dashboard():
                 let li = document.createElement("li");
                 li.id = data.id;
                 if (!data.description) {
-                    data.description = "n/a";
+                    data.description = "null";
                 }
                 let name = document.createElement("p");
                 name.innerText = data.name;

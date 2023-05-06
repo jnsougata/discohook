@@ -96,7 +96,7 @@ class ApplicationCommand:
         self.callback: Optional[Callable] = None
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
-        self.autocomplete_callback: Optional[Callable] = None
+        self.autocompletes: Dict[str, Callable] = {}
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -114,16 +114,24 @@ class ApplicationCommand:
         """
         self.callback = coro
 
-    def autocomplete(self, coro: Callable):
+    def autocomplete(self, name: str):
         """
         A decorator to register a callback for the command's autocomplete choices.
 
         Parameters
         ----------
-        coro: Callable
-            The callback to register.
+        name: str
+            The name of the option to register the autocomplete for.
         """
-        self.autocomplete_callback = coro
+        def decorator(coro: Callable):
+            @wraps(coro)
+            def wrapper(*_, **__):
+                if asyncio.iscoroutinefunction(coro):
+                    self.autocompletes[name] = coro
+                    return coro
+            return wrapper()
+
+        return decorator
 
     def subcommand(
         self,
@@ -195,7 +203,7 @@ def command(
     permissions: Optional[List[Permissions]] = None,
     dm_access: bool = True,
     category: ApplicationCommandType = ApplicationCommandType.slash,
-) -> ApplicationCommand:
+):
     """
     A decorator to register a command.
 

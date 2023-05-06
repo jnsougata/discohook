@@ -15,4 +15,4 @@ async def avatar(inter: discohook.Interaction, user: discohook.User):
 
 # don't forget to add setup function
 def setup(client: discohook.Client):
-    client.load_commands(avatar)
+    client.add_commands(avatar)
