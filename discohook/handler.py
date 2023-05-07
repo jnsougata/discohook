@@ -102,11 +102,8 @@ async def handler(request: Request):
             return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
     except Exception as e:
         if request.app.error_handler:
-            response = await request.app.error_handler(interaction, e)
-            if isinstance(response, Response):
-              return response
-            else:
-              return Response(status_code=500)
+            await request.app.error_handler(interaction, e)
+            return JSONResponse({"message": "internal server error"}, status_code=500)
         else:
             err = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
             raise RuntimeError(err) from None
