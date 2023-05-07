@@ -52,7 +52,7 @@ class Button(Component):
         The style of the button.
     disabled: Optional[:class:`bool`]
         Whether the button is disabled or not.
-    emoji: Optional[:class:`PartialEmoji`]
+    emoji: Optional[Union[:class:`str`, :class:`PartialEmoji`]]
         The emoji to be displayed on the button.
     """
     def __init__(
@@ -287,7 +287,7 @@ def button(
         The style of the button.
     disabled: Optional[:class:`bool`]
         Whether the button is disabled or not.
-    emoji: Optional[:class:`PartialEmoji`]
+    emoji: Optional[Union[:class:`str`, :class:`PartialEmoji`]]
         The emoji of the button.
     custom_id: Optional[:class:`str`]
         The custom id of the button.
