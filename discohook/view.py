@@ -44,7 +44,7 @@ class Button(Component):
 
     Parameters
     ----------
-    label: :class:`str`
+    label: Optional[:class:`str`]
         The text to be displayed on the button.
     url: Optional[:class:`str`]
         The url to be opened when the button is clicked if the style is set to :attr:`ButtonStyle.link`.
@@ -57,7 +57,7 @@ class Button(Component):
     """
     def __init__(
         self,
-        label: str,
+        label: Optional[str] = None,
         *,
         url: Optional[str] = None,
         style: ButtonStyle = ButtonStyle.blurple,
@@ -67,7 +67,7 @@ class Button(Component):
     ):
         super().__init__(MessageComponentType.button, custom_id)
         self.url = url  # type: ignore
-        self.label = label
+        self.label = label  # type: ignore
         self.style = style
         self.disabled = disabled  # type: ignore
         self.emoji = emoji if isinstance(emoji, PartialEmoji) else PartialEmoji(name=emoji)  # type: ignore
@@ -86,8 +86,9 @@ class Button(Component):
         payload = {
             "type": self.type.value,
             "style": self.style.value,
-            "label": self.label,
         }
+        if self.label:
+            payload["label"] = self.label
         if not self.style == ButtonStyle.link:
             payload["custom_id"] = self.custom_id
             payload["disabled"] = self.disabled
@@ -266,7 +267,7 @@ class View:
 
 
 def button(
-    label: str,
+    label: Optional[str] = None,
     *,
     url: Optional[str] = None,
     style: ButtonStyle = ButtonStyle.blurple,
@@ -279,7 +280,7 @@ def button(
 
     Parameters
     ----------
-    label: :class:`str`
+    label: Optional[:class:`str`]
         The label of the button.
     url: Optional[:class:`str`]
         The url of the button. This is only used if the style is set to :attr:`ButtonStyle.link`.
