@@ -5,7 +5,7 @@
 ```bash
 pip install git+https://github.com/jnsougata/discohook
 ```
-` ⚠️ ` `pip install discohook` won't install this library. Use the git method mention above.
+` ⚠️ ` `pip install discohook` won't install this library. Use the git method mentioned above.
 
 ### Links
 
