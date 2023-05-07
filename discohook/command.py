@@ -152,15 +152,14 @@ class ApplicationCommand:
         options: Optional[List[Option]]
             The options of the subcommand.
         """
-        subcommand = SubCommand(name, description, options)
-        if self.options:
-            self.options.append(subcommand)
-        else:
-            self.options = [subcommand]  # type: ignore
-
         def decorator(coro: Callable):
             @wraps(coro)
             def wrapper(*_, **__):
+                subcommand = SubCommand(name, description, options, callback=coro)
+                if self.options:
+                    self.options.append(subcommand)  # type: ignore
+                else:
+                    self.options = [subcommand]  # type: ignore
                 if asyncio.iscoroutinefunction(coro):
                     self.subcommands[name] = subcommand
                     return coro
