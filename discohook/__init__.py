@@ -18,7 +18,7 @@ from .role import Role, PartialRole
 from .command import ApplicationCommand, SubCommand, command
 from .message import Message, FollowupResponse, InteractionResponse
 from .interaction import Interaction, ComponentInteraction
-from .view import View, Button, SelectOption, SelectMenu, button, select_menu
+from .view import View, Button, SelectOption, Select, button, select
 
 
 user_command = ApplicationCommandType.user

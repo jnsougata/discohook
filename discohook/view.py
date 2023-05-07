@@ -152,7 +152,7 @@ class SelectOption:
         return payload
 
 
-class SelectMenu(Component):
+class Select(Component):
     """
     Represents a discord select menu component.
 
@@ -224,12 +224,12 @@ class View:
     ----------
     components: List[:class:`dict`]
         The list of components to be sent to discord. Do not modify this directly.
-    children: List[Union[:class:`Button`, :class:`SelectMenu`]]
+    children: List[Union[:class:`Button`, :class:`Select`]]
         The list of children to be sent to discord. Do not modify this directly.
     """
     def __init__(self):
         self.components: List[Dict[str, Any]] = []
-        self.children: List[Union[Button, SelectMenu]] = []
+        self.children: List[Union[Button, Select]] = []
 
     def add_button_row(self, *buttons: Union[Button, Any]):
         """
@@ -250,7 +250,7 @@ class View:
         )
         self.children.extend(buttons[:5])
 
-    def add_select_menu(self, menu: Union[SelectMenu, Any]):
+    def add_select_menu(self, menu: Union[Select, Any]):
         """
         Adds a select menu to the view.
 
@@ -271,7 +271,8 @@ def button(
     url: Optional[str] = None,
     style: ButtonStyle = ButtonStyle.blurple,
     disabled: Optional[bool] = False,
-    emoji: Optional[PartialEmoji] = None
+    emoji: Optional[PartialEmoji] = None,
+    custom_id: Optional[str] = None,
 ):
     """
     A decorator that creates a button and registers a callback to be called when the button is clicked.
@@ -288,6 +289,8 @@ def button(
         Whether the button is disabled or not.
     emoji: Optional[:class:`PartialEmoji`]
         The emoji of the button.
+    custom_id: Optional[:class:`str`]
+        The custom id of the button.
 
     Returns
     -------
@@ -295,13 +298,13 @@ def button(
     """
 
     def decorator(coro: Callable):
-        btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji)
+        btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
         btn.on_interaction(coro)
         return btn
     return decorator
 
 
-def select_menu(
+def select(
     options: Optional[List[SelectOption]] = None,
     *,
     placeholder: Optional[str] = None,
@@ -309,10 +312,11 @@ def select_menu(
     max_values: Optional[int] = None,
     channel_types: Optional[List[ChannelType]] = None,
     type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select_menu,
-    disabled: Optional[bool] = False
+    disabled: Optional[bool] = False,
+    custom_id: Optional[str] = None,
 ):
     """
-    A decorator that creates a select menu and registers a callback to be called when the select menu is selected.
+    A decorator that creates a select menu and registers a callback.
 
     Parameters
     ----------
@@ -330,20 +334,23 @@ def select_menu(
         Whether the select menu is disabled or not.
     type: :class:`SelectMenuType`
         The type of the select menu.
+    custom_id: Optional[:class:`str`]
+        The custom id of the select menu.
 
     Returns
     -------
-    :class:`SelectMenu`
+    :class:`Select`
     """
     def decorator(coro: Callable):
-        menu = SelectMenu(
+        menu = Select(
             options=options,
             placeholder=placeholder,
             min_values=min_values,
             max_values=max_values,
             channel_types=channel_types,
             type=type,
-            disabled=disabled
+            disabled=disabled,
+            custom_id=custom_id,
         )
         menu.on_interaction(coro)
         return menu
