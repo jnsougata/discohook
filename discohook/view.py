@@ -62,15 +62,15 @@ class Button(Component):
         url: Optional[str] = None,
         style: ButtonStyle = ButtonStyle.blurple,
         disabled: Optional[bool] = False,
-        emoji: Optional[PartialEmoji] = None,
+        emoji: Optional[Union[str, PartialEmoji]] = None,
         custom_id: Optional[str] = None,
     ):
         super().__init__(MessageComponentType.button, custom_id)
         self.url = url  # type: ignore
         self.label = label
-        self.emoji = emoji  # type: ignore
         self.style = style
         self.disabled = disabled  # type: ignore
+        self.emoji = emoji if isinstance(emoji, PartialEmoji) else PartialEmoji(name=emoji)  # type: ignore
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -271,7 +271,7 @@ def button(
     url: Optional[str] = None,
     style: ButtonStyle = ButtonStyle.blurple,
     disabled: Optional[bool] = False,
-    emoji: Optional[PartialEmoji] = None,
+    emoji: Optional[Union[str, PartialEmoji]] = None,
     custom_id: Optional[str] = None,
 ):
     """

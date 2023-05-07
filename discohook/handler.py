@@ -108,4 +108,4 @@ async def handler(request: Request):
             err = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
             raise RuntimeError(err) from None
     else:
-        return JSONResponse({"ack": 1}, status_code=200)
+        return JSONResponse({"message": "acknowledged"}, status_code=200)
