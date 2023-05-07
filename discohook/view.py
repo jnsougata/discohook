@@ -70,7 +70,7 @@ class Button(Component):
         self.label = label  # type: ignore
         self.style = style
         self.disabled = disabled  # type: ignore
-        self.emoji = emoji if isinstance(emoji, PartialEmoji) else PartialEmoji(name=emoji)  # type: ignore
+        self.emoji = PartialEmoji(name=emoji) if isinstance(emoji, str) else emoji  # type: ignore
 
     def to_dict(self) -> Dict[str, Any]:
         """
