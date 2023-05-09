@@ -170,7 +170,7 @@ class Client(FastAPI):
 
     def load_modules(self, directory: str):
         """
-        Loads multiple command modules into the client.
+        Loads multiple command form modules in a directory.
 
         Parameters
         ----------
