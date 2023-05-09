@@ -1,5 +1,5 @@
 from .view import Component
-from typing import Dict, Any, List, Callable
+from typing import Dict, Any, List, Callable, Optional
 from .enums import MessageComponentType, TextInputFieldLength
 
 
@@ -12,7 +12,7 @@ class TextInput:
     label: :class:`str`
         The label of the text input field.
     field_id: :class:`str`
-        The unique id of the text input field. Must be valid python identifier.
+        A unique id of the text input field. Must be valid python identifier.
     required: :class:`bool`
         Whether the text input field is required.
     hint: :class:`str`
@@ -70,9 +70,16 @@ class TextInput:
 class Modal(Component):
     """
     A modal for discord.
+
+    Parameters
+    ----------
+    title: :class:`str`
+        The title of the modal.
+    custom_id: :class:`str`
+        The unique id of the modal.
     """
-    def __init__(self, title: str):
-        super().__init__()
+    def __init__(self, title: str, *, custom_id: Optional[str] = None):
+        super().__init__(custom_id=custom_id)
         self.title = title
         # self.components: List[Component] = []
         self.rows: List[Dict[str, Any]] = []
@@ -101,7 +108,7 @@ class Modal(Component):
         label: str
             The label of the field.
         field_id: str
-            The dev defined ID of the field to be used in the callback.
+            A unique id of the text input field. Must be valid python identifier.
         required: bool
             Whether the field is required or not.
         hint: str
@@ -146,7 +153,9 @@ class Modal(Component):
 
 def modal(
     title: str,
-    fields: List[TextInput]
+    fields: List[TextInput],
+    *,
+    custom_id: Optional[str] = None,
 ):
     """
     A decorator that creates a modal and registers a callback.
@@ -157,13 +166,15 @@ def modal(
         The title of the modal.
     fields: List[TextInput]
         The fields to be added to the modal.
+    custom_id: Optional[str]
+        The custom id of the modal. If not provided, it will be generated automatically.
 
     Returns
     -------
     :class:`Modal`
     """
     def decorator(coro: Callable):
-        m = Modal(title)
+        m = Modal(title, custom_id=custom_id)
         for field in fields:
             m.rows.append(field.to_dict())
         m.callback = coro
