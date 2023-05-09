@@ -168,15 +168,22 @@ class Client(FastAPI):
         """
         return await self.http.delete_command(str(self.application_id), command_id)
 
-    def load_modules(self, *scripts: str):
+    def load_modules(self, directory: str):
         """
         Loads multiple command modules into the client.
+
+        Parameters
+        ----------
+        directory: str
+            The directory to load the modules from.
         """
+        import os
         import importlib
 
-        scripts = [script.replace(".py", "") for script in scripts if script.endswith(".py")]
-        for path in scripts:
-            importlib.import_module(path).setup(self)
+        scripts = os.listdir(directory)
+        scripts = [f"{directory}.{script[:-3]}" for script in scripts if script.endswith(".py")]
+        for script in scripts:
+            importlib.import_module(script).setup(self)
 
     def on_error(self, coro: Callable):
         """
