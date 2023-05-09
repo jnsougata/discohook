@@ -37,10 +37,10 @@ async def handler(request: Request):
     data = await request.json()
     interaction = Interaction(data, request.app)
     try:
-        if data["type"] == InteractionType.ping.value:
+        if interaction.type == InteractionType.ping:
             return JSONResponse({"type": InteractionCallbackType.pong.value}, status_code=200)
 
-        elif data["type"] == InteractionType.app_command.value:
+        elif interaction.type == InteractionType.app_command:
             key = f"{interaction.data['name']}:{interaction.data['type']}"
             cmd: ApplicationCommand = request.app.application_commands.get(key)
             if not cmd:
@@ -60,7 +60,7 @@ async def handler(request: Request):
                 args, kwargs = build_slash_command_prams(cmd.callback, interaction)
                 await cmd.__call__(interaction, *args, **kwargs)
 
-        elif data["type"] == InteractionType.component.value:
+        elif interaction.type == InteractionType.component:
             custom_id = interaction.data["custom_id"]
             if request.app._custom_id_parser:
                 custom_id = await request.app._custom_id_parser(custom_id)
@@ -79,14 +79,14 @@ async def handler(request: Request):
             if interaction.data["component_type"] in menu_types:
                 await component.__call__(interaction, build_select_menu_values(interaction))
 
-        elif data["type"] == InteractionType.modal_submit.value:
+        elif interaction.type == InteractionType.modal_submit:
             component = request.app.active_components.get(interaction.data["custom_id"])
             if not component:
                 return JSONResponse({"error": "component not found!"}, status_code=404)
             args, kwargs = build_modal_params(component.callback, interaction)
             await component.__call__(interaction, *args, **kwargs)
 
-        elif data["type"] == InteractionType.autocomplete.value:
+        elif interaction.type == InteractionType.autocomplete:
             key = f"{interaction.data['name']}:{interaction.data['type']}"
             cmd: ApplicationCommand = request.app.application_commands.get(key)
             if not cmd:
