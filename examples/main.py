@@ -26,7 +26,7 @@ async def on_error(i: discohook.Interaction, err: Exception):
 
 
 @app.command(name="help", description="sample help command")
-async def help_command(i: discohook.Interaction):
+async def callback(i: discohook.Interaction):
     embed = discohook.Embed("Help Command")
     embed.add_field("/help", "Shows this message", inline=True)
     embed.add_field("/do", "Does something", inline=True)

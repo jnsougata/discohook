@@ -2,8 +2,7 @@ import asyncio
 import discohook
 
 # vote command
-
-'''
+"""
 Command that showcases the use of options, as well as the Discord REST API
 to create reactions on a poll.
 
@@ -19,7 +18,7 @@ option_3: str
     The third option
 option_4: str
     The fourth option
-'''
+"""
 
 
 @discohook.command(
@@ -53,7 +52,7 @@ option_4: str
         )
     ]
 )
-async def vote(interaction: discohook.Interaction, statement: str):
+async def vote(interaction: discohook.Interaction, enunciado: str):
     # Get options and remove empty ones
     options = list(filter(None, interaction.data['options'][1:]))
 
@@ -61,40 +60,29 @@ async def vote(interaction: discohook.Interaction, statement: str):
     options = [option['value'] for option in options]
 
     # Format options with emojis (a, b, c, d)
-    formatted_options = [
-        f":regional_indicator_{chr(97+i)}: {item}" for i, item in enumerate(options)]
+    formatted = [f":regional_indicator_{chr(97+i)}: {item}" for i, item in enumerate(options)]
 
     # Create embed
-    vote_embed = discohook.Embed(
-        title=f"{statement}",
-        description="\n\n".join(formatted_options),
-        color=0xb51ed4
-    )
+    embed = discohook.Embed(title=f"{enunciado}", description="\n\n".join(formatted), color=0xb51ed4)
 
     # Add footer with author name and avatar
-    vote_embed.footer("Poll created by " + interaction.author.name,
-                      icon_url=interaction.author.avatar.url)
+    embed.footer("Poll created by " + interaction.author.name, icon_url=interaction.author.avatar.url)
 
     # Send result
-    await interaction.response(
-        embed=vote_embed
-    )
+    await interaction.response(embed=embed)
 
     # Calling the internal Discord API to add the reactions for each option
     # To find your unicode emoji as Encoded URL use this website: https://www.urlencoder.org/
     # To do this for components use "interaction.message.id" instead of "interaction.original_response_message().id"
-    encoded_emoji_letter_list = ["%F0%9F%87%A6",
-                                 "%F0%9F%87%A7", "%F0%9F%87%A8", "%F0%9F%87%A9"]
+    encoded_emojis = ["%F0%9F%87%A6", "%F0%9F%87%A7", "%F0%9F%87%A8", "%F0%9F%87%A9"]
     msg = await interaction.original_response()
-    msg_id = msg.id
 
-    for i in range(len(options)):
-        emoji = encoded_emoji_letter_list[i]
+    for emoji in encoded_emojis:
 
         # Create new reaction for the message
         await interaction.client.http.request(
             method="PUT",
-            path=f"/channels/{interaction.channel_id}/messages/{msg_id}/reactions/{emoji}/@me", use_auth=True)
+            path=f"/channels/{interaction.channel_id}/messages/{msg.id}/reactions/{emoji}/@me", use_auth=True)
 
         # Wait a moment between each reaction to avoid rate limit
         await asyncio.sleep(0.2)

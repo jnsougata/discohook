@@ -3,7 +3,7 @@ import discohook
 
 # invite command
 
-'''
+"""
 Command that showcases the use of permissions, as well as the Discord REST API
 to create an invite to the current channel.
 
@@ -11,7 +11,7 @@ Parameters
 ----------
 duration: int
     Duration of the invite (in days), write "0" for no expiration.
-'''
+"""
 
 
 @discohook.command(
@@ -31,8 +31,7 @@ duration: int
 )
 async def invite(interaction: discohook.Interaction, duration: Union[int, None] = None):
     # Get default duration (1 day) if not specified
-    if duration is None:
-        duration = 1
+    duration = duration or 1
 
     # Send request to Discord API to create a new invite to the current channel
     params = {
