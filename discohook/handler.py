@@ -64,17 +64,17 @@ async def handler(request: Request):
             custom_id = interaction.data["custom_id"]
             if request.app._custom_id_parser:
                 custom_id = await request.app._custom_id_parser(custom_id)
-            component = request.app.active_components.get(custom_id, None)
+            component = request.app.active_components.get(custom_id)
             if not component:
                 return JSONResponse({"error": "component not found"}, status_code=404)
             if interaction.data["component_type"] == MessageComponentType.button.value:
                 await component.__call__(interaction)
             menu_types = [
-                MessageComponentType.text_select_menu.value,
-                MessageComponentType.user_select_menu.value,
-                MessageComponentType.role_select_menu.value,
-                MessageComponentType.mentionable_select_menu.value,
-                MessageComponentType.channel_select_menu.value,
+                MessageComponentType.text_select.value,
+                MessageComponentType.user_select.value,
+                MessageComponentType.role_select.value,
+                MessageComponentType.channel_select.value,
+                MessageComponentType.mentionable_select.value,
             ]
             if interaction.data["component_type"] in menu_types:
                 await component.__call__(interaction, build_select_menu_values(interaction))
@@ -107,4 +107,4 @@ async def handler(request: Request):
             err = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
             raise RuntimeError(err) from None
     else:
-        return JSONResponse({"message": "acknowledged"}, status_code=200)
+        return Response(status_code=200)

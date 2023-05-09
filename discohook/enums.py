@@ -152,12 +152,12 @@ class MessageComponentType(Enum):
     """
     action_row = 1
     button = 2
-    text_select_menu = 3
+    text_select = 3
     text_input = 4
-    user_select_menu = 5
-    role_select_menu = 6
-    mentionable_select_menu = 7
-    channel_select_menu = 8
+    user_select = 5
+    role_select = 6
+    mentionable_select = 7
+    channel_select = 8
 
 
 class SelectMenuType(Enum):

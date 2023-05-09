@@ -120,21 +120,21 @@ def build_modal_params(func: Callable, interaction: Interaction):
 
 
 def build_select_menu_values(interaction: Interaction) -> List[Any]:
-    if interaction.data["component_type"] == MessageComponentType.text_select_menu.value:
+    if interaction.data["component_type"] == MessageComponentType.text_select.value:
         return interaction.data["values"]
-    if interaction.data["component_type"] == MessageComponentType.channel_select_menu.value:
+    if interaction.data["component_type"] == MessageComponentType.channel_select.value:
         resolved = interaction.data["resolved"]["channels"]
         return [Channel(resolved.pop(channel_id), interaction.client) for channel_id in interaction.data["values"]]
-    if interaction.data["component_type"] == MessageComponentType.user_select_menu.value:
+    if interaction.data["component_type"] == MessageComponentType.user_select.value:
         resolved = interaction.data["resolved"]["users"]
         return [User(resolved.pop(user_id), interaction.client) for user_id in interaction.data["values"]]
-    if interaction.data["component_type"] == MessageComponentType.role_select_menu.value:
+    if interaction.data["component_type"] == MessageComponentType.role_select.value:
         resolved = interaction.data["resolved"]["roles"]
         roles = [resolved.pop(role_id) for role_id in interaction.data["values"]]
         for role in roles:
             role["guild_id"] = interaction.guild_id
         return [Role(role, interaction.client) for role in roles]
-    if interaction.data["component_type"] == MessageComponentType.mentionable_select_menu.value:
+    if interaction.data["component_type"] == MessageComponentType.mentionable_select.value:
         raw_values = interaction.data["values"]
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})

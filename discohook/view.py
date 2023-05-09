@@ -182,15 +182,15 @@ class Select(Component):
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         channel_types: Optional[List[ChannelType]] = None,
-        type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select_menu,
+        type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select,
         disabled: Optional[bool] = False,
         custom_id: Optional[str] = None,
     ):
         super().__init__(type, custom_id)
         self.data = {"type": type.value, "custom_id": self.custom_id}
-        if (type.value == MessageComponentType.text_select_menu.value) and (options is not None):
+        if (type.value == MessageComponentType.text_select.value) and (options is not None):
             self.data["options"] = [option.to_dict() for option in options]
-        if (type == MessageComponentType.channel_select_menu) and (channel_types is not None):
+        if (type == MessageComponentType.channel_select) and (channel_types is not None):
             self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
         if placeholder:
             self.data["placeholder"] = placeholder
@@ -312,7 +312,7 @@ def select(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     channel_types: Optional[List[ChannelType]] = None,
-    type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select_menu,
+    type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select,
     disabled: Optional[bool] = False,
     custom_id: Optional[str] = None,
 ):
