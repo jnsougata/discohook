@@ -1,6 +1,70 @@
 from .view import Component
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Callable
 from .enums import MessageComponentType, TextInputFieldLength
+
+
+class TextInput:
+    """
+    Represents a text input field in a modal.
+
+    Parameters
+    ----------
+    label: :class:`str`
+        The label of the text input field.
+    field_id: :class:`str`
+        The unique id of the text input field. Must be valid python identifier.
+    required: :class:`bool`
+        Whether the text input field is required.
+    hint: :class:`str`
+        The hint of the text input field.
+    default_text: :class:`str`
+        The default text of the text input field.
+    min_length: :class:`int`
+        The minimum length of the text input field.
+    max_length: :class:`int`
+        The maximum length of the text input field.
+    style: :class:`TextInputFieldLength`
+        The style of the text input field.
+    """
+
+    def __init__(
+        self,
+        label: str,
+        field_id: str,
+        *,
+        required: bool = False,
+        hint: str = None,
+        default_text: str = None,
+        min_length: int = 0,
+        max_length: int = 4000,
+        style: TextInputFieldLength = TextInputFieldLength.short
+    ):
+        self.label = label
+        self.field_id = field_id
+        self.required = required
+        self.hint = hint
+        self.default_text = default_text
+        self.min_length = min_length
+        self.max_length = max_length
+        self.style = style
+
+    def to_dict(self):
+        return {
+            "type": MessageComponentType.action_row.value,
+            "components": [
+                {
+                    "type": 4,
+                    "label": self.label,
+                    "style": self.style.value,
+                    "value": self.default_text,
+                    "custom_id": self.field_id,
+                    "min_length": self.min_length,
+                    "max_length": self.max_length,
+                    "placeholder": self.hint or "",
+                    "required": self.required,
+                }
+            ]
+        }
 
 
 class Modal(Component):
@@ -78,3 +142,30 @@ class Modal(Component):
         if self.rows:
             data["components"].extend(self.rows)
         return data
+
+
+def modal(
+    title: str,
+    fields: List[TextInput]
+):
+    """
+    A decorator that creates a modal and registers a callback.
+
+    Parameters
+    ----------
+    title: str
+        The title of the modal.
+    fields: List[TextInput]
+        The fields to be added to the modal.
+
+    Returns
+    -------
+    :class:`Modal`
+    """
+    def decorator(coro: Callable):
+        m = Modal(title)
+        for field in fields:
+            m.rows.append(field.to_dict())
+        m.callback = coro
+        return m
+    return decorator

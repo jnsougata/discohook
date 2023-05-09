@@ -5,10 +5,11 @@ from .embed import Embed
 from .modal import Modal
 from .member import Member
 from .option import Choice
+from .guild import PartialGuild
 from .multipart import create_form
 from .channel import PartialChannel
-from .guild import Guild, PartialGuild
-from .enums import InteractionCallbackType
+from .errors import InteractionTypeMismatch
+from .enums import InteractionCallbackType, InteractionType, try_enum
 from .message import Message, InteractionResponse, FollowupResponse
 from .params import handle_send_params, handle_edit_params, merge_fields, MISSING
 from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
@@ -89,9 +90,9 @@ class Interaction:
 
         Returns
         -------
-        int
+        InteractionType
         """
-        return self.payload["type"]
+        return try_enum(InteractionType, self.payload["type"])
 
     @property
     def token(self) -> str:
@@ -218,22 +219,36 @@ class Interaction:
             return
         return PartialGuild(self.guild_id, self.client)
 
-    async def fetch_guild(self) -> Optional[Guild]:
+    @property
+    def message(self) -> Optional[Message]:
         """
-        Fetches the guild of the interaction
+        The message from which the component interaction was triggered
 
         Returns
         -------
-        Guild
+        Message
         """
-        if self.guild_id:
-            resp = await self.client.http.fetch_guild(self.guild_id)
-            data = await resp.json()
-            return Guild(data, self.client)
+        payload = self.payload.get("message")
+        if not payload:
+            return
+        return Message(payload, self.client)
 
-    async def original_response_message(self) -> Optional[Message]:
+    @property
+    def from_originator(self) -> bool:
         """
-        Gets the original response message of the interaction (valid only if the interaction has been responded to)
+        Whether the interaction was triggered by the same user who triggered the message
+
+        Returns
+        -------
+        bool
+        """
+        if not self.message:
+            return True
+        return self.message.interaction.user == self.author
+
+    async def original_response(self) -> Optional[Message]:
+        """
+        Gets the original response message of the interaction if the interaction has been responded to.
 
         Returns
         -------
@@ -246,7 +261,7 @@ class Interaction:
         data = await resp.json()
         return Message(data, self.client)
 
-    async def send_modal(self, modal: Modal):
+    async def send_modal(self, modal: Union[Modal, Any]):
         """
         Sends a modal to the interaction
 
@@ -255,6 +270,8 @@ class Interaction:
         modal: Modal
             The modal to send
         """
+        if self.type not in (InteractionType.component, InteractionType.app_command):
+            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
         self.client.active_components[modal.custom_id] = modal
         # for comp in modal.components:
         #     self.client.active_components[comp.custom_id] = comp
@@ -273,6 +290,8 @@ class Interaction:
         choices: List[Choice]
             The choices to send
         """
+        if self.type != InteractionType.app_command:
+            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
         choices = choices[:25]
         payload = {
             "type": InteractionCallbackType.autocomplete.value,
@@ -289,13 +308,75 @@ class Interaction:
         ephemeral: bool
             Whether the successive responses should be ephemeral or not (only for Application Commands)
         """
-        payload = {
-            "type": InteractionCallbackType.deferred_channel_message_with_source.value,
-        }
-        if ephemeral:
-            payload["data"] = {"flags": 64}
+        payload = {}
+        if self.type == InteractionType.component:
+            payload["type"] = InteractionCallbackType.deferred_update_component_message.value
+        elif self.type == InteractionType.app_command or self.type == InteractionType.modal_submit:
+            payload["type"] = InteractionCallbackType.deferred_channel_message_with_source.value
+            if ephemeral:
+                payload["data"] = {"flags": 64}
+        else:
+            raise InteractionTypeMismatch(f"Cannot defer {self.type}")
+
         await self.client.http.send_interaction_callback(self.id, self.token, payload)
+        self.__responded = True
         return InteractionResponse(self)
+
+    async def update_message(
+        self,
+        content: Optional[str] = MISSING,
+        *,
+        embed: Optional[Embed] = MISSING,
+        embeds: Optional[List[Embed]] = MISSING,
+        view: Optional[View] = MISSING,
+        tts: Optional[bool] = MISSING,
+        file: Optional[File] = MISSING,
+        files: Optional[List[File]] = MISSING,
+        suppress_embeds: Optional[bool] = MISSING,
+    ) -> None:
+        """
+        Edits the message, the component was attached to
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The new content of the message.
+        embed: Optional[Embed]
+            The new embed of the message.
+        embeds: Optional[List[Embed]]
+            The new embeds of the message.
+        view: Optional[View]
+            The new view of the message.
+        tts: Optional[bool]
+            Whether the message should be sent with text-to-speech.
+        file: Optional[File]
+            A file to send with the message.
+        files: Optional[List[File]]
+            A list of files to send with the message.
+        suppress_embeds: Optional[bool]
+            Whether the embeds should be suppressed.
+        """
+        if not self.type == InteractionType.component:
+            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
+
+        data = handle_edit_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            view=view,
+            tts=tts,
+            file=file,
+            files=files,
+            suppress_embeds=suppress_embeds,
+        )
+        if view and view is not MISSING:
+            self.client.load_components(view)
+        self.client.store_inter_token(self.id, self.token)
+        payload = {
+            "type": InteractionCallbackType.update_component_message.value, "data": data}
+        await self.client.http.send_interaction_mp_callback(
+            self.id, self.token, create_form(payload, merge_fields(file, files))
+        )
 
     async def response(
         self,
@@ -418,94 +499,3 @@ class Interaction:
         )
         data = await resp.json()
         return FollowupResponse(data, self)
-
-
-class ComponentInteraction(Interaction):
-
-    def __init__(self, payload: dict, client: "Client"):
-        super().__init__(payload, client)
-
-    @property
-    def message(self) -> Message:
-        """
-        The message from which the component interaction was triggered
-
-        Returns
-        -------
-        Message
-        """
-        return Message(self.payload["message"], self.client)
-
-    @property
-    def from_originator(self) -> bool:
-        """
-        Whether the interaction was triggered by the same user who triggered the message
-
-        Returns
-        -------
-        bool
-        """
-        return self.message.interaction.user == self.author
-
-    async def defer(self, **kwargs) -> None:
-        """
-        Defers the interaction without showing a loading state
-
-        """
-        payload = {
-            "type": InteractionCallbackType.deferred_update_component_message.value,
-        }
-        await self.client.http.send_interaction_callback(self.id, self.token, payload)
-
-    async def update_message(
-            self,
-            content: Optional[str] = MISSING,
-            *,
-            embed: Optional[Embed] = MISSING,
-            embeds: Optional[List[Embed]] = MISSING,
-            view: Optional[View] = MISSING,
-            tts: Optional[bool] = MISSING,
-            file: Optional[File] = MISSING,
-            files: Optional[List[File]] = MISSING,
-            suppress_embeds: Optional[bool] = MISSING,
-    ) -> None:
-        """
-        Edits the message, the component was attached to
-
-        Parameters
-        ----------
-        content: Optional[str]
-            The new content of the message.
-        embed: Optional[Embed]
-            The new embed of the message.
-        embeds: Optional[List[Embed]]
-            The new embeds of the message.
-        view: Optional[View]
-            The new view of the message.
-        tts: Optional[bool]
-            Whether the message should be sent with text-to-speech.
-        file: Optional[File]
-            A file to send with the message.
-        files: Optional[List[File]]
-            A list of files to send with the message.
-        suppress_embeds: Optional[bool]
-            Whether the embeds should be suppressed.
-        """
-        data = handle_edit_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
-        )
-        if view and view is not MISSING:
-            self.client.load_components(view)
-        self.client.store_inter_token(self.id, self.token)
-        payload = {
-            "type": InteractionCallbackType.update_component_message.value, "data": data}
-        await self.client.http.send_interaction_mp_callback(
-            self.id, self.token, create_form(payload, merge_fields(file, files))
-        )

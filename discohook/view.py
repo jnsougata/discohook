@@ -232,11 +232,11 @@ class View:
         self.components: List[Dict[str, Any]] = []
         self.children: List[Union[Button, Select]] = []
 
-    def add_button_row(self, *buttons: Union[Button, Any]):
+    def add_buttons(self, *buttons: Union[Button, Any]):
         """
         Adds a row of buttons to the view.
-
-        Each actions rows can only contain up to 5 buttons. Action rows having buttons can not have select menus.
+        Each row can only contain up to 5 buttons.
+        Action rows having buttons can not have select menus.
 
         Parameters
         ----------
@@ -251,11 +251,11 @@ class View:
         )
         self.children.extend(buttons[:5])
 
-    def add_select_menu(self, menu: Union[Select, Any]):
+    def add_select(self, menu: Union[Select, Any]):
         """
-        Adds a select menu to the view.
-
-        Each actions rows can only contain up to 1 select menu. Action rows having select menu can not have buttons.
+        Adds a row of select to the view.
+        Each row can only contain up to 1 select menu.
+        Action rows having select menu can not have buttons.
         """
         self.components.append(
             {
@@ -300,7 +300,7 @@ def button(
 
     def decorator(coro: Callable):
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
-        btn.on_interaction(coro)
+        btn.callback = coro
         return btn
     return decorator
 
@@ -353,6 +353,6 @@ def select(
             disabled=disabled,
             custom_id=custom_id,
         )
-        menu.on_interaction(coro)
+        menu.callback = coro
         return menu
     return decorator

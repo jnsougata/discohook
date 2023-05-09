@@ -18,6 +18,7 @@ from fastapi.responses import JSONResponse
 from .multipart import create_form
 from typing import Optional, List, Dict, Union, Callable, Any
 from .webhook import Webhook
+from .guild import Guild
 
 
 async def delete_cmd(request: Request, command_id: str, token: str):
@@ -293,3 +294,15 @@ class Client(FastAPI):
         resp = await self.http.fetch_webhook(webhook_id, webhook_token=webhook_token)
         data = await resp.json()
         return Webhook(data, self)
+
+    async def fetch_guild(self, guild_id: str) -> Optional[Guild]:
+        """
+        Fetches the guild of given id.
+
+        Returns
+        -------
+        Guild
+        """
+        resp = await self.http.fetch_guild(guild_id)
+        data = await resp.json()
+        return Guild(data, self)

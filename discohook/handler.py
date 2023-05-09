@@ -15,7 +15,7 @@ from .enums import (
 )
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
-from .interaction import Interaction, ComponentInteraction
+from .interaction import Interaction
 from fastapi.responses import JSONResponse, Response
 
 
@@ -61,7 +61,6 @@ async def handler(request: Request):
                 await cmd.__call__(interaction, *args, **kwargs)
 
         elif data["type"] == InteractionType.component.value:
-            interaction = ComponentInteraction(data, request.app)
             custom_id = interaction.data["custom_id"]
             if request.app._custom_id_parser:
                 custom_id = await request.app._custom_id_parser(custom_id)

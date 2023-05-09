@@ -85,7 +85,7 @@ async def vote(interaction: discohook.Interaction, statement: str):
     # To do this for components use "interaction.message.id" instead of "interaction.original_response_message().id"
     encoded_emoji_letter_list = ["%F0%9F%87%A6",
                                  "%F0%9F%87%A7", "%F0%9F%87%A8", "%F0%9F%87%A9"]
-    msg = await interaction.original_response_message()
+    msg = await interaction.original_response()
     msg_id = msg.id
 
     for i in range(len(options)):

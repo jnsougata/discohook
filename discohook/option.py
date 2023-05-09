@@ -32,7 +32,7 @@ class Option:
     Parameters
     ----------
     name: str
-        The name of the option.
+        The name of the option. Must be a valid python identifier.
     description: str
         The description of the option.
     required: bool
