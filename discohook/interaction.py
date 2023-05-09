@@ -316,7 +316,7 @@ class Interaction:
             if ephemeral:
                 payload["data"] = {"flags": 64}
         else:
-            raise InteractionTypeMismatch(f"Cannot defer {self.type}")
+            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
 
         await self.client.http.send_interaction_callback(self.id, self.token, payload)
         self.__responded = True
