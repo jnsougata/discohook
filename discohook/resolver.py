@@ -51,6 +51,8 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
             options[name] = int(value)
         elif option_type == ApplicationCommandOptionType.boolean.value:
             options[name] = bool(value)
+        elif option_type == ApplicationCommandOptionType.number.value:
+            options[name] = float(value)
         elif option_type == ApplicationCommandOptionType.user.value:
             user_data = interaction.data["resolved"]["users"][value]
             if interaction.guild_id:
@@ -73,21 +75,16 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
     return options
 
 
-def resolve_command_options(interaction: Interaction):
-    if not interaction.data.get("options"):
-        return {}
-    first_option = interaction.data["options"][0]
-    if first_option["type"] == ApplicationCommandOptionType.subcommand.value:
-        return parse_generic_options(first_option["options"], interaction)
-    else:
-        return parse_generic_options(interaction.data["options"], interaction)
-
-
 def build_slash_command_prams(func: Callable, interaction: Interaction, skips: int = 1):
-    options = resolve_command_options(interaction)
-    if not options:
+    command_options = interaction.data.get("options")
+    if not command_options:
         return [], {}
-    return handle_params_by_signature(func, options, skips)
+    if command_options[0]["type"] == ApplicationCommandOptionType.subcommand.value:
+        subcommand_options = command_options[0].get("options") or []
+        parsed = parse_generic_options(subcommand_options, interaction)
+    else:
+        parsed = parse_generic_options(interaction.data["options"], interaction)
+    return handle_params_by_signature(func, parsed, skips)
 
 
 def build_context_menu_param(interaction: Interaction):

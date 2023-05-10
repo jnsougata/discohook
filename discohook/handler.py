@@ -51,10 +51,10 @@ async def handler(request: Request):
                 await cmd.__call__(interaction, target_object)
 
             elif interaction.data.get("options") and (
-                interaction.data["options"][0].get("type") == ApplicationCommandOptionType.subcommand.value
+                interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand.value
             ):
-                subcommand = cmd.subcommands.get(interaction.data["options"][0]["name"])
-                args, kwargs = build_slash_command_prams(subcommand, interaction)
+                subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
+                args, kwargs = build_slash_command_prams(subcommand.callback, interaction)
                 await subcommand.__call__(interaction, *args, **kwargs)
             else:
                 args, kwargs = build_slash_command_prams(cmd.callback, interaction)
@@ -91,11 +91,16 @@ async def handler(request: Request):
             cmd: ApplicationCommand = request.app.application_commands.get(key)
             if not cmd:
                 return JSONResponse({"error": "command not found"}, status_code=404)
-            name = interaction.data["options"][0]["name"]
-            value = interaction.data["options"][0]["value"]
-            callback = cmd.autocompletes.get(name)
+            option_type = interaction.data["options"][0]["type"]
+            if option_type == ApplicationCommandOptionType.subcommand.value:
+                subcommand_name = interaction.data["options"][0]["name"]
+                option = interaction.data["options"][0]["options"][0]
+                callback = cmd.subcommands[subcommand_name].autocompletes.get(option["name"])
+            else:
+                option = interaction.data["options"][0]
+                callback = cmd.autocompletes.get(option["name"])
             if callback:
-                await callback(interaction, value)
+                await callback(interaction, option["value"])
         else:
             return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
     except Exception as e:

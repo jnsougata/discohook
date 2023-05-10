@@ -32,6 +32,7 @@ class SubCommand:
         self.options = options  # type: ignore
         self.callback: Optional[Callable] = callback  # type: ignore
         self.description = description
+        self.autocompletes: Dict[str, Callable] = {}
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -39,6 +40,20 @@ class SubCommand:
                 f"subcommand `{self.name}` of command "
                 f"`{args[0].data['name']}` (id: {args[0].data['id']}) has no callback")
         return self.callback(*args, **kwargs)
+
+    def autocomplete(self, name: str):
+        """
+        A decorator to register a callback for the subcommand's autocomplete options.
+
+        Parameters
+        ----------
+        name: str
+            The name of the option to register the autocomplete for.
+        """
+        def decorator(coro: Callable):
+            self.autocompletes[name] = coro
+
+        return decorator
 
     def to_dict(self) -> Dict[str, Any]:
         payload = {
@@ -154,7 +169,7 @@ class ApplicationCommand:
                 self.options = [subcommand]  # type: ignore
             if asyncio.iscoroutinefunction(coro):
                 self.subcommands[name] = subcommand
-                return coro
+                return subcommand
 
         return decorator
 
