@@ -3,7 +3,6 @@ import aiohttp
 from .embed import Embed
 from .file import File
 from fastapi import FastAPI
-from functools import wraps
 from .handler import handler
 from .https import HTTPClient
 from .enums import ApplicationCommandType
@@ -135,14 +134,11 @@ class Client(FastAPI):
         )
 
         def decorator(coro: Callable):
-            @wraps(coro)
-            def wrapper(*_, **__):
-                if asyncio.iscoroutinefunction(coro):
-                    cmd.callback = coro
-                    self.application_commands[cmd._id] = cmd  # noqa
-                    self._sync_queue.append(cmd)
-                    return cmd
-            return wrapper()
+            if asyncio.iscoroutinefunction(coro):
+                cmd.callback = coro
+                self.application_commands[cmd._id] = cmd  # noqa
+                self._sync_queue.append(cmd)
+                return cmd
 
         return decorator
 

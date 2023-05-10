@@ -84,13 +84,13 @@ class Interaction:
         return self.payload["id"]
 
     @property
-    def type(self):
+    def type(self) -> Optional[InteractionType]:
         """
         The type of the interaction
 
         Returns
         -------
-        InteractionType
+        Optional[InteractionType]
         """
         return try_enum(InteractionType, self.payload["type"])
 
@@ -290,7 +290,7 @@ class Interaction:
         choices: List[Choice]
             The choices to send
         """
-        if self.type != InteractionType.app_command:
+        if self.type != InteractionType.autocomplete:
             raise InteractionTypeMismatch(f"Method not supported for {self.type}")
         choices = choices[:25]
         payload = {

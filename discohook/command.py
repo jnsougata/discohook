@@ -1,5 +1,4 @@
 import asyncio
-from functools import wraps
 from .option import Option
 from .permissions import Permissions
 from typing import Callable, Dict, List, Optional, Any
@@ -116,7 +115,7 @@ class ApplicationCommand:
 
     def autocomplete(self, name: str):
         """
-        A decorator to register a callback for the command's autocomplete choices.
+        A decorator to register a callback for the command's autocomplete options.
 
         Parameters
         ----------
@@ -124,12 +123,7 @@ class ApplicationCommand:
             The name of the option to register the autocomplete for.
         """
         def decorator(coro: Callable):
-            @wraps(coro)
-            def wrapper(*_, **__):
-                if asyncio.iscoroutinefunction(coro):
-                    self.autocompletes[name] = coro
-                    return coro
-            return wrapper()
+            self.autocompletes[name] = coro
 
         return decorator
 
@@ -153,19 +147,16 @@ class ApplicationCommand:
             The options of the subcommand.
         """
         def decorator(coro: Callable):
-            @wraps(coro)
-            def wrapper(*_, **__):
-                subcommand = SubCommand(name, description, options, callback=coro)
-                if self.options:
-                    self.options.append(subcommand)  # type: ignore
-                else:
-                    self.options = [subcommand]  # type: ignore
-                if asyncio.iscoroutinefunction(coro):
-                    self.subcommands[name] = subcommand
-                    return coro
-            return wrapper()
+            subcommand = SubCommand(name, description, options, callback=coro)
+            if self.options:
+                self.options.append(subcommand)  # type: ignore
+            else:
+                self.options = [subcommand]  # type: ignore
+            if asyncio.iscoroutinefunction(coro):
+                self.subcommands[name] = subcommand
+                return coro
 
-        return decorator  # type: ignore
+        return decorator
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -222,18 +213,15 @@ def command(
         The category of the command. Defaults to slash commands.
     """
     def decorator(coro: Callable):
-        @wraps(coro)
-        def wrapper(*_, **__):
-            cmd = ApplicationCommand(
-                name,
-                description,
-                options,
-                dm_access,
-                permissions,
-                category,
-            )
-            cmd.callback = coro
-            return cmd
-        return wrapper()
+        cmd = ApplicationCommand(
+            name,
+            description,
+            options,
+            dm_access,
+            permissions,
+            category,
+        )
+        cmd.callback = coro
+        return cmd
 
-    return decorator  # type: ignore
+    return decorator

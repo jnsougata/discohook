@@ -96,15 +96,14 @@ async def handler(request: Request):
             callback = cmd.autocompletes.get(name)
             if callback:
                 await callback(interaction, value)
-
         else:
             return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
     except Exception as e:
+        stack_trace = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
         if request.app.error_handler:
             await request.app.error_handler(interaction, e)
-            return JSONResponse({"message": "internal server error"}, status_code=500)
+            return JSONResponse({"errors": stack_trace}, status_code=500)
         else:
-            err = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
-            raise RuntimeError(err) from None
+            raise RuntimeError(stack_trace) from None
     else:
         return Response(status_code=200)
