@@ -251,19 +251,25 @@ class View:
         )
         self.children.extend(buttons[:5])
 
-    def add_select(self, menu: Union[Select, Any]):
+    # noinspection PyShadowingNames
+    def add_select(self, select: Union[Select, Any]):
         """
         Adds a row of select to the view.
         Each row can only contain up to 1 select menu.
         Action rows having select menu can not have buttons.
+
+        Parameters
+        ----------
+        select: :class:`Select`
+            The select menu to be added to the view.
         """
         self.components.append(
             {
                 "type": MessageComponentType.action_row.value,
-                "components": [menu.to_dict()],
+                "components": [select.to_dict()],
             }
         )
-        self.children.append(menu)
+        self.children.append(select)
 
 
 def button(
