@@ -175,10 +175,12 @@ def modal(
     -------
     :class:`Modal`
     """
+
     def decorator(coro: Callable):
-        m = Modal(title, custom_id=custom_id)
+        mdl = Modal(title, custom_id=custom_id)
         for field in fields:
-            m.rows.append(field.to_dict())
-        m.callback = coro
-        return m
+            mdl.rows.append(field.to_dict())
+        mdl.callback = coro
+        return mdl
+
     return decorator

@@ -71,9 +71,10 @@ class Webhook:
 
     @property
     def avatar(self) -> Optional[Asset]:
-        h = self.data.get("avatar")
-        if h:
-            return Asset(hash=h, fragment=f"avatars/{self.id}/")
+        hash = self.data.get("avatar")
+        if hash:
+            return Asset(hash=hash, fragment=f"avatars/{self.id}/")
+        return None
 
     @property
     def token(self) -> Optional[str]:

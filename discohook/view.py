@@ -92,7 +92,7 @@ class Button(Component):
         }
         if self.label:
             payload["label"] = self.label
-        if not self.style == ButtonStyle.link:
+        if self.style != ButtonStyle.link:
             payload["custom_id"] = self.custom_id
         payload["disabled"] = self.disabled
         if self.emoji:

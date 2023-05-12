@@ -211,8 +211,7 @@ class Interaction:
             member.update(member.pop("user", {}))
             member["guild_id"] = self.guild_id
             return Member(member, self.client)
-        else:
-            return User(user, self.client)
+        return User(user, self.client)
 
     @property
     def guild(self) -> Optional[PartialGuild]:
@@ -357,7 +356,7 @@ class Interaction:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        if not self.type == InteractionType.component:
+        if self.type != InteractionType.component:
             raise InteractionTypeMismatch(f"Method not supported for {self.type}")
 
         data = handle_edit_params(
