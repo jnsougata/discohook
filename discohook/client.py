@@ -54,6 +54,7 @@ class Client(FastAPI):
     **kwargs
         Keyword arguments to pass to the FastAPI instance.
     """
+
     def __init__(
         self,
         *,
@@ -78,7 +79,8 @@ class Client(FastAPI):
         self.add_api_route("/api/sync/{token}", sync, methods=["GET"], include_in_schema=False)
         self.add_api_route("/api/dash/{token}", dashboard, methods=["GET"], include_in_schema=False)
         self.add_api_route(
-            "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False)
+            "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False
+        )
         self.error_handler: Optional[Callable] = None
         self._custom_id_parser: Optional[Callable] = None
 
@@ -175,8 +177,8 @@ class Client(FastAPI):
         directory: str
             The directory to load the modules from.
         """
-        import os
         import importlib
+        import os
 
         scripts = os.listdir(directory)
         scripts = [f"{directory}.{script[:-3]}" for script in scripts if script.endswith(".py")]
@@ -202,7 +204,7 @@ class Client(FastAPI):
         coro: Callable
         """
         self._custom_id_parser = coro
-        
+
     async def send_message(
         self,
         channel_id: str,
@@ -259,8 +261,7 @@ class Client(FastAPI):
 
         This method is used internally by the client. You should not use this method.
         """
-        resp = await self.http.sync_commands(
-            str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
+        resp = await self.http.sync_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
         return await resp.json()
 
     async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):

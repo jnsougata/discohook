@@ -13,11 +13,12 @@ class Choice:
         The name of the choice.
     value: Union[str, int, float]
         The value of the choice.
-    
+
     Notes
     -----
     The value of the choice must be of the same type as the option.
     """
+
     def __init__(self, name: str, value: Union[str, int, float]):
         self.name = name
         self.value = value  # type: ignore
@@ -41,6 +42,7 @@ class Option:
     type: AppCmdOptionType
         The type of the option.
     """
+
     def __init__(
         self,
         name: str,
@@ -78,13 +80,14 @@ class StringOption(Option):
         Whether the option is required or not.
     max_length: int
         The maximum length of the string.
-    min_length: int         
+    min_length: int
         The minimum length of the string.
     choices: List[Choice]
         The choices for the string.
     autocomplete: bool
         Whether the string should be auto completed or not.
     """
+
     def __init__(
         self,
         name: str,
@@ -135,6 +138,7 @@ class IntegerOption(Option):
     autocomplete: bool
         Whether the integer should be auto completed or not.
     """
+
     def __init__(
         self,
         name: str,
@@ -185,6 +189,7 @@ class NumberOption(Option):
     autocomplete: bool
         Whether the number should be auto completed or not.
     """
+
     def __init__(
         self,
         name: str,
@@ -218,6 +223,7 @@ class BooleanOption(Option):
     """
     Represents a boolean type option for an application command, subclassed from `Option`
     """
+
     def __init__(
         self,
         name: str,
@@ -245,6 +251,7 @@ class UserOption(Option):
     """
     Represents a user type option for an application command, subclassed from `Option`
     """
+
     def __init__(
         self,
         name: str,
@@ -283,6 +290,7 @@ class ChannelOption(Option):
     channel_types: List[ChannelType]
         The channel types that are allowed for this option.
     """
+
     def __init__(
         self,
         name: str,
@@ -304,6 +312,7 @@ class RoleOption(Option):
     """
     Represents a role type option for an application command, subclassed from `Option`
     """
+
     def __init__(
         self,
         name: str,
@@ -330,6 +339,7 @@ class MentionableOption(Option):
     required: bool
         Whether the option is required or not.
     """
+
     def __init__(
         self,
         name: str,
@@ -356,6 +366,7 @@ class AttachmentOption(Option):
     required: bool
         Whether the option is required or not.
     """
+
     def __init__(
         self,
         name: str,

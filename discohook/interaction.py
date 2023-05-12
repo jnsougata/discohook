@@ -55,6 +55,7 @@ class Interaction:
     client: Client
         The request object from fastapi
     """
+
     def __init__(self, data: Dict[str, Any], client: "Client"):
         self.payload = data
         self.__responded = False
@@ -372,8 +373,7 @@ class Interaction:
         if view and view is not MISSING:
             self.client.load_components(view)
         self.client.store_inter_token(self.id, self.token)
-        payload = {
-            "type": InteractionCallbackType.update_component_message.value, "data": data}
+        payload = {"type": InteractionCallbackType.update_component_message.value, "data": data}
         await self.client.http.send_interaction_mp_callback(
             self.id, self.token, create_form(payload, merge_fields(file, files))
         )
@@ -439,7 +439,8 @@ class Interaction:
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
         await self.client.http.send_interaction_mp_callback(
-            self.id, self.token, create_form(payload, merge_fields(file, files)))
+            self.id, self.token, create_form(payload, merge_fields(file, files))
+        )
         self.__responded = True
         return InteractionResponse(self)
 

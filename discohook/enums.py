@@ -19,6 +19,7 @@ class TextInputFieldLength(Enum):
     long: :class:`int`
         Used to specify a long length text input field (up to 3000 characters).
     """
+
     short = 1
     long = 2
 
@@ -34,6 +35,7 @@ class ModalFieldType(Enum):
     text_input: :class:`int`
         Used to specify a text input field.
     """
+
     text_input = 4
 
 
@@ -50,6 +52,7 @@ class ApplicationCommandType(Enum):
     message: :class:`int`
         Used to specify a message command.
     """
+
     slash = 1
     user = 2
     message = 3
@@ -61,6 +64,7 @@ class ApplicationCommandOptionType(Enum):
 
     Used internally by the library. You should not need to use this.
     """
+
     subcommand = 1
     subcommand_groups = 2
     string = 3
@@ -103,6 +107,7 @@ class ChannelType(Enum):
     guild_stage_voice: :class:`int`
         Used to specify a guild stage voice channel.
     """
+
     guild_text = 0
     dm = 1
     guild_voice = 2
@@ -122,6 +127,7 @@ class InteractionType(Enum):
 
     Used internally by the library. You should not need to use this.
     """
+
     ping = 1
     app_command = 2
     component = 3
@@ -135,6 +141,7 @@ class InteractionCallbackType(Enum):
 
     Used internally by the library. You should not need to use this.
     """
+
     pong = 1
     channel_message_with_source = 4
     deferred_channel_message_with_source = 5
@@ -150,6 +157,7 @@ class MessageComponentType(Enum):
 
     Used internally by the library. You should not need to use this.
     """
+
     action_row = 1
     button = 2
     text_select = 3
@@ -165,6 +173,7 @@ class SelectMenuType(Enum):
     The type of select menu.
 
     """
+
     text = 3
     user = 5
     role = 6
@@ -189,6 +198,7 @@ class ButtonStyle(Enum):
     link: :class:`int`
         Used to specify a link type button.
     """
+
     blurple = 1
     grey = 2
     green = 3
@@ -202,6 +212,7 @@ class WebhookType(Enum):
 
     Used internally by the library. You should not need to use this.
     """
+
     incoming = 1
     channel_follower = 2
     application = 3

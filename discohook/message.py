@@ -17,6 +17,7 @@ class MessageInteraction:
     """
     Represents a partial interaction received with message.
     """
+
     def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
         self.client = client
         self.data = payload
@@ -86,6 +87,7 @@ class Message:
         The reactions in the message.
         ...
     """
+
     def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
         self.client = client
         self.data = payload
@@ -276,6 +278,7 @@ class FollowupResponse:
     """
     Represents a followup message sent by an interaction, subclassed from :class:`Message`.
     """
+
     def __init__(self, payload: Dict[str, Any], interaction: "Interaction") -> None:
         self.message = Message(payload, interaction.client)
         self.interaction = interaction
@@ -326,7 +329,7 @@ class FollowupResponse:
             self.interaction.application_id,
             self.interaction.token,
             self.message.id,
-            create_form(data, merge_fields(file, files))
+            create_form(data, merge_fields(file, files)),
         )
         data = await resp.json()
         return Message(data, self.interaction.client)
@@ -336,6 +339,7 @@ class InteractionResponse:
     """
     Represents a response message sent by an interaction
     """
+
     def __init__(self, interaction: "Interaction") -> None:
         self.interaction = interaction
 
@@ -380,8 +384,10 @@ class InteractionResponse:
             self.interaction.client.load_components(view)
         self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = await self.interaction.client.http.edit_webhook_message(
-            self.interaction.application_id, self.interaction.token, "@original",
-            create_form(data, merge_fields(file, files))
+            self.interaction.application_id,
+            self.interaction.token,
+            "@original",
+            create_form(data, merge_fields(file, files)),
         )
         data = await resp.json()
         return Message(data, self.interaction.client)

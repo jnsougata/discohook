@@ -44,7 +44,7 @@ class Webhook:
     url: :class:`str`
         The url of the webhook.
     """
-    
+
     def __init__(self, data: dict, client: "Client"):
         self.data = data
         self.client = client

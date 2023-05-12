@@ -14,6 +14,7 @@ class Component:
     type: :class:`MessageComponentType`
         The type of the component.
     """
+
     def __init__(self, type: Optional[MessageComponentType] = None, custom_id: Optional[str] = None):
         self.type = type
         self.callback: Optional[Callable] = None
@@ -56,6 +57,7 @@ class Button(Component):
     emoji: Optional[Union[:class:`str`, :class:`PartialEmoji`]]
         The emoji to be displayed on the button.
     """
+
     def __init__(
         self,
         label: Optional[str] = None,
@@ -117,6 +119,7 @@ class SelectOption:
     default: Optional[:class:`bool`]
         Whether the option is selected by default or not.
     """
+
     def __init__(
         self,
         label: str,
@@ -175,6 +178,7 @@ class Select(Component):
     type: :class:`SelectMenuType`
         The type of the select menu.
     """
+
     def __init__(
         self,
         options: Optional[List[SelectOption]] = None,
@@ -229,6 +233,7 @@ class View:
     children: List[Union[:class:`Button`, :class:`Select`]]
         The list of children to be sent to discord. Do not modify this directly.
     """
+
     def __init__(self):
         self.components: List[Dict[str, Any]] = []
         self.children: List[Union[Button, Select]] = []
@@ -309,6 +314,7 @@ def button(
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
         btn.callback = coro
         return btn
+
     return decorator
 
 
@@ -349,6 +355,7 @@ def select(
     -------
     :class:`Select`
     """
+
     def decorator(coro: Callable):
         menu = Select(
             options=options,
@@ -362,4 +369,5 @@ def select(
         )
         menu.callback = coro
         return menu
+
     return decorator

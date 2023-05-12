@@ -24,6 +24,7 @@ class PartialChannel:
     client: :class:`Client`
         The client that the channel belongs to.
     """
+
     def __init__(self, data, client: "Client"):
         self.client = client
         self.id: str = data["id"]
@@ -287,6 +288,7 @@ class Channel(PartialChannel):
         The default channel layout of the channel.Appears in forum channels.
 
     """
+
     def __init__(self, data: dict, client: "Client"):
         super().__init__(data, client)
         self.type = data.get("type")

@@ -7,20 +7,12 @@ if TYPE_CHECKING:
 
 
 class HTTPClient:
-
     def __init__(self, token: str, client: "Client", session: aiohttp.ClientSession):
         self.token = token
         self.client = client
         self.session = session
-    
-    async def request(
-            self, 
-            method: str,
-            path: str, 
-            *, 
-            use_auth: bool = False, 
-            **kwargs
-    ):
+
+    async def request(self, method: str, path: str, *, use_auth: bool = False, **kwargs):
         headers = kwargs.pop("headers", {})
         if use_auth:
             headers["Authorization"] = f"Bot {self.token}"
@@ -28,13 +20,7 @@ class HTTPClient:
         kwargs["headers"] = headers
         return await self.session.request(method, f"/api/v10{path}", **kwargs)
 
-    async def multipart(
-        self, method: str, 
-        path: str, 
-        *, 
-        form: aiohttp.MultipartWriter, 
-        use_auth: bool = False
-    ):
+    async def multipart(self, method: str, path: str, *, form: aiohttp.MultipartWriter, use_auth: bool = False):
         if use_auth:
             form.headers.add("Authorization", f"Bot {self.token}")
         return await self.session.request(method, f"/api/v10{path}", data=form, headers=form.headers)
@@ -52,27 +38,29 @@ class HTTPClient:
         return await self.multipart("POST", f"/channels/{channel_id}/messages", form=form, use_auth=True)
 
     async def create_dm_channel(self, payload: Dict[str, Any]):
-        return await self.request("POST", f"/users/@me/channels", json=payload, use_auth=True)
+        return await self.request("POST", "/users/@me/channels", json=payload, use_auth=True)
 
     async def delete_channel(self, channel_id: str):
         return await self.request("DELETE", f"/channels/{channel_id}", use_auth=True)
-    
+
     async def delete_message(self, channel_id: str, message_id: str):
         await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
-    
+
     async def edit_channel_message(self, channel_id: str, message_id: str, form: aiohttp.MultipartWriter):
         return await self.multipart("PATCH", f"/channels/{channel_id}/messages/{message_id}", form=form, use_auth=True)
 
     async def send_webhook_message(self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter):
         return await self.multipart("POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form)
-    
+
     async def delete_webhook_message(self, webhook_id: str, webhook_token: str, message_id: str):
         await self.request("DELETE", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}")
-    
+
     async def edit_webhook_message(
         self, webhook_id: str, webhook_token: str, message_id: str, form: aiohttp.MultipartWriter
     ):
-        return await self.multipart("PATCH", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}", form=form)
+        return await self.multipart(
+            "PATCH", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}", form=form
+        )
 
     async def fetch_original_webhook_message(self, webhook_id: str, webhook_token: str):
         return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original")
@@ -88,20 +76,22 @@ class HTTPClient:
 
     async def ban_user(self, guild_id: str, user_id: str, delete_message_seconds: int = 0):
         return await self.request(
-            "PUT", f"/guilds/{guild_id}/bans/{user_id}", use_auth=True,
-            json={"delete_message_seconds": delete_message_seconds}
+            "PUT",
+            f"/guilds/{guild_id}/bans/{user_id}",
+            use_auth=True,
+            json={"delete_message_seconds": delete_message_seconds},
         )
 
     async def send_interaction_callback(self, interaction_id: str, interaction_token: str, data: dict):
         return await self.request("POST", f"/interactions/{interaction_id}/{interaction_token}/callback", json=data)
 
     async def send_interaction_mp_callback(
-            self, interaction_id: str, interaction_token: str, form: aiohttp.MultipartWriter
+        self, interaction_id: str, interaction_token: str, form: aiohttp.MultipartWriter
     ):
         return await self.multipart("POST", f"/interactions/{interaction_id}/{interaction_token}/callback", form=form)
 
     async def edit_interaction_mp_callback(
-            self, interaction_id: str, interaction_token: str, form: aiohttp.MultipartWriter
+        self, interaction_id: str, interaction_token: str, form: aiohttp.MultipartWriter
     ):
         return await self.multipart("PATCH", f"/interactions/{interaction_id}/{interaction_token}/callback", form=form)
 
@@ -131,7 +121,7 @@ class HTTPClient:
 
     async def edit_guild_role(self, guild_id: str, role_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/guilds/{guild_id}/roles/{role_id}", json=payload, use_auth=True)
-    
+
     async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
         return await self.request("POST", f"/channels/{channel_id}/webhooks", json=payload, use_auth=True)
 

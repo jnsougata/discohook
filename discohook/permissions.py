@@ -5,6 +5,7 @@ class Permissions(Enum):
     """
     Represents discord permission values.
     """
+
     create_instant_invite = 1 << 0
     kick_members = 1 << 1
     ban_members = 1 << 2

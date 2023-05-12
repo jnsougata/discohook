@@ -21,6 +21,7 @@ class SubCommand:
     callback: Optional[Callable]
         The callback of the subcommand.
     """
+
     def __init__(
         self,
         name: str,
@@ -39,7 +40,8 @@ class SubCommand:
         if not self.callback:
             raise RuntimeWarning(
                 f"subcommand `{self.name}` of command "
-                f"`{args[0].data['name']}` (id: {args[0].data['id']}) has no callback")
+                f"`{args[0].data['name']}` (id: {args[0].data['id']}) has no callback"
+            )
         return self.callback(*args, **kwargs)
 
     def autocomplete(self, name: str):
@@ -51,6 +53,7 @@ class SubCommand:
         name: str
             The name of the option to register the autocomplete for.
         """
+
         def decorator(coro: Callable):
             self.autocompletes[name] = coro
 
@@ -75,7 +78,7 @@ class SubCommandGroup:
 class ApplicationCommand:
     """
     A class representing a discord application command.
-        
+
     Parameters
     ----------
     name: str
@@ -91,6 +94,7 @@ class ApplicationCommand:
     category: AppCmdType
         The category of the command. Defaults to slash commands.
     """
+
     def __init__(
         self,
         name: str,
@@ -138,6 +142,7 @@ class ApplicationCommand:
         name: str
             The name of the option to register the autocomplete for.
         """
+
         def decorator(coro: Callable):
             self.autocompletes[name] = coro
 
@@ -162,6 +167,7 @@ class ApplicationCommand:
         options: Optional[List[Option]]
             The options of the subcommand.
         """
+
         def decorator(coro: Callable):
             subcommand = SubCommand(name, description, options, callback=coro)
             if self.options:
@@ -228,6 +234,7 @@ def command(
     category: AppCmdType
         The category of the command. Defaults to slash commands.
     """
+
     def decorator(coro: Callable):
         cmd = ApplicationCommand(
             name,

@@ -10,11 +10,11 @@ from .file import File
 def create_form(payload: Dict[str, Any], files: Optional[List[File]] = None) -> aiohttp.MultipartWriter:
     form = aiohttp.MultipartWriter("form-data")
     form.append(
-        json.dumps(payload), 
+        json.dumps(payload),
         headers={
             "Content-Disposition": 'form-data; name="payload_json"',
-            "Content-Type": "application/json"
-        }
+            "Content-Type": "application/json",
+        },
     )
     if not files:
         return form
@@ -24,6 +24,6 @@ def create_form(payload: Dict[str, Any], files: Optional[List[File]] = None) -> 
             headers={
                 "Content-Disposition": f'form-data; name="files[{i}]"; filename="{file.name}"',
                 "Content-Type": "application/octet-stream",
-            }
+            },
         )
     return form
