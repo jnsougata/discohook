@@ -86,14 +86,14 @@ class Button(Component):
         payload = {
             "type": self.type.value,
             "style": self.style.value,
+            "disabled": self.disabled,
         }
         if self.label:
             payload["label"] = self.label
-        if not self.style == ButtonStyle.link:
-            payload["custom_id"] = self.custom_id
-        payload["disabled"] = self.disabled
         if self.emoji:
             payload["emoji"] = self.emoji.to_dict()
+        if self.style != ButtonStyle.link:
+            payload["custom_id"] = self.custom_id
         if self.url and self.style == ButtonStyle.link:
             payload["url"] = self.url
         return payload
