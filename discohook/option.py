@@ -21,7 +21,7 @@ class Choice:
 
     def __init__(self, name: str, value: Union[str, int, float]):
         self.name = name
-        self.value = value  # type: ignore
+        self.value = value
 
     def to_dict(self) -> Dict[str, Any]:
         return {"name": self.name, "value": self.value}

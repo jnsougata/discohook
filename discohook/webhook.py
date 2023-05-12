@@ -88,12 +88,14 @@ class Webhook:
         data = self.data.get("source_guild")
         if data:
             return PartialGuild(data["id"], self.client)
+        return None
 
     @property
     def source_channel(self) -> Optional[PartialChannel]:
         data = self.data.get("source_channel")
         if data:
             return PartialChannel(data, self.client)
+        return None
 
     @property
     def url(self) -> Optional[str]:

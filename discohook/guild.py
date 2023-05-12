@@ -48,20 +48,20 @@ class PartialGuild:
         name: str,
         *,
         type: ChannelType = ChannelType.guild_text,
-        topic: str = None,
-        bitrate: int = None,
-        user_limit: int = None,
-        rate_limit_per_user: int = None,
-        position: int = None,
-        permission_overwrites: List[Dict[str, Any]] = None,
-        parent_id: str = None,
-        nsfw: bool = None,
-        rtc_region: str = None,
-        video_quality_mode: int = None,
-        default_auto_archive_duration: int = None,
-        default_reaction_emoji: PartialEmoji = None,
-        available_tags: List[Dict[str, Any]] = None,
-        default_sort_order: int = None,
+        topic: Optional[str] = None,
+        bitrate: Optional[int] = None,
+        user_limit: Optional[int] = None,
+        rate_limit_per_user: Optional[int] = None,
+        position: Optional[int] = None,
+        permission_overwrites: Optional[List[Dict[str, Any]]] = None,
+        parent_id: Optional[str] = None,
+        nsfw: Optional[bool] = None,
+        rtc_region: Optional[str] = None,
+        video_quality_mode: Optional[int] = None,
+        default_auto_archive_duration: Optional[int] = None,
+        default_reaction_emoji: Optional[PartialEmoji] = None,
+        available_tags: Optional[List[Dict[str, Any]]] = None,
+        default_sort_order: Optional[int] = None,
     ) -> Channel:
         """
         Creates a channel in the guild. Requires the MANAGE_CHANNELS permission.
@@ -168,16 +168,15 @@ class PartialGuild:
         await self.client.http.edit_guild_channel_position(self.id, payload)
 
     async def create_role(
-            self,
-            name: str,
-            *,
-            permissions: Optional[List[Permissions]] = None,
-            color: int = 0,
-            hoist: bool = False,
-            mentionable: bool = False,
-            icon_data_uri: str = None,
-            unicode_emoji: str = None,
-
+        self,
+        name: str,
+        *,
+        permissions: Optional[List[Permissions]] = None,
+        color: int = 0,
+        hoist: bool = False,
+        mentionable: Optional[bool] = False,
+        icon_data_uri: Optional[str] = None,
+        unicode_emoji: Optional[str] = None,
     ):
         payload = {"name": name}
         base_permissions = 0

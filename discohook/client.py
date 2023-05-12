@@ -69,7 +69,7 @@ class Client(FastAPI):
         self.docs_url = None
         self.redoc_url = None
         self.public_key = public_key
-        self.application_id = application_id  # type: ignore
+        self.application_id = application_id
         self.http = HTTPClient(token, self, aiohttp.ClientSession("https://discord.com"))
         self.active_components: Optional[Dict[str, Component]] = {}
         self._sync_queue: List[ApplicationCommand] = []

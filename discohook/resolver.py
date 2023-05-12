@@ -148,5 +148,5 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
             for role_id in raw_values
             if role_id in resolved_roles
         ]
-        return users + roles  # type: ignore
+        return users + roles
     return []

@@ -31,8 +31,8 @@ class SubCommand:
         callback: Optional[Callable] = None,
     ):
         self.name = name
-        self.options = options  # type: ignore
-        self.callback: Optional[Callable] = callback  # type: ignore
+        self.options = options
+        self.callback: Optional[Callable] = callback
         self.description = description
         self.autocompletes: Dict[str, Callable] = {}
 
@@ -66,7 +66,7 @@ class SubCommand:
             "description": self.description,
         }
         if self.options:
-            payload["options"] = [option.to_dict() for option in self.options]  # type: ignore
+            payload["options"] = [option.to_dict() for option in self.options]
         return payload
 
 
@@ -99,19 +99,19 @@ class ApplicationCommand:
         self,
         name: str,
         description: Optional[str] = None,
-        options: List[Option] = None,
+        options: Optional[List[Option]] = None,
         dm_access: bool = True,
         permissions: Optional[List[Permissions]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
         self._id = f"{name}:{category.value}"
         self.name = name
-        self.description = description  # type: ignore
-        self.options: List[Option] = options
+        self.description = description
+        self.options = options
         self.dm_access = dm_access
         self.application_id = None
         self.category = category
-        self.permissions = permissions  # type: ignore
+        self.permissions = permissions
         self.callback: Optional[Callable] = None
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
@@ -153,7 +153,7 @@ class ApplicationCommand:
         name: str,
         description: str,
         *,
-        options: List[Option] = None,
+        options: Optional[List[Option]] = None,
     ):
         """
         A decorator to register a subcommand for the command.
@@ -171,9 +171,9 @@ class ApplicationCommand:
         def decorator(coro: Callable):
             subcommand = SubCommand(name, description, options, callback=coro)
             if self.options:
-                self.options.append(subcommand)  # type: ignore
+                self.options.append(subcommand)
             else:
-                self.options = [subcommand]  # type: ignore
+                self.options = [subcommand]
             if asyncio.iscoroutinefunction(coro):
                 self.subcommands[name] = subcommand
                 return subcommand

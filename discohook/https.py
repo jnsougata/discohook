@@ -128,7 +128,7 @@ class HTTPClient:
     async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/webhooks/{webhook_id}", json=payload, use_auth=True)
 
-    async def fetch_webhook(self, webhook_id: str, webhook_token: str = None):
+    async def fetch_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
         if webhook_token:
             return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
         return await self.request("GET", f"/webhooks/{webhook_id}", use_auth=True)

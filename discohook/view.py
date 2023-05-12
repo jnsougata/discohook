@@ -69,11 +69,11 @@ class Button(Component):
         custom_id: Optional[str] = None,
     ):
         super().__init__(MessageComponentType.button, custom_id)
-        self.url = url  # type: ignore
-        self.label = label  # type: ignore
+        self.url = url
+        self.label = label
         self.style = style
-        self.disabled = disabled  # type: ignore
-        self.emoji = PartialEmoji(name=emoji) if isinstance(emoji, str) else emoji  # type: ignore
+        self.disabled = disabled
+        self.emoji = PartialEmoji(name=emoji) if isinstance(emoji, str) else emoji
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -131,9 +131,9 @@ class SelectOption:
     ):
         self.label = label
         self.value = value
-        self.description = description  # type: ignore
-        self.emoji = emoji  # type: ignore
-        self.default = default  # type: ignore
+        self.description = description
+        self.emoji = emoji
+        self.default = default
 
     def to_dict(self) -> Dict[str, Any]:
         """

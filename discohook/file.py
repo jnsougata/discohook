@@ -21,5 +21,5 @@ class File:
     def __init__(self, name: str, *, content: io.BytesIO, description: Optional[str] = None, spoiler: bool = False):
         self.name = name
         self.content = content
-        self.description = description  # type: ignore
+        self.description = description
         self.spoiler = spoiler
