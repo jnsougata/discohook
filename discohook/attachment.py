@@ -1,5 +1,6 @@
-import aiohttp
 from typing import Optional
+
+import aiohttp
 
 
 class Attachment:

@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING, Any, Dict
+
 from .user import User
-from typing import TYPE_CHECKING, Dict, Any
 
 if TYPE_CHECKING:
     from .client import Client

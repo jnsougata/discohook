@@ -1,9 +1,10 @@
-from .role import Role
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 from .channel import Channel
-from .enums import ChannelType
 from .emoji import PartialEmoji
+from .enums import ChannelType
 from .permissions import Permissions
-from typing import Dict, Any, TYPE_CHECKING, List, Optional
+from .role import Role
 
 if TYPE_CHECKING:
     from .client import Client

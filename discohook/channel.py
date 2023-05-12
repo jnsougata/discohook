@@ -1,12 +1,13 @@
-from .file import File
-from .view import View
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 from .embed import Embed
-from .message import Message
 from .emoji import PartialEmoji
 from .enums import ChannelType
+from .file import File
+from .message import Message
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
-from typing import Optional, List, TYPE_CHECKING, Dict, Any
+from .view import View
 
 if TYPE_CHECKING:
     from .client import Client

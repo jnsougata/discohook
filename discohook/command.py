@@ -1,8 +1,9 @@
 import asyncio
+from typing import Any, Callable, Dict, List, Optional
+
+from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
 from .permissions import Permissions
-from typing import Callable, Dict, List, Optional, Any
-from .enums import ApplicationCommandType, ApplicationCommandOptionType
 
 
 class SubCommand:

@@ -1,6 +1,7 @@
-from .view import Component
-from typing import Dict, Any, List, Callable, Optional
+from typing import Any, Callable, Dict, List, Optional
+
 from .enums import MessageComponentType, TextInputFieldLength
+from .view import Component
 
 
 class TextInput:

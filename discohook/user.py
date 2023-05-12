@@ -1,11 +1,11 @@
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 from .asset import Asset
-from .file import File
-from typing import Optional
-from .permissions import Permissions
 from .embed import Embed
+from .file import File
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
-from typing import TYPE_CHECKING, Dict, Any, List
+from .permissions import Permissions
 
 if TYPE_CHECKING:
     from .client import Client

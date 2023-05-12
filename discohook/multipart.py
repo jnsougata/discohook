@@ -1,7 +1,9 @@
 import json
+from typing import Any, Dict, List, Optional
+
 import aiohttp
+
 from .file import File
-from typing import Dict, Any, List, Optional
 
 
 # noinspection PyTypeChecker

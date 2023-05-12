@@ -1,5 +1,6 @@
+from typing import Any, Dict, List, Optional, Union
+
 from .enums import ApplicationCommandOptionType, ChannelType
-from typing import Optional, List, Dict, Any, Union
 
 
 class Choice:

@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 from .permissions import Permissions
-from typing import Optional, TYPE_CHECKING, Dict, Any, List
 
 if TYPE_CHECKING:
     from .client import Client

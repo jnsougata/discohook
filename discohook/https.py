@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 import aiohttp
-from typing import TYPE_CHECKING, List, Dict, Any
 
 if TYPE_CHECKING:
     from .client import Client

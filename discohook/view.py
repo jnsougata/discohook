@@ -1,7 +1,8 @@
 import secrets
+from typing import Any, Callable, Dict, List, Optional, Union
+
 from .emoji import PartialEmoji
-from typing import Optional, List, Dict, Any, Callable, Union
-from .enums import ButtonStyle, MessageComponentType, ChannelType, SelectMenuType
+from .enums import ButtonStyle, ChannelType, MessageComponentType, SelectMenuType
 
 
 class Component:

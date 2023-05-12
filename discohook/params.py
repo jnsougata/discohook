@@ -1,8 +1,8 @@
+from typing import Any, List, Optional
+
+from .embed import Embed
 from .file import File
 from .view import View
-from .embed import Embed
-from typing import Optional, List, Any
-
 
 MISSING = Any
 

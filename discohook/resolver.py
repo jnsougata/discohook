@@ -1,13 +1,18 @@
 import inspect
-from .user import User
-from .role import Role
-from .member import Member
-from .channel import Channel
-from .message import Message
+from typing import Any, Callable, Dict, List, Tuple
+
 from .attachment import Attachment
+from .channel import Channel
+from .enums import (
+    ApplicationCommandOptionType,
+    ApplicationCommandType,
+    MessageComponentType,
+)
 from .interaction import Interaction
-from typing import List, Dict, Any, Callable, Tuple
-from .enums import ApplicationCommandOptionType, ApplicationCommandType, MessageComponentType
+from .member import Member
+from .message import Message
+from .role import Role
+from .user import User
 
 
 def handle_params_by_signature(

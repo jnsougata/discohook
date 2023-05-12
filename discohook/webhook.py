@@ -1,14 +1,15 @@
-from .user import User
+from typing import TYPE_CHECKING, List, Optional
+
+from .asset import Asset
+from .channel import PartialChannel
 from .embed import Embed
 from .file import File
-from .view import View
-from .asset import Asset
 from .guild import PartialGuild
-from .channel import PartialChannel
-from .multipart import create_form
 from .message import Message
-from typing import TYPE_CHECKING, Optional, List
-from .params import handle_send_params, merge_fields, handle_edit_params, MISSING
+from .multipart import create_form
+from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
+from .user import User
+from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
