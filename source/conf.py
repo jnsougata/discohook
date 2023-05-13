@@ -1,12 +1,18 @@
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.abspath('..'))
 
-project = 'Discohook'
-copyright = '2023, Sougata Jana'
+project = 'discohook'
+copyright = '2022-present, Sougata Jana'
 author = 'Sougata Jana'
-release = '0.0.5'
+
+version = ''
+with open('../discohook/__init__.py') as f:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)  # type: ignore
+
+release = version
 
 
 templates_path = ['_templates']
