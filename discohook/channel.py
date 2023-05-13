@@ -161,9 +161,11 @@ class PartialChannel:
             The new default sort order of the channel. Applies to text and forum channels.
         default_forum_layout: Optional[:class:`int`]
             The new default forum layout of the channel. Applies to text and forum channels.
+
         Returns
         -------
         :class:`Channel`
+            The edited channel.
         """
         payload = {}
         if name:

@@ -150,6 +150,7 @@ class PartialGuild:
     ):
         """
         Changes the position of the channel. Only available for guild channels.
+
         Parameters
         ----------
         channel_id: :class:`str`
@@ -159,8 +160,7 @@ class PartialGuild:
         lock_permissions:
             Whether to sync the permissions of the channel with the parent category.
         parent_id: Optional[:class:`str`]
-            The id of the parent category to move the channel to.
-            If not provided, the channel will be moved to the root.
+            The id of the parent category to move the channel to. If not provided, the channel will be moved to the root.
         """
         payload = {"id": channel_id, "position": position, "lock_permissions": lock_permissions}
         if parent_id:

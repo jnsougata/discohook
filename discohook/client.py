@@ -43,7 +43,7 @@ class Client(FastAPI):
 
     Parameters
     ----------
-    application_id: Union[int, str]
+    application_id: int | str
         The application ID of the bot.
     public_key: str
         The public key of the bot.

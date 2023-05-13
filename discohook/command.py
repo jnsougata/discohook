@@ -16,9 +16,9 @@ class SubCommand:
         The name of the subcommand.
     description: str
         The description of the subcommand.
-    options: Optional[List[Option]]
+    options: List[Option] | None
         The options of the subcommand.
-    callback: Optional[Callable]
+    callback: Callable | None
         The callback of the subcommand.
     """
 
@@ -32,7 +32,7 @@ class SubCommand:
     ):
         self.name = name
         self.options = options
-        self.callback: Optional[Callable] = callback
+        self.callback = callback
         self.description = description
         self.autocompletes: Dict[str, Callable] = {}
 
@@ -83,15 +83,15 @@ class ApplicationCommand:
     ----------
     name: str
         The name of the command.
-    description: Optional[str]
+    description: str | None
         The description of the command. Does not apply to user & message commands.
-    options: Optional[List[Option]]
+    options: List[Option] | None
         The options of the command. Does not apply to user & message commands.
     dm_access: bool
         Whether the command can be used in DMs. Defaults to True.
-    permissions: Optional[List[Permissions]]
+    permissions: List[Permissions] | None
         The default permissions of the command.
-    category: AppCmdType
+    category: ApplicationCommandType
         The category of the command. Defaults to slash commands.
     """
 
@@ -181,7 +181,7 @@ class ApplicationCommand:
         def decorator(coro: Callable):
             subcommand = SubCommand(name, description, options, callback=coro)
             if self.options:
-                self.options.append(subcommand)
+                self.options.append(subcommand)  # type: ignore
             else:
                 self.options = [subcommand]  # type: ignore
             if not asyncio.iscoroutinefunction(coro):

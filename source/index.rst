@@ -73,15 +73,11 @@ Documentation
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.SelectMenuType
+.. autoclass:: discohook.SelectType
    :members:
    :show-inheritance:
 
 .. autoclass:: discohook.Interaction
-   :members:
-   :show-inheritance:
-
-.. autoclass:: discohook.ComponentInteraction
    :members:
    :show-inheritance:
 
@@ -137,7 +133,7 @@ Documentation
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.SelectMenu
+.. autoclass:: discohook.Select
    :members:
    :show-inheritance:
 

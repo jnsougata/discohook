@@ -11,7 +11,7 @@ class Choice:
     ----------
     name: str
         The name of the choice.
-    value: Union[str, int, float]
+    value: str| int| float
         The value of the choice.
 
     Notes

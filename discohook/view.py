@@ -3,7 +3,7 @@ import secrets
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from .emoji import PartialEmoji
-from .enums import ButtonStyle, ChannelType, MessageComponentType, SelectMenuType
+from .enums import ButtonStyle, ChannelType, MessageComponentType, SelectType
 
 
 class Component:
@@ -27,11 +27,8 @@ class Component:
 
         Parameters
         ----------
-        coro
-
-        Returns
-        -------
-        None
+        coro: Callable
+            The coroutine to be called when the component is interacted with.
 
         Raises
         ------
@@ -54,15 +51,15 @@ class Button(Component):
 
     Parameters
     ----------
-    label: Optional[:class:`str`]
+    label: str | None
         The text to be displayed on the button.
-    url: Optional[:class:`str`]
+    url: str | None
         The url to be opened when the button is clicked if the style is set to :attr:`ButtonStyle.link`.
     style: :class:`ButtonStyle`
         The style of the button.
     disabled: :class:`bool`
         Whether the button is disabled or not.
-    emoji: Optional[Union[:class:`str`, :class:`PartialEmoji`]]
+    emoji: :class:`str` | :class:`PartialEmoji` | None
         The emoji to be displayed on the button.
     """
 
@@ -120,11 +117,11 @@ class SelectOption:
         The text to be displayed on the option.
     value: :class:`str`
         The value to be sent to the bot when the option is selected.
-    description: Optional[:class:`str`]
+    description: str | None
         The description to be displayed on the option.
-    emoji: Optional[:class:`PartialEmoji`]
+    emoji: :class:`str` | :class:`PartialEmoji` | None
         The emoji to be displayed on the option.
-    default: Optional[:class:`bool`]
+    default: :class:`bool`
         Whether the option is selected by default or not.
     """
 

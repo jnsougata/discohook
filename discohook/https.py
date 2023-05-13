@@ -113,8 +113,8 @@ class HTTPClient:
     async def edit_guild_channel_position(self, guild_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/guilds/{guild_id}/channels", json=payload, use_auth=True)
 
-    async def create_guild_role(self, guild_id: str):
-        return await self.request("POST", f"/guilds/{guild_id}/roles", use_auth=True)
+    async def create_guild_role(self, guild_id: str, payload: Dict[str, Any]):
+        return await self.request("POST", f"/guilds/{guild_id}/roles", json=payload, use_auth=True)
 
     async def edit_guild_role_position(self, guild_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/guilds/{guild_id}/roles", json=payload, use_auth=True)

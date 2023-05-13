@@ -7,15 +7,15 @@ class Embed:
 
     Parameters
     ----------
-    title: Optional[:class:`str`]
+    title: str | None
         The title of the embed.
-    description: Optional[:class:`str`]
+    description: str | None
         The description of the embed.
-    url: Optional[:class:`str`]
+    url: str | None
         The url of the embed.
-    color: Optional[:class:`int`]
+    color: int | None
         The color of the embed.
-    timestamp: Optional[:class:`str`]
+    timestamp: str | None
         The timestamp of the embed.
     """
 
@@ -28,18 +28,12 @@ class Embed:
         color: Optional[int] = None,
         timestamp: Optional[str] = None,
     ):
+        self.title = title
+        self.description = description
+        self.url = url
+        self.color = color
+        self.timestamp = timestamp
         self.data: Dict[str, Any] = {}
-        if title:
-            self.data["title"] = str(title)
-        if description:
-            self.data["description"] = str(description)
-        if url:
-            self.data["url"] = url
-        if color:
-            self.data["color"] = color
-        if timestamp:
-            self.data["timestamp"] = timestamp
-
         self.fields: List[Dict[str, Any]] = []
 
     def author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
@@ -143,7 +137,19 @@ class Embed:
 
         Returns
         -------
+        :class:`dict`
+            The embed as a dictionary.
         """
+        if self.title:
+            self.data["title"] = str(self.title)
+        if self.description:
+            self.data["description"] = str(self.description)
+        if self.url:
+            self.data["url"] = self.url
+        if self.color is not None:
+            self.data["color"] = self.color
+        if self.timestamp:
+            self.data["timestamp"] = self.timestamp
         if self.fields:
             self.data["fields"] = self.fields
         return self.data
