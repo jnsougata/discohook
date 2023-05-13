@@ -16,7 +16,7 @@ from .enums import (
     InteractionType,
     MessageComponentType,
     ModalFieldType,
-    SelectMenuType,
+    SelectType,
     TextInputFieldLength,
     WebhookType,
 )
