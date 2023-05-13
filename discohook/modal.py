@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any, Callable, Dict, List, Optional
 
 from .enums import MessageComponentType, TextInputFieldLength
@@ -174,9 +175,16 @@ def modal(
     Returns
     -------
     :class:`Modal`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
     """
 
     def decorator(coro: Callable):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
         mdl = Modal(title, custom_id=custom_id)
         for field in fields:
             mdl.rows.append(field.to_dict())

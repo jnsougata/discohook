@@ -138,11 +138,12 @@ class Client(FastAPI):
         )
 
         def decorator(coro: Callable):
-            if asyncio.iscoroutinefunction(coro):
-                cmd.callback = coro
-                self.application_commands[cmd._id] = cmd  # noqa
-                self._sync_queue.append(cmd)
-                return cmd
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Callback must be a coroutine.")
+            cmd.callback = coro
+            self.application_commands[cmd._id] = cmd  # noqa
+            self._sync_queue.append(cmd)
+            return cmd
 
         return decorator
 

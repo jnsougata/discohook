@@ -170,7 +170,7 @@ class MessageComponentType(Enum):
     channel_select = 8
 
 
-class SelectMenuType(Enum):
+class SelectType(Enum):
     """
     The type of select menu.
 
