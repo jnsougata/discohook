@@ -1,8 +1,9 @@
 import asyncio
 import secrets
+from typing import Any, Callable, Dict, List, Optional, Union
+
 from .emoji import PartialEmoji
-from typing import Optional, List, Dict, Any, Callable, Union
-from .enums import ButtonStyle, MessageComponentType, ChannelType, SelectType
+from .enums import ButtonStyle, ChannelType, MessageComponentType, SelectMenuType
 
 
 class Component:
@@ -14,6 +15,7 @@ class Component:
     type: :class:`MessageComponentType`
         The type of the component.
     """
+
     def __init__(self, type: Optional[MessageComponentType] = None, custom_id: Optional[str] = None):
         self.type = type
         self.callback: Optional[Callable] = None
@@ -63,6 +65,7 @@ class Button(Component):
     emoji: Optional[Union[:class:`str`, :class:`PartialEmoji`]]
         The emoji to be displayed on the button.
     """
+
     def __init__(
         self,
         label: Optional[str] = None,
@@ -74,11 +77,11 @@ class Button(Component):
         custom_id: Optional[str] = None,
     ):
         super().__init__(MessageComponentType.button, custom_id)
-        self.url: Optional[str] = url
-        self.label: Optional[str] = label
+        self.url = url
+        self.label = label
         self.style = style
         self.disabled = disabled
-        self.emoji: Optional[Union[str, PartialEmoji]] = PartialEmoji(name=emoji) if isinstance(emoji, str) else emoji
+        self.emoji = PartialEmoji(name=emoji) if isinstance(emoji, str) else emoji
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -124,6 +127,7 @@ class SelectOption:
     default: Optional[:class:`bool`]
         Whether the option is selected by default or not.
     """
+
     def __init__(
         self,
         label: str,
@@ -135,9 +139,9 @@ class SelectOption:
     ):
         self.label = label
         self.value = value
-        self.description: Optional[str] = description
-        self.emoji: Optional[PartialEmoji] = emoji
-        self.default: bool = default
+        self.description = description
+        self.emoji = emoji
+        self.default = default
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -182,6 +186,7 @@ class Select(Component):
     type: :class:`SelectType`
         The type of the select menu.
     """
+
     def __init__(
         self,
         options: Optional[List[SelectOption]] = None,
@@ -243,6 +248,7 @@ class View:
     children: List[Union[:class:`Button`, :class:`Select`]]
         The list of children to be sent to discord. Do not modify this directly.
     """
+
     def __init__(self):
         self.components: List[Dict[str, Any]] = []
         self.children: List[Union[Button, Select]] = []
@@ -331,6 +337,7 @@ def button(
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
         btn.callback = coro
         return btn
+
     return decorator
 
 
@@ -376,6 +383,7 @@ def select(
     TypeError
         If the callback is not a coroutine.
     """
+
     def decorator(coro: Callable):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
@@ -391,4 +399,5 @@ def select(
         )
         menu.callback = coro
         return menu
+
     return decorator

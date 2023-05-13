@@ -1,7 +1,7 @@
 from fastapi.responses import HTMLResponse
 
 
-def dashboard():
+async def dashboard():
     content = """
 <!DOCTYPE html>
 <html lang="en">
@@ -147,12 +147,12 @@ def dashboard():
         <script>
             let commands = document.querySelector("#commands");
             let token = window.location.href.split("/").pop();
-            
+
             let reload = document.getElementById("reload");
             reload.addEventListener("click", () => {
                 window.location.reload();
             });
-            
+
             window.addEventListener("DOMContentLoaded", async () => {
                 resp = await fetch(`/api/sync/${token}`)
                 if (resp.status === 200) {

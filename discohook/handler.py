@@ -1,22 +1,24 @@
 import traceback
-from .command import *
+
 from fastapi import Request
-from .resolver import (
-    build_modal_params,
-    build_slash_command_prams,
-    build_context_menu_param,
-    build_select_menu_values,
-)
+from fastapi.responses import JSONResponse, Response
+from nacl.exceptions import BadSignatureError
+from nacl.signing import VerifyKey
+
+from .command import ApplicationCommand, ApplicationCommandOptionType
 from .enums import (
     ApplicationCommandType,
+    InteractionCallbackType,
     InteractionType,
     MessageComponentType,
-    InteractionCallbackType,
 )
-from nacl.signing import VerifyKey
-from nacl.exceptions import BadSignatureError
 from .interaction import Interaction
-from fastapi.responses import JSONResponse, Response
+from .resolver import (
+    build_context_menu_param,
+    build_modal_params,
+    build_select_menu_values,
+    build_slash_command_prams,
+)
 
 
 # noinspection PyProtectedMember
@@ -103,12 +105,10 @@ async def handler(request: Request):
                 await callback(interaction, option["value"])
         else:
             return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
-    except Exception as e:
-        stack_trace = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
+    except Exception as exc:
+        stack_trace = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
         if request.app.error_handler:
-            await request.app.error_handler(interaction, e)
+            await request.app.error_handler(interaction, exc)
             return JSONResponse({"errors": stack_trace}, status_code=500)
-        else:
-            raise RuntimeError(stack_trace) from None
-    else:
-        return Response(status_code=200)
+        raise RuntimeError(stack_trace) from None
+    return Response(status_code=200)

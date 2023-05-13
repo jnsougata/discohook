@@ -1,7 +1,8 @@
 import asyncio
-from .view import Component
-from typing import Dict, Any, List, Callable, Optional
+from typing import Any, Callable, Dict, List, Optional
+
 from .enums import MessageComponentType, TextInputFieldLength
+from .view import Component
 
 
 class TextInput:
@@ -34,11 +35,11 @@ class TextInput:
         field_id: str,
         *,
         required: bool = False,
-        hint: str = None,
-        default_text: str = None,
+        hint: Optional[str] = None,
+        default_text: Optional[str] = None,
         min_length: int = 0,
         max_length: int = 4000,
-        style: TextInputFieldLength = TextInputFieldLength.short
+        style: TextInputFieldLength = TextInputFieldLength.short,
     ):
         self.label = label
         self.field_id = field_id
@@ -64,7 +65,7 @@ class TextInput:
                     "placeholder": self.hint or "",
                     "required": self.required,
                 }
-            ]
+            ],
         }
 
 
@@ -79,6 +80,7 @@ class Modal(Component):
     custom_id: :class:`str`
         The unique id of the modal.
     """
+
     def __init__(self, title: str, *, custom_id: Optional[str] = None):
         super().__init__(custom_id=custom_id)
         self.title = title
@@ -95,8 +97,8 @@ class Modal(Component):
         field_id: str,
         *,
         required: bool = False,
-        hint: str = None,
-        default_text: str = None,
+        hint: Optional[str] = None,
+        default_text: Optional[str] = None,
         min_length: int = 0,
         max_length: int = 4000,
         style: TextInputFieldLength = TextInputFieldLength.short,
@@ -179,12 +181,14 @@ def modal(
     TypeError
         If the callback is not a coroutine.
     """
+
     def decorator(coro: Callable):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
-        m = Modal(title, custom_id=custom_id)
+        mdl = Modal(title, custom_id=custom_id)
         for field in fields:
-            m.rows.append(field.to_dict())
-        m.callback = coro
-        return m
+            mdl.rows.append(field.to_dict())
+        mdl.callback = coro
+        return mdl
+
     return decorator

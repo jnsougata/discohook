@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
 
 
 class Embed:
@@ -18,6 +18,7 @@ class Embed:
     timestamp: Optional[:class:`str`]
         The timestamp of the embed.
     """
+
     def __init__(
         self,
         title: Optional[str] = None,
@@ -25,7 +26,7 @@ class Embed:
         description: Optional[str] = None,
         url: Optional[str] = None,
         color: Optional[int] = None,
-        timestamp: Optional[str] = None
+        timestamp: Optional[str] = None,
     ):
         self.data: Dict[str, Any] = {}
         if title:
@@ -41,9 +42,7 @@ class Embed:
 
         self.fields: List[Dict[str, Any]] = []
 
-    def author(
-        self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None
-    ):
+    def author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
         """
         Sets the author of the embed.
 
@@ -65,7 +64,7 @@ class Embed:
     def footer(self, text: str, *, icon_url: Optional[str] = None):
         """
         Sets the footer of the embed.
-        
+
         Parameters
         ----------
         text: :class:`str`
@@ -87,7 +86,7 @@ class Embed:
             The url of the image.
         """
         self.data["image"] = {"url": url}
-    
+
     def image_from_attachment(self, name: str):
         """
         Sets the image of the embed from a file attachment.
@@ -109,7 +108,7 @@ class Embed:
             The url of the thumbnail.
         """
         self.data["thumbnail"] = {"url": url}
-    
+
     def thumbnail_from_attachment(self, name: str):
         """
         Sets the thumbnail of the embed from a file attachment.

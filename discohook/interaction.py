@@ -1,19 +1,19 @@
-from .user import User
-from .file import File
-from .view import View
-from .embed import Embed
-from .modal import Modal
-from .member import Member
-from .option import Choice
-from .guild import PartialGuild
-from .multipart import create_form
-from .channel import PartialChannel
-from .errors import InteractionTypeMismatch
-from .enums import InteractionCallbackType, InteractionType, try_enum
-from .message import Message, InteractionResponse, FollowupResponse
-from .params import handle_send_params, handle_edit_params, merge_fields, MISSING
-from typing import Any, Dict, Optional, List, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
+from .channel import PartialChannel
+from .embed import Embed
+from .enums import InteractionCallbackType, InteractionType, try_enum
+from .errors import InteractionTypeMismatch
+from .file import File
+from .guild import PartialGuild
+from .member import Member
+from .message import FollowupResponse, InteractionResponse, Message
+from .modal import Modal
+from .multipart import create_form
+from .option import Choice
+from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
+from .user import User
+from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
@@ -55,6 +55,7 @@ class Interaction:
     client: Client
         The request object from fastapi
     """
+
     def __init__(self, data: Dict[str, Any], client: "Client"):
         self.payload = data
         self.__responded = False
@@ -210,8 +211,7 @@ class Interaction:
             member.update(member.pop("user", {}))
             member["guild_id"] = self.guild_id
             return Member(member, self.client)
-        else:
-            return User(user, self.client)
+        return User(user, self.client)
 
     @property
     def guild(self) -> Optional[PartialGuild]:
@@ -356,7 +356,7 @@ class Interaction:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        if not self.type == InteractionType.component:
+        if self.type != InteractionType.component:
             raise InteractionTypeMismatch(f"Method not supported for {self.type}")
 
         data = handle_edit_params(
@@ -372,8 +372,7 @@ class Interaction:
         if view and view is not MISSING:
             self.client.load_components(view)
         self.client.store_inter_token(self.id, self.token)
-        payload = {
-            "type": InteractionCallbackType.update_component_message.value, "data": data}
+        payload = {"type": InteractionCallbackType.update_component_message.value, "data": data}
         await self.client.http.send_interaction_mp_callback(
             self.id, self.token, create_form(payload, merge_fields(file, files))
         )
@@ -439,7 +438,8 @@ class Interaction:
             "type": InteractionCallbackType.channel_message_with_source.value,
         }
         await self.client.http.send_interaction_mp_callback(
-            self.id, self.token, create_form(payload, merge_fields(file, files)))
+            self.id, self.token, create_form(payload, merge_fields(file, files))
+        )
         self.__responded = True
         return InteractionResponse(self)
 

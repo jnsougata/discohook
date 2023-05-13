@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING, Any, Dict
+
 from .user import User
-from typing import TYPE_CHECKING, Dict, Any
 
 if TYPE_CHECKING:
     from .client import Client
@@ -9,6 +10,7 @@ class Member(User):
     """
     Represents a member of a guild sent with an interaction, subclassed from :class:`User`.
     """
+
     def __init__(self, data: Dict[str, Any], client: "Client"):
         super().__init__(data, client)
         self.nick = data.get("nick")
@@ -28,7 +30,7 @@ class Member(User):
         """
         return f"<@!{self.id}>"
 
-    async def add_role(self, role_id: str) -> None:
+    async def add_role(self, role_id: str):
         """
         Add a role to the member.
 
@@ -39,7 +41,7 @@ class Member(User):
         """
         return await self.client.http.add_role(self.guild_id, self.id, role_id)
 
-    async def remove_role(self, role_id: str) -> None:
+    async def remove_role(self, role_id: str):
         """
         Remove a role from the member.
 
@@ -49,14 +51,14 @@ class Member(User):
             The ID of the role.
         """
         return await self.client.http.remove_role(self.guild_id, self.id, role_id)
-    
-    async def kick(self) -> None:
+
+    async def kick(self):
         """
         Kick the member.
         """
         return await self.client.http.kick_user(self.guild_id, self.id)
 
-    async def ban(self, *, delete_message_seconds: int = 0) -> None:
+    async def ban(self, *, delete_message_seconds: int = 0):
         """
         Ban the member.
 

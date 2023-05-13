@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 from .permissions import Permissions
-from typing import Optional, TYPE_CHECKING, Dict, Any, List
 
 if TYPE_CHECKING:
     from .client import Client
@@ -84,12 +85,7 @@ class PartialRole:
         data = await resp.json()
         return Role(data, self.client)
 
-    async def edit_position(
-        self,
-        role_id: str,
-        *,
-        position: int
-    ) -> List["Role"]:
+    async def edit_position(self, role_id: str, *, position: int) -> List["Role"]:
         """
         Changes the position of the role.
         Parameters
@@ -140,6 +136,7 @@ class Role(PartialRole):
     flags: :class:`int`
         The flags of the role.
     """
+
     def __init__(self, data: dict, client: "Client"):
         super().__init__(data, client)
         self.id: str = data.get("id")

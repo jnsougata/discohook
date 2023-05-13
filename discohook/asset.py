@@ -11,6 +11,7 @@ class Asset:
     fragment: :class:`str`
         The fragment of the asset path.
     """
+
     base_url = "https://cdn.discordapp.com"
 
     def __init__(self, *, hash: str, fragment: str) -> None:  # noqa
@@ -58,6 +59,6 @@ class Asset:
         Returns
         -------
         :class:`str`
-        
+
         """
         return f"{self.base_url}/{self._fragment}.{format}?size={size}"

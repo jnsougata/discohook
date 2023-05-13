@@ -1,14 +1,15 @@
-from .user import User
+from typing import TYPE_CHECKING, List, Optional
+
+from .asset import Asset
+from .channel import PartialChannel
 from .embed import Embed
 from .file import File
-from .view import View
-from .asset import Asset
 from .guild import PartialGuild
-from .channel import PartialChannel
-from .multipart import create_form
 from .message import Message
-from typing import TYPE_CHECKING, Optional, List
-from .params import handle_send_params, merge_fields, handle_edit_params, MISSING
+from .multipart import create_form
+from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
+from .user import User
+from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
@@ -43,7 +44,7 @@ class Webhook:
     url: :class:`str`
         The url of the webhook.
     """
-    
+
     def __init__(self, data: dict, client: "Client"):
         self.data = data
         self.client = client
@@ -70,9 +71,10 @@ class Webhook:
 
     @property
     def avatar(self) -> Optional[Asset]:
-        h = self.data.get("avatar")
-        if h:
-            return Asset(hash=h, fragment=f"avatars/{self.id}/")
+        hash = self.data.get("avatar")
+        if hash:
+            return Asset(hash=hash, fragment=f"avatars/{self.id}/")
+        return None
 
     @property
     def token(self) -> Optional[str]:
@@ -87,12 +89,14 @@ class Webhook:
         data = self.data.get("source_guild")
         if data:
             return PartialGuild(data["id"], self.client)
+        return None
 
     @property
     def source_channel(self) -> Optional[PartialChannel]:
         data = self.data.get("source_channel")
         if data:
             return PartialChannel(data, self.client)
+        return None
 
     @property
     def url(self) -> Optional[str]:

@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 
 class PartialEmoji:
@@ -14,6 +14,7 @@ class PartialEmoji:
     animated: :class:`bool`
         Whether the emoji is animated.
     """
+
     def __init__(self, name: str, id: Optional[str] = None, animated: bool = False):  # noqa
         self.id = id
         self.name = name

@@ -1,11 +1,11 @@
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 from .asset import Asset
-from .file import File
-from typing import Optional
-from .permissions import Permissions
 from .embed import Embed
+from .file import File
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
-from typing import TYPE_CHECKING, Dict, Any, List
+from .permissions import Permissions
 
 if TYPE_CHECKING:
     from .client import Client
@@ -44,6 +44,7 @@ class User:
     mention: :class:`str`
         Returns a string that allows you to mention the user.
     """
+
     def __init__(self, data: Dict[str, Any], client: "Client"):
         self.data = data
         self.client = client
@@ -64,7 +65,7 @@ class User:
     def avatar(self) -> Asset:
         av_hash = self.data.get("avatar")
         if not av_hash:
-            fragment = f"embed/avatars/"
+            fragment = "embed/avatars/"
             av_hash = str({int(self.discriminator) % 5})
             return Asset(hash=av_hash, fragment=fragment)
         return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
@@ -181,6 +182,7 @@ class ClientUser:
     flags: :class:`int`
         The flags of the client user.
     """
+
     def __init__(self, data: Dict[str, Any], client: "Client") -> None:
         self.data = data
         self.client = client

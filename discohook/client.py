@@ -1,23 +1,25 @@
 import asyncio
+from typing import Any, Callable, Dict, List, Optional, Union
+
 import aiohttp
-from .guild import Guild
-from .embed import Embed
-from .file import File
-from .webhook import Webhook
 from fastapi import FastAPI
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse
+
+from .command import ApplicationCommand, Option
+from .dash import dashboard
+from .embed import Embed
+from .enums import ApplicationCommandType
+from .file import File
+from .guild import Guild
 from .handler import handler
 from .https import HTTPClient
-from .enums import ApplicationCommandType
-from .user import ClientUser
-from .permissions import Permissions
-from .command import ApplicationCommand, Option
-from .view import View, Component
-from fastapi.requests import Request
-from .dash import dashboard
-from .params import handle_send_params, merge_fields
-from fastapi.responses import JSONResponse
 from .multipart import create_form
-from typing import Optional, List, Dict, Union, Callable, Any
+from .params import handle_send_params, merge_fields
+from .permissions import Permissions
+from .user import ClientUser
+from .view import Component, View
+from .webhook import Webhook
 
 
 async def delete_cmd(request: Request, command_id: str, token: str):
@@ -52,6 +54,7 @@ class Client(FastAPI):
     **kwargs
         Keyword arguments to pass to the FastAPI instance.
     """
+
     def __init__(
         self,
         *,
@@ -66,9 +69,9 @@ class Client(FastAPI):
         self.docs_url = None
         self.redoc_url = None
         self.public_key = public_key
-        self.application_id = application_id  # type: ignore
+        self.application_id = application_id
         self.http = HTTPClient(token, self, aiohttp.ClientSession("https://discord.com"))
-        self.active_components: Optional[Dict[str, Component]] = {}
+        self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
@@ -76,7 +79,8 @@ class Client(FastAPI):
         self.add_api_route("/api/sync/{token}", sync, methods=["GET"], include_in_schema=False)
         self.add_api_route("/api/dash/{token}", dashboard, methods=["GET"], include_in_schema=False)
         self.add_api_route(
-            "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False)
+            "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False
+        )
         self.error_handler: Optional[Callable] = None
         self._custom_id_parser: Optional[Callable] = None
 
@@ -174,8 +178,8 @@ class Client(FastAPI):
         directory: str
             The directory to load the modules from.
         """
-        import os
         import importlib
+        import os
 
         scripts = os.listdir(directory)
         scripts = [f"{directory}.{script[:-3]}" for script in scripts if script.endswith(".py")]
@@ -201,7 +205,7 @@ class Client(FastAPI):
         coro: Callable
         """
         self._custom_id_parser = coro
-        
+
     async def send_message(
         self,
         channel_id: str,
@@ -258,8 +262,7 @@ class Client(FastAPI):
 
         This method is used internally by the client. You should not use this method.
         """
-        resp = await self.http.sync_commands(
-            str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
+        resp = await self.http.sync_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
         return await resp.json()
 
     async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):

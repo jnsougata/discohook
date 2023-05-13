@@ -1,8 +1,9 @@
 import asyncio
+from typing import Any, Callable, Dict, List, Optional
+
+from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
 from .permissions import Permissions
-from typing import Callable, Dict, List, Optional, Any
-from .enums import ApplicationCommandType, ApplicationCommandOptionType
 
 
 class SubCommand:
@@ -20,6 +21,7 @@ class SubCommand:
     callback: Optional[Callable]
         The callback of the subcommand.
     """
+
     def __init__(
         self,
         name: str,
@@ -29,8 +31,8 @@ class SubCommand:
         callback: Optional[Callable] = None,
     ):
         self.name = name
-        self.options = options  # type: ignore
-        self.callback: Optional[Callable] = callback  # type: ignore
+        self.options = options
+        self.callback: Optional[Callable] = callback
         self.description = description
         self.autocompletes: Dict[str, Callable] = {}
 
@@ -38,7 +40,8 @@ class SubCommand:
         if not self.callback:
             raise RuntimeWarning(
                 f"subcommand `{self.name}` of command "
-                f"`{args[0].data['name']}` (id: {args[0].data['id']}) has no callback")
+                f"`{args[0].data['name']}` (id: {args[0].data['id']}) has no callback"
+            )
         return self.callback(*args, **kwargs)
 
     def autocomplete(self, name: str):
@@ -50,6 +53,7 @@ class SubCommand:
         name: str
             The name of the option to register the autocomplete for.
         """
+
         def decorator(coro: Callable):
             self.autocompletes[name] = coro
 
@@ -62,7 +66,7 @@ class SubCommand:
             "description": self.description,
         }
         if self.options:
-            payload["options"] = [option.to_dict() for option in self.options]  # type: ignore
+            payload["options"] = [option.to_dict() for option in self.options]
         return payload
 
 
@@ -74,7 +78,7 @@ class SubCommandGroup:
 class ApplicationCommand:
     """
     A class representing a discord application command.
-        
+
     Parameters
     ----------
     name: str
@@ -90,22 +94,24 @@ class ApplicationCommand:
     category: AppCmdType
         The category of the command. Defaults to slash commands.
     """
+
     def __init__(
         self,
         name: str,
         description: Optional[str] = None,
-        options: List[Option] = None,
+        options: Optional[List[Option]] = None,
         dm_access: bool = True,
         permissions: Optional[List[Permissions]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
         self._id = f"{name}:{category.value}"
         self.name = name
-        self.description: Optional[str] = description
-        self.options: List[Option] = options
-        self.dm_access: bool = dm_access
-        self.category: ApplicationCommandType = category
-        self.permissions: Optional[List[Permissions]] = permissions
+        self.description = description
+        self.options = options
+        self.dm_access = dm_access
+        self.application_id = None
+        self.category = category
+        self.permissions = permissions
         self.callback: Optional[Callable] = None
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
@@ -136,6 +142,7 @@ class ApplicationCommand:
         name: str
             The name of the option to register the autocomplete for.
         """
+
         def decorator(coro: Callable):
             self.autocompletes[name] = coro
 
@@ -146,7 +153,7 @@ class ApplicationCommand:
         name: str,
         description: str,
         *,
-        options: List[Option] = None,
+        options: Optional[List[Option]] = None,
     ):
         """
         A decorator to register a subcommand for the command.
@@ -170,10 +177,11 @@ class ApplicationCommand:
         TypeError
             If the callback is not a coroutine.
         """
+
         def decorator(coro: Callable):
             subcommand = SubCommand(name, description, options, callback=coro)
             if self.options:
-                self.options.append(subcommand)  # type: ignore
+                self.options.append(subcommand)
             else:
                 self.options = [subcommand]  # type: ignore
             if not asyncio.iscoroutinefunction(coro):
@@ -237,6 +245,7 @@ def command(
     category: AppCmdType
         The category of the command. Defaults to slash commands.
     """
+
     def decorator(coro: Callable):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("callback must be a coroutine")
