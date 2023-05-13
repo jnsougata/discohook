@@ -1,5 +1,19 @@
-__version__ = "0.0.5"
+"""
+Discord API Wrapper
+~~~~~~~~~~~~~~~~~~~
+
+A simple wrapper for the Discord API designed for serverless apps.
+
+:copyright: (c) 2022-present Sougata Jana
+:license: MIT, see LICENSE for more details.
+
+"""
+
+__title__ = "discohook"
+__license__ = "MIT"
+__copyright__ = "Copyright 2022-present Sougata Jana"
 __author__ = "Sougata Jana"
+__version__ = "0.0.5a"
 
 from .attachment import Attachment
 from .channel import Channel, PartialChannel
