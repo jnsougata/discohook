@@ -1,7 +1,8 @@
+import asyncio
 import secrets
 from .emoji import PartialEmoji
 from typing import Optional, List, Dict, Any, Callable, Union
-from .enums import ButtonStyle, MessageComponentType, ChannelType, SelectMenuType
+from .enums import ButtonStyle, MessageComponentType, ChannelType, SelectType
 
 
 class Component:
@@ -29,7 +30,14 @@ class Component:
         Returns
         -------
         None
+
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
         """
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
         self.callback = coro
 
     def __call__(self, *args, **kwargs):
@@ -50,7 +58,7 @@ class Button(Component):
         The url to be opened when the button is clicked if the style is set to :attr:`ButtonStyle.link`.
     style: :class:`ButtonStyle`
         The style of the button.
-    disabled: Optional[:class:`bool`]
+    disabled: :class:`bool`
         Whether the button is disabled or not.
     emoji: Optional[Union[:class:`str`, :class:`PartialEmoji`]]
         The emoji to be displayed on the button.
@@ -61,16 +69,16 @@ class Button(Component):
         *,
         url: Optional[str] = None,
         style: ButtonStyle = ButtonStyle.blurple,
-        disabled: Optional[bool] = False,
+        disabled: bool = False,
         emoji: Optional[Union[str, PartialEmoji]] = None,
         custom_id: Optional[str] = None,
     ):
         super().__init__(MessageComponentType.button, custom_id)
-        self.url = url  # type: ignore
-        self.label = label  # type: ignore
+        self.url: Optional[str] = url
+        self.label: Optional[str] = label
         self.style = style
-        self.disabled = disabled  # type: ignore
-        self.emoji = PartialEmoji(name=emoji) if isinstance(emoji, str) else emoji  # type: ignore
+        self.disabled = disabled
+        self.emoji: Optional[Union[str, PartialEmoji]] = PartialEmoji(name=emoji) if isinstance(emoji, str) else emoji
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -123,13 +131,13 @@ class SelectOption:
         *,
         description: Optional[str] = None,
         emoji: Optional[PartialEmoji] = None,
-        default: Optional[bool] = False,
+        default: bool = False,
     ):
         self.label = label
         self.value = value
-        self.description = description  # type: ignore
-        self.emoji = emoji  # type: ignore
-        self.default = default  # type: ignore
+        self.description: Optional[str] = description
+        self.emoji: Optional[PartialEmoji] = emoji
+        self.default: bool = default
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -171,7 +179,7 @@ class Select(Component):
         The maximum number of options that can be selected.
     disabled: Optional[:class:`bool`]
         Whether the select menu is disabled or not.
-    type: :class:`SelectMenuType`
+    type: :class:`SelectType`
         The type of the select menu.
     """
     def __init__(
@@ -182,24 +190,18 @@ class Select(Component):
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         channel_types: Optional[List[ChannelType]] = None,
-        type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select,
+        type: Union[MessageComponentType, SelectType] = MessageComponentType.text_select,
         disabled: Optional[bool] = False,
         custom_id: Optional[str] = None,
     ):
         super().__init__(type, custom_id)
         self.data = {"type": type.value, "custom_id": self.custom_id}
-        if (type.value == MessageComponentType.text_select.value) and (options is not None):
-            self.data["options"] = [option.to_dict() for option in options]
-        if (type == MessageComponentType.channel_select) and (channel_types is not None):
-            self.data["channel_types"] = [channel_type.value for channel_type in channel_types]
-        if placeholder:
-            self.data["placeholder"] = placeholder
-        if min_values:
-            self.data["min_values"] = min_values
-        if max_values:
-            self.data["max_values"] = max_values
-        if disabled:
-            self.data["disabled"] = disabled
+        self.options: Optional[List[SelectOption]] = options
+        self.channel_types: Optional[List[ChannelType]] = channel_types
+        self.placeholder: Optional[str] = placeholder
+        self.min_values: Optional[int] = min_values
+        self.max_values: Optional[int] = max_values
+        self.disabled: Optional[bool] = disabled
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -212,6 +214,19 @@ class Select(Component):
         :class:`dict`
             The dictionary representation of the button.
         """
+        if self.options:
+            if self.type == MessageComponentType.text_select:
+                self.data["options"] = [option.to_dict() for option in self.options]  # type: ignore
+            if self.type == MessageComponentType.channel_select and self.channel_types:
+                self.data["channel_types"] = [channel_type.value for channel_type in self.channel_types]
+        if self.placeholder:
+            self.data["placeholder"] = self.placeholder
+        if self.min_values:
+            self.data["min_values"] = self.min_values
+        if self.max_values:
+            self.data["max_values"] = self.max_values
+        if self.disabled:
+            self.data["disabled"] = self.disabled
         return self.data
 
 
@@ -249,6 +264,7 @@ class View:
                 "components": [btn.to_dict() for btn in buttons[:5]],
             }
         )
+        # TODO: Add support auto parse more than 5 buttons and add them to the next row.
         self.children.extend(buttons[:5])
 
     # noinspection PyShadowingNames
@@ -302,9 +318,16 @@ def button(
     Returns
     -------
     :class:`Button`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
     """
 
     def decorator(coro: Callable):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
         btn.callback = coro
         return btn
@@ -318,7 +341,7 @@ def select(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     channel_types: Optional[List[ChannelType]] = None,
-    type: Union[MessageComponentType, SelectMenuType] = MessageComponentType.text_select,
+    type: Union[MessageComponentType, SelectType] = MessageComponentType.text_select,
     disabled: Optional[bool] = False,
     custom_id: Optional[str] = None,
 ):
@@ -339,7 +362,7 @@ def select(
         The channel types to be displayed on the select menu. Used only for channel select menus.
     disabled: Optional[:class:`bool`]
         Whether the select menu is disabled or not.
-    type: :class:`SelectMenuType`
+    type: :class:`SelectType`
         The type of the select menu.
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
@@ -347,8 +370,15 @@ def select(
     Returns
     -------
     :class:`Select`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
     """
     def decorator(coro: Callable):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
         menu = Select(
             options=options,
             placeholder=placeholder,

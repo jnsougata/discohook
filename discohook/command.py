@@ -101,12 +101,11 @@ class ApplicationCommand:
     ):
         self._id = f"{name}:{category.value}"
         self.name = name
-        self.description = description  # type: ignore
+        self.description: Optional[str] = description
         self.options: List[Option] = options
-        self.dm_access = dm_access
-        self.application_id = None
-        self.category = category
-        self.permissions = permissions  # type: ignore
+        self.dm_access: bool = dm_access
+        self.category: ApplicationCommandType = category
+        self.permissions: Optional[List[Permissions]] = permissions
         self.callback: Optional[Callable] = None
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
@@ -160,6 +159,16 @@ class ApplicationCommand:
             The description of the subcommand.
         options: Optional[List[Option]]
             The options of the subcommand.
+
+        Returns
+        -------
+        SubCommand
+            The subcommand object.
+
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
         """
         def decorator(coro: Callable):
             subcommand = SubCommand(name, description, options, callback=coro)
@@ -167,9 +176,10 @@ class ApplicationCommand:
                 self.options.append(subcommand)  # type: ignore
             else:
                 self.options = [subcommand]  # type: ignore
-            if asyncio.iscoroutinefunction(coro):
-                self.subcommands[name] = subcommand
-                return subcommand
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("subcommand callback must be a coroutine")
+            self.subcommands[name] = subcommand
+            return subcommand
 
         return decorator
 
@@ -228,6 +238,8 @@ def command(
         The category of the command. Defaults to slash commands.
     """
     def decorator(coro: Callable):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("callback must be a coroutine")
         cmd = ApplicationCommand(
             name,
             description,

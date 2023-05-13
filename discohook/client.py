@@ -1,7 +1,9 @@
 import asyncio
 import aiohttp
+from .guild import Guild
 from .embed import Embed
 from .file import File
+from .webhook import Webhook
 from fastapi import FastAPI
 from .handler import handler
 from .https import HTTPClient
@@ -16,8 +18,6 @@ from .params import handle_send_params, merge_fields
 from fastapi.responses import JSONResponse
 from .multipart import create_form
 from typing import Optional, List, Dict, Union, Callable, Any
-from .webhook import Webhook
-from .guild import Guild
 
 
 async def delete_cmd(request: Request, command_id: str, token: str):
@@ -134,11 +134,12 @@ class Client(FastAPI):
         )
 
         def decorator(coro: Callable):
-            if asyncio.iscoroutinefunction(coro):
-                cmd.callback = coro
-                self.application_commands[cmd._id] = cmd  # noqa
-                self._sync_queue.append(cmd)
-                return cmd
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Callback must be a coroutine.")
+            cmd.callback = coro
+            self.application_commands[cmd._id] = cmd  # noqa
+            self._sync_queue.append(cmd)
+            return cmd
 
         return decorator
 

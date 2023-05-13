@@ -136,10 +136,12 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})
         users = [
-            User(resolved_users.pop(user_id), interaction.client) for user_id in raw_values if user_id in resolved_users
+            User(resolved_users.pop(user_id), interaction.client)
+            for user_id in raw_values if user_id in resolved_users
         ]
         roles = [
-            Role(resolved_roles.pop(role_id), interaction.client) for role_id in raw_values if role_id in resolved_roles
+            Role(resolved_roles.pop(role_id), interaction.client)
+            for role_id in raw_values if role_id in resolved_roles
         ]
         return users + roles  # type: ignore
     return []
