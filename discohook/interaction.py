@@ -356,7 +356,7 @@ class Interaction:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        if self.type in (InteractionType.autocomplete, InteractionType.app_command, InteractionType.ping):
+        if self.type in (InteractionType.autocomplete, InteractionType.app_command):
             raise InteractionTypeMismatch(f"Method not supported for {self.type}")
 
         data = handle_edit_params(
