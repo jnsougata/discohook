@@ -356,8 +356,6 @@ class Interaction:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        if self.type != InteractionType.component:
-            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
 
         data = handle_edit_params(
             content=content,
