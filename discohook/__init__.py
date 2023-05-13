@@ -57,7 +57,3 @@ from .permissions import Permissions
 from .role import PartialRole, Role
 from .user import User
 from .view import Button, Select, SelectOption, View, button, select
-
-user_command = ApplicationCommandType.user
-slash_command = ApplicationCommandType.slash
-message_command = ApplicationCommandType.message
