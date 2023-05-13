@@ -1,7 +1,7 @@
 from fastapi.responses import HTMLResponse
 
 
-def dashboard():
+async def dashboard():
     content = """
 <!DOCTYPE html>
 <html lang="en">
