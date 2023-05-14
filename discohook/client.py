@@ -83,6 +83,9 @@ class Client(FastAPI):
         )
         self.error_handler: Optional[Callable] = None
         self._custom_id_parser: Optional[Callable] = None
+        self._before_invoke: Optional[Callable] = None
+        self._after_invoke: Optional[Callable] = None
+        self._interaction_check: Optional[Callable] = None
 
     def load_components(self, view: View):
         """
@@ -205,6 +208,33 @@ class Client(FastAPI):
         coro: Callable
         """
         self._custom_id_parser = coro
+        
+    def before_invoke(self, coro: Callable):
+        """
+        A decorator to register a dev defined interactions pre-invoke hook.
+        Parameters
+        ----------
+        coro: Callable
+        """
+        self._before_invoke = coro
+        
+    def after_invoke(self, coro: Callable):
+        """
+        A decorator to register a dev defined interactions post-invoke hook.
+        Parameters
+        ----------
+        coro: Callable
+        """
+        self._after_invoke = coro
+        
+    def interaction_check(self, coro: Callable):
+        """
+        A decorator to register a dev defined global interactions check to determine if interactions should be processed or not.
+        Parameters
+        ----------
+        coro: Callable
+        """
+        self._interactions_check = coro
 
     async def send_message(
         self,
