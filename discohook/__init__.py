@@ -1,8 +1,8 @@
 """
-Discord API Wrapper
-~~~~~~~~~~~~~~~~~~~
+Discord HTTP Interaction API Wrapper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A simple wrapper for the Discord API designed for serverless apps.
+A simple wrapper for the Discord HTTP Interaction API, designed for serverless apps.
 
 :copyright: (c) 2022-present Sougata Jana
 :license: MIT, see LICENSE for more details.
@@ -48,7 +48,6 @@ from .option import (
     IntegerOption,
     MentionableOption,
     NumberOption,
-    Option,
     RoleOption,
     StringOption,
     UserOption,
