@@ -316,3 +316,4 @@ class Client(FastAPI):
             return Guild(data, self)
         except KeyError:
             return None
+
