@@ -5,12 +5,13 @@
 ```bash
 pip install git+https://github.com/jnsougata/discohook
 ```
-` ⚠️ ` `pip install discohook` won't install this library. Use the git method mentioned above.
+- ⚠️ `pip install discohook` won't install this library. Use the git method mentioned above.
 
 ### Links
 
-- [📕 Documentation](https://discohook.readthedocs.io/en/latest/)
-- [💬 Discord Server](https://discord.gg/5PwqKbM7wu)
+- [Documentation](https://discohook.readthedocs.io/en/latest/)
+- [More Examples](examples)
+- [Discord Server](https://discord.gg/5PwqKbM7wu)
 
 ## Quickstart
 
@@ -72,9 +73,9 @@ curl -X GET https://example.io/api/sync/<bot_token_here>
 
 **🎉 Boom!** You're done. Now you can test your bot by using ` /help ` command in your server.
 
-### 📚 Get more examples [here](examples)
+#### Get more examples [here](examples)
 
-### 📕 Why we didn't add auto registration?
+#### Why we didn't add auto registration?
 As this library is meant to be used in serverless functions,
 we didn't add auto registration as at each invocation the scripts will be reloaded
 and the commands will be re-registered again.
