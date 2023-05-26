@@ -9,9 +9,9 @@ pip install git+https://github.com/jnsougata/discohook
 
 ### Links
 
-- [Documentation](https://discohook.readthedocs.io/en/latest/)
-- [More Examples](examples)
-- [Discord Server](https://discord.gg/5PwqKbM7wu)
+- [Docs](https://discohook.readthedocs.io/en/latest/)
+- [Discord](https://discord.gg/5PwqKbM7wu)
+- [Examples](examples)
 
 ## Quickstart
 
@@ -72,8 +72,6 @@ curl -X GET https://example.io/api/sync/<bot_token_here>
 ```
 
 **🎉 Boom!** You're done. Now you can test your bot by using ` /help ` command in your server.
-
-#### Get more examples [here](examples)
 
 #### Why we didn't add auto registration?
 As this library is meant to be used in serverless functions,
