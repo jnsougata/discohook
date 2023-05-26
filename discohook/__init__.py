@@ -1,8 +1,8 @@
 """
-Discord API Wrapper
-~~~~~~~~~~~~~~~~~~~
+Discord HTTP Interaction API Wrapper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A simple wrapper for the Discord API designed for serverless apps.
+A simple wrapper for the Discord HTTP Interaction API, designed for serverless apps.
 
 :copyright: (c) 2022-present Sougata Jana
 :license: MIT, see LICENSE for more details.
@@ -18,7 +18,7 @@ __version__ = "0.0.5a"
 from .attachment import Attachment
 from .channel import Channel, PartialChannel
 from .client import Client
-from .command import ApplicationCommand, SubCommand, command
+from .command import ApplicationCommand, SubCommand, command, command_checker
 from .embed import Embed
 from .emoji import PartialEmoji
 from .enums import (
@@ -48,7 +48,6 @@ from .option import (
     IntegerOption,
     MentionableOption,
     NumberOption,
-    Option,
     RoleOption,
     StringOption,
     UserOption,
@@ -56,4 +55,4 @@ from .option import (
 from .permissions import Permissions
 from .role import PartialRole, Role
 from .user import User
-from .view import Button, Select, SelectOption, View, button, select
+from .view import Button, Select, SelectOption, View, button, select, component_checker

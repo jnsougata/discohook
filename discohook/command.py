@@ -116,6 +116,7 @@ class ApplicationCommand:
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
         self.autocompletes: Dict[str, Callable] = {}
+        self.checks: List[Callable] = []
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -258,6 +259,36 @@ def command(
             category,
         )
         cmd.callback = coro
+        return cmd
+
+    return decorator
+
+
+def command_checker(*checks: Callable):
+    """
+    Decorator for adding a checks to a command.
+
+    Parameters
+    ----------
+    *checks: Callable
+        The checks to add to the command.
+
+    Returns
+    -------
+    ApplicationCommand
+        The command with the checks added.
+
+    Raises
+    ------
+    TypeError
+        If the any of the checks is not a coroutine.
+    """
+
+    def decorator(cmd: ApplicationCommand):
+        for check in checks:
+            if not asyncio.iscoroutinefunction(check):
+                raise TypeError(f"check `{check.__name__}` must be coroutines")
+        cmd.checks.extend(checks)
         return cmd
 
     return decorator

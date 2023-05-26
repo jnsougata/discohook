@@ -20,6 +20,7 @@ class Component:
         self.type = type
         self.callback: Optional[Callable] = None
         self.custom_id = custom_id or secrets.token_urlsafe(16)
+        self.checks: List[Callable] = []
 
     def on_interaction(self, coro: Callable):
         """
@@ -396,5 +397,35 @@ def select(
         )
         menu.callback = coro
         return menu
+
+    return decorator
+
+
+def component_checker(*checks: Callable):
+    """
+    Decorator for adding a checks to a component.
+
+    Parameters
+    ----------
+    *checks: Callable
+        The checks to be added to the component.
+
+    Returns
+    -------
+    Component
+        The component with the checks added to it.
+
+    Raises
+    ------
+    TypeError
+        If any of the checks is not a coroutine.
+    """
+
+    def decorator(comp: Component):
+        for check in checks:
+            if not asyncio.iscoroutinefunction(check):
+                raise TypeError(f"check `{check.__name__}` must be a coroutine.")
+        comp.checks.extend(checks)
+        return comp
 
     return decorator

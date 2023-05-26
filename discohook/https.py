@@ -71,6 +71,9 @@ class HTTPClient:
     async def remove_role(self, guild_id: str, user_id: str, role_id: str):
         return await self.request("DELETE", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", use_auth=True)
 
+    async def fetch_user(self, user_id: str):
+        return await self.request("GET", f"/users/{user_id}", use_auth=True)
+    
     async def kick_user(self, guild_id: str, user_id: str):
         return await self.request("DELETE", f"/guilds/{guild_id}/members/{user_id}", use_auth=True)
 

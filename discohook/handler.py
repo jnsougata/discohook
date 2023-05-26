@@ -1,3 +1,4 @@
+import asyncio
 import traceback
 
 from fastapi import Request
@@ -48,7 +49,15 @@ async def handler(request: Request):
             if not cmd:
                 raise RuntimeError(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
 
-            elif not (interaction.data["type"] == ApplicationCommandType.slash.value):
+            if cmd.checks:
+                results = await asyncio.gather(*[check(interaction) for check in cmd.checks])
+                for result in results:
+                    if not isinstance(result, bool):
+                        raise TypeError(f"check returned {type(result)}, expected bool")
+                if not all(results):
+                    return JSONResponse({"error": "command checks failed"}, status_code=403)
+
+            if not (interaction.data["type"] == ApplicationCommandType.slash.value):
                 target_object = build_context_menu_param(interaction)
                 await cmd.__call__(interaction, target_object)
 
@@ -61,32 +70,6 @@ async def handler(request: Request):
             else:
                 args, kwargs = build_slash_command_prams(cmd.callback, interaction)
                 await cmd.__call__(interaction, *args, **kwargs)
-
-        elif interaction.type == InteractionType.component:
-            custom_id = interaction.data["custom_id"]
-            if request.app._custom_id_parser:
-                custom_id = await request.app._custom_id_parser(custom_id)
-            component = request.app.active_components.get(custom_id)
-            if not component:
-                return JSONResponse({"error": "component not found"}, status_code=404)
-            if interaction.data["component_type"] == MessageComponentType.button.value:
-                await component.__call__(interaction)
-            menu_types = [
-                MessageComponentType.text_select.value,
-                MessageComponentType.user_select.value,
-                MessageComponentType.role_select.value,
-                MessageComponentType.channel_select.value,
-                MessageComponentType.mentionable_select.value,
-            ]
-            if interaction.data["component_type"] in menu_types:
-                await component.__call__(interaction, build_select_menu_values(interaction))
-
-        elif interaction.type == InteractionType.modal_submit:
-            component = request.app.active_components.get(interaction.data["custom_id"])
-            if not component:
-                return JSONResponse({"error": "component not found!"}, status_code=404)
-            args, kwargs = build_modal_params(component.callback, interaction)
-            await component.__call__(interaction, *args, **kwargs)
 
         elif interaction.type == InteractionType.autocomplete:
             key = f"{interaction.data['name']}:{interaction.data['type']}"
@@ -103,6 +86,39 @@ async def handler(request: Request):
                 callback = cmd.autocompletes.get(option["name"])
             if callback:
                 await callback(interaction, option["value"])
+
+        elif interaction.type in (InteractionType.component, InteractionType.modal_submit):
+            custom_id = interaction.data["custom_id"]
+            if request.app._custom_id_parser:
+                custom_id = await request.app._custom_id_parser(custom_id)
+            component = request.app.active_components.get(custom_id)
+            if component.checks:
+                results = await asyncio.gather(*[check(interaction) for check in component.checks])
+                for result in results:
+                    if not isinstance(result, bool):
+                        raise TypeError(f"check returned {type(result)}, expected bool")
+                if not all(results):
+                    return JSONResponse({"error": "component checks failed"}, status_code=403)
+            if not component:
+                return JSONResponse({"error": "component not found"}, status_code=404)
+            
+            if interaction.type == InteractionType.component:
+                if interaction.data["component_type"] == MessageComponentType.button.value:
+                    await component.__call__(interaction)
+                menu_types = [
+                    MessageComponentType.text_select.value,
+                    MessageComponentType.user_select.value,
+                    MessageComponentType.role_select.value,
+                    MessageComponentType.channel_select.value,
+                    MessageComponentType.mentionable_select.value,
+                ]
+                if interaction.data["component_type"] in menu_types:
+                    await component.__call__(interaction, build_select_menu_values(interaction))
+                    
+            elif interaction.type == InteractionType.modal_submit:
+                args, kwargs = build_modal_params(component.callback, interaction)
+                await component.__call__(interaction, *args, **kwargs)
+                
         else:
             return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
     except Exception as exc:
