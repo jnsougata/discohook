@@ -1,3 +1,4 @@
+import asyncio
 import traceback
 
 from fastapi import Request
@@ -48,7 +49,15 @@ async def handler(request: Request):
             if not cmd:
                 raise RuntimeError(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
 
-            elif not (interaction.data["type"] == ApplicationCommandType.slash.value):
+            if cmd.checks:
+                results = await asyncio.gather(*[check(interaction) for check in cmd.checks])
+                for result in results:
+                    if not isinstance(result, bool):
+                        raise TypeError(f"check returned {type(result)}, expected bool")
+                if not all(results):
+                    return JSONResponse({"error": "command checks failed"}, status_code=403)
+
+            if not (interaction.data["type"] == ApplicationCommandType.slash.value):
                 target_object = build_context_menu_param(interaction)
                 await cmd.__call__(interaction, target_object)
 
@@ -83,6 +92,13 @@ async def handler(request: Request):
             if request.app._custom_id_parser:
                 custom_id = await request.app._custom_id_parser(custom_id)
             component = request.app.active_components.get(custom_id)
+            if component.checks:
+                results = await asyncio.gather(*[check(interaction) for check in component.checks])
+                for result in results:
+                    if not isinstance(result, bool):
+                        raise TypeError(f"check returned {type(result)}, expected bool")
+                if not all(results):
+                    return JSONResponse({"error": "component checks failed"}, status_code=403)
             if not component:
                 return JSONResponse({"error": "component not found"}, status_code=404)
             
