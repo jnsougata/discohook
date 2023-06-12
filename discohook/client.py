@@ -34,7 +34,8 @@ async def delete_cmd(request: Request, command_id: str, token: str):
 async def sync(request: Request, token: str):
     if token != request.app.token:
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    return JSONResponse(await request.app.sync())
+    resp = await request.app.sync()
+    return JSONResponse(await resp.json(), status_code=resp.status)
 
 
 class Client(FastAPI):
@@ -262,8 +263,7 @@ class Client(FastAPI):
 
         This method is used internally by the client. You should not use this method.
         """
-        resp = await self.http.sync_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
-        return await resp.json()
+        return await self.http.sync_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
 
     async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
         """
