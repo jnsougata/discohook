@@ -71,7 +71,7 @@ class Client(FastAPI):
         self.redoc_url = None
         self.public_key = public_key
         self.application_id = application_id
-        self.http = HTTPClient(token, self, aiohttp.ClientSession("https://discord.com"))
+        self.http = HTTPClient(self, token, aiohttp.ClientSession("https://discord.com"))
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
@@ -254,8 +254,7 @@ class Client(FastAPI):
             The client as partial user.
         """
         resp = await self.http.fetch_client_info()
-        data = await resp.json()
-        return ClientUser(data, self)
+        return ClientUser(self, await resp.json())
 
     async def sync(self):
         """
