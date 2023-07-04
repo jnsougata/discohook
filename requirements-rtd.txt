@@ -1,1 +1,4 @@
+aiohttp
+fastapi
 furo
+PyNaCl
