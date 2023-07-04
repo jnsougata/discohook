@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 class PartialRole:
-    def __init__(self, data: Dict[str, Any], client: "Client"):
+    def __init__(self, client: "Client", data: Dict[str, Any], ):
         self.client = client
         self.id = data["id"]
         self.guild_id = data.get("guild_id")
@@ -83,7 +83,7 @@ class PartialRole:
             payload["icon"] = icon_data_uri
         resp = await self.client.http.edit_guild_role(self.guild_id, self.id, payload)
         data = await resp.json()
-        return Role(data, self.client)
+        return Role(self.client, data)
 
     async def edit_position(self, role_id: str, *, position: int) -> List["Role"]:
         """
@@ -102,7 +102,7 @@ class PartialRole:
         payload = {"id": role_id, "position": position}
         resp = await self.client.http.edit_guild_role_position(self.guild_id, payload)
         data = await resp.json()
-        return [Role(role, self.client) for role in data]
+        return [Role(self.client, role) for role in data]
 
 
 class Role(PartialRole):
@@ -137,8 +137,8 @@ class Role(PartialRole):
         The flags of the role.
     """
 
-    def __init__(self, data: dict, client: "Client"):
-        super().__init__(data, client)
+    def __init__(self, client: "Client", data: dict):
+        super().__init__(client, data)
         self.id: str = data.get("id")
         self.name: str = data.get("name")
         self.color: int = data.get("color")

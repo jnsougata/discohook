@@ -11,8 +11,8 @@ class Member(User):
     Represents a member of a guild sent with an interaction, subclassed from :class:`User`.
     """
 
-    def __init__(self, data: Dict[str, Any], client: "Client"):
-        super().__init__(data, client)
+    def __init__(self, client: "Client", data: Dict[str, Any]):
+        super().__init__(client, data)
         self.nick = data.get("nick")
         self.roles = data.get("roles")
         self.joined_at = data.get("joined_at")

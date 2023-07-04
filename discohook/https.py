@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 class HTTPClient:
-    def __init__(self, token: str, client: "Client", session: aiohttp.ClientSession):
+    def __init__(self, client: "Client", token: str, session: aiohttp.ClientSession):
         self.token = token
         self.client = client
         self.session = session

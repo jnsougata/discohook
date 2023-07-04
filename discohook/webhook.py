@@ -71,9 +71,9 @@ class Webhook:
 
     @property
     def avatar(self) -> Optional[Asset]:
-        hash = self.data.get("avatar")
-        if hash:
-            return Asset(hash=hash, fragment=f"avatars/{self.id}/")
+        _hash = self.data.get("avatar")
+        if _hash:
+            return Asset(hash=_hash, fragment=f"avatars/{self.id}/")
         return None
 
     @property
@@ -88,14 +88,14 @@ class Webhook:
     def source_guild(self) -> Optional[PartialGuild]:
         data = self.data.get("source_guild")
         if data:
-            return PartialGuild(data["id"], self.client)
+            return PartialGuild(self.client, data["id"])
         return None
 
     @property
     def source_channel(self) -> Optional[PartialChannel]:
         data = self.data.get("source_channel")
         if data:
-            return PartialChannel(data, self.client)
+            return PartialChannel(self.client, data["id"])
         return None
 
     @property
@@ -106,7 +106,7 @@ class Webhook:
     def user(self) -> Optional[User]:
         data = self.data.get("user")
         if data:
-            return User(data, self.client)
+            return User(self.client, data)
 
     async def delete(self):
         """

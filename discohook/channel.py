@@ -19,16 +19,18 @@ class PartialChannel:
 
     Parameters
     ----------
-    data: :class:`dict`
-        The partial channel data which must contain the id.
+    channel_id: str
+        The channel's ID.
+    guild_id: str | None
+        The guild's ID.
     client: :class:`Client`
         The client that the channel belongs to.
     """
 
-    def __init__(self, data, client: "Client"):
+    def __init__(self, client: "Client", channel_id: str, guild_id: Optional[str] = None):
         self.client = client
-        self.id: str = data["id"]
-        self.guild_id: Optional[str] = data.get("guild_id")
+        self.id: str = channel_id
+        self.guild_id = guild_id
 
     def __eq__(self, other):
         return self.id == other.id
@@ -292,7 +294,7 @@ class Channel(PartialChannel):
     """
 
     def __init__(self, data: dict, client: "Client"):
-        super().__init__(data, client)
+        super().__init__(client, data["id"], data.get("guild_id"))
         self.type = data.get("type")
         self.guild_id = data.get("guild_id")
         self.position = data.get("position")

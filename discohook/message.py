@@ -48,7 +48,7 @@ class MessageInteraction:
         """
         The user who invoked the interaction.
         """
-        return User(self.data["user"], self.client)
+        return User(self.client, self.data["user"])
 
 
 class Message:
@@ -106,7 +106,7 @@ class Message:
 
     @property
     def author(self) -> User:
-        return User(self.data["author"], self.client)
+        return User(self.client, self.data["author"])
 
     @property
     def content(self) -> Optional[str]:
@@ -130,7 +130,7 @@ class Message:
 
     @property
     def mentions(self) -> List[User]:
-        return [User(x, self.client) for x in self.data.get("mentions", [])]
+        return [User(self.client, x) for x in self.data.get("mentions", [])]
 
     @property
     def mention_roles(self) -> List[Role]:

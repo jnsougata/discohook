@@ -56,7 +56,7 @@ class Interaction:
         The request object from fastapi
     """
 
-    def __init__(self, data: Dict[str, Any], client: "Client"):
+    def __init__(self, client: "Client", data: Dict[str, Any]):
         self.payload = data
         self.__responded = False
         self.client: "Client" = client
@@ -192,7 +192,7 @@ class Interaction:
         -------
         PartialChannel
         """
-        return PartialChannel({"id": self.channel_id}, self.client)
+        return PartialChannel(self.client, self.channel_id, self.guild_id)
 
     @property
     def author(self) -> Optional[Union[User, Member]]:
@@ -217,7 +217,7 @@ class Interaction:
     def guild(self) -> Optional[PartialGuild]:
         if not self.guild_id:
             return
-        return PartialGuild(self.guild_id, self.client)
+        return PartialGuild(self.client, self.guild_id)
 
     @property
     def message(self) -> Optional[Message]:

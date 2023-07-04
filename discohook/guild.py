@@ -15,7 +15,7 @@ class PartialGuild:
     Represents a partial guild.
     """
 
-    def __init__(self, guild_id: str, client: "Client"):
+    def __init__(self, client: "Client", guild_id: str):
         self.id = guild_id
         self.client = client
 
@@ -160,7 +160,8 @@ class PartialGuild:
         lock_permissions:
             Whether to sync the permissions of the channel with the parent category.
         parent_id: Optional[:class:`str`]
-            The id of the parent category to move the channel to. If not provided, the channel will be moved to the root.
+            The id of the parent category to move the channel to.
+            If not provided, the channel will be moved to the root.
         """
         payload = {"id": channel_id, "position": position, "lock_permissions": lock_permissions}
         if parent_id:
@@ -288,7 +289,7 @@ class Guild(PartialGuild):
     """
 
     def __init__(self, data: Dict[str, Any], client: "Client"):
-        super().__init__(data["id"], client)
+        super().__init__(client, data["id"])
         self.name = data["name"]
         self.icon = data.get("icon")
         self.icon_hash = data.get("icon_hash")

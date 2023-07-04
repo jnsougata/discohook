@@ -67,13 +67,13 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
                 if not member_data["avatar"]:
                     member_data["avatar"] = user_data["avatar"]
                 user_data.update(member_data)
-                options[name] = Member(user_data, interaction.client)
+                options[name] = Member(interaction.client, user_data)
             else:
-                options[name] = User(user_data, interaction.client)
+                options[name] = User(interaction.client, user_data)
         elif option_type == ApplicationCommandOptionType.channel.value:
             options[name] = Channel(interaction.data["resolved"]["channels"][value], interaction.client)
         elif option_type == ApplicationCommandOptionType.role.value:
-            options[name] = Role(interaction.data["resolved"]["roles"][value], interaction.client)
+            options[name] = Role(interaction.client, interaction.data["resolved"]["roles"][value])
         elif option_type == ApplicationCommandOptionType.mentionable.value:
             # TODO: this is a shit option type, not enough motivation to implement it
             pass
@@ -102,7 +102,7 @@ def build_context_menu_param(interaction: Interaction):
         if member_resolved:
             member_resolved["avatar"] = user_resolved["avatar"]
             user_resolved.update(member_resolved)
-        return User(user_resolved, interaction.client)
+        return User(interaction.client, user_resolved)
 
     if interaction.data["type"] == ApplicationCommandType.message.value:
         message_id = interaction.data["target_id"]
@@ -127,24 +127,24 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         return [Channel(resolved.pop(channel_id), interaction.client) for channel_id in interaction.data["values"]]
     if interaction.data["component_type"] == MessageComponentType.user_select.value:
         resolved = interaction.data["resolved"]["users"]
-        return [User(resolved.pop(user_id), interaction.client) for user_id in interaction.data["values"]]
+        return [User(interaction.client, resolved.pop(user_id)) for user_id in interaction.data["values"]]
     if interaction.data["component_type"] == MessageComponentType.role_select.value:
         resolved = interaction.data["resolved"]["roles"]
         roles = [resolved.pop(role_id) for role_id in interaction.data["values"]]
         for role in roles:
             role["guild_id"] = interaction.guild_id
-        return [Role(role, interaction.client) for role in roles]
+        return [Role(interaction.client, role) for role in roles]
     if interaction.data["component_type"] == MessageComponentType.mentionable_select.value:
         raw_values = interaction.data["values"]
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})
         users = [
-            User(resolved_users.pop(user_id), interaction.client)
+            User(interaction.client, resolved_users.pop(user_id))
             for user_id in raw_values
             if user_id in resolved_users
         ]
         roles = [
-            Role(resolved_roles.pop(role_id), interaction.client)
+            Role(interaction.client, resolved_roles.pop(role_id))
             for role_id in raw_values
             if role_id in resolved_roles
         ]

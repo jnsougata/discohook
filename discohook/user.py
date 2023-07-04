@@ -45,7 +45,7 @@ class User:
         Returns a string that allows you to mention the user.
     """
 
-    def __init__(self, data: Dict[str, Any], client: "Client"):
+    def __init__(self, client: "Client", data: Dict[str, Any]):
         self.data = data
         self.client = client
 
@@ -183,7 +183,7 @@ class ClientUser:
         The flags of the client user.
     """
 
-    def __init__(self, data: Dict[str, Any], client: "Client") -> None:
+    def __init__(self, client: "Client", data: Dict[str, Any]) -> None:
         self.data = data
         self.client = client
 
@@ -221,7 +221,7 @@ class ClientUser:
 
     @property
     def owner(self) -> User:
-        return User(self.data["owner"], self.client)
+        return User(self.client, self.data["owner"])
 
     @property
     def flags(self) -> int:
