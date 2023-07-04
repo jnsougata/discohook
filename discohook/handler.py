@@ -38,7 +38,7 @@ async def handler(request: Request):
         return Response(content="BadSignature", status_code=401)
 
     data = await request.json()
-    interaction = Interaction(data, request.app)
+    interaction = Interaction(request.app, data)
     try:
         if interaction.type == InteractionType.ping:
             return JSONResponse({"type": InteractionCallbackType.pong.value}, status_code=200)
