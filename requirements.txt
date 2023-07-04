@@ -1,4 +1,3 @@
-furo
-PyNaCl
 aiohttp
 fastapi
+PyNaCl
