@@ -58,7 +58,7 @@ class Interaction:
 
     def __init__(self, client: "Client", data: Dict[str, Any]):
         self.payload = data
-        self.__responded = False
+        self._responded = False
         self.client: "Client" = client
         self.data: Optional[Dict[str, Any]] = data.get("data")
 
@@ -71,7 +71,7 @@ class Interaction:
         -------
         bool
         """
-        return self.__responded
+        return self._responded
 
     @property
     def id(self) -> str:
@@ -207,11 +207,11 @@ class Interaction:
         """
         member = self.payload.get("member")
         user = self.payload.get("user")
-        if member:
-            member.update(member.pop("user", {}))
-            member["guild_id"] = self.guild_id
-            return Member(member, self.client)
-        return User(user, self.client)
+        if not member:
+            return User(self.client, user)
+        member.update(member.pop("user", {}))
+        member["guild_id"] = self.guild_id
+        return Member(self.client, member)
 
     @property
     def guild(self) -> Optional[PartialGuild]:
@@ -255,7 +255,7 @@ class Interaction:
         InteractionResponse
             The original response message
         """
-        if not self.__responded:
+        if not self._responded:
             return
         resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
         data = await resp.json()
@@ -319,7 +319,7 @@ class Interaction:
             raise InteractionTypeMismatch(f"Method not supported for {self.type}")
 
         await self.client.http.send_interaction_callback(self.id, self.token, payload)
-        self.__responded = True
+        self._responded = True
         return InteractionResponse(self)
 
     async def update_message(
@@ -440,7 +440,7 @@ class Interaction:
         await self.client.http.send_interaction_mp_callback(
             self.id, self.token, create_form(payload, merge_fields(file, files))
         )
-        self.__responded = True
+        self._responded = True
         return InteractionResponse(self)
 
     async def followup(

@@ -134,7 +134,7 @@ class Message:
 
     @property
     def mention_roles(self) -> List[Role]:
-        return [Role(x, self.client) for x in self.data.get("mention_roles", [])]
+        return [Role(self.client, x) for x in self.data.get("mention_roles", [])]
 
     @property
     def mention_channels(self) -> Optional[dict]:
