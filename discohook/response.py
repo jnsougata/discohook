@@ -1,14 +1,16 @@
+from typing import TYPE_CHECKING, Optional, List, Union, Any, Dict
+
 from .embed import Embed
-from .file import File
-from .view import View
-from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
 from .errors import InteractionTypeMismatch
 from .enums import InteractionCallbackType, InteractionType
+from .file import File
 from .multipart import create_form
-from typing import TYPE_CHECKING, Optional, List, Union, Any, Dict
 from .message import Message
 from .modal import Modal
 from .option import Choice
+from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
+from .view import View
+
 if TYPE_CHECKING:
     from .interaction import Interaction
 
