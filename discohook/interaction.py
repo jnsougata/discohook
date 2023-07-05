@@ -1,19 +1,12 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from .channel import PartialChannel
-from .embed import Embed
-from .enums import InteractionCallbackType, InteractionType, try_enum
-from .errors import InteractionTypeMismatch
-from .file import File
+from .enums import InteractionType, try_enum
 from .guild import PartialGuild
 from .member import Member
-from .message import FollowupResponse, InteractionResponse, Message
-from .modal import Modal
-from .multipart import create_form
-from .option import Choice
-from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
+from .message import Message
+from .response import ResponseAdapter
 from .user import User
-from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
@@ -234,6 +227,17 @@ class Interaction:
         return Message(payload, self.client)
 
     @property
+    def response(self):
+        """
+        The response adapter for the interaction
+
+        Returns
+        -------
+        ResponseAdapter
+        """
+        return ResponseAdapter(self)
+
+    @property
     def from_originator(self) -> bool:
         """
         Whether the interaction was triggered by the same user who triggered the message
@@ -260,242 +264,3 @@ class Interaction:
         resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
         data = await resp.json()
         return Message(data, self.client)
-
-    async def send_modal(self, modal: Union[Modal, Any]):
-        """
-        Sends a modal to the interaction
-
-        Parameters
-        ----------
-        modal: Modal
-            The modal to send
-        """
-        if self.type not in (InteractionType.component, InteractionType.app_command):
-            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
-        self.client.active_components[modal.custom_id] = modal
-        # for comp in modal.components:
-        #     self.client.active_components[comp.custom_id] = comp
-        payload = {
-            "data": modal.to_dict(),
-            "type": InteractionCallbackType.modal.value,
-        }
-        await self.client.http.send_interaction_callback(self.id, self.token, payload)
-
-    async def autocomplete(self, choices: List[Choice]):
-        """
-        Sends autocomplete choices to the interaction (max 25)
-
-        Parameters
-        ----------
-        choices: List[Choice]
-            The choices to send
-        """
-        if self.type != InteractionType.autocomplete:
-            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
-        choices = choices[:25]
-        payload = {
-            "type": InteractionCallbackType.autocomplete.value,
-            "data": {"choices": [choice.to_dict() for choice in choices]},
-        }
-        await self.client.http.send_interaction_callback(self.id, self.token, payload)
-
-    async def defer(self, ephemeral: bool = False) -> InteractionResponse:
-        """
-        Defers the interaction
-
-        Parameters
-        ----------
-        ephemeral: bool
-            Whether the successive responses should be ephemeral or not (only for Application Commands)
-        """
-        payload = {}
-        if self.type == InteractionType.component:
-            payload["type"] = InteractionCallbackType.deferred_update_component_message.value
-        elif self.type == InteractionType.app_command or self.type == InteractionType.modal_submit:
-            payload["type"] = InteractionCallbackType.deferred_channel_message_with_source.value
-            if ephemeral:
-                payload["data"] = {"flags": 64}
-        else:
-            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
-
-        await self.client.http.send_interaction_callback(self.id, self.token, payload)
-        self._responded = True
-        return InteractionResponse(self)
-
-    async def update_message(
-        self,
-        content: Optional[str] = MISSING,
-        *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        suppress_embeds: Optional[bool] = MISSING,
-    ) -> None:
-        """
-        Edits the message, the component was attached to
-
-        Parameters
-        ----------
-        content: Optional[str]
-            The new content of the message.
-        embed: Optional[Embed]
-            The new embed of the message.
-        embeds: Optional[List[Embed]]
-            The new embeds of the message.
-        view: Optional[View]
-            The new view of the message.
-        tts: Optional[bool]
-            Whether the message should be sent with text-to-speech.
-        file: Optional[File]
-            A file to send with the message.
-        files: Optional[List[File]]
-            A list of files to send with the message.
-        suppress_embeds: Optional[bool]
-            Whether the embeds should be suppressed.
-        """
-        if self.type in (InteractionType.autocomplete, InteractionType.app_command):
-            raise InteractionTypeMismatch(f"Method not supported for {self.type}")
-
-        data = handle_edit_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
-        )
-        if view and view is not MISSING:
-            self.client.load_components(view)
-        self.client.store_inter_token(self.id, self.token)
-        payload = {"type": InteractionCallbackType.update_component_message.value, "data": data}
-        await self.client.http.send_interaction_mp_callback(
-            self.id, self.token, create_form(payload, merge_fields(file, files))
-        )
-
-    async def response(
-        self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        ephemeral: Optional[bool] = False,
-        suppress_embeds: Optional[bool] = False,
-    ) -> InteractionResponse:
-        """
-        Sends a response to the interaction
-
-        Parameters
-        ----------
-        content: Optional[str]
-            The content of the message to send
-        embed: Optional[Embed]
-            The embed to send with the message
-        embeds: Optional[List[Embed]]
-            The list of embeds to send with the message (max 10)
-        view: Optional[View]
-            The view to send with the message
-        tts: Optional[bool]
-            Whether the message should be sent as tts or not
-        file: Optional[File]
-            The file to send with the message
-        files: Optional[List[File]]
-            The list of files to send with the message
-        ephemeral: Optional[bool]
-            Whether the message should be ephemeral or not
-        suppress_embeds: Optional[bool]
-            Whether the embeds should be suppressed or not
-
-        Returns
-        -------
-        InteractionResponse
-        """
-        data = handle_send_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            suppress_embeds=suppress_embeds,
-        )
-        if view:
-            self.client.store_inter_token(self.id, self.token)
-            self.client.load_components(view)
-
-        payload = {
-            "data": data,
-            "type": InteractionCallbackType.channel_message_with_source.value,
-        }
-        await self.client.http.send_interaction_mp_callback(
-            self.id, self.token, create_form(payload, merge_fields(file, files))
-        )
-        self._responded = True
-        return InteractionResponse(self)
-
-    async def followup(
-        self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        ephemeral: Optional[bool] = False,
-        suppress_embeds: Optional[bool] = False,
-    ) -> FollowupResponse:
-        """
-        Sends a follow-up message to a deferred interaction
-
-        Parameters
-        ----------
-        content: Optional[str]
-            The content of the message to send
-        embed: Optional[Embed]
-            The embed to send with the message
-        embeds: Optional[List[Embed]]
-            The list of embeds to send with the message (max 10)
-        view: Optional[View]
-            The view to send with the message
-        tts: Optional[bool]
-            Whether the message should be sent as tts or not
-        file: Optional[File]
-            The file to send with the message
-        files: Optional[List[File]]
-            The list of files to send with the message
-        ephemeral: Optional[bool]
-            Whether the message should be ephemeral or not
-        suppress_embeds: Optional[bool]
-            Whether the message should suppress embeds or not
-        """
-        payload = handle_send_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            suppress_embeds=suppress_embeds,
-        )
-        if view:
-            self.client.store_inter_token(self.id, self.token)
-            self.client.load_components(view)
-        resp = await self.client.http.send_webhook_message(
-            self.application_id, self.token, create_form(payload, merge_fields(file, files))
-        )
-        data = await resp.json()
-        return FollowupResponse(data, self)
