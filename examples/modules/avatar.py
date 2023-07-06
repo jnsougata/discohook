@@ -10,7 +10,7 @@ import discohook
 async def avatar(inter: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed(title=f"{user.name}#{user.discriminator}")
     embed.image(user.avatar.url)
-    await inter.response(embed=embed)
+    await inter.response.send(embed=embed)
 
 
 # don't forget to add setup function

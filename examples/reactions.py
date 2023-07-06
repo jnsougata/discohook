@@ -69,7 +69,7 @@ async def vote(interaction: discohook.Interaction, enunciado: str):
     embed.footer("Poll created by " + interaction.author.name, icon_url=interaction.author.avatar.url)
 
     # Send result
-    await interaction.response(embed=embed)
+    await interaction.response.send(embed=embed)
 
     # Calling the internal Discord API to add the reactions for each option
     # To find your unicode emoji as Encoded URL use this website: https://www.urlencoder.org/

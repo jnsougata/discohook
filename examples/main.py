@@ -18,9 +18,9 @@ app.add_commands(random_num)  # import a command from another file
 @app.on_error
 async def on_error(i: discohook.Interaction, err: Exception):
     if i.responded:
-        await i.followup(f"```py\nError: {err}\n```", ephemeral=True)
+        await i.response.followup(f"```py\nError: {err}\n```", ephemeral=True)
     else:
-        await i.response(f"```py\nError: {err}\n```", ephemeral=True)
+        await i.response.send(f"```py\nError: {err}\n```", ephemeral=True)
     # the above is not recommended as it might leak secret tokens
     # you can get a logging channel and push the traceback there
 
@@ -31,4 +31,4 @@ async def callback(i: discohook.Interaction):
     embed.add_field("/help", "Shows this message", inline=True)
     embed.add_field("/do", "Does something", inline=True)
 
-    await i.response(embed=embed)
+    await i.response.send(embed=embed)

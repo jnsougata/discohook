@@ -38,7 +38,7 @@ async def roll(interaction: discohook.Interaction, dice: int):
     embed.add_field(name="Dice used", value=f"{dice} faces (d{dice})")
 
     # Send result
-    await interaction.response(embed=embed)
+    await interaction.response.send(embed=embed)
 
 
 # gamechoice command
@@ -68,7 +68,7 @@ Note: the StringOption parameter "name" must be in lowercase and a valid python 
     ]
 )
 async def gamechoice(interaction: discohook.Interaction, videogame: str):
-    await interaction.response(content=f"You have chosen `{videogame}`")
+    await interaction.response.send(content=f"You have chosen `{videogame}`")
 
 
 # coinflip command
@@ -92,4 +92,4 @@ async def coinflip(interaction: discohook.Interaction):
     embed.image("https://i.gifer.com/Fw3P.gif")
 
     # Send result
-    await interaction.response(embed=embed)
+    await interaction.response.send(embed=embed)
