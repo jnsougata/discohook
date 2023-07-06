@@ -224,7 +224,7 @@ class Interaction:
         payload = self.payload.get("message")
         if not payload:
             return
-        return Message(payload, self.client)
+        return Message(self.client, payload)
 
     @property
     def response(self):
@@ -263,4 +263,4 @@ class Interaction:
             return
         resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
         data = await resp.json()
-        return Message(data, self.client)
+        return Message(self.client, data)

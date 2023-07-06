@@ -10,7 +10,6 @@ from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
-    from .interaction import Interaction
 
 
 class MessageInteraction:
@@ -18,7 +17,7 @@ class MessageInteraction:
     Represents a partial interaction received with message.
     """
 
-    def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
+    def __init__(self, client: "Client", payload: Dict[str, Any]) -> None:
         self.client = client
         self.data = payload
 
@@ -88,7 +87,7 @@ class Message:
         ...
     """
 
-    def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
+    def __init__(self, client: "Client", payload: Dict[str, Any]) -> None:
         self.client = client
         self.data = payload
 
@@ -193,7 +192,7 @@ class Message:
         data = self.data.get("interaction")
         if not data:
             return
-        return MessageInteraction(data, self.client)
+        return MessageInteraction(self.client, data)
 
     @property
     def thread(self) -> Optional[dict]:
@@ -271,4 +270,4 @@ class Message:
             self.channel_id, self.id, create_form(data, merge_fields(file, files))
         )
         data = await resp.json()
-        return Message(data, self.client)
+        return Message(self.client, data)

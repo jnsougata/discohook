@@ -220,8 +220,6 @@ class ResponseAdapter:
         if self.inter.type not in (InteractionType.component, InteractionType.app_command):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         self.inter.client.active_components[modal.custom_id] = modal
-        # for comp in modal.components:
-        #     self.client.active_components[comp.custom_id] = comp
         payload = {
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal.value,
