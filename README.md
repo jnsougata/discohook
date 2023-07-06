@@ -34,7 +34,7 @@ app = discohook.Client(
     description="basic help command for the bot"
 )
 async def help_command(interaction: discohook.Interaction):
-    await interaction.response(
+    await interaction.response.send(
         "Hello, World!",
         embed=discohook.Embed(title="Help", description="This is a help command"),
         ephemeral=True,
@@ -47,7 +47,7 @@ Command will not be automatically registered.
 We provide a dashboard to register commands.
 We will talk about it later.
 
-### Devportal Setup
+### Developer Portal Setup
 **1.** Head over to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application. Once you've created the application, go to the "Bot" tab and create a new bot. Generate new token by using `Reset Token` and copy the bot token and paste it in the `APPLICATION_TOKEN` variable.
 ![image](https://user-images.githubusercontent.com/53375272/205481601-934f7304-96a1-493f-82ed-91a3890e6352.png)
 **2.** Then go to the `General Information` tab and copy the `Application ID` and paste it in the `APPLICATION_ID` variable and copy the `Public Key` and paste it in the `APPLICATION_PUBLIC_KEY` variable.
