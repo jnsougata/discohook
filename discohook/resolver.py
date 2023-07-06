@@ -107,7 +107,7 @@ def build_context_menu_param(interaction: Interaction):
     if interaction.data["type"] == ApplicationCommandType.message.value:
         message_id = interaction.data["target_id"]
         message_data = interaction.data["resolved"]["messages"][message_id]
-        return Message(message_data, interaction.client)
+        return Message(interaction.client, message_data)
 
 
 def build_modal_params(func: Callable, interaction: Interaction):

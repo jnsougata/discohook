@@ -38,7 +38,8 @@ from .file import File
 from .guild import Guild, PartialGuild
 from .interaction import Interaction
 from .member import Member
-from .message import FollowupResponse, InteractionResponse, Message
+from .message import Message
+from .response import FollowupResponse, InteractionResponse
 from .modal import Modal, TextInput, modal
 from .option import (
     AttachmentOption,

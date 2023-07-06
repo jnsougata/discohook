@@ -92,7 +92,7 @@ class PartialChannel:
 
         resp = await self.client.http.send_message(self.id, create_form(payload, merge_fields(file, files)))
         data = await resp.json()
-        return Message(data, self.client)
+        return Message(self.client, data)
 
     async def edit(
         self,

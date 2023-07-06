@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 
+from .channel import PartialChannel
 from .command import ApplicationCommand, Option
 from .dash import dashboard
 from .embed import Embed
@@ -14,8 +15,7 @@ from .file import File
 from .guild import Guild
 from .handler import handler
 from .https import HTTPClient
-from .multipart import create_form
-from .params import handle_send_params, merge_fields
+from .message import Message
 from .permissions import Permissions
 from .user import ClientUser
 from .view import Component, View
@@ -97,6 +97,31 @@ class Client(FastAPI):
         """
         for component in view.children:
             self.active_components[component.custom_id] = component
+
+    def preload(self, component: Component) -> Component:
+        """
+        This decorator is used to load a component into the client.
+        This method will help you to use persistent components with static custom ids.
+
+        Parameters
+        ----------
+        component: Component
+            The component to load.
+
+        Returns
+        -------
+        Component
+            The component that was loaded.
+
+        Raises
+        ------
+        ValueError
+            If the component does not have a static custom id.
+        """
+        if not component.has_static_custom_id:
+            raise ValueError("Component must have a static custom id to be preloaded.")
+        self.active_components[component.custom_id] = component
+        return component
 
     def store_inter_token(self, interaction_id: str, token: str):
         self.cached_inter_tokens[interaction_id] = token
@@ -217,7 +242,8 @@ class Client(FastAPI):
         embeds: Optional[List[Embed]] = None,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
-    ):
+        view: Optional[View] = None,
+    ) -> Message:
         """
         Send a message to a channel using the ID of the channel.
 
@@ -237,12 +263,27 @@ class Client(FastAPI):
             A file to be sent with the message
         files: Optional[List[File]]
             A list of files to be sent with message.
+        view: Optional[View]
+            The view to send with the message.
+
+        Returns
+        -------
+        Message
+            The message that was sent.
         """
         if not channel_id.isdigit():
             raise TypeError("Channel ID must be a snowflake.")
-        payload = handle_send_params(content, tts=tts, embed=embed, embeds=embeds, file=file, files=files)
-        form = create_form(payload, merge_fields(file, files))
-        return await self.http.send_message(channel_id, form)
+        channel = PartialChannel(self, channel_id)
+        return await channel.send(
+            content=content,
+            tts=tts,
+            embed=embed,
+            embeds=embeds,
+            file=file,
+            files=files,
+            view=view,
+
+        )
 
     async def as_user(self) -> ClientUser:
         """

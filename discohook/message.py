@@ -10,7 +10,6 @@ from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
-    from .interaction import Interaction
 
 
 class MessageInteraction:
@@ -18,7 +17,7 @@ class MessageInteraction:
     Represents a partial interaction received with message.
     """
 
-    def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
+    def __init__(self, client: "Client", payload: Dict[str, Any]) -> None:
         self.client = client
         self.data = payload
 
@@ -88,7 +87,7 @@ class Message:
         ...
     """
 
-    def __init__(self, payload: Dict[str, Any], client: "Client") -> None:
+    def __init__(self, client: "Client", payload: Dict[str, Any]) -> None:
         self.client = client
         self.data = payload
 
@@ -134,7 +133,7 @@ class Message:
 
     @property
     def mention_roles(self) -> List[Role]:
-        return [Role(x, self.client) for x in self.data.get("mention_roles", [])]
+        return [Role(self.client, x) for x in self.data.get("mention_roles", [])]
 
     @property
     def mention_channels(self) -> Optional[dict]:
@@ -193,7 +192,7 @@ class Message:
         data = self.data.get("interaction")
         if not data:
             return
-        return MessageInteraction(data, self.client)
+        return MessageInteraction(self.client, data)
 
     @property
     def thread(self) -> Optional[dict]:
@@ -271,123 +270,4 @@ class Message:
             self.channel_id, self.id, create_form(data, merge_fields(file, files))
         )
         data = await resp.json()
-        return Message(data, self.client)
-
-
-class FollowupResponse:
-    """
-    Represents a followup message sent by an interaction, subclassed from :class:`Message`.
-    """
-
-    def __init__(self, payload: Dict[str, Any], interaction: "Interaction") -> None:
-        self.message = Message(payload, interaction.client)
-        self.interaction = interaction
-
-    async def delete(self):
-        """
-        Deletes the followup message.
-        """
-        return await self.interaction.client.http.delete_webhook_message(
-            self.interaction.application_id,
-            self.interaction.token,
-            self.message.id,
-        )
-
-    async def edit(
-        self,
-        content: Optional[str] = MISSING,
-        *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        suppress_embeds: Optional[bool] = MISSING,
-    ) -> Message:
-        """
-        Edits the followup message.
-
-        Parameters
-        ----------
-        same as :meth:`Message.edit`
-        """
-        data = handle_edit_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
-        )
-        if view and view is not MISSING:
-            self.interaction.client.load_components(view)
-        self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
-        resp = await self.interaction.client.http.edit_webhook_message(
-            self.interaction.application_id,
-            self.interaction.token,
-            self.message.id,
-            create_form(data, merge_fields(file, files)),
-        )
-        data = await resp.json()
-        return Message(data, self.interaction.client)
-
-
-class InteractionResponse:
-    """
-    Represents a response message sent by an interaction
-    """
-
-    def __init__(self, interaction: "Interaction") -> None:
-        self.interaction = interaction
-
-    async def delete(self):
-        """
-        Deletes the response message.
-        """
-        await self.interaction.client.http.delete_webhook_message(
-            self.interaction.application_id, self.interaction.token, "@original"
-        )
-
-    async def edit(
-        self,
-        content: Optional[str] = MISSING,
-        *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        suppress_embeds: Optional[bool] = MISSING,
-    ) -> Message:
-        """
-        Edits the response message.
-
-        Parameters
-        ----------
-        same as :meth:`Message.edit`
-        """
-        data = handle_edit_params(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
-        )
-        if view and view is not MISSING:
-            self.interaction.client.load_components(view)
-        self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
-        resp = await self.interaction.client.http.edit_webhook_message(
-            self.interaction.application_id,
-            self.interaction.token,
-            "@original",
-            create_form(data, merge_fields(file, files)),
-        )
-        data = await resp.json()
-        return Message(data, self.interaction.client)
+        return Message(self.client, data)
