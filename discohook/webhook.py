@@ -250,7 +250,7 @@ class Webhook:
         form = create_form(payload, merge_fields(file, files))
         resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, form)
         data = await resp.json()
-        return Message(data, self.client)
+        return Message(self.client, data)
 
     async def delete_message(self, message_id: str) -> None:
         """

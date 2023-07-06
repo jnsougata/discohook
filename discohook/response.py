@@ -70,7 +70,7 @@ class InteractionResponse:
             create_form(data, merge_fields(file, files)),
         )
         data = await resp.json()
-        return Message(data, self.inter.client)
+        return Message(self.inter.client, data)
 
 
 class FollowupResponse:
@@ -79,7 +79,7 @@ class FollowupResponse:
     """
 
     def __init__(self, payload: Dict[str, Any], interaction: "Interaction") -> None:
-        self.message = Message(payload, interaction.client)
+        self.message = Message(interaction.client, payload)
         self.interaction = interaction
 
     async def delete(self):
@@ -131,7 +131,7 @@ class FollowupResponse:
             create_form(data, merge_fields(file, files)),
         )
         data = await resp.json()
-        return Message(data, self.interaction.client)
+        return Message(self.interaction.client, data)
 
 
 class ResponseAdapter:

@@ -41,7 +41,7 @@ class PartialGuild:
         """
         resp = await self.client.http.fetch_guild_roles(self.id)
         data = await resp.json()
-        return [Role(r, self.client) for r in data]
+        return [Role(self.client, r) for r in data]
 
     async def create_channel(
         self,
@@ -197,7 +197,7 @@ class PartialGuild:
             payload["unicode_emoji"] = unicode_emoji
         resp = await self.client.http.create_guild_role(self.id, payload)
         data = await resp.json()
-        return Role(data, self.client)
+        return Role(self.client, data)
 
 
 class Guild(PartialGuild):
