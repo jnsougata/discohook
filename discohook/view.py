@@ -21,6 +21,7 @@ class Component:
         self.callback: Optional[Callable] = None
         self.custom_id = custom_id or secrets.token_urlsafe(16)
         self.checks: List[Callable] = []
+        self.has_static_custom_id = bool(custom_id)
 
     def on_interaction(self, coro: Callable):
         """

@@ -98,6 +98,31 @@ class Client(FastAPI):
         for component in view.children:
             self.active_components[component.custom_id] = component
 
+    def preload(self, component: Component) -> Component:
+        """
+        This decorator is used to load a component into the client.
+        This method will help you to use persistent components with static custom ids.
+
+        Parameters
+        ----------
+        component: Component
+            The component to load.
+
+        Returns
+        -------
+        Component
+            The component that was loaded.
+
+        Raises
+        ------
+        ValueError
+            If the component does not have a static custom id.
+        """
+        if not component.has_static_custom_id:
+            raise ValueError("Component must have a static custom id to be preloaded.")
+        self.active_components[component.custom_id] = component
+        return component
+
     def store_inter_token(self, interaction_id: str, token: str):
         self.cached_inter_tokens[interaction_id] = token
 
