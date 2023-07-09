@@ -353,6 +353,6 @@ class Client(FastAPI):
         resp = await self.http.fetch_guild(guild_id)
         data = await resp.json()
         try:
-            return Guild(data, self)
+            return Guild(self, data)
         except KeyError:
             return None

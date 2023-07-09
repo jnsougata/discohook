@@ -288,7 +288,7 @@ class Guild(PartialGuild):
         Whether the premium progress bar is enabled.
     """
 
-    def __init__(self, data: Dict[str, Any], client: "Client"):
+    def __init__(self, client: "Client", data: Dict[str, Any]):
         super().__init__(client, data["id"])
         self.name = data["name"]
         self.icon = data.get("icon")

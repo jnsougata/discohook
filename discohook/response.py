@@ -136,7 +136,7 @@ class FollowupResponse:
 
 class ResponseAdapter:
     """
-    Represents a response message sent by an interaction
+    Interface for sending responses to interactions
     """
 
     def __init__(self, interaction: "Interaction") -> None:
