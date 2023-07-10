@@ -58,17 +58,24 @@ class User:
         return self.data["username"]
 
     @property
+    def global_name(self) -> Optional[str]:
+        return self.data.get("global_name")
+
+    @property
     def discriminator(self) -> str:
         return self.data["discriminator"]
 
     @property
     def avatar(self) -> Asset:
         av_hash = self.data.get("avatar")
-        if not av_hash:
-            fragment = "embed/avatars/"
-            av_hash = str({int(self.discriminator) % 5})
-            return Asset(hash=av_hash, fragment=fragment)
-        return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
+        if av_hash:
+            return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
+        fragment = "embed/avatars/"
+        if self.discriminator == 0:
+            av_hash = str({(int(self.id) >> 22) % 6})
+        else:
+            av_hash = str(int(self.discriminator) % 5)
+        return Asset(hash=av_hash, fragment=fragment)
 
     @property
     def system(self) -> bool:
@@ -103,6 +110,8 @@ class User:
         return self.data.get("public_flags")
 
     def __str__(self) -> str:
+        if self.discriminator == 0:
+            return self.name
         return f"{self.name}#{self.discriminator}"
 
     def __eq__(self, other):
