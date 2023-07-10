@@ -42,5 +42,7 @@ setup(
     ],
     packages=["discohook"],
     python_requires=">=3.6",
-    install_requires=requirements
+    install_requires=requirements,
+    package_data={'': ['requirements.txt', 'LICENSE', 'README.md', 'Manifest.in']},
+    include_package_data=True,
 )
