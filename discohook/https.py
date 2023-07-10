@@ -43,8 +43,11 @@ class HTTPClient:
     async def delete_channel(self, channel_id: str):
         return await self.request("DELETE", f"/channels/{channel_id}", use_auth=True)
 
-    async def delete_message(self, channel_id: str, message_id: str):
+    async def delete_channel_message(self, channel_id: str, message_id: str):
         await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
+
+    async def pin_channel_message(self, channel_id: str, message_id: str):
+        await self.request("PUT", f"/channels/{channel_id}/messages/{message_id}/pin", use_auth=True)
 
     async def edit_channel_message(self, channel_id: str, message_id: str, form: aiohttp.MultipartWriter):
         return await self.multipart("PATCH", f"/channels/{channel_id}/messages/{message_id}", form=form, use_auth=True)
