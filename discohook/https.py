@@ -101,6 +101,9 @@ class HTTPClient:
     async def fetch_guild(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}?with_counts=true", use_auth=True)
 
+    async def fetch_guild_member(self, guild_id: str, user_id: str):
+        return await self.request("GET", f"/guilds/{guild_id}/members/{user_id}", use_auth=True)
+
     async def fetch_guild_channels(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}/channels", use_auth=True)
 

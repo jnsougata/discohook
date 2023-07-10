@@ -199,10 +199,8 @@ class Interaction:
         Optional[Union[User, Member]]
         """
         member = self.payload.get("member")
-        user = self.payload.get("user")
         if not member:
-            return User(self.client, user)
-        member.update(member.pop("user", {}))
+            return User(self.client, self.payload["user"])
         member["guild_id"] = self.guild_id
         return Member(self.client, member)
 

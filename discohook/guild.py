@@ -5,6 +5,7 @@ from .emoji import PartialEmoji
 from .enums import ChannelType
 from .permissions import Permissions
 from .role import Role
+from .member import Member
 
 if TYPE_CHECKING:
     from .client import Client
@@ -18,6 +19,25 @@ class PartialGuild:
     def __init__(self, client: "Client", guild_id: str):
         self.id = guild_id
         self.client = client
+
+    async def fetch_member(self, user_id: str) -> Optional[Member]:
+        """
+        Fetches a member from the guild.
+
+        Parameters
+        ----------
+        user_id: :class:`str`
+            The id of the user to fetch.
+
+        Returns
+        -------
+        Optional[:class:`Member`]
+        """
+        resp = await self.client.http.fetch_guild_member(self.id, user_id)
+        data = await resp.json()
+        if not data:
+            return
+        return Member(self.client, data)
 
     async def fetch_channels(self) -> List[Channel]:
         """

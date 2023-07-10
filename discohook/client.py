@@ -17,7 +17,7 @@ from .handler import handler
 from .https import HTTPClient
 from .message import Message
 from .permissions import Permissions
-from .user import ClientUser
+from .user import ClientUser, User
 from .view import Component, View
 from .webhook import Webhook
 
@@ -342,7 +342,7 @@ class Client(FastAPI):
         data = await resp.json()
         return Webhook(data, self)
 
-    async def fetch_guild(self, guild_id: str) -> Optional[Guild]:
+    async def fetch_guild(self, guild_id: str, /) -> Optional[Guild]:
         """
         Fetches the guild of given id.
 
@@ -352,7 +352,20 @@ class Client(FastAPI):
         """
         resp = await self.http.fetch_guild(guild_id)
         data = await resp.json()
-        try:
-            return Guild(self, data)
-        except KeyError:
-            return None
+        if not data.get("id"):
+            return
+        return Guild(self, data)
+
+    async def fetch_user(self, user_id: str, /) -> Optional[User]:
+        """
+        Fetches the user of given id.
+
+        Returns
+        -------
+        User
+        """
+        resp = await self.http.fetch_user(user_id)
+        data = await resp.json()
+        if not data.get("id"):
+            return
+        return User(self, data)
