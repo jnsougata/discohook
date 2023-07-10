@@ -29,7 +29,7 @@ class Member(User):
         av_hash = self.data.get("avatar")
         if not av_hash:
             return super().avatar
-        return Asset(hash=av_hash, fragment=f"avatars/{self.id}/{av_hash}")
+        return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
 
     @property
     def mention(self) -> str:

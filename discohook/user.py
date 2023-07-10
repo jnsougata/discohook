@@ -70,12 +70,11 @@ class User:
         av_hash = self.data.get("avatar")
         if av_hash:
             return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
-        fragment = "embed/avatars/"
         if self.discriminator == 0:
             av_hash = str({(int(self.id) >> 22) % 6})
         else:
             av_hash = str(int(self.discriminator) % 5)
-        return Asset(hash=av_hash, fragment=fragment)
+        return Asset(hash=av_hash, fragment="embed/avatars")
 
     @property
     def system(self) -> bool:
