@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict
 
+from .asset import Asset
 from .user import User
 
 if TYPE_CHECKING:
@@ -22,6 +23,13 @@ class Member(User):
         self.flags = data.get("flags")
         self.guild_id = data.get("guild_id")
         self.communication_disabled_until = data.get("communication_disabled_until")
+
+    @property
+    def avatar(self) -> Asset:
+        av_hash = self.data.get("avatar")
+        if not av_hash:
+            return super().avatar
+        return Asset(hash=av_hash, fragment=f"avatars/{self.id}/{av_hash}")
 
     @property
     def mention(self) -> str:
