@@ -23,16 +23,13 @@
             --black-secondary: #26262e;
         }
         body {
-            width: 100vw;
-            height: 100vh;
-            height: 100dvh;
-            overflow: hidden;
-            font-family: 'Prompt', sans-serif;
+            font-family: system-ui, 'Prompt', sans-serif;
             background-color: var(--black-main);
         }
         main {
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
             color: white;
             padding: 10px;
             background-color: var(--black-main);
@@ -44,42 +41,45 @@
         }
         main > header {
             width: 100%;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
+            height: 100px;
+            margin-top: 6px;
+            margin-bottom: 15px;
         }
         main > header > p {
             width: 100%;
-            text-align: right;
+            text-align: left;
         }
         main > .card {
             width: 100%;
-            display: block;
+            display: flex;
             color: white;
             padding: 0 20px;
+            align-items: flex-end;
+            justify-content: flex-end;
             height: max-content;
             margin-bottom: 40px;
+            background-color: var(--black-secondary);
         }
-        main > .card pre {
+        main > .card > pre {
             width: 100%;
             overflow: auto;
             height: max-content;
+            background-color: transparent;
+        }
+        main > .card > pre > code {
+            background-color: transparent;
         }
         main > .card > button {
-            position: absolute;
-            padding: 10px 12px;
-            border-radius: 50%;
-            margin-top: -24px;
-            margin-left: -24px;
+            padding: 10px 15px;
             border: none;
             outline: none;
             color: white;
             cursor: pointer;
             font-size: 15px;
             background-color: rgb(247, 62, 62);
+            margin-right: -20px;
         }
+        
     </style>
 </head>
 <body>
@@ -87,11 +87,77 @@
         <header>
             <p>DISCOHOOK</p>
         </header>
+        <div class="card">
+            <pre>
+                <code class="json">
+{
+    "id": "1126418573204660304",
+    "application_id": "1125851018542977166",
+    "version": "1126418573204660305",
+    "default_member_permissions": null,
+    "type": 1,
+    "name": "ping",
+    "name_localizations": null,
+    "description": "Ping pong!",
+    "description_localizations": null,
+    "dm_permission": true,
+    "contexts": null,
+    "nsfw": false
+}
+                </code>
+            </pre>
+            <button>
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="card">
+            <pre>
+                <code class="json">
+{
+    "id": "1128081795968139326",
+    "application_id": "1125851018542977166",
+    "version": "1128081795968139327",
+    "default_member_permissions": "268435456",
+    "type": 1,
+    "name": "deny",
+    "name_localizations": null,
+    "description": "Deny a member",
+    "description_localizations": null,
+    "dm_permission": true,
+    "contexts": null,
+    "options": [
+        {
+            "type": 6,
+            "name": "member",
+            "name_localizations": null,
+            "description": "Member to verify",
+            "description_localizations": null,
+            "required": true
+        },
+        {
+            "type": 3,
+            "name": "reason",
+            "name_localizations": null,
+            "description": "Reason for denying",
+            "description_localizations": null,
+            "required": true,
+            "min_length": 1,
+            "max_length": 100
+        }
+    ],
+    "nsfw": false
+}
+                </code>
+            </pre>
+            <button>
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
     </main>
     <script>
         let main = document.querySelector("main");
         let token = window.location.href.split("/").pop();
-
+        hljs.highlightAll();
         window.addEventListener("DOMContentLoaded", async () => {
             resp = await fetch(`/api/sync/${token}`)
             if (resp.status === 200) {
