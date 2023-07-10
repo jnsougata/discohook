@@ -63,7 +63,7 @@ We will talk about it later.
 You can sync commands by just visiting the dashboard.
 The dashboard will be available at `https://example.io/api/dash/<bot_token_here> `. 
 
-![image](https://user-images.githubusercontent.com/53375272/229229047-38102ff8-16ea-4f57-8e33-4e00fed939a2.png)
+![image](https://github.com/jnsougata/discohook/assets/53375272/13679cc5-1f88-4be5-9547-4a081af5e33a)
 
 Once you visit the dashboard, it will automatically register all the commands. 
 You can also register commands manually by using the bash command below.   
