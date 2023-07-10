@@ -49,6 +49,9 @@ class HTTPClient:
     async def pin_channel_message(self, channel_id: str, message_id: str):
         await self.request("PUT", f"/channels/{channel_id}/messages/{message_id}/pin", use_auth=True)
 
+    async def unpin_channel_message(self, channel_id: str, message_id: str):
+        await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}/pin", use_auth=True)
+
     async def edit_channel_message(self, channel_id: str, message_id: str, form: aiohttp.MultipartWriter):
         return await self.multipart("PATCH", f"/channels/{channel_id}/messages/{message_id}", form=form, use_auth=True)
 
@@ -61,9 +64,7 @@ class HTTPClient:
     async def edit_webhook_message(
         self, webhook_id: str, webhook_token: str, message_id: str, form: aiohttp.MultipartWriter
     ):
-        return await self.multipart(
-            "PATCH", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}", form=form
-        )
+        return await self.multipart("PATCH", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}", form=form)
 
     async def fetch_original_webhook_message(self, webhook_id: str, webhook_token: str):
         return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original")

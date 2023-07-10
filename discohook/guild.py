@@ -37,6 +37,7 @@ class PartialGuild:
         data = await resp.json()
         if not data.get("user"):
             return
+        data["guild_id"] = self.id
         return Member(self.client, data)
 
     async def fetch_channels(self) -> List[Channel]:
