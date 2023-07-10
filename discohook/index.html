@@ -91,7 +91,6 @@
     <script>
         let main = document.querySelector("main");
         let token = window.location.href.split("/").pop();
-        hljs.highlightAll();
         window.addEventListener("DOMContentLoaded", async () => {
             resp = await fetch(`/api/sync/${token}`)
             if (resp.status === 200) {
