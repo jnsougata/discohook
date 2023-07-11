@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional, Union, Type
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import aiohttp
 from fastapi import FastAPI
@@ -15,7 +15,6 @@ from .file import File
 from .guild import Guild
 from .handler import handler
 from .https import HTTPClient
-from .interaction import Interaction
 from .message import Message
 from .permissions import Permissions
 from .user import ClientUser, User
@@ -98,15 +97,15 @@ class Client(FastAPI):
         for component in view.children:
             self.active_components[component.custom_id] = component
 
-    def preload(self, component: Component) -> Component:
+    def preload(self, custom_id: str):
         """
         This decorator is used to load a component into the client.
         This method will help you to use persistent components with static custom ids.
 
         Parameters
         ----------
-        component: Component
-            The component to load.
+        custom_id: str
+            The unique custom id of the component.
 
         Returns
         -------
@@ -118,10 +117,12 @@ class Client(FastAPI):
         ValueError
             If the component does not have a static custom id.
         """
-        if not component.has_static_custom_id:
-            raise ValueError("Component must have a static custom id to be preloaded.")
-        self.active_components[component.custom_id] = component
-        return component
+        def decorator(component: Component):
+            component.custom_id = custom_id
+            self.active_components[custom_id] = component
+            return component
+
+        return decorator
 
     def store_inter_token(self, interaction_id: str, token: str):
         self.cached_inter_tokens[interaction_id] = token
@@ -212,20 +213,16 @@ class Client(FastAPI):
         for script in scripts:
             importlib.import_module(script).setup(self)
 
-    def on_error(self, exc_class: Type[Exception] = Exception):
+    def on_error(self):
         """
         A decorator to register a global error handler.
 
-        Parameters
-        ----------
-        exc_class: Type[Exception]
-            The exception to register the error handler for.
         """
 
         def decorator(coro: Callable):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Exception handler must be a coroutine.")
-            self.add_exception_handler(exc_class, coro)
+            self.add_exception_handler(Exception, coro)
             return coro
 
         return decorator
