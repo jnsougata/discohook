@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union, Type
 
 import aiohttp
 from fastapi import FastAPI
@@ -15,6 +15,7 @@ from .file import File
 from .guild import Guild
 from .handler import handler
 from .https import HTTPClient
+from .interaction import Interaction
 from .message import Message
 from .permissions import Permissions
 from .user import ClientUser, User
@@ -82,7 +83,6 @@ class Client(FastAPI):
         self.add_api_route(
             "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False
         )
-        self.error_handler: Optional[Callable] = None
         self._custom_id_parser: Optional[Callable] = None
 
     def load_components(self, view: View):
@@ -212,16 +212,23 @@ class Client(FastAPI):
         for script in scripts:
             importlib.import_module(script).setup(self)
 
-    def on_error(self, coro: Callable):
+    def on_error(self, exc_class: Type[Exception] = Exception):
         """
         A decorator to register a global error handler.
 
         Parameters
         ----------
-        coro: Callable
-            The coroutine to register as the global error handler. Must take 2 parameters:`error` and `data`.
+        exc_class: Type[Exception]
+            The exception to register the error handler for.
         """
-        self.error_handler = coro
+
+        def decorator(coro: Callable):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Exception handler must be a coroutine.")
+            self.add_exception_handler(exc_class, coro)
+            return coro
+
+        return decorator
 
     def custom_id_parser(self, coro: Callable):
         """

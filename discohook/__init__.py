@@ -34,6 +34,7 @@ from .enums import (
     TextInputFieldLength,
     WebhookType,
 )
+from .errors import GlobalException
 from .file import File
 from .guild import Guild, PartialGuild
 from .interaction import Interaction

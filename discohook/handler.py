@@ -1,5 +1,4 @@
 import asyncio
-import traceback
 
 from fastapi import Request
 from fastapi.responses import JSONResponse, Response
@@ -13,6 +12,7 @@ from .enums import (
     InteractionType,
     MessageComponentType,
 )
+from .errors import GlobalException
 from .interaction import Interaction
 from .resolver import (
     build_context_menu_param,
@@ -47,7 +47,7 @@ async def handler(request: Request):
             key = f"{interaction.data['name']}:{interaction.data['type']}"
             cmd: ApplicationCommand = request.app.application_commands.get(key)
             if not cmd:
-                raise RuntimeError(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
+                raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
 
             if cmd.checks:
                 results = await asyncio.gather(*[check(interaction) for check in cmd.checks])
@@ -55,7 +55,7 @@ async def handler(request: Request):
                     if not isinstance(result, bool):
                         raise TypeError(f"check returned {type(result)}, expected bool")
                 if not all(results):
-                    return JSONResponse({"error": "command checks failed"}, status_code=403)
+                    raise Exception(f"command checks failed")
 
             if not (interaction.data["type"] == ApplicationCommandType.slash.value):
                 target_object = build_context_menu_param(interaction)
@@ -75,7 +75,7 @@ async def handler(request: Request):
             key = f"{interaction.data['name']}:{interaction.data['type']}"
             cmd: ApplicationCommand = request.app.application_commands.get(key)
             if not cmd:
-                return JSONResponse({"error": "command not found"}, status_code=404)
+                raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
             if interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand.value:
                 subcommand_name = interaction.data["options"][0]["name"]
                 option = interaction.data["options"][0]["options"][0]
@@ -92,15 +92,15 @@ async def handler(request: Request):
                 custom_id = await request.app._custom_id_parser(custom_id)
             component = request.app.active_components.get(custom_id)
             if not component:
-                return JSONResponse({"error": "component not found"}, status_code=404)
+                raise Exception(f"component `{custom_id}` not found")
             if component.checks:
                 results = await asyncio.gather(*[check(interaction) for check in component.checks])
                 for result in results:
                     if not isinstance(result, bool):
                         raise TypeError(f"check returned {type(result)}, expected bool")
                 if not all(results):
-                    return JSONResponse({"error": "component checks failed"}, status_code=403)
-            
+                    raise Exception("component checks failed")
+
             if interaction.type == InteractionType.component:
                 if interaction.data["component_type"] == MessageComponentType.button.value:
                     await component.__call__(interaction)
@@ -112,16 +112,13 @@ async def handler(request: Request):
                     MessageComponentType.mentionable_select.value
                 ):
                     await component.__call__(interaction, build_select_menu_values(interaction))
-                    
+
             elif interaction.type == InteractionType.modal_submit:
                 args, kwargs = build_modal_params(component.callback, interaction)
                 await component.__call__(interaction, *args, **kwargs)
         else:
-            return JSONResponse({"message": "unhandled interaction type"}, status_code=300)
-    except Exception as exc:
-        stack_trace = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-        if request.app.error_handler:
-            await request.app.error_handler(interaction, exc)
-            return JSONResponse({"errors": stack_trace}, status_code=500)
-        raise RuntimeError(stack_trace) from None
-    return Response(status_code=200)
+            raise Exception(f"unhandled interaction type", interaction)
+    except Exception as e:
+        raise GlobalException(str(e), interaction)
+    else:
+        return Response(status_code=200)
