@@ -15,12 +15,12 @@ app.add_commands(random_num)  # import a command from another file
 
 
 # adding a error handler
-@app.on_error
-async def on_error(i: discohook.Interaction, err: Exception):
-    if i.responded:
-        await i.response.followup(f"```py\nError: {err}\n```", ephemeral=True)
+@app.on_error()
+async def on_error(_, err: discohook.GlobalException):
+    if err.interaction.responded:
+        await err.interaction.response.followup(f"```py\nError: {err}\n```", ephemeral=True)
     else:
-        await i.response.send(f"```py\nError: {err}\n```", ephemeral=True)
+        await err.interaction.response.send(f"```py\nError: {err}\n```", ephemeral=True)
     # the above is not recommended as it might leak secret tokens
     # you can get a logging channel and push the traceback there
 
