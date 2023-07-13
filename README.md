@@ -22,11 +22,13 @@ import discohook
 APPLICATION_ID = "YOUR_APPLICATION_ID"
 APPLICATION_TOKEN = "YOUR_APPLICATION_TOKEN"
 APPLICATION_PUBLIC_KEY = "YOUR_APPLICATION_PUBLIC_KEY"
+APPLICATION_DASH_PASSWORD = "YOUR_APPLICATION_DASH_PASSWORD"
 
 app = discohook.Client(
     application_id=APPLICATION_ID,
     token=APPLICATION_TOKEN,
-    public_key=APPLICATION_PUBLIC_KEY
+    public_key=APPLICATION_PUBLIC_KEY,
+    password=APPLICATION_DASH_PASSWORD,
 )
 
 @app.command(
@@ -61,14 +63,14 @@ We will talk about it later.
 
 #### Registering Commands
 You can sync commands by just visiting the dashboard.
-The dashboard will be available at `https://example.io/api/dash/<bot_token_here> `. 
+The dashboard will be available at `https://example.io/api/dash `. 
 
 ![image](https://github.com/jnsougata/discohook/assets/53375272/b174878b-7aac-4e05-83cc-62f00dfa8c80)
 
 Once you visit the dashboard, it will automatically register all the commands. 
 You can also register commands manually by using the bash command below.   
 ```bash
-curl -X GET https://example.io/api/sync/<bot_token_here>
+curl -d '{"password":  <sha256 hashed password>}' -X POST https://example.io/api/sync  
 ```
 
 **🎉 Boom!** You're done. Now you can test your bot by using ` /help ` command in your server.
