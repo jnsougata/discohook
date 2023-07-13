@@ -18,12 +18,18 @@ from .https import HTTPClient
 from .message import Message
 from .permissions import Permissions
 from .user import ClientUser, User
+from .utils import compare_password
 from .view import Component, View
 from .webhook import Webhook
 
 
-async def delete_cmd(request: Request, command_id: str, token: str):
-    if token != request.app.token:
+async def delete_cmd(request: Request):
+    if not request.app.password:
+        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+    data = await request.json()
+    password = data.get("password")
+    command_id = data.get("id")
+    if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
     resp = await request.app.delete_command(command_id)
     if resp.status == 204:
@@ -31,11 +37,25 @@ async def delete_cmd(request: Request, command_id: str, token: str):
     return JSONResponse({"error": "Failed to delete command"}, status_code=resp.status)
 
 
-async def sync(request: Request, token: str):
-    if token != request.app.token:
+async def sync(request: Request):
+    if not request.app.password:
+        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+    data = await request.json()
+    password = data.get("password")
+    if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
     resp = await request.app.sync()
     return JSONResponse(await resp.json(), status_code=resp.status)
+
+
+async def authenticate(request: Request):
+    if not request.app.password:
+        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+    data = await request.json()
+    password = data.get("password")
+    if not compare_password(request.app.password, password):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    return JSONResponse({"success": True}, status_code=200)
 
 
 class Client(FastAPI):
@@ -52,6 +72,8 @@ class Client(FastAPI):
         The token of the bot.
     route: str
         The route to listen for interactions on.
+    password: str | None
+        The password to use for the dashboard.
     **kwargs
         Keyword arguments to pass to the FastAPI instance.
     """
@@ -63,6 +85,7 @@ class Client(FastAPI):
         public_key: str,
         token: str,
         route: str = "/interactions",
+        password: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -71,17 +94,17 @@ class Client(FastAPI):
         self.redoc_url = None
         self.public_key = public_key
         self.application_id = application_id
+        self.password = password
         self.http = HTTPClient(self, token, aiohttp.ClientSession("https://discord.com"))
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
         self.cached_inter_tokens: Dict[str, str] = {}
         self.add_route(route, handler, methods=["POST"], include_in_schema=False)
-        self.add_api_route("/api/sync/{token}", sync, methods=["GET"], include_in_schema=False)
-        self.add_api_route("/api/dash/{token}", dashboard, methods=["GET"], include_in_schema=False)
-        self.add_api_route(
-            "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False
-        )
+        self.add_api_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
+        self.add_api_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
+        self.add_api_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
+        self.add_api_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
         self._custom_id_parser: Optional[Callable] = None
 
     def load_components(self, view: View):

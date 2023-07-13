@@ -21,7 +21,6 @@ class Component:
         self.callback: Optional[Callable] = None
         self.custom_id = custom_id or secrets.token_urlsafe(16)
         self.checks: List[Callable] = []
-        self.has_static_custom_id = bool(custom_id)
 
     def on_interaction(self, coro: Callable):
         """
@@ -220,7 +219,7 @@ class Select(Component):
         """
         if self.options:
             if self.type == MessageComponentType.text_select:
-                self.data["options"] = [option.to_dict() for option in self.options]  # type: ignore
+                self.data["options"] = [option.to_dict() for option in self.options]
             if self.type == MessageComponentType.channel_select and self.channel_types:
                 self.data["channel_types"] = [channel_type.value for channel_type in self.channel_types]
         if self.placeholder:
