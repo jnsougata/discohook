@@ -58,7 +58,7 @@ async def ping(i: discohook.Interaction):
 
 # Making user command
 @app.command(category=discohook.ApplicationCommandType.user)
-async def avatar(i: discohook.Interaction, user: discohook.User ):
+async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
     embed.set_image(url=user.avatar.url)
     await i.response.send(embed=embed)

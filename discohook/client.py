@@ -139,12 +139,8 @@ class Client(FastAPI):
         -------
         Component
             The component that was loaded.
-
-        Raises
-        ------
-        ValueError
-            If the component does not have a static custom id.
         """
+
         def decorator(component: Component):
             component.custom_id = custom_id
             self.active_components[custom_id] = component
