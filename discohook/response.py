@@ -62,7 +62,6 @@ class InteractionResponse:
         )
         if view and view is not MISSING:
             self.inter.client.load_components(view)
-        self.inter.client.store_inter_token(self.inter.id, self.inter.token)
         resp = await self.inter.client.http.edit_webhook_message(
             self.inter.application_id,
             self.inter.token,
@@ -123,7 +122,6 @@ class FollowupResponse:
         )
         if view and view is not MISSING:
             self.interaction.client.load_components(view)
-        self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
             self.interaction.token,
@@ -195,7 +193,6 @@ class ResponseAdapter:
             suppress_embeds=suppress_embeds,
         )
         if view:
-            self.inter.client.store_inter_token(self.inter.id, self.inter.token)
             self.inter.client.load_components(view)
 
         payload = {
@@ -316,7 +313,6 @@ class ResponseAdapter:
         )
         if view and view is not MISSING:
             self.inter.client.load_components(view)
-        self.inter.client.store_inter_token(self.inter.id, self.inter.token)
         payload = {"type": InteractionCallbackType.update_component_message.value, "data": data}
         await self.inter.client.http.send_interaction_mp_callback(
             self.inter.id, self.inter.token, create_form(payload, merge_fields(file, files))
@@ -371,7 +367,6 @@ class ResponseAdapter:
             suppress_embeds=suppress_embeds,
         )
         if view:
-            self.inter.client.store_inter_token(self.inter.id, self.inter.token)
             self.inter.client.load_components(view)
         resp = await self.inter.client.http.send_webhook_message(
             self.inter.application_id, self.inter.token, create_form(payload, merge_fields(file, files))

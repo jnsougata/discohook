@@ -212,7 +212,25 @@ class PartialChannel:
             payload["default_forum_layout"] = default_forum_layout
         resp = await self.client.http.edit_channel(self.id, payload)
         data = await resp.json()
-        return Channel(data, self.client)
+        return Channel(self.client, data)
+
+    async def fetch_message(self, message_id: str) -> Optional[Message]:
+        """
+        Fetches a message from the channel.
+
+        Parameters
+        ----------
+        message_id: :class:`str`
+            The id of the message to fetch.
+
+        Returns
+        -------
+        :class:`Message`
+            The fetched message.
+        """
+        resp = await self.client.http.fetch_channel_message(self.id, message_id)
+        data = await resp.json()
+        return Message(self.client, data)
 
     async def delete(self):
         await self.client.http.delete_channel(self.id)
@@ -293,7 +311,7 @@ class Channel(PartialChannel):
 
     """
 
-    def __init__(self, data: dict, client: "Client"):
+    def __init__(self, client: "Client", data: dict):
         super().__init__(client, data["id"], data.get("guild_id"))
         self.type = data.get("type")
         self.guild_id = data.get("guild_id")

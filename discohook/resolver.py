@@ -70,7 +70,7 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
             else:
                 options[name] = User(interaction.client, user_data)
         elif option_type == ApplicationCommandOptionType.channel.value:
-            options[name] = Channel(interaction.data["resolved"]["channels"][value], interaction.client)
+            options[name] = Channel(interaction.client, interaction.data["resolved"]["channels"][value])
         elif option_type == ApplicationCommandOptionType.role.value:
             options[name] = Role(interaction.client, interaction.data["resolved"]["roles"][value])
         elif option_type == ApplicationCommandOptionType.mentionable.value:
@@ -123,7 +123,7 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         return interaction.data["values"]
     if interaction.data["component_type"] == MessageComponentType.channel_select.value:
         resolved = interaction.data["resolved"]["channels"]
-        return [Channel(resolved.pop(channel_id), interaction.client) for channel_id in interaction.data["values"]]
+        return [Channel(interaction.client, resolved.pop(channel_id)) for channel_id in interaction.data["values"]]
     if interaction.data["component_type"] == MessageComponentType.user_select.value:
         resolved = interaction.data["resolved"]["users"]
         return [User(interaction.client, resolved.pop(user_id)) for user_id in interaction.data["values"]]

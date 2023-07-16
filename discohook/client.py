@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 
-from .channel import PartialChannel
+from .channel import PartialChannel, Channel
 from .command import ApplicationCommand, Option
 from .dash import dashboard
 from .embed import Embed
@@ -99,7 +99,6 @@ class Client(FastAPI):
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
-        self.cached_inter_tokens: Dict[str, str] = {}
         self.add_route(route, handler, methods=["POST"], include_in_schema=False)
         self.add_api_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
         self.add_api_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
@@ -146,9 +145,6 @@ class Client(FastAPI):
             return component
 
         return decorator
-
-    def store_inter_token(self, interaction_id: str, token: str):
-        self.cached_inter_tokens[interaction_id] = token
 
     def command(
         self,
@@ -396,3 +392,17 @@ class Client(FastAPI):
         if not data.get("id"):
             return
         return User(self, data)
+
+    async def fetch_channel(self, channel_id: str, /) -> Optional[Channel]:
+        """
+        Fetches the channel of given id.
+
+        Returns
+        -------
+        Channel
+        """
+        resp = await self.http.fetch_channel(channel_id)
+        data = await resp.json()
+        if not data.get("id"):
+            return
+        return Channel(self, data)

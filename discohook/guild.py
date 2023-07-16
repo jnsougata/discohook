@@ -50,7 +50,7 @@ class PartialGuild:
         """
         resp = await self.client.http.fetch_guild_channels(self.id)
         data = await resp.json()
-        return [Channel(c, self.client) for c in data]
+        return [Channel(self.client, c) for c in data]
 
     async def fetch_roles(self) -> List[Role]:
         """
@@ -159,7 +159,7 @@ class PartialGuild:
             payload["default_sort_order"] = default_sort_order
         resp = await self.client.http.create_guild_channel(self.id, payload)
         data = await resp.json()
-        return Channel(data, self.client)
+        return Channel(self.client, data)
 
     async def edit_channel_position(
         self,

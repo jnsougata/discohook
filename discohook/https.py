@@ -40,8 +40,14 @@ class HTTPClient:
     async def create_dm_channel(self, payload: Dict[str, Any]):
         return await self.request("POST", "/users/@me/channels", json=payload, use_auth=True)
 
+    async def fetch_channel(self, channel_id: str):
+        return await self.request("GET", f"/channels/{channel_id}", use_auth=True)
+
     async def delete_channel(self, channel_id: str):
         return await self.request("DELETE", f"/channels/{channel_id}", use_auth=True)
+
+    async def fetch_channel_message(self, channel_id: str, message_id: str):
+        return await self.request("GET", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
 
     async def delete_channel_message(self, channel_id: str, message_id: str):
         await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
