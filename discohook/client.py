@@ -14,6 +14,7 @@ from .enums import ApplicationCommandType
 from .file import File
 from .guild import Guild
 from .handler import handler
+from .help_cmd import default_help_command
 from .https import HTTPClient
 from .message import Message
 from .permissions import Permissions
@@ -86,6 +87,7 @@ class Client(FastAPI):
         token: str,
         route: str = "/interactions",
         password: Optional[str] = None,
+        use_default_help_command: bool = False,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -105,6 +107,8 @@ class Client(FastAPI):
         self.add_api_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
         self.add_api_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
         self._custom_id_parser: Optional[Callable] = None
+        if use_default_help_command:
+            self.add_commands(default_help_command())
 
     def load_components(self, view: View):
         """
@@ -186,8 +190,10 @@ class Client(FastAPI):
         def decorator(coro: Callable):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Callback must be a coroutine.")
+            if not cmd.description:
+                cmd.description = coro.__doc__
             cmd.callback = coro
-            self.application_commands[cmd._id] = cmd  # noqa
+            self.application_commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
             return cmd
 
@@ -202,7 +208,7 @@ class Client(FastAPI):
         *commands: ApplicationCommand
             The commands to add to the client.
         """
-        self.application_commands.update({command._id: command for command in commands})  # noqa
+        self.application_commands.update({command.key: command for command in commands})  # noqa
         self._sync_queue.extend(commands)
 
     async def delete_command(self, command_id: str):

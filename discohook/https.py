@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 
 class HTTPClient:
+    """Represents an HTTP client for Discord's API."""
     def __init__(self, client: "Client", token: str, session: aiohttp.ClientSession):
         self.token = token
         self.client = client

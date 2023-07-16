@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Optional
 
+from .file import File
+
 
 class Embed:
     """
@@ -81,16 +83,16 @@ class Embed:
         """
         self.data["image"] = {"url": url}
 
-    def image_from_attachment(self, name: str):
+    def image_from_attachment(self, file: File):
         """
         Sets the image of the embed from a file attachment.
 
         Parameters
         ----------
-        name: :class:`str`
-            name of the file attachment.
+        file: :class:`File`
+            The file attachment.
         """
-        self.data["image"] = {"url": f"attachment://{name}"}
+        self.data["image"] = {"url": f"attachment://{file.name}"}
 
     def thumbnail(self, url: str):
         """
@@ -103,16 +105,16 @@ class Embed:
         """
         self.data["thumbnail"] = {"url": url}
 
-    def thumbnail_from_attachment(self, name: str):
+    def thumbnail_from_attachment(self, file: File):
         """
         Sets the thumbnail of the embed from a file attachment.
 
         Parameters
         ----------
-        name: :class:`str`
-            name of the file attachment.
+        file: :class:`File`
+            The file attachment.
         """
-        self.data["thumbnail"] = {"url": f"attachment://{name}"}
+        self.data["thumbnail"] = {"url": f"attachment://{file.name}"}
 
     def add_field(self, name: str, value: str, *, inline: bool = False):
         """

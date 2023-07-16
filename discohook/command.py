@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
@@ -104,10 +104,10 @@ class ApplicationCommand:
         permissions: Optional[List[Permissions]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
-        self._id = f"{name}:{category.value}"
+        self.key = f"{name}:{category.value}"
         self.name = name
         self.description = description
-        self.options = options
+        self.options: List[Union[Option, SubCommand]] = options
         self.dm_access = dm_access
         self.application_id = None
         self.category = category
@@ -120,7 +120,7 @@ class ApplicationCommand:
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
-            raise RuntimeWarning(f"command `{self._id}` has no callback")
+            raise RuntimeWarning(f"command `{self.key}` has no callback")
         return self.callback(*args, **kwargs)
 
     def on_interaction(self, coro: Callable):
@@ -182,9 +182,9 @@ class ApplicationCommand:
         def decorator(coro: Callable):
             subcommand = SubCommand(name, description, options, callback=coro)
             if self.options:
-                self.options.append(subcommand)  # type: ignore
+                self.options.append(subcommand)
             else:
-                self.options = [subcommand]  # type: ignore
+                self.options = [subcommand]
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("subcommand callback must be a coroutine")
             self.subcommands[name] = subcommand
@@ -259,6 +259,8 @@ def command(
             category,
         )
         cmd.callback = coro
+        if cmd.category == ApplicationCommandType.slash and not cmd.description:
+            raise ValueError(f"command `{cmd.name}` has no description")
         return cmd
 
     return decorator
