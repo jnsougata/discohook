@@ -21,10 +21,9 @@ async def help_cmd_callback(i: Interaction):
 
 
 def default_help_command() -> ApplicationCommand:
-    help_command = ApplicationCommand(
+    command = ApplicationCommand(
         name="help",
         description="Shows this message.",
     )
-    help_command.callback = help_cmd_callback
-
-    return help_command
+    command.callback = help_cmd_callback
+    return command
