@@ -16,31 +16,53 @@ pip install git+https://github.com/jnsougata/discohook
 ## Quickstart
 
 ```python
+import os
+
 import discohook
 
 
-APPLICATION_ID = "YOUR_APPLICATION_ID"
-APPLICATION_TOKEN = "YOUR_APPLICATION_TOKEN"
-APPLICATION_PUBLIC_KEY = "YOUR_APPLICATION_PUBLIC_KEY"
-APPLICATION_DASH_PASSWORD = "YOUR_APPLICATION_DASH_PASSWORD"
+
+DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
+PUBLIC_KEY = os.environ["PUBLIC_KEY"]
+APPLICATION_ID = os.environ["APPLICATION_ID"]
+APPLICATION_PASSWORD = os.environ["APPLICATION_PASSWORD"]
 
 app = discohook.Client(
     application_id=APPLICATION_ID,
-    token=APPLICATION_TOKEN,
-    public_key=APPLICATION_PUBLIC_KEY,
-    password=APPLICATION_DASH_PASSWORD,
+    public_key=PUBLIC_KEY,
+    token=DISCORD_TOKEN,
+    password=APPLICATION_PASSWORD,  # Must be provided if you want to use the dashboard.
+    use_default_help_command=True,  # This will enable your bot to use  default help command (/help).
 )
 
-@app.command(
-    name="help", 
-    description="basic help command for the bot"
-)
-async def help_command(interaction: discohook.Interaction):
-    await interaction.response.send(
-        "Hello, World!",
-        embed=discohook.Embed(title="Help", description="This is a help command"),
-        ephemeral=True,
-    )
+# adding a error handler
+@app.on_error()
+async def on_error(_, err: discohook.GlobalException):
+    user_response = "Some error occurred! Please contact the developer."
+    if err.interaction.responded:
+        await err.interaction.response.followup(user_response, ephemeral=True)
+    else:
+        await err.interaction.response.send(user_response, ephemeral=True)
+
+    await app.send_message("12345678910", f"Error: {err}")  # send error to a channel in development server
+
+
+# If description is not provided, it will look for function's docstring.
+# If description is not provided and function's docstring is not found, it will raise ValueError.
+# If name is not provided, it will use the function name as the command name. (in this case, "ping")
+# If category is not provided, it will use ApplicationCommandType.slash as the command category.
+@app.command()
+async def ping(i: discohook.Interaction):
+    """Ping the bot."""
+    await i.response.send("Pong!")
+
+# Making user command
+@app.command(category=discohook.ApplicationCommandType.user)
+async def avatar(i: discohook.Interaction, user: discohook.User ):
+    embed = discohook.Embed()
+    embed.set_image(url=user.avatar.url)
+    await i.response.send(embed=embed)
+
 ```
 ### Deployment
 Deploy the snippet above to your serverless function, and you're good to go to the next step.

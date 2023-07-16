@@ -75,6 +75,8 @@ class Client(FastAPI):
         The route to listen for interactions on.
     password: str | None
         The password to use for the dashboard.
+    use_default_help_command: bool
+        Whether to use the default help command or not. Defaults to False.
     **kwargs
         Keyword arguments to pass to the FastAPI instance.
     """
@@ -152,7 +154,7 @@ class Client(FastAPI):
 
     def command(
         self,
-        name: str,
+        name: Optional[str] = None,
         description: Optional[str] = None,
         *,
         options: Optional[List[Option]] = None,
@@ -165,8 +167,8 @@ class Client(FastAPI):
 
         Parameters
         ----------
-        name: str
-            The name of the command.
+        name: str | None
+            The name of the command. Defaults to the name of the coroutine if not provided.
         description: Optional[str]
             The description of the command. Does not apply to user & message commands.
         options: Optional[List[Option]]
@@ -178,21 +180,19 @@ class Client(FastAPI):
         category: AppCmdType
             The category of the command. Defaults to slash commands.
         """
-        cmd = ApplicationCommand(
-            name=name,
-            description=description,
-            options=options,
-            permissions=permissions,
-            dm_access=dm_access,
-            category=category,
-        )
 
-        def decorator(coro: Callable):
-            if not asyncio.iscoroutinefunction(coro):
+        def decorator(callback: Callable):
+            if not asyncio.iscoroutinefunction(callback):
                 raise TypeError("Callback must be a coroutine.")
-            if not cmd.description:
-                cmd.description = coro.__doc__
-            cmd.callback = coro
+            cmd = ApplicationCommand(
+                name or callback.__name__,
+                description or callback.__doc__,
+                options=options,
+                permissions=permissions,
+                dm_access=dm_access,
+                category=category,
+            )
+            cmd.callback = callback
             self.application_commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
             return cmd

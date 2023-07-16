@@ -12,10 +12,10 @@ async def help_cmd_callback(i: Interaction):
     sorted_commands = sorted(commands, key=lambda x: x.category.value)
     for command in sorted_commands:
         if command.category == ApplicationCommandType.slash:
-            embed.description += f"\n**` /{command.name} `** - {command.description}\n"
+            embed.description += f"\n**` /{command.name} `**  {command.description}\n"
         else:
             cmd_category_str = str(command.category).split(".")[1]
-            embed.description += f"\n**` {command.name} `** - This is {cmd_category_str} command.\n"
+            embed.description += f"\n**` {command.name} `**  This is {cmd_category_str} command.\n"
 
     await i.response.send(embed=embed)
 

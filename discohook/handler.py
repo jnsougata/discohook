@@ -59,17 +59,17 @@ async def handler(request: Request):
 
             if not (interaction.data["type"] == ApplicationCommandType.slash.value):
                 target_object = build_context_menu_param(interaction)
-                await cmd.__call__(interaction, target_object)
+                await cmd(interaction, target_object)
 
             elif interaction.data.get("options") and (
                 interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand.value
             ):
                 subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
                 args, kwargs = build_slash_command_prams(subcommand.callback, interaction)
-                await subcommand.__call__(interaction, *args, **kwargs)
+                await subcommand(interaction, *args, **kwargs)
             else:
                 args, kwargs = build_slash_command_prams(cmd.callback, interaction)
-                await cmd.__call__(interaction, *args, **kwargs)
+                await cmd(interaction, *args, **kwargs)
 
         elif interaction.type == InteractionType.autocomplete:
             key = f"{interaction.data['name']}:{interaction.data['type']}"
@@ -103,7 +103,7 @@ async def handler(request: Request):
 
             if interaction.type == InteractionType.component:
                 if interaction.data["component_type"] == MessageComponentType.button.value:
-                    await component.__call__(interaction)
+                    await component(interaction)
                 if interaction.data["component_type"] in (
                     MessageComponentType.text_select.value,
                     MessageComponentType.user_select.value,
@@ -111,11 +111,11 @@ async def handler(request: Request):
                     MessageComponentType.channel_select.value,
                     MessageComponentType.mentionable_select.value
                 ):
-                    await component.__call__(interaction, build_select_menu_values(interaction))
+                    await component(interaction, build_select_menu_values(interaction))
 
             elif interaction.type == InteractionType.modal_submit:
                 args, kwargs = build_modal_params(component.callback, interaction)
-                await component.__call__(interaction, *args, **kwargs)
+                await component(interaction, *args, **kwargs)
         else:
             raise Exception(f"unhandled interaction type", interaction)
     except Exception as e:

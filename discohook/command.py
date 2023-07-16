@@ -220,7 +220,7 @@ class ApplicationCommand:
 
 
 def command(
-    name: str,
+    name: Optional[str] = None,
     description: Optional[str] = None,
     *,
     options: Optional[List[Option]] = None,
@@ -247,18 +247,18 @@ def command(
         The category of the command. Defaults to slash commands.
     """
 
-    def decorator(coro: Callable):
-        if not asyncio.iscoroutinefunction(coro):
+    def decorator(callback: Callable):
+        if not asyncio.iscoroutinefunction(callback):
             raise TypeError("callback must be a coroutine")
         cmd = ApplicationCommand(
-            name,
-            description,
+            name or callback.__name__,
+            description or callback.__doc__,
             options,
             dm_access,
             permissions,
             category,
         )
-        cmd.callback = coro
+        cmd.callback = callback
         if cmd.category == ApplicationCommandType.slash and not cmd.description:
             raise ValueError(f"command `{cmd.name}` has no description")
         return cmd
