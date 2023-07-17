@@ -182,10 +182,10 @@ async def dashboard():
                         id: command.id
                     })
                 })
-                let data = await resp.json();
                 if (resp.status === 204) {
                     card.remove();
                 } else {
+                    let data = await resp.json();
                     alert(data.error);
                 }
             });
