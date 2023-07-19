@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import aiohttp
 from fastapi import FastAPI
@@ -108,7 +108,7 @@ class Client(FastAPI):
         self.add_api_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
         self.add_api_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
         self.add_api_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
-        self._custom_id_parser: Optional[Callable] = None
+        self._custom_id_parser: Optional[AsyncFunc] = None
         if default_help_command:
             self.add_commands(_help)
 
@@ -251,7 +251,7 @@ class Client(FastAPI):
 
         """
 
-        def decorator(coro: Callable):
+        def decorator(coro: AsyncFunc):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Exception handler must be a coroutine.")
             self.add_exception_handler(Exception, coro)
@@ -259,7 +259,7 @@ class Client(FastAPI):
 
         return decorator
 
-    def custom_id_parser(self, coro: Callable):
+    def custom_id_parser(self, coro: AsyncFunc):
         """
         A decorator to register a dev defined custom id parser.
         Parameters
