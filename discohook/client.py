@@ -14,7 +14,7 @@ from .enums import ApplicationCommandType
 from .file import File
 from .guild import Guild
 from .handler import handler
-from .help_cmd import help_command
+from .help import _help
 from .https import HTTPClient
 from .message import Message
 from .permissions import Permissions
@@ -110,7 +110,7 @@ class Client(FastAPI):
         self.add_api_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
         self._custom_id_parser: Optional[Callable] = None
         if default_help_command:
-            self.add_commands(help_command())
+            self.add_commands(_help)
 
     def load_components(self, view: View):
         """
