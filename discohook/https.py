@@ -50,8 +50,14 @@ class HTTPClient:
     async def fetch_channel_message(self, channel_id: str, message_id: str):
         return await self.request("GET", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
 
+    async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
+        return await self.request("GET", f"/channels/{channel_id}/messages", params=params, use_auth=True)
+
     async def delete_channel_message(self, channel_id: str, message_id: str):
         await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
+
+    async def delete_channel_messages(self, channel_id: str, payload: Dict[str, Any]):
+        await self.request("POST", f"/channels/{channel_id}/messages/bulk-delete", json=payload, use_auth=True)
 
     async def pin_channel_message(self, channel_id: str, message_id: str):
         await self.request("PUT", f"/channels/{channel_id}/messages/{message_id}/pin", use_auth=True)

@@ -232,6 +232,79 @@ class PartialChannel:
         data = await resp.json()
         return Message(self.client, data)
 
+    async def fetch_messages(
+        self,
+        *,
+        limit: int = 50,
+        before: Optional[str] = None,
+        after: Optional[str] = None,
+        around: Optional[str] = None,
+    ) -> List[Message]:
+        """
+        Fetches messages from the channel.
+
+        Parameters
+        ----------
+        limit: Optional[:class:`int`]
+            The maximum amount of messages to fetch.
+        before: Optional[:class:`str`]
+            The id of the message to fetch before.
+        after: Optional[:class:`str`]
+            The id of the message to fetch after.
+        around: Optional[:class:`str`]
+            The id of the message to fetch around.
+
+        Returns
+        -------
+        List[:class:`Message`]
+            The fetched messages.
+        """
+        params = {"limit": limit}
+        if before:
+            params["before"] = before
+        if after:
+            params["after"] = after
+        if around:
+            params["around"] = around
+        resp = await self.client.http.fetch_channel_messages(self.id, params=params)
+        data = await resp.json()
+        return [Message(self.client, msg) for msg in data]
+
+    async def purge(
+        self,
+        *,
+        limit: int = 50,
+        before: Optional[str] = None,
+        after: Optional[str] = None,
+        around: Optional[str] = None,
+    ) -> List[Message]:
+        """
+        Deletes messages from the channel in bulk.
+
+        Parameters
+        ----------
+        limit: Optional[:class:`int`]
+            The maximum amount of messages to delete.
+        before: Optional[:class:`str`]
+            The id of the message to delete before.
+        after: Optional[:class:`str`]
+            The id of the message to delete after.
+        around: Optional[:class:`str`]
+            The id of the message to delete around.
+
+        Returns
+        -------
+        List[:class:`Message`]
+            The deleted messages.
+        """
+        messages = await self.fetch_messages(limit=limit, before=before, after=after, around=around)
+        ids = [msg.id for msg in messages]
+        if len(ids) < 2:
+            await self.client.http.delete_channel_message(self.id, ids[0])
+            return messages
+        await self.client.http.delete_channel_messages(self.id, {"messages": ids})
+        return messages
+
     async def delete(self):
         await self.client.http.delete_channel(self.id)
 
