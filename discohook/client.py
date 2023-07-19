@@ -163,6 +163,7 @@ class Client(FastAPI):
         options: Optional[List[Option]] = None,
         permissions: Optional[List[Permissions]] = None,
         dm_access: bool = True,
+        nsfw: bool = False,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
         """
@@ -180,6 +181,8 @@ class Client(FastAPI):
             The default permissions of the command.
         dm_access: bool
             Whether the command can be used in DMs. Defaults to True.
+        nsfw: bool
+            Whether the command is age restricted. Defaults to False.
         category: AppCmdType
             The category of the command. Defaults to slash commands.
         """
@@ -189,11 +192,12 @@ class Client(FastAPI):
                 raise TypeError("Callback must be a coroutine.")
             cmd = ApplicationCommand(
                 name or callback.__name__,
-                description or callback.__doc__,
+                description=description or callback.__doc__,
                 options=options,
                 permissions=permissions,
                 dm_access=dm_access,
                 category=category,
+                nsfw=nsfw,
             )
             cmd.callback = callback
             self.application_commands[cmd.key] = cmd

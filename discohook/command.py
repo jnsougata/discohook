@@ -90,6 +90,8 @@ class ApplicationCommand:
         The options of the command. Does not apply to user & message commands.
     dm_access: bool
         Whether the command can be used in DMs. Defaults to True.
+    nsfw: bool
+        Whether the command is age restricted. Defaults to False.
     permissions: List[Permissions] | None
         The default permissions of the command.
     category: ApplicationCommandType
@@ -99,9 +101,11 @@ class ApplicationCommand:
     def __init__(
         self,
         name: str,
+        *,
         description: Optional[str] = None,
         options: Optional[List[Option]] = None,
         dm_access: bool = True,
+        nsfw: bool = False,
         permissions: Optional[List[Permissions]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
@@ -110,6 +114,7 @@ class ApplicationCommand:
         self.description = description
         self.options: List[Union[Option, SubCommand]] = options
         self.dm_access = dm_access
+        self.nsfw = nsfw
         self.application_id = None
         self.category = category
         self.permissions = permissions
@@ -217,6 +222,8 @@ class ApplicationCommand:
             for permission in self.permissions:
                 base |= permission.value
             self.data["default_member_permissions"] = str(base)
+        if self.nsfw:
+            self.data["nsfw"] = self.nsfw
         return self.data
 
 
@@ -227,6 +234,7 @@ def command(
     options: Optional[List[Option]] = None,
     permissions: Optional[List[Permissions]] = None,
     dm_access: bool = True,
+    nsfw: bool = False,
     category: ApplicationCommandType = ApplicationCommandType.slash,
 ):
     """
@@ -242,6 +250,8 @@ def command(
         The options of the command. Does not apply to user & message commands.
     dm_access: bool
         Whether the command can be used in DMs. Defaults to True.
+    nsfw: bool
+        Whether the command is age-restricted. Defaults to False.
     permissions: Optional[List[Permissions]]
         The default permissions of the command.
     category: AppCmdType
@@ -253,11 +263,12 @@ def command(
             raise TypeError("callback must be a coroutine")
         cmd = ApplicationCommand(
             name or callback.__name__,
-            description or callback.__doc__,
-            options,
-            dm_access,
-            permissions,
-            category,
+            description=description or callback.__doc__,
+            options=options,
+            dm_access=dm_access,
+            permissions=permissions,
+            category=category,
+            nsfw=nsfw
         )
         cmd.callback = callback
         if cmd.category == ApplicationCommandType.slash and not cmd.description:
