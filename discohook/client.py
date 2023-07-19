@@ -321,16 +321,16 @@ class Client(FastAPI):
 
         )
 
-    async def as_user(self) -> User:
+    async def me(self) -> User:
         """
-        Get the client as partial user.
+        Get the client as a discord user.
 
         Returns
         -------
         User
             The client as a user.
         """
-        resp = await self.http.fetch_client_info(self.application_id)
+        resp = await self.http.fetch_user(self.application_id)
         return User(self, await resp.json())
 
     async def sync(self):

@@ -32,9 +32,6 @@ class HTTPClient:
     async def fetch_global_application_commands(self, application_id: str):
         return await self.request("GET", f"/applications/{application_id}/commands", use_auth=True)
 
-    async def fetch_client_info(self, application_id: str):
-        return await self.request("GET", f"/users/{application_id}", use_auth=True)
-
     async def edit_client_info(self, payload: Dict[str, Any]):
         return await self.request("PATCH", "/users/@me", json=payload, use_auth=True)
 
