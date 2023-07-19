@@ -7,7 +7,7 @@ async def dashboard():
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Discohook | Dashboard</title>
+    <title>Discohook</title>
     <link rel="icon" href="https://filebox-1-q0603932.deta.app/embed/ffc197bb50206ac1" />
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -210,7 +210,7 @@ async def dashboard():
                 });
                 hljs.highlightAll();
             } else {
-                alert(data.error);
+                alert(`Discord Error: ${data.message} (code: ${data.code})`);
             }
         }
 

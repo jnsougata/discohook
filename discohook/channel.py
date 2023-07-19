@@ -234,8 +234,8 @@ class PartialChannel:
 
     async def fetch_messages(
         self,
-        *,
         limit: int = 50,
+        *,
         before: Optional[str] = None,
         after: Optional[str] = None,
         around: Optional[str] = None,
@@ -272,8 +272,8 @@ class PartialChannel:
 
     async def purge(
         self,
-        *,
         limit: int = 50,
+        *,
         before: Optional[str] = None,
         after: Optional[str] = None,
         around: Optional[str] = None,
