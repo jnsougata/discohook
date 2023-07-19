@@ -14,11 +14,11 @@ from .enums import ApplicationCommandType
 from .file import File
 from .guild import Guild
 from .handler import handler
-from .help_cmd import default_help_command
+from .help_cmd import help_command
 from .https import HTTPClient
 from .message import Message
 from .permissions import Permissions
-from .user import ClientUser, User
+from .user import User
 from .utils import compare_password, AsyncFunc
 from .view import Component, View
 from .webhook import Webhook
@@ -75,7 +75,7 @@ class Client(FastAPI):
         The route to listen for interactions on.
     password: str | None
         The password to use for the dashboard.
-    use_default_help_command: bool
+    default_help_command: bool
         Whether to use the default help command or not. Defaults to False.
     **kwargs
         Keyword arguments to pass to the FastAPI instance.
@@ -89,7 +89,7 @@ class Client(FastAPI):
         token: str,
         route: str = "/interactions",
         password: Optional[str] = None,
-        use_default_help_command: bool = False,
+        default_help_command: bool = False,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -109,8 +109,8 @@ class Client(FastAPI):
         self.add_api_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
         self.add_api_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
         self._custom_id_parser: Optional[Callable] = None
-        if use_default_help_command:
-            self.add_commands(default_help_command())
+        if default_help_command:
+            self.add_commands(help_command())
 
     def load_components(self, view: View):
         """
@@ -321,17 +321,17 @@ class Client(FastAPI):
 
         )
 
-    async def as_user(self) -> ClientUser:
+    async def as_user(self) -> User:
         """
         Get the client as partial user.
 
         Returns
         -------
-        ClientUser
-            The client as partial user.
+        User
+            The client as a user.
         """
-        resp = await self.http.fetch_client_info()
-        return ClientUser(self, await resp.json())
+        resp = await self.http.fetch_client_info(self.application_id)
+        return User(self, await resp.json())
 
     async def sync(self):
         """
@@ -419,3 +419,14 @@ class Client(FastAPI):
         if not data.get("id"):
             return
         return Channel(self, data)
+
+    async def fetch_commands(self):
+        """
+        Fetches the commands of the client.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+        """
+        resp = await self.http.fetch_global_application_commands(str(self.application_id))
+        return await resp.json()

@@ -220,6 +220,29 @@ class PartialGuild:
         data = await resp.json()
         return Role(self.client, data)
 
+    async def create_emoji(self, name: str, image: str, *, roles: Optional[List[str]] = None):
+        """
+        Creates a new emoji for the guild.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the emoji.
+        image: :class:`str`
+            The image data of the emoji in base64 data uri format.
+        roles: Optional[List[:class:`str`]]
+            A list of role ids to limit the emoji to.
+
+        Returns
+        -------
+        :class:`Emoji`
+        """
+        payload = {"name": name, "image": image}
+        if roles:
+            payload["roles"] = roles
+        resp = await self.client.http.create_guild_emoji(self.id, payload)
+        return await resp.json()
+
 
 class Guild(PartialGuild):
     """

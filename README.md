@@ -20,8 +20,6 @@ import os
 
 import discohook
 
-
-
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]
 APPLICATION_ID = os.environ["APPLICATION_ID"]
@@ -32,8 +30,9 @@ app = discohook.Client(
     public_key=PUBLIC_KEY,
     token=DISCORD_TOKEN,
     password=APPLICATION_PASSWORD,  # Must be provided if you want to use the dashboard.
-    use_default_help_command=True,  # This will enable your bot to use  default help command (/help).
+    default_help_command=True,  # This will enable your bot to use  default help command (/help).
 )
+
 
 # adding a error handler
 @app.on_error()
@@ -55,6 +54,7 @@ async def on_error(_, err: discohook.GlobalException):
 async def ping(i: discohook.Interaction):
     """Ping the bot."""
     await i.response.send("Pong!")
+
 
 # Making user command
 @app.command(category=discohook.ApplicationCommandType.user)

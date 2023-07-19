@@ -23,6 +23,8 @@ class User:
         The name of the user.
     discriminator: :class:`str`
         The discriminator of the user.
+    accent_color: Optional[:class:`int`]
+        The accent color of the user.
     avatar: :class:`Asset`
         The avatar of the user.
     system: :class:`bool`
@@ -64,6 +66,10 @@ class User:
     @property
     def discriminator(self) -> str:
         return self.data["discriminator"]
+
+    @property
+    def accent_color(self) -> Optional[int]:
+        return self.data.get("accent_color")
 
     @property
     def avatar(self) -> Asset:
@@ -245,3 +251,19 @@ class ClientUser:
             The permission to check.
         """
         return permission.value & int(self.permissions) == permission.value
+
+    def edit(self, username: str, *, avatar: Optional[str] = None):
+        """
+        Edits the client user.
+
+        Parameters
+        ----------
+        username: :class:`str`
+            The new username of the client user.
+        avatar: Optional[:class:`str`]
+            The new avatar of the client user in base64 data URI scheme.
+        """
+        payload = {"username": username}
+        if avatar:
+            payload["avatar"] = avatar
+        return self.client.http.edit_client_user(payload)

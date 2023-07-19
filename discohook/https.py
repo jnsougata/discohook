@@ -29,8 +29,14 @@ class HTTPClient:
     async def sync_commands(self, application_id: str, commands: List[Dict[str, Any]]):
         return await self.request("PUT", f"/applications/{application_id}/commands", json=commands, use_auth=True)
 
-    async def fetch_client_info(self):
-        return await self.request("GET", "/oauth2/applications/@me", use_auth=True)
+    async def fetch_global_application_commands(self, application_id: str):
+        return await self.request("GET", f"/applications/{application_id}/commands", use_auth=True)
+
+    async def fetch_client_info(self, application_id: str):
+        return await self.request("GET", f"/users/{application_id}", use_auth=True)
+
+    async def edit_client_info(self, payload: Dict[str, Any]):
+        return await self.request("PATCH", "/users/@me", json=payload, use_auth=True)
 
     async def delete_command(self, application_id: str, command_id: str):
         return await self.request("DELETE", f"/applications/{application_id}/commands/{command_id}", use_auth=True)
@@ -144,6 +150,9 @@ class HTTPClient:
 
     async def edit_guild_role(self, guild_id: str, role_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/guilds/{guild_id}/roles/{role_id}", json=payload, use_auth=True)
+
+    async def create_guild_emoji(self, guild_id: str, payload: Dict[str, Any]):
+        return await self.request("POST", f"/guilds/{guild_id}/emojis", json=payload, use_auth=True)
 
     async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
         return await self.request("POST", f"/channels/{channel_id}/webhooks", json=payload, use_auth=True)

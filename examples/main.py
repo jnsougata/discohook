@@ -13,7 +13,7 @@ app = discohook.Client(
     public_key=PUBLIC_KEY,
     token=DISCORD_TOKEN,
     password=APPLICATION_PASSWORD,
-    use_default_help_command=True,  # This will enable your bot to use  default help command (/help).
+    default_help_command=True,  # This will enable your bot to use  default help command (/help).
 )
 
 app.load_modules("modules")  # load a command from a module in a directory named modules
