@@ -1,9 +1,10 @@
 import asyncio
 import secrets
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from .emoji import PartialEmoji
 from .enums import ButtonStyle, ChannelType, MessageComponentType, SelectType
+from .utils import AsyncFunc
 
 
 class Component:
@@ -18,11 +19,11 @@ class Component:
 
     def __init__(self, type: Optional[MessageComponentType] = None, custom_id: Optional[str] = None):
         self.type = type
-        self.callback: Optional[Callable] = None
+        self.callback: Optional[AsyncFunc] = None
         self.custom_id = custom_id or secrets.token_urlsafe(16)
-        self.checks: List[Callable] = []
+        self.checks: List[AsyncFunc] = []
 
-    def on_interaction(self, coro: Callable):
+    def on_interaction(self, coro: AsyncFunc):
         """
         Decorator that registers a callback to be called when the component is interacted with.
 
@@ -329,7 +330,7 @@ def button(
         If the callback is not a coroutine.
     """
 
-    def decorator(coro: Callable):
+    def decorator(coro: AsyncFunc):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
@@ -382,7 +383,7 @@ def select(
         If the callback is not a coroutine.
     """
 
-    def decorator(coro: Callable):
+    def decorator(coro: AsyncFunc):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         menu = Select(
@@ -401,7 +402,7 @@ def select(
     return decorator
 
 
-def component_checker(*checks: Callable):
+def component_checker(*checks: AsyncFunc):
     """
     Decorator for adding a checks to a component.
 

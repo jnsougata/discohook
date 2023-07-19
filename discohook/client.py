@@ -19,7 +19,7 @@ from .https import HTTPClient
 from .message import Message
 from .permissions import Permissions
 from .user import ClientUser, User
-from .utils import compare_password
+from .utils import compare_password, AsyncFunc
 from .view import Component, View
 from .webhook import Webhook
 
@@ -139,9 +139,16 @@ class Client(FastAPI):
         -------
         Component
             The component that was loaded.
+
+        Raises
+        ------
+        ValueError
+            If the custom id is not a not empty string or is not provided.
         """
 
         def decorator(component: Component):
+            if not custom_id or not isinstance(custom_id, str):
+                raise ValueError("Invalid custom id provided.")
             component.custom_id = custom_id
             self.active_components[custom_id] = component
             return component
@@ -177,7 +184,7 @@ class Client(FastAPI):
             The category of the command. Defaults to slash commands.
         """
 
-        def decorator(callback: Callable):
+        def decorator(callback: AsyncFunc):
             if not asyncio.iscoroutinefunction(callback):
                 raise TypeError("Callback must be a coroutine.")
             cmd = ApplicationCommand(

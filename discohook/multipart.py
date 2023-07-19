@@ -20,7 +20,7 @@ def create_form(payload: Dict[str, Any], files: Optional[List[File]] = None) -> 
         return form
     for i, file in enumerate(files):
         form.append(
-            file.content.read(),
+            file.content,
             headers={
                 "Content-Disposition": f'form-data; name="files[{i}]"; filename="{file.name}"',
                 "Content-Type": "application/octet-stream",

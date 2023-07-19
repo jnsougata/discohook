@@ -1,9 +1,10 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
 from .permissions import Permissions
+from .utils import AsyncFunc
 
 
 class SubCommand:
@@ -18,7 +19,7 @@ class SubCommand:
         The description of the subcommand.
     options: List[Option] | None
         The options of the subcommand.
-    callback: Callable | None
+    callback: `AsyncCallable` | None
         The callback of the subcommand.
     """
 
@@ -28,13 +29,13 @@ class SubCommand:
         description: str,
         options: Optional[List[Option]] = None,
         *,
-        callback: Optional[Callable] = None,
+        callback: Optional[AsyncFunc] = None,
     ):
         self.name = name
         self.options = options
         self.callback = callback
         self.description = description
-        self.autocompletes: Dict[str, Callable] = {}
+        self.autocompletes: Dict[str, AsyncFunc] = {}
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -54,7 +55,7 @@ class SubCommand:
             The name of the option to register the autocomplete for.
         """
 
-        def decorator(coro: Callable):
+        def decorator(coro: AsyncFunc):
             self.autocompletes[name] = coro
 
         return decorator
@@ -112,24 +113,24 @@ class ApplicationCommand:
         self.application_id = None
         self.category = category
         self.permissions = permissions
-        self.callback: Optional[Callable] = None
+        self.callback: Optional[AsyncFunc] = None
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
-        self.autocompletes: Dict[str, Callable] = {}
-        self.checks: List[Callable] = []
+        self.autocompletes: Dict[str, AsyncFunc] = {}
+        self.checks: List[AsyncFunc] = []
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
             raise RuntimeWarning(f"command `{self.key}` has no callback")
         return self.callback(*args, **kwargs)
 
-    def on_interaction(self, coro: Callable):
+    def on_interaction(self, coro: AsyncFunc):
         """
         A decorator to register a callback for the command.
 
         Parameters
         ----------
-        coro: Callable
+        coro: AsyncCallable
             The callback to register.
         """
         self.callback = coro
@@ -144,7 +145,7 @@ class ApplicationCommand:
             The name of the option to register the autocomplete for.
         """
 
-        def decorator(coro: Callable):
+        def decorator(coro: AsyncFunc):
             self.autocompletes[name] = coro
 
         return decorator
@@ -179,7 +180,7 @@ class ApplicationCommand:
             If the callback is not a coroutine.
         """
 
-        def decorator(coro: Callable):
+        def decorator(coro: AsyncFunc):
             subcommand = SubCommand(name, description, options, callback=coro)
             if self.options:
                 self.options.append(subcommand)
@@ -247,7 +248,7 @@ def command(
         The category of the command. Defaults to slash commands.
     """
 
-    def decorator(callback: Callable):
+    def decorator(callback: AsyncFunc):
         if not asyncio.iscoroutinefunction(callback):
             raise TypeError("callback must be a coroutine")
         cmd = ApplicationCommand(
@@ -266,13 +267,13 @@ def command(
     return decorator
 
 
-def command_checker(*checks: Callable):
+def command_checker(*checks: AsyncFunc):
     """
     Decorator for adding a checks to a command.
 
     Parameters
     ----------
-    *checks: Callable
+    *checks: AsyncCallable
         The checks to add to the command.
 
     Returns

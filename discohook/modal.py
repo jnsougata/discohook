@@ -1,7 +1,8 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from .enums import MessageComponentType, TextInputFieldLength
+from .utils import AsyncFunc
 from .view import Component
 
 
@@ -182,7 +183,7 @@ def modal(
         If the callback is not a coroutine.
     """
 
-    def decorator(coro: Callable):
+    def decorator(coro: AsyncFunc):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         mdl = Modal(title, custom_id=custom_id)
