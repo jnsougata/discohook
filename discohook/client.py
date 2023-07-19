@@ -333,6 +333,22 @@ class Client(FastAPI):
         resp = await self.http.fetch_user(self.application_id)
         return User(self, await resp.json())
 
+    async def edit(self, username: str, *, avatar: Optional[str] = None):
+        """
+        Edits the client user.
+
+        Parameters
+        ----------
+        username: :class:`str`
+            The new username of the client user.
+        avatar: Optional[:class:`str`]
+            The new avatar of the client user in base64 data URI scheme.
+        """
+        payload = {"username": username}
+        if avatar:
+            payload["avatar"] = avatar
+        await self.http.edit_client(payload)
+
     async def sync(self):
         """
         Sync the commands to the client.
