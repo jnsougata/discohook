@@ -16,6 +16,6 @@ async def _help(i: Interaction):
             embed.description += f"\n**` /{cmd.name} `**  {cmd.description}\n"
         else:
             category = "user" if cmd.category == ApplicationCommandType.user else "message"
-            embed.description += f"\n**` {cmd.name} `**  (a {category} command)\n"
+            embed.description += f"\n**` {cmd.name} `**  (A {category} command)\n"
 
     await i.response.send(embed=embed)
