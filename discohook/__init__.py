@@ -54,7 +54,7 @@ from .option import (
     StringOption,
     UserOption,
 )
-from .permissions import Permissions
+from .permission import Permission
 from .role import PartialRole, Role
 from .user import User
 from .view import Button, Select, SelectOption, View, button, select, component_checker

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
-from .permissions import Permissions
+from .permission import Permission
 from .utils import AsyncFunc
 
 
@@ -92,7 +92,7 @@ class ApplicationCommand:
         Whether the command can be used in DMs. Defaults to True.
     nsfw: bool
         Whether the command is age restricted. Defaults to False.
-    permissions: List[Permissions] | None
+    permissions: List[Permission] | None
         The default permissions of the command.
     category: ApplicationCommandType
         The category of the command. Defaults to slash commands.
@@ -106,7 +106,7 @@ class ApplicationCommand:
         options: Optional[List[Option]] = None,
         dm_access: bool = True,
         nsfw: bool = False,
-        permissions: Optional[List[Permissions]] = None,
+        permissions: Optional[List[Permission]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
         self.key = f"{name}:{category.value}"
@@ -232,7 +232,7 @@ def command(
     description: Optional[str] = None,
     *,
     options: Optional[List[Option]] = None,
-    permissions: Optional[List[Permissions]] = None,
+    permissions: Optional[List[Permission]] = None,
     dm_access: bool = True,
     nsfw: bool = False,
     category: ApplicationCommandType = ApplicationCommandType.slash,
@@ -252,7 +252,7 @@ def command(
         Whether the command can be used in DMs. Defaults to True.
     nsfw: bool
         Whether the command is age-restricted. Defaults to False.
-    permissions: Optional[List[Permissions]]
+    permissions: Optional[List[Permission]]
         The default permissions of the command.
     category: AppCmdType
         The category of the command. Defaults to slash commands.

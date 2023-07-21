@@ -17,7 +17,7 @@ from .handler import handler
 from .help import _help
 from .https import HTTPClient
 from .message import Message
-from .permissions import Permissions
+from .permission import Permission
 from .user import User
 from .utils import compare_password, AsyncFunc
 from .view import Component, View
@@ -161,7 +161,7 @@ class Client(FastAPI):
         description: Optional[str] = None,
         *,
         options: Optional[List[Option]] = None,
-        permissions: Optional[List[Permissions]] = None,
+        permissions: Optional[List[Permission]] = None,
         dm_access: bool = True,
         nsfw: bool = False,
         category: ApplicationCommandType = ApplicationCommandType.slash,
@@ -177,7 +177,7 @@ class Client(FastAPI):
             The description of the command. Does not apply to user & message commands.
         options: Optional[List[Option]]
             The options of the command. Does not apply to user & message commands.
-        permissions: Optional[List[Permissions]]
+        permissions: Optional[List[Permission]]
             The default permissions of the command.
         dm_access: bool
             Whether the command can be used in DMs. Defaults to True.

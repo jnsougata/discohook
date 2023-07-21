@@ -5,7 +5,7 @@ from .embed import Embed
 from .file import File
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
-from .permissions import Permissions
+from .permission import Permission
 
 if TYPE_CHECKING:
     from .client import Client
@@ -241,13 +241,13 @@ class ClientUser:
     def flags(self) -> int:
         return self.data["flags"]
 
-    def has_permission(self, permission: Permissions) -> bool:
+    def has_permission(self, permission: Permission) -> bool:
         """
         Checks if the client user has a permission.
 
         Parameters
         ----------
-        permission: :class:`Permissions`
+        permission: :class:`Permission`
             The permission to check.
         """
         return permission.value & int(self.permissions) == permission.value

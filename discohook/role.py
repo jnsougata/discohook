@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from .permissions import Permissions
+from .permission import Permission
 
 if TYPE_CHECKING:
     from .client import Client
@@ -27,7 +27,7 @@ class PartialRole:
         self,
         *,
         name: Optional[str] = None,
-        permissions: Optional[List[Permissions]] = None,
+        permissions: Optional[List[Permission]] = None,
         color: Optional[int] = None,
         hoist: Optional[bool] = None,
         mentionable: Optional[bool] = None,
@@ -42,7 +42,7 @@ class PartialRole:
         ----------
         name: Optional[:class:`str`]
             The name of the role.
-        permissions: Optional[:class:`Permissions`]
+        permissions: Optional[:class:`Permission`]
             The permissions of the role.
         color: Optional[:class:`int`]
             The color of the role.
@@ -155,17 +155,17 @@ class Role(PartialRole):
     def __eq__(self, other):
         return self.id == other.id
 
-    def has_permission(self, permissions: Permissions) -> bool:
+    def has_permission(self, permission: Permission) -> bool:
         """
         Checks if the role has the given permissions.
 
         Parameters
         ----------
-        permissions: :class:`Permissions`
+        permission: :class:`Permission`
             The permissions to check.
 
         Returns
         -------
         :class:`bool`
         """
-        return int(self.permissions) & permissions.value == permissions.value
+        return Permission.check(int(self.permissions), permission)

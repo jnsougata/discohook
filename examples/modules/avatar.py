@@ -4,7 +4,7 @@ import discohook
 @discohook.command(
     name="avatar",
     category=discohook.ApplicationCommandType.user,
-    permissions=[discohook.Permissions.send_messages],
+    permissions=[discohook.Permission.send_messages],
     dm_access=False,
 )
 async def avatar(inter: discohook.Interaction, user: discohook.User):

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from .channel import Channel
 from .emoji import PartialEmoji
 from .enums import ChannelType
-from .permissions import Permissions
+from .permission import Permission
 from .role import Role
 from .member import Member
 
@@ -193,7 +193,7 @@ class PartialGuild:
         self,
         name: str,
         *,
-        permissions: Optional[List[Permissions]] = None,
+        permissions: Optional[List[Permission]] = None,
         color: int = 0,
         hoist: bool = False,
         mentionable: Optional[bool] = False,
