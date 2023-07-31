@@ -341,15 +341,15 @@ def button(
 
 
 def select(
-    options: Optional[List[SelectOption]] = None,
-    *,
     placeholder: Optional[str] = None,
+    *,
+    options: Optional[List[SelectOption]] = None,
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     channel_types: Optional[List[ChannelType]] = None,
-    type: Union[MessageComponentType, SelectType] = MessageComponentType.text_select,
     disabled: Optional[bool] = False,
     custom_id: Optional[str] = None,
+    type: Union[MessageComponentType, SelectType] = MessageComponentType.text_select,
 ):
     """
     A decorator that creates a select menu and registers a callback.
@@ -394,6 +394,150 @@ def select(
             channel_types=channel_types,
             type=type,
             disabled=disabled,
+            custom_id=custom_id,
+        )
+        menu.callback = coro
+        return menu
+
+    return decorator
+
+
+def user_select(
+    placeholder: Optional[str] = None,
+    *,
+    min_values: Optional[int] = None,
+    max_values: Optional[int] = None,
+    custom_id: Optional[str] = None,
+):
+    """
+    A decorator that creates a user select menu and registers a callback.
+
+    Parameters
+    ----------
+    placeholder: Optional[:class:`str`]
+        The placeholder to be displayed on the select menu.
+    min_values: Optional[:class:`int`]
+        The minimum number of options that can be selected.
+    max_values: Optional[:class:`int`]
+        The maximum number of options that can be selected.
+    custom_id: Optional[:class:`str`]
+        The custom id of the select menu.
+
+    Returns
+    -------
+    :class:`Select`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
+    """
+
+    def decorator(coro: AsyncFunc):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
+        menu = Select(
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            type=SelectType.user,
+            custom_id=custom_id,
+        )
+        menu.callback = coro
+        return menu
+
+    return decorator
+
+
+def role_select(
+    placeholder: Optional[str] = None,
+    *,
+    min_values: Optional[int] = None,
+    max_values: Optional[int] = None,
+    custom_id: Optional[str] = None,
+):
+    """
+    A decorator that creates a role select menu and registers a callback.
+
+    Parameters
+    ----------
+    placeholder: Optional[:class:`str`]
+        The placeholder to be displayed on the select menu.
+    min_values: Optional[:class:`int`]
+        The minimum number of options that can be selected.
+    max_values: Optional[:class:`int`]
+        The maximum number of options that can be selected.
+    custom_id: Optional[:class:`str`]
+        The custom id of the select menu.
+
+    Returns
+    -------
+    :class:`Select`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
+    """
+
+    def decorator(coro: AsyncFunc):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
+        menu = Select(
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            type=SelectType.role,
+            custom_id=custom_id,
+        )
+        menu.callback = coro
+        return menu
+
+    return decorator
+
+
+def channel_select(
+    placeholder: Optional[str] = None,
+    *,
+    channel_types: Optional[List[ChannelType]] = None,
+    min_values: Optional[int] = None,
+    max_values: Optional[int] = None,
+    custom_id: Optional[str] = None,
+):
+    """
+    A decorator that creates a channel select menu and registers a callback.
+
+    Parameters
+    ----------
+    placeholder: Optional[:class:`str`]
+        The placeholder to be displayed on the select menu.
+    channel_types: Optional[List[:class:`ChannelType`]]
+        The channel types to be displayed on the select menu.
+    min_values: Optional[:class:`int`]
+        The minimum number of options that can be selected.
+    max_values: Optional[:class:`int`]
+        The maximum number of options that can be selected.
+    custom_id: Optional[:class:`str`]
+        The custom id of the select menu.
+
+    Returns
+    -------
+    :class:`Select`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
+    """
+
+    def decorator(coro: AsyncFunc):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
+        menu = Select(
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            type=SelectType.channel,
             custom_id=custom_id,
         )
         menu.callback = coro

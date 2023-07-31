@@ -185,6 +185,16 @@ class Client(FastAPI):
             Whether the command is age restricted. Defaults to False.
         category: AppCmdType
             The category of the command. Defaults to slash commands.
+
+        Returns
+        -------
+        ApplicationCommand
+            The command that was registered.
+
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
         """
 
         def decorator(callback: AsyncFunc):
@@ -203,6 +213,94 @@ class Client(FastAPI):
             self.application_commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
             return cmd
+
+        return decorator
+
+    def user_command(
+        self,
+        name: Optional[str] = None,
+        *,
+        permissions: Optional[List[Permission]] = None,
+        dm_access: bool = True,
+        nsfw: bool = False,
+    ):
+        """
+        A decorator to register a user command.
+
+        Parameters
+        ----------
+        name: str | None
+            The name of the command. Defaults to the name of the coroutine if not provided.
+        permissions: List[Permission] | None
+            The default permissions of the command.
+        dm_access: bool
+            Whether the command can be used in DMs. Defaults to True.
+        nsfw: bool
+            Whether the command is age restricted. Defaults to False.
+
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
+        """
+
+        def decorator(callback: AsyncFunc):
+            if not asyncio.iscoroutinefunction(callback):
+                raise TypeError("Callback must be a coroutine.")
+            cmd = ApplicationCommand(
+                name or callback.__name__,
+                permissions=permissions,
+                dm_access=dm_access,
+                category=ApplicationCommandType.user,
+                nsfw=nsfw,
+            )
+            cmd.callback = callback
+            self.application_commands[cmd.key] = cmd
+            self._sync_queue.append(cmd)
+
+        return decorator
+
+    def message_command(
+        self,
+        name: Optional[str] = None,
+        *,
+        permissions: Optional[List[Permission]] = None,
+        dm_access: bool = True,
+        nsfw: bool = False,
+    ):
+        """
+        A decorator to register a message command.
+
+        Parameters
+        ----------
+        name: str | None
+            The name of the command. Defaults to the name of the coroutine if not provided.
+        permissions: List[Permission] | None
+            The default permissions of the command.
+        dm_access: bool
+            Whether the command can be used in DMs. Defaults to True.
+        nsfw: bool
+            Whether the command is age restricted. Defaults to False.
+
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
+        """
+
+        def decorator(callback: AsyncFunc):
+            if not asyncio.iscoroutinefunction(callback):
+                raise TypeError("Callback must be a coroutine.")
+            cmd = ApplicationCommand(
+                name or callback.__name__,
+                permissions=permissions,
+                dm_access=dm_access,
+                category=ApplicationCommandType.message,
+                nsfw=nsfw,
+            )
+            cmd.callback = callback
+            self.application_commands[cmd.key] = cmd
+            self._sync_queue.append(cmd)
 
         return decorator
 

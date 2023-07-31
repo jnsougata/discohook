@@ -57,4 +57,15 @@ from .option import (
 from .permission import Permission
 from .role import PartialRole, Role
 from .user import User
-from .view import Button, Select, SelectOption, View, button, select, component_checker
+from .view import (
+    Button,
+    Select,
+    SelectOption,
+    View,
+    button,
+    select,
+    user_select,
+    role_select,
+    channel_select,
+    component_checker
+)
