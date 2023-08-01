@@ -45,7 +45,7 @@ class Webhook:
         The url of the webhook.
     """
 
-    def __init__(self, data: dict, client: "Client"):
+    def __init__(self, client: "Client", data: dict):
         self.data = data
         self.client = client
 
@@ -152,7 +152,7 @@ class Webhook:
             payload["channel_id"] = channel_id
         resp = await self.client.http.edit_webhook(self.id, payload)
         data = await resp.json()
-        return Webhook(data, self.client)
+        return Webhook(self.client, data)
 
     async def send_message(
         self,

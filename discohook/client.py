@@ -455,26 +455,6 @@ class Client(FastAPI):
         """
         return await self.http.sync_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
 
-    async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
-        """
-        Create a webhook in a channel.
-        Parameters
-        ----------
-        channel_id: str
-            The ID of the channel to create the webhook in.
-        name:
-            The name of the webhook.
-        image_base64:
-            The base64 encoded image of the webhook.
-        Returns
-        -------
-        Webhook
-
-        """
-        resp = await self.http.create_webhook(channel_id, {"name": name, "avatar": image_base64})
-        data = await resp.json()
-        return Webhook(data, self)
-
     async def fetch_webhook(self, webhook_id: str, *, webhook_token: Optional[str] = None):
         """
         Fetch a webhook from the client.
@@ -490,7 +470,7 @@ class Client(FastAPI):
         """
         resp = await self.http.fetch_webhook(webhook_id, webhook_token=webhook_token)
         data = await resp.json()
-        return Webhook(data, self)
+        return Webhook(self, data)
 
     async def fetch_guild(self, guild_id: str, /) -> Optional[Guild]:
         """

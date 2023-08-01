@@ -32,7 +32,6 @@ from .enums import (
     ModalFieldType,
     SelectType,
     TextInputFieldLength,
-    WebhookType,
 )
 from .errors import GlobalException
 from .file import File
