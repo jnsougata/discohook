@@ -1,6 +1,5 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Union
-
+from typing import Any, Dict, List, Optional, Union, Callable
 import aiohttp
 from fastapi import FastAPI
 from fastapi.requests import Request
@@ -16,6 +15,7 @@ from .guild import Guild
 from .handler import handler
 from .help import _help
 from .https import HTTPClient
+from .interaction import Interaction
 from .message import Message
 from .permission import Permission
 from .user import User
@@ -135,11 +135,6 @@ class Client(FastAPI):
         custom_id: str
             The unique custom id of the component.
 
-        Returns
-        -------
-        Component
-            The component that was loaded.
-
         Raises
         ------
         ValueError
@@ -186,18 +181,13 @@ class Client(FastAPI):
         category: AppCmdType
             The category of the command. Defaults to slash commands.
 
-        Returns
-        -------
-        ApplicationCommand
-            The command that was registered.
-
         Raises
         ------
         TypeError
             If the callback is not a coroutine.
         """
 
-        def decorator(callback: AsyncFunc):
+        def decorator(callback: Callable[[Interaction, ...], Any]):
             if not asyncio.iscoroutinefunction(callback):
                 raise TypeError("Callback must be a coroutine.")
             cmd = ApplicationCommand(
@@ -246,7 +236,7 @@ class Client(FastAPI):
             If the callback is not a coroutine.
         """
 
-        def decorator(callback: AsyncFunc):
+        def decorator(callback: Callable[[Interaction, User], Any]):
             if not asyncio.iscoroutinefunction(callback):
                 raise TypeError("Callback must be a coroutine.")
             cmd = ApplicationCommand(
@@ -259,6 +249,7 @@ class Client(FastAPI):
             cmd.callback = callback
             self.application_commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
+            return cmd
 
         return decorator
 
@@ -290,7 +281,7 @@ class Client(FastAPI):
             If the callback is not a coroutine.
         """
 
-        def decorator(callback: AsyncFunc):
+        def decorator(callback: Callable[[Interaction, Message], Any]):
             if not asyncio.iscoroutinefunction(callback):
                 raise TypeError("Callback must be a coroutine.")
             cmd = ApplicationCommand(
@@ -303,6 +294,7 @@ class Client(FastAPI):
             cmd.callback = callback
             self.application_commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
+            return cmd
 
         return decorator
 

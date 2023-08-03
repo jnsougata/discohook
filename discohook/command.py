@@ -1,6 +1,7 @@
 import asyncio
 from typing import Any, Dict, List, Optional, Union
 
+from .abc import Interactable
 from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
 from .permission import Permission
@@ -76,7 +77,7 @@ class SubCommandGroup:
 
 
 # noinspection PyShadowingBuiltins
-class ApplicationCommand:
+class ApplicationCommand(Interactable):
     """
     A class representing a discord application command.
 
@@ -109,6 +110,7 @@ class ApplicationCommand:
         permissions: Optional[List[Permission]] = None,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
+        super().__init__()
         self.key = f"{name}:{category.value}"
         self.name = name
         self.description = description
@@ -122,7 +124,6 @@ class ApplicationCommand:
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
         self.autocompletes: Dict[str, AsyncFunc] = {}
-        self.checks: List[AsyncFunc] = []
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -273,36 +274,6 @@ def command(
         cmd.callback = callback
         if cmd.category == ApplicationCommandType.slash:
             cmd.description = auto_description(description, callback)
-        return cmd
-
-    return decorator
-
-
-def command_checker(*checks: AsyncFunc):
-    """
-    Decorator for adding a checks to a command.
-
-    Parameters
-    ----------
-    *checks: AsyncCallable
-        The checks to add to the command.
-
-    Returns
-    -------
-    ApplicationCommand
-        The command with the checks added.
-
-    Raises
-    ------
-    TypeError
-        If any of the checks is not a coroutine.
-    """
-
-    def decorator(cmd: ApplicationCommand):
-        for check in checks:
-            if not asyncio.iscoroutinefunction(check):
-                raise TypeError(f"check `{check.__name__}` must be coroutines")
-        cmd.checks.extend(checks)
         return cmd
 
     return decorator

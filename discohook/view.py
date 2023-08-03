@@ -1,13 +1,17 @@
 import asyncio
 import secrets
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Callable, TYPE_CHECKING
 
+from .abc import Interactable
 from .emoji import PartialEmoji
 from .enums import ButtonStyle, ChannelType, MessageComponentType, SelectType
 from .utils import AsyncFunc
 
+if TYPE_CHECKING:
+    from .interaction import Interaction
 
-class Component:
+
+class Component(Interactable):
     """
     Represents a discord component.
 
@@ -18,28 +22,27 @@ class Component:
     """
 
     def __init__(self, type: Optional[MessageComponentType] = None, custom_id: Optional[str] = None):
+        super().__init__()
         self.type = type
-        self.callback: Optional[AsyncFunc] = None
+        self.callback: Optional[Callable[["Interaction", ...], Any]] = None
         self.custom_id = custom_id or secrets.token_urlsafe(16)
-        self.checks: List[AsyncFunc] = []
 
-    def on_interaction(self, coro: AsyncFunc):
+    def on_interaction(self):
         """
         Decorator that registers a callback to be called when the component is interacted with.
-
-        Parameters
-        ----------
-        coro: Callable
-            The coroutine to be called when the component is interacted with.
 
         Raises
         ------
         TypeError
             If the callback is not a coroutine.
         """
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        self.callback = coro
+
+        def decorator(coro: Callable[["Interaction", ...], Any]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Callback must be a coroutine.")
+            self.callback = coro
+
+        return decorator
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -320,17 +323,13 @@ def button(
     custom_id: Optional[:class:`str`]
         The custom id of the button.
 
-    Returns
-    -------
-    :class:`Button`
-
     Raises
     ------
     TypeError
         If the callback is not a coroutine.
     """
 
-    def decorator(coro: AsyncFunc):
+    def decorator(coro: Callable[["Interaction"], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
@@ -373,17 +372,13 @@ def select(
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
 
-    Returns
-    -------
-    :class:`Select`
-
     Raises
     ------
     TypeError
         If the callback is not a coroutine.
     """
 
-    def decorator(coro: AsyncFunc):
+    def decorator(coro: Callable[["Interaction", ...], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         menu = Select(
@@ -539,38 +534,9 @@ def channel_select(
             max_values=max_values,
             type=SelectType.channel,
             custom_id=custom_id,
+            channel_types=channel_types,
         )
         menu.callback = coro
         return menu
-
-    return decorator
-
-
-def component_checker(*checks: AsyncFunc):
-    """
-    Decorator for adding a checks to a component.
-
-    Parameters
-    ----------
-    *checks: Callable
-        The checks to be added to the component.
-
-    Returns
-    -------
-    Component
-        The component with the checks added to it.
-
-    Raises
-    ------
-    TypeError
-        If any of the checks is not a coroutine.
-    """
-
-    def decorator(comp: Component):
-        for check in checks:
-            if not asyncio.iscoroutinefunction(check):
-                raise TypeError(f"check `{check.__name__}` must be a coroutine.")
-        comp.checks.extend(checks)
-        return comp
 
     return decorator

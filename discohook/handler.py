@@ -48,28 +48,32 @@ async def handler(request: Request):
             cmd: ApplicationCommand = request.app.application_commands.get(key)
             if not cmd:
                 raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
+            try:
+                if cmd.checks:
+                    results = await asyncio.gather(*[check(interaction) for check in cmd.checks])
+                    for result in results:
+                        if not isinstance(result, bool):
+                            raise TypeError(f"check returned {type(result)}, expected bool")
+                    if not all(results):
+                        raise Exception(f"command checks failed")
 
-            if cmd.checks:
-                results = await asyncio.gather(*[check(interaction) for check in cmd.checks])
-                for result in results:
-                    if not isinstance(result, bool):
-                        raise TypeError(f"check returned {type(result)}, expected bool")
-                if not all(results):
-                    raise Exception(f"command checks failed")
+                if not (interaction.data["type"] == ApplicationCommandType.slash.value):
+                    target_object = build_context_menu_param(interaction)
+                    await cmd(interaction, target_object)
 
-            if not (interaction.data["type"] == ApplicationCommandType.slash.value):
-                target_object = build_context_menu_param(interaction)
-                await cmd(interaction, target_object)
-
-            elif interaction.data.get("options") and (
-                interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand.value
-            ):
-                subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
-                args, kwargs = build_slash_command_prams(subcommand.callback, interaction)
-                await subcommand(interaction, *args, **kwargs)
-            else:
-                args, kwargs = build_slash_command_prams(cmd.callback, interaction)
-                await cmd(interaction, *args, **kwargs)
+                elif interaction.data.get("options") and (
+                    interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand.value
+                ):
+                    subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
+                    args, kwargs = build_slash_command_prams(subcommand.callback, interaction)
+                    await subcommand(interaction, *args, **kwargs)
+                else:
+                    args, kwargs = build_slash_command_prams(cmd.callback, interaction)
+                    await cmd(interaction, *args, **kwargs)
+            except Exception as e:
+                if not cmd._error_handler:
+                    raise e
+                await cmd._error_handler(interaction, e)
 
         elif interaction.type == InteractionType.autocomplete:
             key = f"{interaction.data['name']}:{interaction.data['type']}"
@@ -93,29 +97,34 @@ async def handler(request: Request):
             component = request.app.active_components.get(custom_id)
             if not component:
                 raise Exception(f"component `{custom_id}` not found")
-            if component.checks:
-                results = await asyncio.gather(*[check(interaction) for check in component.checks])
-                for result in results:
-                    if not isinstance(result, bool):
-                        raise TypeError(f"check returned {type(result)}, expected bool")
-                if not all(results):
-                    raise Exception("component checks failed")
+            try:
+                if component.checks:
+                    results = await asyncio.gather(*[check(interaction) for check in component.checks])
+                    for result in results:
+                        if not isinstance(result, bool):
+                            raise TypeError(f"check returned {type(result)}, expected bool")
+                    if not all(results):
+                        raise Exception("component checks failed")
 
-            if interaction.type == InteractionType.component:
-                if interaction.data["component_type"] == MessageComponentType.button.value:
-                    await component(interaction)
-                if interaction.data["component_type"] in (
-                    MessageComponentType.text_select.value,
-                    MessageComponentType.user_select.value,
-                    MessageComponentType.role_select.value,
-                    MessageComponentType.channel_select.value,
-                    MessageComponentType.mentionable_select.value
-                ):
-                    await component(interaction, build_select_menu_values(interaction))
+                if interaction.type == InteractionType.component:
+                    if interaction.data["component_type"] == MessageComponentType.button.value:
+                        await component(interaction)
+                    if interaction.data["component_type"] in (
+                        MessageComponentType.text_select.value,
+                        MessageComponentType.user_select.value,
+                        MessageComponentType.role_select.value,
+                        MessageComponentType.channel_select.value,
+                        MessageComponentType.mentionable_select.value
+                    ):
+                        await component(interaction, build_select_menu_values(interaction))
 
-            elif interaction.type == InteractionType.modal_submit:
-                args, kwargs = build_modal_params(component.callback, interaction)
-                await component(interaction, *args, **kwargs)
+                elif interaction.type == InteractionType.modal_submit:
+                    args, kwargs = build_modal_params(component.callback, interaction)
+                    await component(interaction, *args, **kwargs)
+            except Exception as e:
+                if not component._error_handler:
+                    raise e
+                await component._error_handler(interaction, e)
         else:
             raise Exception(f"unhandled interaction type", interaction)
     except Exception as e:

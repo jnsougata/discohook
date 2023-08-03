@@ -2,7 +2,6 @@ import discohook
 
 
 @discohook.command(
-    name="avatar",
     category=discohook.ApplicationCommandType.user,
     permissions=[discohook.Permission.send_messages],
     dm_access=False,

@@ -18,7 +18,7 @@ __version__ = "0.0.5a"
 from .attachment import Attachment
 from .channel import Channel, PartialChannel
 from .client import Client
-from .command import ApplicationCommand, SubCommand, command, command_checker
+from .command import ApplicationCommand, SubCommand, command
 from .embed import Embed
 from .emoji import PartialEmoji
 from .enums import (
@@ -66,5 +66,4 @@ from .view import (
     user_select,
     role_select,
     channel_select,
-    component_checker
 )
