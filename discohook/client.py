@@ -19,7 +19,7 @@ from .https import HTTPClient
 from .message import Message
 from .permission import Permission
 from .user import User
-from .utils import compare_password, AsyncFunc
+from .utils import compare_password, AsyncFunc, auto_description
 from .view import Component, View
 from .webhook import Webhook
 
@@ -202,7 +202,7 @@ class Client(FastAPI):
                 raise TypeError("Callback must be a coroutine.")
             cmd = ApplicationCommand(
                 name or callback.__name__,
-                description=description or callback.__doc__,
+                description=description,
                 options=options,
                 permissions=permissions,
                 dm_access=dm_access,
@@ -210,6 +210,8 @@ class Client(FastAPI):
                 nsfw=nsfw,
             )
             cmd.callback = callback
+            if category == ApplicationCommandType.slash:
+                cmd.description = auto_description(description, callback)
             self.application_commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
             return cmd
@@ -454,6 +456,27 @@ class Client(FastAPI):
         This method is used internally by the client. You should not use this method.
         """
         return await self.http.sync_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
+
+    async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
+        """
+        Create a webhook in a channel.
+
+        Parameters
+        ----------
+        channel_id: str
+            The ID of the channel to create the webhook in.
+        name:
+            The name of the webhook.
+        image_base64:
+            The base64 encoded image of the webhook.
+        Returns
+        -------
+        Webhook
+
+        """
+        resp = await self.http.create_webhook(channel_id, {"name": name, "avatar": image_base64})
+        data = await resp.json()
+        return Webhook(self, data)
 
     async def fetch_webhook(self, webhook_id: str, *, webhook_token: Optional[str] = None):
         """

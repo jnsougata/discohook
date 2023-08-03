@@ -8,7 +8,6 @@ from .message import Message
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
 from .view import View
-from .webhook import Webhook
 
 if TYPE_CHECKING:
     from .client import Client
@@ -305,24 +304,6 @@ class PartialChannel:
             return messages
         await self.client.http.delete_channel_messages(self.id, {"messages": ids})
         return messages
-
-    async def create_webhook(self, *, name: str, image_base64: Optional[str] = None):
-        """
-        Create a webhook in a channel.
-        Parameters
-        ----------
-        name:
-            The name of the webhook.
-        image_base64:
-            The base64 encoded image of the webhook.
-        Returns
-        -------
-        Webhook
-
-        """
-        resp = await self.client.http.create_webhook(self.id, {"name": name, "avatar": image_base64})
-        data = await resp.json()
-        return Webhook(self.client, data)
 
     async def delete(self):
         await self.client.http.delete_channel(self.id)

@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
 from .permission import Permission
-from .utils import AsyncFunc
+from .utils import AsyncFunc, auto_description
 
 
 class SubCommand:
@@ -157,8 +157,8 @@ class ApplicationCommand:
 
     def subcommand(
         self,
-        name: str,
-        description: str,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
         *,
         options: Optional[List[Option]] = None,
     ):
@@ -271,8 +271,8 @@ def command(
             nsfw=nsfw
         )
         cmd.callback = callback
-        if cmd.category == ApplicationCommandType.slash and not cmd.description:
-            raise ValueError(f"command `{cmd.name}` has no description")
+        if cmd.category == ApplicationCommandType.slash:
+            cmd.description = auto_description(description, callback)
         return cmd
 
     return decorator
@@ -295,7 +295,7 @@ def command_checker(*checks: AsyncFunc):
     Raises
     ------
     TypeError
-        If the any of the checks is not a coroutine.
+        If any of the checks is not a coroutine.
     """
 
     def decorator(cmd: ApplicationCommand):
