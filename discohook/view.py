@@ -266,14 +266,15 @@ class View:
         *buttons: :class:`Button`
             The buttons to be added to the view.
         """
-        self.components.append(
-            {
-                "type": MessageComponentType.action_row.value,
-                "components": [btn.to_dict() for btn in buttons[:5]],
-            }
-        )
-        # TODO: Add support auto parse more than 5 buttons and add them to the next row.
-        self.children.extend(buttons[:5])
+        batches = [buttons[i: i + 5] for i in range(0, len(buttons), 5)]
+        for batch in batches:
+            self.components.append(
+                {
+                    "type": MessageComponentType.action_row.value,
+                    "components": [btn.to_dict() for btn in batch],
+                }
+            )
+            self.children.extend(batch)
 
     # noinspection PyShadowingNames
     def add_select(self, select: Union[Select, Any]):

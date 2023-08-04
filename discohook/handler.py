@@ -93,7 +93,7 @@ async def handler(request: Request):
         elif interaction.type in (InteractionType.component, InteractionType.modal_submit):
             custom_id = interaction.data["custom_id"]
             if request.app._custom_id_parser:
-                custom_id = await request.app._custom_id_parser(custom_id)
+                custom_id = await request.app._custom_id_parser(interaction, custom_id)
             component = request.app.active_components.get(custom_id)
             if not component:
                 raise Exception(f"component `{custom_id}` not found")

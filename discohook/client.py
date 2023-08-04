@@ -10,6 +10,7 @@ from .command import ApplicationCommand, Option
 from .dash import dashboard
 from .embed import Embed
 from .enums import ApplicationCommandType
+from .errors import GlobalException
 from .file import File
 from .guild import Guild
 from .handler import handler
@@ -19,7 +20,7 @@ from .interaction import Interaction
 from .message import Message
 from .permission import Permission
 from .user import User
-from .utils import compare_password, AsyncFunc, auto_description
+from .utils import compare_password, auto_description
 from .view import Component, View
 from .webhook import Webhook
 
@@ -108,7 +109,7 @@ class Client(FastAPI):
         self.add_api_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
         self.add_api_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
         self.add_api_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
-        self._custom_id_parser: Optional[AsyncFunc] = None
+        self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
             self.add_commands(_help)
 
@@ -343,7 +344,7 @@ class Client(FastAPI):
 
         """
 
-        def decorator(coro: AsyncFunc):
+        def decorator(coro: Callable[[Request, GlobalException], Any]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Exception handler must be a coroutine.")
             self.add_exception_handler(Exception, coro)
@@ -351,14 +352,17 @@ class Client(FastAPI):
 
         return decorator
 
-    def custom_id_parser(self, coro: AsyncFunc):
+    def custom_id_parser(self):
         """
         A decorator to register a dev defined custom id parser.
-        Parameters
-        ----------
-        coro: Callable
         """
-        self._custom_id_parser = coro
+
+        def decorator(coro: Callable[[Interaction, str], str]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Custom id parser must be a coroutine.")
+            self._custom_id_parser = coro
+
+        return decorator
 
     async def send_message(
         self,
