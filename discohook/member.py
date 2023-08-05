@@ -15,11 +15,10 @@ class Member(User):
     """
 
     def __init__(self, client: "Client", data: Dict[str, Any]):
-        self.data = data
-        super().__init__(client, data["user"])
+        super().__init__(client, data)
 
     @property
-    def guild_id(self):
+    def guild_id(self) -> str:
         return self.data["guild_id"]
 
     @property
