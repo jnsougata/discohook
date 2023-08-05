@@ -1,9 +1,8 @@
 import asyncio
 
-from fastapi import Request
-from fastapi.responses import JSONResponse, Response
-from nacl.exceptions import BadSignatureError
-from nacl.signing import VerifyKey
+import ed25519
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response
 
 from .command import ApplicationCommand, ApplicationCommandOptionType
 from .enums import (
@@ -23,20 +22,20 @@ from .resolver import (
 
 
 # noinspection PyProtectedMember
-async def handler(request: Request):
+async def _handler(request: Request):
     """
     Handles all interactions from discord
 
     Note: This is not a public API and should not be used outside the library
     """
-    signature = request.headers.get("X-Signature-Ed25519")
-    timestamp = request.headers.get("X-Signature-Timestamp")
+    signature = bytes.fromhex(request.headers.get("X-Signature-Ed25519", ""))
+    timestamp = request.headers.get("X-Signature-Timestamp", "")
+    message = timestamp.encode() + await request.body()
+    public_key = bytes.fromhex(request.app.public_key)
     try:
-        key = VerifyKey(bytes.fromhex(request.app.public_key))
-        key.verify(str(timestamp).encode() + await request.body(), bytes.fromhex(str(signature)))
-    except BadSignatureError:
+        ed25519.VerifyingKey(public_key).verify(signature, message)
+    except ed25519.BadSignatureError:
         return Response(content="BadSignature", status_code=401)
-
     data = await request.json()
     interaction = Interaction(request.app, data)
     try:

@@ -1,7 +1,7 @@
-from fastapi.responses import HTMLResponse
+from starlette.responses import HTMLResponse
 
 
-async def dashboard():
+async def dashboard(_):
     return HTMLResponse(
         """
 <!DOCTYPE html>

@@ -1,9 +1,9 @@
 import asyncio
 from typing import Any, Dict, List, Optional, Union, Callable
 import aiohttp
-from fastapi import FastAPI
-from fastapi.requests import Request
-from fastapi.responses import JSONResponse
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from .channel import PartialChannel, Channel
 from .command import ApplicationCommand, Option
@@ -13,7 +13,7 @@ from .enums import ApplicationCommandType
 from .errors import GlobalException
 from .file import File
 from .guild import Guild
-from .handler import handler
+from .handler import _handler
 from .help import _help
 from .https import HTTPClient
 from .interaction import Interaction
@@ -60,7 +60,7 @@ async def authenticate(request: Request):
     return JSONResponse({"success": True}, status_code=200)
 
 
-class Client(FastAPI):
+class Client(Starlette):
     """
     The base client class for discohook.
 
@@ -104,11 +104,11 @@ class Client(FastAPI):
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
-        self.add_route(route, handler, methods=["POST"], include_in_schema=False)
-        self.add_api_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
-        self.add_api_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
-        self.add_api_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
-        self.add_api_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
+        self.add_route(route, _handler, methods=["POST"], include_in_schema=False)
+        self.add_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
+        self.add_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
+        self.add_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
+        self.add_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
         self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
             self.add_commands(_help)
