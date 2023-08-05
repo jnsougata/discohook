@@ -154,6 +154,9 @@ class HTTPClient:
     async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
         return await self.request("POST", f"/channels/{channel_id}/webhooks", json=payload, use_auth=True)
 
+    async def execute_webhook(self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter):
+        return await self.multipart("POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form)
+
     async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/webhooks/{webhook_id}", json=payload, use_auth=True)
 

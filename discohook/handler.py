@@ -127,6 +127,6 @@ async def _handler(request: Request):
         else:
             raise Exception(f"unhandled interaction type", interaction)
     except Exception as e:
-        raise GlobalException(str(e), interaction)
+        raise GlobalException(str(e), interaction) from e
     else:
         return Response(status_code=200)

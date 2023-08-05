@@ -67,3 +67,4 @@ from .view import (
     role_select,
     channel_select,
 )
+from .webhook import Webhook, PartialWebhook

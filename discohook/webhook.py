@@ -15,6 +15,70 @@ if TYPE_CHECKING:
     from .client import Client
 
 
+# noinspection PyShadowingBuiltins
+class PartialWebhook:
+
+    def __init__(self,  client: "Client", id: str, token: str):
+        self.id = id
+        self.token = token
+        self.client = client
+
+    async def send(
+            self,
+            content: Optional[str] = None,
+            *,
+            username: Optional[str] = None,
+            avatar_url: Optional[str] = None,
+            embed: Optional[Embed] = None,
+            embeds: Optional[List[Embed]] = None,
+            file: Optional[File] = None,
+            files: Optional[List[File]] = None,
+            tts: bool = False,
+            view: Optional[View] = None,
+            thread_name: Optional[str] = None,
+    ) -> None:
+        """
+        Sends a message to the webhook.
+        Parameters
+        ----------
+        content: Optional[:class:`str`]
+            The content of the message.
+        username:
+            The username of the webhook.
+        avatar_url:
+            The avatar url of the webhook. (Overrides the webhook's avatar)
+        embed: Optional[:class:`Embed`]
+            The embed of the message.
+        embeds: Optional[List[:class:`Embed`]]
+            The embeds of the message.
+        file: Optional[:class:`File`]
+            The file of the message.
+        files:
+            The files of the message.
+        tts: :class:`bool`
+            Whether the message should be sent with text-to-speech.
+        view: Optional[:class:`View`]
+            The view to be sent with the message.
+        thread_name: Optional[:class:`str`]
+            The name of the thread to create.
+
+        Returns
+        -------
+        None
+        """
+        payload = handle_send_params(content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        if username:
+            payload["username"] = username
+        if avatar_url:
+            payload["avatar_url"] = avatar_url
+        if thread_name:
+            payload["thread_name"] = thread_name
+        if view:
+            self.client.load_components(view)
+        form = create_form(payload, merge_fields(file, files))
+        await self.client.http.execute_webhook(self.id, self.token, form=form)
+
+
 class Webhook:
     """
     Represents a Discord Application Owned Webhook.
@@ -154,7 +218,7 @@ class Webhook:
         data = await resp.json()
         return Webhook(self.client, data)
 
-    async def send_message(
+    async def send(
         self,
         content: Optional[str] = None,
         *,

@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Union, Callable
+from typing import Any, Dict, List, Optional, Union, Callable, Tuple
 import aiohttp
 from starlette.applications import Starlette
 from starlette.requests import Request
@@ -22,7 +22,7 @@ from .permission import Permission
 from .user import User
 from .utils import compare_password, auto_description
 from .view import Component, View
-from .webhook import Webhook
+from .webhook import Webhook, PartialWebhook
 
 
 async def delete_cmd(request: Request):
@@ -112,6 +112,33 @@ class Client(Starlette):
         self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
             self.add_commands(_help)
+        self._debug_hook: Optional[Tuple[str, str, Callable[[PartialWebhook, Request, Exception], Any]]] = None
+
+    def debugger(self, webhook_id: str, webhook_token: str):
+        """
+        A decorator to add a debugging webhook to the client.
+
+        Parameters
+        ----------
+        webhook_id: str
+            The webhook id to add.
+        webhook_token: str
+            The webhook token to add.
+        """
+
+        def decorator(coro: Callable[[PartialWebhook, Request, Exception], Any]):
+            self._debug_hook = (webhook_id, webhook_token, coro)
+            self.add_exception_handler(Exception, self._execute_debug_hook)
+            return coro
+
+        return decorator
+
+    async def _execute_debug_hook(self, request: Request, exception: Exception):
+        if not self._debug_hook:
+            return
+        webhook_id, webhook_token, coro = self._debug_hook
+        webhook = PartialWebhook(self, id=webhook_id, token=webhook_token)
+        await coro(webhook, request, exception)
 
     def load_components(self, view: View):
         """
@@ -341,7 +368,6 @@ class Client(Starlette):
     def on_error(self):
         """
         A decorator to register a global error handler.
-
         """
 
         def decorator(coro: Callable[[Request, GlobalException], Any]):
