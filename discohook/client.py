@@ -323,7 +323,7 @@ class Client(FastAPI):
 
     def load_modules(self, directory: str):
         """
-        Loads multiple command form modules in a directory.
+        Loads multiple command form modules from a directory by walking through it.
 
         Parameters
         ----------
@@ -333,10 +333,10 @@ class Client(FastAPI):
         import importlib
         import os
 
-        scripts = os.listdir(directory)
-        scripts = [f"{directory}.{script[:-3]}" for script in scripts if script.endswith(".py")]
-        for script in scripts:
-            importlib.import_module(script).setup(self)
+        for path, dirs, files in os.walk(directory):
+            modules = [os.path.join(path, f)[:-3].replace(os.sep, ".") for f in files if f.endswith(".py")]
+            for module in modules:
+                importlib.import_module(module).setup(self)
 
     def on_error(self):
         """
