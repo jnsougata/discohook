@@ -491,7 +491,7 @@ class Client(FastAPI):
         data = await resp.json()
         return Webhook(self, data)
 
-    async def fetch_guild(self, guild_id: str, /) -> Optional[Guild]:
+    async def fetch_guild(self, guild_id: str) -> Optional[Guild]:
         """
         Fetches the guild of given id.
 
@@ -505,7 +505,7 @@ class Client(FastAPI):
             return
         return Guild(self, data)
 
-    async def fetch_user(self, user_id: str, /) -> Optional[User]:
+    async def fetch_user(self, user_id: str) -> Optional[User]:
         """
         Fetches the user of given id.
 
@@ -519,7 +519,7 @@ class Client(FastAPI):
             return
         return User(self, data)
 
-    async def fetch_channel(self, channel_id: str, /) -> Optional[Channel]:
+    async def fetch_channel(self, channel_id: str) -> Optional[Channel]:
         """
         Fetches the channel of given id.
 

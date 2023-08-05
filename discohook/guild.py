@@ -20,7 +20,7 @@ class PartialGuild:
         self.id = guild_id
         self.client = client
 
-    async def fetch_member(self, user_id: str, /) -> Optional[Member]:
+    async def fetch_member(self, user_id: str) -> Optional[Member]:
         """
         Fetches a member from the guild.
 
