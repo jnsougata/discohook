@@ -348,7 +348,7 @@ class Client(Starlette):
 
     def load_modules(self, directory: str):
         """
-        Loads multiple command form modules from a directory by walking through it.
+        Loads multiple command from modules within directory by walking through it.
 
         Parameters
         ----------
@@ -356,12 +356,13 @@ class Client(Starlette):
             The directory to load the modules from.
         """
         import importlib
-        import os
+        import pathlib
+        from os import sep
 
-        for path, dirs, files in os.walk(directory):
-            modules = [os.path.join(path, f)[:-3].replace(os.sep, ".") for f in files if f.endswith(".py")]
-            for module in modules:
-                importlib.import_module(module).setup(self)
+        globs = pathlib.Path(directory).glob(f"**{sep}*.py")
+        modules = [str(path).replace(sep, ".")[:-3] for path in globs]
+        for module in modules:
+            importlib.import_module(module).setup(self)
 
     def on_interaction_error(self):
         """
