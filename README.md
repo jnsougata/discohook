@@ -35,13 +35,13 @@ app = discohook.Client(
 
 
 # adding a error handler
-@app.on_error()
-async def on_error(_, err: discohook.GlobalException):
+@app.on_interaction_error()
+async def on_error(i: discohook.Interaction, err: Exception):
     user_response = "Some error occurred! Please contact the developer."
-    if err.interaction.responded:
-        await err.interaction.response.followup(user_response, ephemeral=True)
+    if i.responded:
+        await i.response.followup(user_response, ephemeral=True)
     else:
-        await err.interaction.response.send(user_response, ephemeral=True)
+        await i.response.send(user_response, ephemeral=True)
 
     await app.send_message("12345678910", f"Error: {err}")  # send error to a channel in development server
 

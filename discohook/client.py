@@ -10,7 +10,6 @@ from .command import ApplicationCommand, Option
 from .dash import dashboard
 from .embed import Embed
 from .enums import ApplicationCommandType
-from .errors import GlobalException
 from .file import File
 from .guild import Guild
 from .handler import _handler
@@ -22,7 +21,7 @@ from .permission import Permission
 from .user import User
 from .utils import compare_password, auto_description
 from .view import Component, View
-from .webhook import Webhook, PartialWebhook
+from .webhook import Webhook
 
 
 async def delete_cmd(request: Request):
@@ -112,33 +111,32 @@ class Client(Starlette):
         self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
             self.add_commands(_help)
-        self._debug_hook: Optional[Tuple[str, str, Callable[[PartialWebhook, Request, Exception], Any]]] = None
+        self._debug_channel: Optional[Tuple[str, Callable[[PartialChannel, Request, Exception], Any]]] = None
+        self._interaction_error_handler: Optional[Callable[[Interaction, Exception], Any]] = None
 
-    def debugger(self, webhook_id: str, webhook_token: str):
+    def debugger(self, channel_id: str):
         """
-        A decorator to add a debugging webhook to the client.
+        A decorator to add a debug channel to the client.
 
         Parameters
         ----------
-        webhook_id: str
-            The webhook id to add.
-        webhook_token: str
-            The webhook token to add.
+        channel_id: str
+            The channel ID to send the debug messages to.
         """
 
-        def decorator(coro: Callable[[PartialWebhook, Request, Exception], Any]):
-            self._debug_hook = (webhook_id, webhook_token, coro)
-            self.add_exception_handler(Exception, self._execute_debug_hook)
+        def decorator(coro: Callable[[PartialChannel, Request, Exception], Any]):
+            self._debug_channel = (channel_id, coro)
+            self.add_exception_handler(Exception, self._execute_debugger)
             return coro
 
         return decorator
 
-    async def _execute_debug_hook(self, request: Request, exception: Exception):
-        if not self._debug_hook:
+    async def _execute_debugger(self, request: Request, exception: Exception):
+        if not self._debug_channel:
             return
-        webhook_id, webhook_token, coro = self._debug_hook
-        webhook = PartialWebhook(self, id=webhook_id, token=webhook_token)
-        await coro(webhook, request, exception)
+        channel_id, coro = self._debug_channel
+        channel = PartialChannel(self, channel_id)
+        await coro(channel, request, exception)
 
     def load_components(self, view: View):
         """
@@ -365,15 +363,15 @@ class Client(Starlette):
             for module in modules:
                 importlib.import_module(module).setup(self)
 
-    def on_error(self):
+    def on_interaction_error(self):
         """
-        A decorator to register a global error handler.
+        A decorator to register a global interaction error handler.
         """
 
-        def decorator(coro: Callable[[Request, GlobalException], Any]):
+        def decorator(coro: Callable[[Interaction, Exception], Any]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Exception handler must be a coroutine.")
-            self.add_exception_handler(Exception, coro)
+            self._interaction_error_handler = coro
             return coro
 
         return decorator

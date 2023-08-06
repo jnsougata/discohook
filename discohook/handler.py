@@ -11,7 +11,6 @@ from .enums import (
     InteractionType,
     MessageComponentType,
 )
-from .errors import GlobalException
 from .interaction import Interaction
 from .resolver import (
     build_context_menu_param,
@@ -127,6 +126,10 @@ async def _handler(request: Request):
         else:
             raise Exception(f"unhandled interaction type", interaction)
     except Exception as e:
-        raise GlobalException(str(e), interaction) from e
+        if request.app._interaction_error_handler:
+            await request.app._interaction_error_handler(interaction, e)
+        else:
+            raise e from None
+        return Response(status_code=500)
     else:
         return Response(status_code=200)

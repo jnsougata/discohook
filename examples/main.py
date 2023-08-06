@@ -22,7 +22,7 @@ app.add_commands(random_num)  # import a command from another file
 
 
 # adding a error handler
-@app.on_error()
+@app.on_interaction_error()
 async def on_error(_, err: discohook.GlobalException):
     user_response = "Some error occurred! Please contact the developer."
     if err.interaction.responded:
