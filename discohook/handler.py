@@ -128,8 +128,8 @@ async def _handler(request: Request):
     except Exception as e:
         if request.app._interaction_error_handler:
             await request.app._interaction_error_handler(interaction, e)
+            return Response(status_code=500)
         else:
             raise e from None
-        return Response(status_code=500)
     else:
         return Response(status_code=200)
