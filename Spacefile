@@ -1,0 +1,13 @@
+v: 0
+micros:
+  - name: backend
+    src: .
+    engine: python3.9
+    primary: true
+    public: true
+    presets:
+      env:
+        - name: PASSWORD
+        - name: PUBLIC_KEY
+        - name: DISCORD_TOKEN
+        - name: APPLICATION_ID
