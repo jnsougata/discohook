@@ -13,7 +13,7 @@ from .member import Member
 from .message import Message
 from .role import Role
 from .user import User
-from .utils import raw_member_from_user
+from .utils import unwrap_user
 
 
 def handle_params_by_signature(
@@ -66,7 +66,7 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
             if interaction.guild_id:
                 member_data = interaction.data["resolved"]["members"][value]
                 member_data["user"] = user_data
-                member_data = raw_member_from_user(member_data, interaction.guild_id)
+                member_data = unwrap_user(member_data, interaction.guild_id)
                 options[name] = Member(interaction.client, member_data)
             else:
                 options[name] = User(interaction.client, user_data)

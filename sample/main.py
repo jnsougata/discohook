@@ -43,7 +43,7 @@ async def interaction_error(i: discohook.Interaction, err: Exception):
     else:
         await i.response.send("An error occurred while processing your interaction.", ephemeral=True)
     stack = "\n".join(traceback.format_exception(type(err), err, err.__traceback__))
-    embed = discohook.Embed(title="Exception", description=f"```py\n{stack}```")
+    embed = discohook.Embed(title="Exception", description=f"```py\n{stack}\n```")
     view = discohook.View()
     view.add_buttons(delete_button)
     await app.send(LOG_CHANNEL_ID, embed=embed, view=view)

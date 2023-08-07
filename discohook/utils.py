@@ -1,4 +1,5 @@
 import hashlib
+import json
 import secrets
 from typing import Any, Callable, Coroutine, Union
 
@@ -28,8 +29,9 @@ def auto_description(description: Any, callback: AsyncFunc) -> str:
     raise TypeError("description is required")
 
 
-def raw_member_from_user(data: dict, guild_id: str) -> dict:
-    user: dict = data.pop("user")
-    user.update(data)
-    user["guild_id"] = guild_id
-    return user
+def unwrap_user(data: dict, guild_id: str) -> dict:
+    member = json.loads(json.dumps(data))
+    user: dict = member.pop("user")
+    member.update(user)
+    member["guild_id"] = guild_id
+    return member
