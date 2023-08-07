@@ -111,32 +111,18 @@ class Client(Starlette):
         self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
             self.add_commands(_help)
-        self._debug_channel: Optional[Tuple[str, Callable[[PartialChannel, Request, Exception], Any]]] = None
         self._interaction_error_handler: Optional[Callable[[Interaction, Exception], Any]] = None
 
-    def debugger(self, channel_id: str):
+    def on_error(self):
         """
-        A decorator to add a debug channel to the client.
-
-        Parameters
-        ----------
-        channel_id: str
-            The channel ID to send the debug messages to.
+        A decorator to add an error handler for any server errors.
         """
 
-        def decorator(coro: Callable[[PartialChannel, Request, Exception], Any]):
-            self._debug_channel = (channel_id, coro)
-            self.add_exception_handler(Exception, self._execute_debugger)
+        def decorator(coro: Callable[[Request, Exception], Any]):
+            self.add_exception_handler(Exception, coro)
             return coro
 
         return decorator
-
-    async def _execute_debugger(self, request: Request, exception: Exception):
-        if not self._debug_channel:
-            return
-        channel_id, coro = self._debug_channel
-        channel = PartialChannel(self, channel_id)
-        await coro(channel, request, exception)
 
     def load_components(self, view: View):
         """
