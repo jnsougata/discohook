@@ -7,8 +7,14 @@ from .file import File
 from .multipart import create_form
 from .message import Message
 from .modal import Modal
+from .models import AllowedMentions
 from .option import Choice
-from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
+from .params import (
+    MISSING,
+    handle_edit_params,
+    handle_send_params,
+    merge_fields
+)
 from .view import View
 
 if TYPE_CHECKING:
@@ -150,6 +156,7 @@ class ResponseAdapter:
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
+        allowed_mentions: Optional[AllowedMentions] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
     ) -> InteractionResponse:
@@ -172,6 +179,8 @@ class ResponseAdapter:
             The file to send with the message
         files: Optional[List[File]]
             The list of files to send with the message
+        allowed_mentions: Optional[AllowedMentions]
+            The allowed_mentions object to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
         suppress_embeds: Optional[bool]
@@ -191,6 +200,7 @@ class ResponseAdapter:
             files=files,
             ephemeral=ephemeral,
             suppress_embeds=suppress_embeds,
+            allowed_mentions=allowed_mentions,
         )
         if view:
             self.inter.client.load_components(view)
@@ -235,10 +245,7 @@ class ResponseAdapter:
         if self.inter.type != InteractionType.autocomplete:
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         choices = choices[:25]
-        payload = {
-            "type": InteractionCallbackType.autocomplete,
-            "data": {"choices": [choice.to_dict() for choice in choices]},
-        }
+        payload = {"type": InteractionCallbackType.autocomplete, "data": {"choices": choices}}
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
 
     async def defer(self, ephemeral: bool = False) -> InteractionResponse:
@@ -328,6 +335,7 @@ class ResponseAdapter:
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
+        allowed_mentions: Optional[AllowedMentions] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
     ) -> FollowupResponse:
@@ -350,6 +358,8 @@ class ResponseAdapter:
             The file to send with the message
         files: Optional[List[File]]
             The list of files to send with the message
+        allowed_mentions: Optional[AllowedMentions]
+            The allowed_mentions object to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
         suppress_embeds: Optional[bool]
@@ -365,6 +375,7 @@ class ResponseAdapter:
             files=files,
             ephemeral=ephemeral,
             suppress_embeds=suppress_embeds,
+            allowed_mentions=allowed_mentions,
         )
         if view:
             self.inter.client.load_components(view)

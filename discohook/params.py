@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 
 from .embed import Embed
 from .file import File
-from .more import AllowedMentions, MessageReference
+from .models import AllowedMentions, MessageReference
 from .view import View
 
 MISSING = Any
