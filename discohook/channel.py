@@ -5,6 +5,7 @@ from .emoji import PartialEmoji
 from .enums import ChannelType
 from .file import File
 from .message import Message
+from .models import AllowedMentions, MessageReference
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
 from .view import View
@@ -56,6 +57,8 @@ class PartialChannel:
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
+        allowed_mentions: Optional[AllowedMentions] = None,
+        message_reference: Optional[MessageReference] = None,
     ):
         """
         Sends a message to the channel.
@@ -76,6 +79,10 @@ class PartialChannel:
             A file to send with the message.
         files: Optional[List[File]]
             A list of files to send with the message.
+        allowed_mentions: Optional[:class:`AllowedMentions`]
+            The allowed mentions for the message.
+        message_reference: Optional[:class:`MessageReference`]
+            The message reference for the message.
         """
         if view:
             self.client.load_components(view)
@@ -88,6 +95,8 @@ class PartialChannel:
             tts=tts,
             file=file,
             files=files,
+            allowed_mentions=allowed_mentions,
+            message_reference=message_reference,
         )
 
         resp = await self.client.http.send_message(self.id, create_form(payload, merge_fields(file, files)))

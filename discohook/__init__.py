@@ -32,6 +32,7 @@ from .enums import (
     ModalFieldType,
     SelectType,
     TextInputFieldLength,
+    AllowedMentionsTypes
 )
 from .errors import GlobalException
 from .file import File
@@ -41,6 +42,7 @@ from .member import Member
 from .message import Message
 from .response import FollowupResponse, InteractionResponse
 from .modal import Modal, TextInput, modal
+from .models import AllowedMentions, MessageReference
 from .option import (
     AttachmentOption,
     BooleanOption,
