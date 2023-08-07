@@ -97,14 +97,14 @@ class Button(Component):
             The dictionary representation of the button.
         """
         payload = {
-            "type": self.type.value,
-            "style": self.style.value,
+            "type": self.type,
+            "style": self.style,
             "disabled": self.disabled,
         }
         if self.label:
             payload["label"] = self.label
         if self.emoji:
-            payload["emoji"] = self.emoji.to_dict()
+            payload["emoji"] = self.emoji
         if self.style != ButtonStyle.link:
             payload["custom_id"] = self.custom_id
         if self.url and self.style == ButtonStyle.link:
@@ -163,7 +163,7 @@ class SelectOption:
             "default": self.default,
         }
         if self.emoji:
-            payload["emoji"] = self.emoji.to_dict()
+            payload["emoji"] = self.emoji
         return payload
 
 

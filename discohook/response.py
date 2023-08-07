@@ -197,7 +197,7 @@ class ResponseAdapter:
 
         payload = {
             "data": data,
-            "type": InteractionCallbackType.channel_message_with_source.value,
+            "type": InteractionCallbackType.channel_message_with_source,
         }
         await self.inter.client.http.send_interaction_mp_callback(
             self.inter.id, self.inter.token, create_form(payload, merge_fields(file, files))
@@ -219,7 +219,7 @@ class ResponseAdapter:
         self.inter.client.active_components[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
-            "type": InteractionCallbackType.modal.value,
+            "type": InteractionCallbackType.modal,
         }
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
 
@@ -236,7 +236,7 @@ class ResponseAdapter:
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         choices = choices[:25]
         payload = {
-            "type": InteractionCallbackType.autocomplete.value,
+            "type": InteractionCallbackType.autocomplete,
             "data": {"choices": [choice.to_dict() for choice in choices]},
         }
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
@@ -252,9 +252,9 @@ class ResponseAdapter:
         """
         payload = {}
         if self.inter.type == InteractionType.component:
-            payload["type"] = InteractionCallbackType.deferred_update_component_message.value
+            payload["type"] = InteractionCallbackType.deferred_update_component_message
         elif self.inter.type == InteractionType.app_command or self.inter.type == InteractionType.modal_submit:
-            payload["type"] = InteractionCallbackType.deferred_channel_message_with_source.value
+            payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
             if ephemeral:
                 payload["data"] = {"flags": 64}
         else:
@@ -313,7 +313,7 @@ class ResponseAdapter:
         )
         if view and view is not MISSING:
             self.inter.client.load_components(view)
-        payload = {"type": InteractionCallbackType.update_component_message.value, "data": data}
+        payload = {"type": InteractionCallbackType.update_component_message, "data": data}
         await self.inter.client.http.send_interaction_mp_callback(
             self.inter.id, self.inter.token, create_form(payload, merge_fields(file, files))
         )

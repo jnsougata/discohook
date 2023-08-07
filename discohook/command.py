@@ -63,7 +63,7 @@ class SubCommand:
 
     def to_dict(self) -> Dict[str, Any]:
         payload = {
-            "type": ApplicationCommandOptionType.subcommand.value,
+            "type": ApplicationCommandOptionType.subcommand,
             "name": self.name,
             "description": self.description,
         }
@@ -209,7 +209,7 @@ class ApplicationCommand(Interactable):
         -------
         Dict[str, Any]
         """
-        self.data["type"] = self.category.value
+        self.data["type"] = self.category
         if self.category is ApplicationCommandType.slash:
             if self.description:
                 self.data["description"] = self.description

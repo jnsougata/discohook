@@ -39,7 +39,7 @@ async def _handler(request: Request):
     interaction = Interaction(request.app, data)
     try:
         if interaction.type == InteractionType.ping:
-            return JSONResponse({"type": InteractionCallbackType.pong.value}, status_code=200)
+            return JSONResponse({"type": InteractionCallbackType.pong}, status_code=200)
 
         elif interaction.type == InteractionType.app_command:
             key = f"{interaction.data['name']}:{interaction.data['type']}"
@@ -55,12 +55,12 @@ async def _handler(request: Request):
                     if not all(results):
                         raise Exception(f"command checks failed")
 
-                if not (interaction.data["type"] == ApplicationCommandType.slash.value):
+                if not (interaction.data["type"] == ApplicationCommandType.slash):
                     target_object = build_context_menu_param(interaction)
                     await cmd(interaction, target_object)
 
                 elif interaction.data.get("options") and (
-                    interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand.value
+                    interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand
                 ):
                     subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
                     args, kwargs = build_slash_command_prams(subcommand.callback, interaction)
@@ -78,7 +78,7 @@ async def _handler(request: Request):
             cmd: ApplicationCommand = request.app.application_commands.get(key)
             if not cmd:
                 raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
-            if interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand.value:
+            if interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand:
                 subcommand_name = interaction.data["options"][0]["name"]
                 option = interaction.data["options"][0]["options"][0]
                 callback = cmd.subcommands[subcommand_name].autocompletes.get(option["name"])
@@ -105,14 +105,14 @@ async def _handler(request: Request):
                         raise Exception("component checks failed")
 
                 if interaction.type == InteractionType.component:
-                    if interaction.data["component_type"] == MessageComponentType.button.value:
+                    if interaction.data["component_type"] == MessageComponentType.button:
                         await component(interaction)
                     if interaction.data["component_type"] in (
-                        MessageComponentType.text_select.value,
-                        MessageComponentType.user_select.value,
-                        MessageComponentType.role_select.value,
-                        MessageComponentType.channel_select.value,
-                        MessageComponentType.mentionable_select.value
+                        MessageComponentType.text_select,
+                        MessageComponentType.user_select,
+                        MessageComponentType.role_select,
+                        MessageComponentType.channel_select,
+                        MessageComponentType.mentionable_select
                     ):
                         await component(interaction, build_select_menu_values(interaction))
 

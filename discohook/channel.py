@@ -203,7 +203,7 @@ class PartialChannel:
         if icon:
             payload["icon"] = icon
         if default_reaction_emoji:
-            payload["default_reaction_emoji"] = default_reaction_emoji.to_dict()
+            payload["default_reaction_emoji"] = default_reaction_emoji
         if default_thread_rate_limit_per_user:
             payload["default_thread_rate_limit_per_user"] = default_thread_rate_limit_per_user
         if default_sort_order:
