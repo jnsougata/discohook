@@ -1,16 +1,7 @@
 from typing import Any, Dict, List, Optional, Union
 
 from .file import File
-
-
-def parse_color(color: Union[int, str]) -> int:
-    if isinstance(color, int):
-        if not (color < 0 or color > 0xFFFFFF):
-            return color
-        raise ValueError("Color must be in the range [0, 16777215]")
-    if color.startswith("#"):
-        color = color[1:]
-    return int(color, 16)
+from .utils import color_parser
 
 
 class Embed:
@@ -159,7 +150,7 @@ class Embed:
         if self.url:
             self.data["url"] = self.url
         if self.color is not None:
-            self.data["color"] = parse_color(self.color)
+            self.data["color"] = color_parser(self.color)
         if self.timestamp:
             self.data["timestamp"] = self.timestamp
         if self.fields:

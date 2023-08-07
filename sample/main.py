@@ -8,6 +8,7 @@ PASSWORD = os.environ["PASSWORD"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 APPLICATION_ID = os.environ["APPLICATION_ID"]
+LOG_CHANNEL_ID = os.environ["LOG_CHANNEL_ID"]
 
 
 app = discohook.Client(
@@ -32,16 +33,20 @@ async def debugger(_, err: Exception):
     embed = discohook.Embed(title="Exception", description=f"```py\n{stack}```")
     view = discohook.View()
     view.add_buttons(delete_button)
-    channel = discohook.PartialChannel(app, "1137928648490487809")
-    await channel.send(embed=embed, view=view)
+    await app.send(LOG_CHANNEL_ID, embed=embed, view=view)
 
 
 @app.on_interaction_error()
-async def interaction_error(i: discohook.Interaction, _: Exception):
+async def interaction_error(i: discohook.Interaction, err: Exception):
     if i.responded:
         await i.response.followup("An error occurred while processing your interaction.", ephemeral=True)
     else:
         await i.response.send("An error occurred while processing your interaction.", ephemeral=True)
+    stack = "\n".join(traceback.format_exception(type(err), err, err.__traceback__))
+    embed = discohook.Embed(title="Exception", description=f"```py\n{stack}```")
+    view = discohook.View()
+    view.add_buttons(delete_button)
+    await app.send(LOG_CHANNEL_ID, embed=embed, view=view)
 
 
 def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:

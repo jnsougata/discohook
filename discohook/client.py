@@ -375,7 +375,7 @@ class Client(Starlette):
 
         return decorator
 
-    async def send_message(
+    async def send(
         self,
         channel_id: str,
         content: Optional[str] = None,

@@ -7,6 +7,7 @@ from .member import Member
 from .message import Message
 from .response import ResponseAdapter
 from .user import User
+from .utils import raw_member_from_user
 
 if TYPE_CHECKING:
     from .client import Client
@@ -200,9 +201,7 @@ class Interaction:
         """
         if not self.guild_id:
             return User(self.client, self.payload["user"])
-        member = self.payload["member"]
-        member["guild_id"] = self.guild_id
-        return Member(self.client, member)
+        return Member(self.client, raw_member_from_user(self.payload["member"], self.guild_id))
 
     @property
     def guild(self) -> Optional[PartialGuild]:

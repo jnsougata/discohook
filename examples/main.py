@@ -30,7 +30,7 @@ async def on_error(_, err: discohook.GlobalException):
     else:
         await err.interaction.response.send(user_response, ephemeral=True)
 
-    await app.send_message("12345678910", f"Error: {err}")
+    await app.send("12345678910", f"Error: {err}")
 
 
 @app.command()

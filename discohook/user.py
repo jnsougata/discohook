@@ -52,27 +52,27 @@ class User:
 
     @property
     def id(self) -> str:
-        return self.data["user"]["id"]
+        return self.data["id"]
 
     @property
     def name(self) -> str:
-        return self.data["user"]["username"]
+        return self.data["username"]
 
     @property
     def global_name(self) -> Optional[str]:
-        return self.data["user"].get("global_name")
+        return self.data.get("global_name")
 
     @property
     def discriminator(self) -> str:
-        return self.data["user"]["discriminator"]
+        return self.data["discriminator"]
 
     @property
     def accent_color(self) -> Optional[int]:
-        return self.data["user"].get("accent_color")
+        return self.data.get("accent_color")
 
     @property
     def avatar(self) -> Asset:
-        av_hash = self.data["user"].get("avatar")
+        av_hash = self.data.get("avatar")
         if av_hash:
             return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
         if self.discriminator == 0:
@@ -83,35 +83,35 @@ class User:
 
     @property
     def system(self) -> bool:
-        return self.data["user"].get("system", False)
+        return self.data.get("system", False)
 
     @property
     def bot(self) -> bool:
-        return self.data["user"].get("bot", False)
+        return self.data.get("bot", False)
 
     @property
     def mfa_enabled(self) -> bool:
-        return self.data["user"].get("mfa_enabled", False)
+        return self.data.get("mfa_enabled", False)
 
     @property
     def locale(self) -> Optional[str]:
-        return self.data["user"].get("locale")
+        return self.data.get("locale")
 
     @property
     def verified(self) -> bool:
-        return self.data["user"].get("verified", False)
+        return self.data.get("verified", False)
 
     @property
     def email(self) -> Optional[str]:
-        return self.data["user"].get("email")
+        return self.data.get("email")
 
     @property
     def premium_type(self) -> Optional[int]:
-        return self.data["user"].get("premium_type")
+        return self.data.get("premium_type")
 
     @property
     def public_flags(self) -> Optional[int]:
-        return self.data["user"].get("public_flags")
+        return self.data.get("public_flags")
 
     def __str__(self) -> str:
         if self.discriminator == 0:

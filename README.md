@@ -43,7 +43,7 @@ async def on_error(i: discohook.Interaction, err: Exception):
     else:
         await i.response.send(user_response, ephemeral=True)
 
-    await app.send_message("12345678910", f"Error: {err}")  # send error to a channel in development server
+    await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
 
 
 # If description is not provided, it will look for function's docstring.

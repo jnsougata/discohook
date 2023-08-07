@@ -6,6 +6,7 @@ from .enums import ChannelType
 from .permission import Permission
 from .role import Role
 from .member import Member
+from .utils import raw_member_from_user
 
 if TYPE_CHECKING:
     from .client import Client
@@ -37,8 +38,7 @@ class PartialGuild:
         data = await resp.json()
         if not data.get("user"):
             return
-        data["guild_id"] = self.id
-        return Member(self.client, data)
+        return Member(self.client, raw_member_from_user(data, self.id))
 
     async def fetch_channels(self) -> List[Channel]:
         """
