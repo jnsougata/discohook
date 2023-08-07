@@ -1,4 +1,5 @@
 v: 0
+app_name: Gear
 micros:
   - name: backend
     src: .
@@ -11,3 +12,9 @@ micros:
         - name: PUBLIC_KEY
         - name: DISCORD_TOKEN
         - name: APPLICATION_ID
+    commands:
+      - mv sample/* .
+    include:
+      - main.py
+      - discohook/
+      - requirements.txt
