@@ -1,6 +1,6 @@
 v: 0
 app_name: Gear
-icon: ./sample/assets/icon.png
+icon: ./sample/assets/gear.png
 micros:
   - name: backend
     src: .
