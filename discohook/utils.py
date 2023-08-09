@@ -4,7 +4,7 @@ import secrets
 from typing import Any, Callable, Coroutine, Union
 
 
-AsyncFunc = Callable[["Interaction", ...], Coroutine[Any, Any, Any]]
+AsyncFunc = Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
 
 
 def compare_password(local: str, remote: str) -> bool:
