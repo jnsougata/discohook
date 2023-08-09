@@ -13,7 +13,7 @@ __title__ = "discohook"
 __license__ = "MIT"
 __copyright__ = "Copyright 2022-present Sougata Jana"
 __author__ = "Sougata Jana"
-__version__ = "0.0.5a"
+__version__ = "0.0.6a"
 
 from .attachment import Attachment
 from .channel import Channel, PartialChannel
