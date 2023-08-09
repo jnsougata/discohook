@@ -145,7 +145,7 @@ Documentation
    :members:
    :show-inheritance:
 
-.. autoclass:: discohook.Permissions
+.. autoclass:: discohook.Permission
    :members:
    :show-inheritance:
 
