@@ -1,4 +1,4 @@
 aiohttp
-fastapi
+ed25519
 furo
-PyNaCl
+starlette
