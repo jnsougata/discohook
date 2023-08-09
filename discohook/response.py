@@ -7,8 +7,14 @@ from .file import File
 from .multipart import create_form
 from .message import Message
 from .modal import Modal
+from .models import AllowedMentions
 from .option import Choice
-from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
+from .params import (
+    MISSING,
+    handle_edit_params,
+    handle_send_params,
+    merge_fields
+)
 from .view import View
 
 if TYPE_CHECKING:
@@ -62,7 +68,6 @@ class InteractionResponse:
         )
         if view and view is not MISSING:
             self.inter.client.load_components(view)
-        self.inter.client.store_inter_token(self.inter.id, self.inter.token)
         resp = await self.inter.client.http.edit_webhook_message(
             self.inter.application_id,
             self.inter.token,
@@ -123,7 +128,6 @@ class FollowupResponse:
         )
         if view and view is not MISSING:
             self.interaction.client.load_components(view)
-        self.interaction.client.store_inter_token(self.interaction.id, self.interaction.token)
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
             self.interaction.token,
@@ -136,7 +140,7 @@ class FollowupResponse:
 
 class ResponseAdapter:
     """
-    Represents a response message sent by an interaction
+    Interface for sending responses to interactions
     """
 
     def __init__(self, interaction: "Interaction") -> None:
@@ -152,6 +156,7 @@ class ResponseAdapter:
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
+        allowed_mentions: Optional[AllowedMentions] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
     ) -> InteractionResponse:
@@ -174,6 +179,8 @@ class ResponseAdapter:
             The file to send with the message
         files: Optional[List[File]]
             The list of files to send with the message
+        allowed_mentions: Optional[AllowedMentions]
+            The allowed_mentions object to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
         suppress_embeds: Optional[bool]
@@ -193,14 +200,14 @@ class ResponseAdapter:
             files=files,
             ephemeral=ephemeral,
             suppress_embeds=suppress_embeds,
+            allowed_mentions=allowed_mentions,
         )
         if view:
-            self.inter.client.store_inter_token(self.inter.id, self.inter.token)
             self.inter.client.load_components(view)
 
         payload = {
             "data": data,
-            "type": InteractionCallbackType.channel_message_with_source.value,
+            "type": InteractionCallbackType.channel_message_with_source,
         }
         await self.inter.client.http.send_interaction_mp_callback(
             self.inter.id, self.inter.token, create_form(payload, merge_fields(file, files))
@@ -222,7 +229,7 @@ class ResponseAdapter:
         self.inter.client.active_components[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
-            "type": InteractionCallbackType.modal.value,
+            "type": InteractionCallbackType.modal,
         }
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
 
@@ -238,10 +245,7 @@ class ResponseAdapter:
         if self.inter.type != InteractionType.autocomplete:
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         choices = choices[:25]
-        payload = {
-            "type": InteractionCallbackType.autocomplete.value,
-            "data": {"choices": [choice.to_dict() for choice in choices]},
-        }
+        payload = {"type": InteractionCallbackType.autocomplete, "data": {"choices": choices}}
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
 
     async def defer(self, ephemeral: bool = False) -> InteractionResponse:
@@ -255,9 +259,9 @@ class ResponseAdapter:
         """
         payload = {}
         if self.inter.type == InteractionType.component:
-            payload["type"] = InteractionCallbackType.deferred_update_component_message.value
+            payload["type"] = InteractionCallbackType.deferred_update_component_message
         elif self.inter.type == InteractionType.app_command or self.inter.type == InteractionType.modal_submit:
-            payload["type"] = InteractionCallbackType.deferred_channel_message_with_source.value
+            payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
             if ephemeral:
                 payload["data"] = {"flags": 64}
         else:
@@ -316,8 +320,7 @@ class ResponseAdapter:
         )
         if view and view is not MISSING:
             self.inter.client.load_components(view)
-        self.inter.client.store_inter_token(self.inter.id, self.inter.token)
-        payload = {"type": InteractionCallbackType.update_component_message.value, "data": data}
+        payload = {"type": InteractionCallbackType.update_component_message, "data": data}
         await self.inter.client.http.send_interaction_mp_callback(
             self.inter.id, self.inter.token, create_form(payload, merge_fields(file, files))
         )
@@ -332,6 +335,7 @@ class ResponseAdapter:
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
+        allowed_mentions: Optional[AllowedMentions] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
     ) -> FollowupResponse:
@@ -354,6 +358,8 @@ class ResponseAdapter:
             The file to send with the message
         files: Optional[List[File]]
             The list of files to send with the message
+        allowed_mentions: Optional[AllowedMentions]
+            The allowed_mentions object to send with the message
         ephemeral: Optional[bool]
             Whether the message should be ephemeral or not
         suppress_embeds: Optional[bool]
@@ -369,9 +375,9 @@ class ResponseAdapter:
             files=files,
             ephemeral=ephemeral,
             suppress_embeds=suppress_embeds,
+            allowed_mentions=allowed_mentions,
         )
         if view:
-            self.inter.client.store_inter_token(self.inter.id, self.inter.token)
             self.inter.client.load_components(view)
         resp = await self.inter.client.http.send_webhook_message(
             self.inter.application_id, self.inter.token, create_form(payload, merge_fields(file, files))

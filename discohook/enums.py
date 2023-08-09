@@ -10,7 +10,7 @@ def try_enum(enum_class, value):
         return None
 
 
-class TextInputFieldLength(Enum):
+class TextInputFieldLength(int, Enum):
     """
     The length of a text input field for a modal.
 
@@ -26,7 +26,7 @@ class TextInputFieldLength(Enum):
     long = 2
 
 
-class ModalFieldType(Enum):
+class ModalFieldType(int, Enum):
     """
     The type of field in a modal.
 
@@ -41,7 +41,7 @@ class ModalFieldType(Enum):
     text_input = 4
 
 
-class ApplicationCommandType(Enum):
+class ApplicationCommandType(int, Enum):
     """
     The type of application command.
 
@@ -60,7 +60,7 @@ class ApplicationCommandType(Enum):
     message = 3
 
 
-class ApplicationCommandOptionType(Enum):
+class ApplicationCommandOptionType(int, Enum):
     """
     The type of application command option.
 
@@ -80,7 +80,7 @@ class ApplicationCommandOptionType(Enum):
     attachment = 11
 
 
-class ChannelType(Enum):
+class ChannelType(int, Enum):
     """
     Use to specify discord channel type in application command Option.
 
@@ -96,18 +96,22 @@ class ChannelType(Enum):
         Used to specify a group dm channel.
     guild_category: :class:`int`
         Used to specify a guild category channel.
-    guild_news: :class:`int`
-        Used to specify a guild news channel.
-    guild_store: :class:`int`
-        Used to specify a guild store channel.
-    guild_news_thread: :class:`int`
-        Used to specify a guild news thread channel.
-    guild_public_thread: :class:`int`
+    guild_announcement: :class:`int`
+        Used to specify a guild announcement channel.
+    guild_announcement_thread: :class:`int`
+        Used to specify a guild announcement thread channel.
+    public_thread: :class:`int`
         Used to specify a guild public thread channel.
-    guild_private_thread: :class:`int`
+    private_thread: :class:`int`
         Used to specify a guild private thread channel.
     guild_stage_voice: :class:`int`
         Used to specify a guild stage voice channel.
+    guild_directory: :class:`int`
+        Used to specify a guild directory channel.
+    guild_forum: :class:`int`
+        Used to specify a guild forum channel.
+    guild_media: :class:`int`
+        Used to specify a guild media channel.
     """
 
     guild_text = 0
@@ -115,15 +119,17 @@ class ChannelType(Enum):
     guild_voice = 2
     group_dm = 3
     guild_category = 4
-    guild_news = 5
-    guild_store = 6
-    guild_news_thread = 10
-    guild_public_thread = 11
-    guild_private_thread = 12
+    guild_announcement = 5
+    guild_announcement_thread = 10
+    public_thread = 11
+    private_thread = 12
     guild_stage_voice = 13
+    guild_directory = 14
+    guild_forum = 15
+    guild_media = 16
 
 
-class InteractionType(Enum):
+class InteractionType(int, Enum):
     """
     The type of interaction received from discord.
 
@@ -137,7 +143,7 @@ class InteractionType(Enum):
     modal_submit = 5
 
 
-class InteractionCallbackType(Enum):
+class InteractionCallbackType(int, Enum):
     """
     The type of interaction callback.
 
@@ -153,7 +159,7 @@ class InteractionCallbackType(Enum):
     modal = 9
 
 
-class MessageComponentType(Enum):
+class MessageComponentType(int, Enum):
     """
     The type of message component.
 
@@ -170,10 +176,9 @@ class MessageComponentType(Enum):
     channel_select = 8
 
 
-class SelectType(Enum):
+class SelectType(int, Enum):
     """
     The type of select menu.
-
     """
 
     text = 3
@@ -183,7 +188,7 @@ class SelectType(Enum):
     channel = 8
 
 
-class ButtonStyle(Enum):
+class ButtonStyle(int, Enum):
     """
     Represents the style of a button.
 
@@ -208,7 +213,7 @@ class ButtonStyle(Enum):
     link = 5
 
 
-class WebhookType(Enum):
+class WebhookType(int, Enum):
     """
     The type of webhook.
 
@@ -218,3 +223,15 @@ class WebhookType(Enum):
     incoming = 1
     channel_follower = 2
     application = 3
+
+
+class AllowedMentionsTypes(str, Enum):
+    """
+    The type of mentions allowed in a message.
+
+    Used internally by the library. You should not need to use this.
+    """
+
+    roles = "roles"
+    users = "users"
+    everyone = "everyone"

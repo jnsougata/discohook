@@ -1,29 +1,36 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional, Union
-
+from typing import Any, Dict, List, Optional, Union, Callable, Tuple
 import aiohttp
-from fastapi import FastAPI
-from fastapi.requests import Request
-from fastapi.responses import JSONResponse
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
-from .channel import PartialChannel
+from .channel import PartialChannel, Channel
 from .command import ApplicationCommand, Option
 from .dash import dashboard
 from .embed import Embed
 from .enums import ApplicationCommandType
 from .file import File
 from .guild import Guild
-from .handler import handler
+from .handler import _handler
+from .help import _help
 from .https import HTTPClient
+from .interaction import Interaction
 from .message import Message
-from .permissions import Permissions
-from .user import ClientUser
+from .permission import Permission
+from .user import User
+from .utils import compare_password, auto_description
 from .view import Component, View
 from .webhook import Webhook
 
 
-async def delete_cmd(request: Request, command_id: str, token: str):
-    if token != request.app.token:
+async def delete_cmd(request: Request):
+    if not request.app.password:
+        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+    data = await request.json()
+    password = data.get("password")
+    command_id = data.get("id")
+    if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
     resp = await request.app.delete_command(command_id)
     if resp.status == 204:
@@ -31,14 +38,28 @@ async def delete_cmd(request: Request, command_id: str, token: str):
     return JSONResponse({"error": "Failed to delete command"}, status_code=resp.status)
 
 
-async def sync(request: Request, token: str):
-    if token != request.app.token:
+async def sync(request: Request):
+    if not request.app.password:
+        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+    data = await request.json()
+    password = data.get("password")
+    if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
     resp = await request.app.sync()
     return JSONResponse(await resp.json(), status_code=resp.status)
 
 
-class Client(FastAPI):
+async def authenticate(request: Request):
+    if not request.app.password:
+        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+    data = await request.json()
+    password = data.get("password")
+    if not compare_password(request.app.password, password):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    return JSONResponse({"success": True}, status_code=200)
+
+
+class Client(Starlette):
     """
     The base client class for discohook.
 
@@ -52,6 +73,10 @@ class Client(FastAPI):
         The token of the bot.
     route: str
         The route to listen for interactions on.
+    password: str | None
+        The password to use for the dashboard.
+    default_help_command: bool
+        Whether to use the default help command or not. Defaults to False.
     **kwargs
         Keyword arguments to pass to the FastAPI instance.
     """
@@ -63,6 +88,8 @@ class Client(FastAPI):
         public_key: str,
         token: str,
         route: str = "/interactions",
+        password: Optional[str] = None,
+        default_help_command: bool = False,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -71,19 +98,31 @@ class Client(FastAPI):
         self.redoc_url = None
         self.public_key = public_key
         self.application_id = application_id
+        self.password = password
         self.http = HTTPClient(self, token, aiohttp.ClientSession("https://discord.com"))
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.application_commands: Dict[str, ApplicationCommand] = {}
-        self.cached_inter_tokens: Dict[str, str] = {}
-        self.add_route(route, handler, methods=["POST"], include_in_schema=False)
-        self.add_api_route("/api/sync/{token}", sync, methods=["GET"], include_in_schema=False)
-        self.add_api_route("/api/dash/{token}", dashboard, methods=["GET"], include_in_schema=False)
-        self.add_api_route(
-            "/api/commands/{command_id}/{token}", delete_cmd, methods=["DELETE"], include_in_schema=False
-        )
-        self.error_handler: Optional[Callable] = None
-        self._custom_id_parser: Optional[Callable] = None
+        self.add_route(route, _handler, methods=["POST"], include_in_schema=False)
+        self.add_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
+        self.add_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
+        self.add_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
+        self.add_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
+        self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
+        if default_help_command:
+            self.add_commands(_help)
+        self._interaction_error_handler: Optional[Callable[[Interaction, Exception], Any]] = None
+
+    def on_error(self):
+        """
+        A decorator to add an error handler for any server errors.
+        """
+
+        def decorator(coro: Callable[[Request, Exception], Any]):
+            self.add_exception_handler(Exception, coro)
+            return coro
+
+        return decorator
 
     def load_components(self, view: View):
         """
@@ -98,42 +137,40 @@ class Client(FastAPI):
         for component in view.children:
             self.active_components[component.custom_id] = component
 
-    def preload(self, component: Component) -> Component:
+    def preload(self, custom_id: str):
         """
         This decorator is used to load a component into the client.
         This method will help you to use persistent components with static custom ids.
 
         Parameters
         ----------
-        component: Component
-            The component to load.
-
-        Returns
-        -------
-        Component
-            The component that was loaded.
+        custom_id: str
+            The unique custom id of the component.
 
         Raises
         ------
         ValueError
-            If the component does not have a static custom id.
+            If the custom id is not a not empty string or is not provided.
         """
-        if not component.has_static_custom_id:
-            raise ValueError("Component must have a static custom id to be preloaded.")
-        self.active_components[component.custom_id] = component
-        return component
 
-    def store_inter_token(self, interaction_id: str, token: str):
-        self.cached_inter_tokens[interaction_id] = token
+        def decorator(component: Component):
+            if not custom_id or not isinstance(custom_id, str):
+                raise ValueError("Invalid custom id provided.")
+            component.custom_id = custom_id
+            self.active_components[custom_id] = component
+            return component
+
+        return decorator
 
     def command(
         self,
-        name: str,
+        name: Optional[str] = None,
         description: Optional[str] = None,
         *,
         options: Optional[List[Option]] = None,
-        permissions: Optional[List[Permissions]] = None,
+        permissions: Optional[List[Permission]] = None,
         dm_access: bool = True,
+        nsfw: bool = False,
         category: ApplicationCommandType = ApplicationCommandType.slash,
     ):
         """
@@ -141,33 +178,133 @@ class Client(FastAPI):
 
         Parameters
         ----------
-        name: str
-            The name of the command.
+        name: str | None
+            The name of the command. Defaults to the name of the coroutine if not provided.
         description: Optional[str]
             The description of the command. Does not apply to user & message commands.
         options: Optional[List[Option]]
             The options of the command. Does not apply to user & message commands.
-        permissions: Optional[List[Permissions]]
+        permissions: Optional[List[Permission]]
             The default permissions of the command.
         dm_access: bool
             Whether the command can be used in DMs. Defaults to True.
+        nsfw: bool
+            Whether the command is age restricted. Defaults to False.
         category: AppCmdType
             The category of the command. Defaults to slash commands.
-        """
-        cmd = ApplicationCommand(
-            name=name,
-            description=description,
-            options=options,
-            permissions=permissions,
-            dm_access=dm_access,
-            category=category,
-        )
 
-        def decorator(coro: Callable):
-            if not asyncio.iscoroutinefunction(coro):
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
+        """
+
+        def decorator(callback: Callable[[Interaction, ...], Any]):
+            if not asyncio.iscoroutinefunction(callback):
                 raise TypeError("Callback must be a coroutine.")
-            cmd.callback = coro
-            self.application_commands[cmd._id] = cmd  # noqa
+            cmd = ApplicationCommand(
+                name or callback.__name__,
+                description=description,
+                options=options,
+                permissions=permissions,
+                dm_access=dm_access,
+                category=category,
+                nsfw=nsfw,
+            )
+            cmd.callback = callback
+            if category == ApplicationCommandType.slash:
+                cmd.description = auto_description(description, callback)
+            self.application_commands[cmd.key] = cmd
+            self._sync_queue.append(cmd)
+            return cmd
+
+        return decorator
+
+    def user_command(
+        self,
+        name: Optional[str] = None,
+        *,
+        permissions: Optional[List[Permission]] = None,
+        dm_access: bool = True,
+        nsfw: bool = False,
+    ):
+        """
+        A decorator to register a user command.
+
+        Parameters
+        ----------
+        name: str | None
+            The name of the command. Defaults to the name of the coroutine if not provided.
+        permissions: List[Permission] | None
+            The default permissions of the command.
+        dm_access: bool
+            Whether the command can be used in DMs. Defaults to True.
+        nsfw: bool
+            Whether the command is age restricted. Defaults to False.
+
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
+        """
+
+        def decorator(callback: Callable[[Interaction, User], Any]):
+            if not asyncio.iscoroutinefunction(callback):
+                raise TypeError("Callback must be a coroutine.")
+            cmd = ApplicationCommand(
+                name or callback.__name__,
+                permissions=permissions,
+                dm_access=dm_access,
+                category=ApplicationCommandType.user,
+                nsfw=nsfw,
+            )
+            cmd.callback = callback
+            self.application_commands[cmd.key] = cmd
+            self._sync_queue.append(cmd)
+            return cmd
+
+        return decorator
+
+    def message_command(
+        self,
+        name: Optional[str] = None,
+        *,
+        permissions: Optional[List[Permission]] = None,
+        dm_access: bool = True,
+        nsfw: bool = False,
+    ):
+        """
+        A decorator to register a message command.
+
+        Parameters
+        ----------
+        name: str | None
+            The name of the command. Defaults to the name of the coroutine if not provided.
+        permissions: List[Permission] | None
+            The default permissions of the command.
+        dm_access: bool
+            Whether the command can be used in DMs. Defaults to True.
+        nsfw: bool
+            Whether the command is age restricted. Defaults to False.
+
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
+        """
+
+        def decorator(callback: Callable[[Interaction, Message], Any]):
+            if not asyncio.iscoroutinefunction(callback):
+                raise TypeError("Callback must be a coroutine.")
+            cmd = ApplicationCommand(
+                name or callback.__name__,
+                permissions=permissions,
+                dm_access=dm_access,
+                category=ApplicationCommandType.message,
+                nsfw=nsfw,
+            )
+            cmd.callback = callback
+            self.application_commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
             return cmd
 
@@ -182,7 +319,7 @@ class Client(FastAPI):
         *commands: ApplicationCommand
             The commands to add to the client.
         """
-        self.application_commands.update({command._id: command for command in commands})  # noqa
+        self.application_commands.update({command.key: command for command in commands})  # noqa
         self._sync_queue.extend(commands)
 
     async def delete_command(self, command_id: str):
@@ -197,7 +334,7 @@ class Client(FastAPI):
 
     def load_modules(self, directory: str):
         """
-        Loads multiple command form modules in a directory.
+        Loads multiple command from modules within directory by walking through it.
 
         Parameters
         ----------
@@ -205,34 +342,40 @@ class Client(FastAPI):
             The directory to load the modules from.
         """
         import importlib
-        import os
+        import pathlib
+        from os import sep
 
-        scripts = os.listdir(directory)
-        scripts = [f"{directory}.{script[:-3]}" for script in scripts if script.endswith(".py")]
-        for script in scripts:
-            importlib.import_module(script).setup(self)
+        globs = pathlib.Path(directory).glob(f"**{sep}*.py")
+        modules = [str(path).replace(sep, ".")[:-3] for path in globs]
+        for module in modules:
+            importlib.import_module(module).setup(self)
 
-    def on_error(self, coro: Callable):
+    def on_interaction_error(self):
         """
-        A decorator to register a global error handler.
-
-        Parameters
-        ----------
-        coro: Callable
-            The coroutine to register as the global error handler. Must take 2 parameters:`error` and `data`.
+        A decorator to register a global interaction error handler.
         """
-        self.error_handler = coro
 
-    def custom_id_parser(self, coro: Callable):
+        def decorator(coro: Callable[[Interaction, Exception], Any]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Exception handler must be a coroutine.")
+            self._interaction_error_handler = coro
+            return coro
+
+        return decorator
+
+    def custom_id_parser(self):
         """
         A decorator to register a dev defined custom id parser.
-        Parameters
-        ----------
-        coro: Callable
         """
-        self._custom_id_parser = coro
 
-    async def send_message(
+        def decorator(coro: Callable[[Interaction, str], str]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Custom id parser must be a coroutine.")
+            self._custom_id_parser = coro
+
+        return decorator
+
+    async def send(
         self,
         channel_id: str,
         content: Optional[str] = None,
@@ -285,17 +428,33 @@ class Client(FastAPI):
 
         )
 
-    async def as_user(self) -> ClientUser:
+    async def me(self) -> User:
         """
-        Get the client as partial user.
+        Get the client as a discord user.
 
         Returns
         -------
-        ClientUser
-            The client as partial user.
+        User
+            The client as a user.
         """
-        resp = await self.http.fetch_client_info()
-        return ClientUser(self, await resp.json())
+        resp = await self.http.fetch_user(self.application_id)
+        return User(self, await resp.json())
+
+    async def edit(self, username: str, *, avatar: Optional[str] = None):
+        """
+        Edits the client user.
+
+        Parameters
+        ----------
+        username: :class:`str`
+            The new username of the client user.
+        avatar: Optional[:class:`str`]
+            The new avatar of the client user in base64 data URI scheme.
+        """
+        payload = {"username": username}
+        if avatar:
+            payload["avatar"] = avatar
+        await self.http.edit_client(payload)
 
     async def sync(self):
         """
@@ -308,6 +467,7 @@ class Client(FastAPI):
     async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
         """
         Create a webhook in a channel.
+
         Parameters
         ----------
         channel_id: str
@@ -323,7 +483,7 @@ class Client(FastAPI):
         """
         resp = await self.http.create_webhook(channel_id, {"name": name, "avatar": image_base64})
         data = await resp.json()
-        return Webhook(data, self)
+        return Webhook(self, data)
 
     async def fetch_webhook(self, webhook_id: str, *, webhook_token: Optional[str] = None):
         """
@@ -340,7 +500,7 @@ class Client(FastAPI):
         """
         resp = await self.http.fetch_webhook(webhook_id, webhook_token=webhook_token)
         data = await resp.json()
-        return Webhook(data, self)
+        return Webhook(self, data)
 
     async def fetch_guild(self, guild_id: str) -> Optional[Guild]:
         """
@@ -352,7 +512,45 @@ class Client(FastAPI):
         """
         resp = await self.http.fetch_guild(guild_id)
         data = await resp.json()
-        try:
-            return Guild(data, self)
-        except KeyError:
-            return None
+        if not data.get("id"):
+            return
+        return Guild(self, data)
+
+    async def fetch_user(self, user_id: str) -> Optional[User]:
+        """
+        Fetches the user of given id.
+
+        Returns
+        -------
+        User
+        """
+        resp = await self.http.fetch_user(user_id)
+        data = await resp.json()
+        if not data.get("id"):
+            return
+        return User(self, data)
+
+    async def fetch_channel(self, channel_id: str) -> Optional[Channel]:
+        """
+        Fetches the channel of given id.
+
+        Returns
+        -------
+        Channel
+        """
+        resp = await self.http.fetch_channel(channel_id)
+        data = await resp.json()
+        if not data.get("id"):
+            return
+        return Channel(self, data)
+
+    async def fetch_commands(self):
+        """
+        Fetches the commands of the client.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+        """
+        resp = await self.http.fetch_global_application_commands(str(self.application_id))
+        return await resp.json()

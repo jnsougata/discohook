@@ -32,7 +32,7 @@ setup(
     version=version,
     description="discord http api wrapper for serverless apps",
     url="https://github.com/jnsougata/discohook",
-    author="jnsougata",
+    author="Sougata Jana",
     author_email="jnsougata@gmail.com",
     license="MIT",
     classifiers=[
@@ -42,5 +42,5 @@ setup(
     ],
     packages=["discohook"],
     python_requires=">=3.6",
-    install_requires=requirements
+    install_requires=requirements,
 )

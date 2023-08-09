@@ -1,0 +1,22 @@
+v: 0
+app_name: Gear
+icon: ./sample/assets/gear.png
+micros:
+  - name: backend
+    src: .
+    engine: python3.9
+    primary: true
+    public: true
+    presets:
+      env:
+        - name: PASSWORD
+        - name: PUBLIC_KEY
+        - name: DISCORD_TOKEN
+        - name: APPLICATION_ID
+        - name: LOG_CHANNEL_ID
+    commands:
+      - mv sample/* .
+    include:
+      - main.py
+      - discohook/
+      - requirements.txt

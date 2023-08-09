@@ -218,7 +218,7 @@ class Message:
         """
         Deletes the message.
         """
-        return await self.client.http.delete_message(self.channel_id, self.id)
+        return await self.client.http.delete_channel_message(self.channel_id, self.id)
 
     async def edit(
         self,
@@ -271,3 +271,15 @@ class Message:
         )
         data = await resp.json()
         return Message(self.client, data)
+
+    async def pin(self):
+        """
+        Pins the message to the channel.
+        """
+        return await self.client.http.pin_channel_message(self.channel_id, self.id)
+
+    async def unpin(self):
+        """
+        Unpins the message from the channel.
+        """
+        return await self.client.http.unpin_channel_message(self.channel_id, self.id)

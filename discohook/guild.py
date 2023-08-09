@@ -3,8 +3,10 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from .channel import Channel
 from .emoji import PartialEmoji
 from .enums import ChannelType
-from .permissions import Permissions
+from .permission import Permission
 from .role import Role
+from .member import Member
+from .utils import unwrap_user
 
 if TYPE_CHECKING:
     from .client import Client
@@ -19,6 +21,25 @@ class PartialGuild:
         self.id = guild_id
         self.client = client
 
+    async def fetch_member(self, user_id: str) -> Optional[Member]:
+        """
+        Fetches a member from the guild.
+
+        Parameters
+        ----------
+        user_id: :class:`str`
+            The id of the user to fetch.
+
+        Returns
+        -------
+        Optional[:class:`Member`]
+        """
+        resp = await self.client.http.fetch_guild_member(self.id, user_id)
+        data = await resp.json()
+        if not data.get("user"):
+            return
+        return Member(self.client, unwrap_user(data, self.id))
+
     async def fetch_channels(self) -> List[Channel]:
         """
         Fetches all channels in the guild.
@@ -29,7 +50,7 @@ class PartialGuild:
         """
         resp = await self.client.http.fetch_guild_channels(self.id)
         data = await resp.json()
-        return [Channel(c, self.client) for c in data]
+        return [Channel(self.client, c) for c in data]
 
     async def fetch_roles(self) -> List[Role]:
         """
@@ -138,7 +159,7 @@ class PartialGuild:
             payload["default_sort_order"] = default_sort_order
         resp = await self.client.http.create_guild_channel(self.id, payload)
         data = await resp.json()
-        return Channel(data, self.client)
+        return Channel(self.client, data)
 
     async def edit_channel_position(
         self,
@@ -172,7 +193,7 @@ class PartialGuild:
         self,
         name: str,
         *,
-        permissions: Optional[List[Permissions]] = None,
+        permissions: Optional[List[Permission]] = None,
         color: int = 0,
         hoist: bool = False,
         mentionable: Optional[bool] = False,
@@ -198,6 +219,29 @@ class PartialGuild:
         resp = await self.client.http.create_guild_role(self.id, payload)
         data = await resp.json()
         return Role(self.client, data)
+
+    async def create_emoji(self, name: str, image: str, *, roles: Optional[List[str]] = None):
+        """
+        Creates a new emoji for the guild.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the emoji.
+        image: :class:`str`
+            The image data of the emoji in base64 data uri format.
+        roles: Optional[List[:class:`str`]]
+            A list of role ids to limit the emoji to.
+
+        Returns
+        -------
+        :class:`Emoji`
+        """
+        payload = {"name": name, "image": image}
+        if roles:
+            payload["roles"] = roles
+        resp = await self.client.http.create_guild_emoji(self.id, payload)
+        return await resp.json()
 
 
 class Guild(PartialGuild):
@@ -288,7 +332,7 @@ class Guild(PartialGuild):
         Whether the premium progress bar is enabled.
     """
 
-    def __init__(self, data: Dict[str, Any], client: "Client"):
+    def __init__(self, client: "Client", data: Dict[str, Any]):
         super().__init__(client, data["id"])
         self.name = data["name"]
         self.icon = data.get("icon")

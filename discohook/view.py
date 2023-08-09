@@ -1,12 +1,17 @@
 import asyncio
 import secrets
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Callable, TYPE_CHECKING
 
+from .abc import Interactable
 from .emoji import PartialEmoji
 from .enums import ButtonStyle, ChannelType, MessageComponentType, SelectType
+from .utils import AsyncFunc
+
+if TYPE_CHECKING:
+    from .interaction import Interaction
 
 
-class Component:
+class Component(Interactable):
     """
     Represents a discord component.
 
@@ -17,29 +22,27 @@ class Component:
     """
 
     def __init__(self, type: Optional[MessageComponentType] = None, custom_id: Optional[str] = None):
+        super().__init__()
         self.type = type
-        self.callback: Optional[Callable] = None
+        self.callback: Optional[Callable[["Interaction", ...], Any]] = None
         self.custom_id = custom_id or secrets.token_urlsafe(16)
-        self.checks: List[Callable] = []
-        self.has_static_custom_id = bool(custom_id)
 
-    def on_interaction(self, coro: Callable):
+    def on_interaction(self):
         """
         Decorator that registers a callback to be called when the component is interacted with.
-
-        Parameters
-        ----------
-        coro: Callable
-            The coroutine to be called when the component is interacted with.
 
         Raises
         ------
         TypeError
             If the callback is not a coroutine.
         """
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        self.callback = coro
+
+        def decorator(coro: Callable[["Interaction", ...], Any]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Callback must be a coroutine.")
+            self.callback = coro
+
+        return decorator
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -94,14 +97,14 @@ class Button(Component):
             The dictionary representation of the button.
         """
         payload = {
-            "type": self.type.value,
-            "style": self.style.value,
+            "type": self.type,
+            "style": self.style,
             "disabled": self.disabled,
         }
         if self.label:
             payload["label"] = self.label
         if self.emoji:
-            payload["emoji"] = self.emoji.to_dict()
+            payload["emoji"] = self.emoji
         if self.style != ButtonStyle.link:
             payload["custom_id"] = self.custom_id
         if self.url and self.style == ButtonStyle.link:
@@ -160,7 +163,7 @@ class SelectOption:
             "default": self.default,
         }
         if self.emoji:
-            payload["emoji"] = self.emoji.to_dict()
+            payload["emoji"] = self.emoji
         return payload
 
 
@@ -220,7 +223,7 @@ class Select(Component):
         """
         if self.options:
             if self.type == MessageComponentType.text_select:
-                self.data["options"] = [option.to_dict() for option in self.options]  # type: ignore
+                self.data["options"] = [option.to_dict() for option in self.options]
             if self.type == MessageComponentType.channel_select and self.channel_types:
                 self.data["channel_types"] = [channel_type.value for channel_type in self.channel_types]
         if self.placeholder:
@@ -263,14 +266,15 @@ class View:
         *buttons: :class:`Button`
             The buttons to be added to the view.
         """
-        self.components.append(
-            {
-                "type": MessageComponentType.action_row.value,
-                "components": [btn.to_dict() for btn in buttons[:5]],
-            }
-        )
-        # TODO: Add support auto parse more than 5 buttons and add them to the next row.
-        self.children.extend(buttons[:5])
+        batches = [buttons[i: i + 5] for i in range(0, len(buttons), 5)]
+        for batch in batches:
+            self.components.append(
+                {
+                    "type": MessageComponentType.action_row.value,
+                    "components": [btn.to_dict() for btn in batch],
+                }
+            )
+            self.children.extend(batch)
 
     # noinspection PyShadowingNames
     def add_select(self, select: Union[Select, Any]):
@@ -320,17 +324,13 @@ def button(
     custom_id: Optional[:class:`str`]
         The custom id of the button.
 
-    Returns
-    -------
-    :class:`Button`
-
     Raises
     ------
     TypeError
         If the callback is not a coroutine.
     """
 
-    def decorator(coro: Callable):
+    def decorator(coro: Callable[["Interaction"], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
@@ -341,15 +341,15 @@ def button(
 
 
 def select(
-    options: Optional[List[SelectOption]] = None,
-    *,
     placeholder: Optional[str] = None,
+    *,
+    options: Optional[List[SelectOption]] = None,
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     channel_types: Optional[List[ChannelType]] = None,
-    type: Union[MessageComponentType, SelectType] = MessageComponentType.text_select,
     disabled: Optional[bool] = False,
     custom_id: Optional[str] = None,
+    type: Union[MessageComponentType, SelectType] = MessageComponentType.text_select,
 ):
     """
     A decorator that creates a select menu and registers a callback.
@@ -373,17 +373,13 @@ def select(
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
 
-    Returns
-    -------
-    :class:`Select`
-
     Raises
     ------
     TypeError
         If the callback is not a coroutine.
     """
 
-    def decorator(coro: Callable):
+    def decorator(coro: Callable[["Interaction", ...], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         menu = Select(
@@ -402,31 +398,146 @@ def select(
     return decorator
 
 
-def component_checker(*checks: Callable):
+def user_select(
+    placeholder: Optional[str] = None,
+    *,
+    min_values: Optional[int] = None,
+    max_values: Optional[int] = None,
+    custom_id: Optional[str] = None,
+):
     """
-    Decorator for adding a checks to a component.
+    A decorator that creates a user select menu and registers a callback.
 
     Parameters
     ----------
-    *checks: Callable
-        The checks to be added to the component.
+    placeholder: Optional[:class:`str`]
+        The placeholder to be displayed on the select menu.
+    min_values: Optional[:class:`int`]
+        The minimum number of options that can be selected.
+    max_values: Optional[:class:`int`]
+        The maximum number of options that can be selected.
+    custom_id: Optional[:class:`str`]
+        The custom id of the select menu.
 
     Returns
     -------
-    Component
-        The component with the checks added to it.
+    :class:`Select`
 
     Raises
     ------
     TypeError
-        If any of the checks is not a coroutine.
+        If the callback is not a coroutine.
     """
 
-    def decorator(comp: Component):
-        for check in checks:
-            if not asyncio.iscoroutinefunction(check):
-                raise TypeError(f"check `{check.__name__}` must be a coroutine.")
-        comp.checks.extend(checks)
-        return comp
+    def decorator(coro: AsyncFunc):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
+        menu = Select(
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            type=SelectType.user,
+            custom_id=custom_id,
+        )
+        menu.callback = coro
+        return menu
+
+    return decorator
+
+
+def role_select(
+    placeholder: Optional[str] = None,
+    *,
+    min_values: Optional[int] = None,
+    max_values: Optional[int] = None,
+    custom_id: Optional[str] = None,
+):
+    """
+    A decorator that creates a role select menu and registers a callback.
+
+    Parameters
+    ----------
+    placeholder: Optional[:class:`str`]
+        The placeholder to be displayed on the select menu.
+    min_values: Optional[:class:`int`]
+        The minimum number of options that can be selected.
+    max_values: Optional[:class:`int`]
+        The maximum number of options that can be selected.
+    custom_id: Optional[:class:`str`]
+        The custom id of the select menu.
+
+    Returns
+    -------
+    :class:`Select`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
+    """
+
+    def decorator(coro: AsyncFunc):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
+        menu = Select(
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            type=SelectType.role,
+            custom_id=custom_id,
+        )
+        menu.callback = coro
+        return menu
+
+    return decorator
+
+
+def channel_select(
+    placeholder: Optional[str] = None,
+    *,
+    channel_types: Optional[List[ChannelType]] = None,
+    min_values: Optional[int] = None,
+    max_values: Optional[int] = None,
+    custom_id: Optional[str] = None,
+):
+    """
+    A decorator that creates a channel select menu and registers a callback.
+
+    Parameters
+    ----------
+    placeholder: Optional[:class:`str`]
+        The placeholder to be displayed on the select menu.
+    channel_types: Optional[List[:class:`ChannelType`]]
+        The channel types to be displayed on the select menu.
+    min_values: Optional[:class:`int`]
+        The minimum number of options that can be selected.
+    max_values: Optional[:class:`int`]
+        The maximum number of options that can be selected.
+    custom_id: Optional[:class:`str`]
+        The custom id of the select menu.
+
+    Returns
+    -------
+    :class:`Select`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
+    """
+
+    def decorator(coro: AsyncFunc):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
+        menu = Select(
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            type=SelectType.channel,
+            custom_id=custom_id,
+            channel_types=channel_types,
+        )
+        menu.callback = coro
+        return menu
 
     return decorator

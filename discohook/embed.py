@@ -1,4 +1,7 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
+
+from .file import File
+from .utils import color_parser
 
 
 class Embed:
@@ -13,8 +16,8 @@ class Embed:
         The description of the embed.
     url: str | None
         The url of the embed.
-    color: int | None
-        The color of the embed.
+    color: int | str | None
+        The color of the embed in hex or int.
     timestamp: str | None
         The timestamp of the embed.
     """
@@ -25,7 +28,7 @@ class Embed:
         *,
         description: Optional[str] = None,
         url: Optional[str] = None,
-        color: Optional[int] = None,
+        color: Optional[Union[int, str]] = None,
         timestamp: Optional[str] = None,
     ):
         self.title = title
@@ -70,7 +73,7 @@ class Embed:
         if icon_url:
             self.data["footer"]["icon_url"] = icon_url
 
-    def image(self, url: str):
+    def set_image(self, url: str):
         """
         Sets the image of the embed.
 
@@ -81,18 +84,18 @@ class Embed:
         """
         self.data["image"] = {"url": url}
 
-    def image_from_attachment(self, name: str):
+    def image_from_attachment(self, file: File):
         """
         Sets the image of the embed from a file attachment.
 
         Parameters
         ----------
-        name: :class:`str`
-            name of the file attachment.
+        file: :class:`File`
+            The file attachment.
         """
-        self.data["image"] = {"url": f"attachment://{name}"}
+        self.data["image"] = {"url": f"attachment://{file.name}"}
 
-    def thumbnail(self, url: str):
+    def set_thumbnail(self, url: str):
         """
         Sets the thumbnail of the embed.
 
@@ -103,16 +106,16 @@ class Embed:
         """
         self.data["thumbnail"] = {"url": url}
 
-    def thumbnail_from_attachment(self, name: str):
+    def thumbnail_from_attachment(self, file: File):
         """
         Sets the thumbnail of the embed from a file attachment.
 
         Parameters
         ----------
-        name: :class:`str`
-            name of the file attachment.
+        file: :class:`File`
+            The file attachment.
         """
-        self.data["thumbnail"] = {"url": f"attachment://{name}"}
+        self.data["thumbnail"] = {"url": f"attachment://{file.name}"}
 
     def add_field(self, name: str, value: str, *, inline: bool = False):
         """
@@ -147,7 +150,7 @@ class Embed:
         if self.url:
             self.data["url"] = self.url
         if self.color is not None:
-            self.data["color"] = self.color
+            self.data["color"] = color_parser(self.color)
         if self.timestamp:
             self.data["timestamp"] = self.timestamp
         if self.fields:

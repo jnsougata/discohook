@@ -1,5 +1,8 @@
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
+from .asset import Asset
+from .permission import Permission
+from .role import PartialRole
 from .user import User
 
 if TYPE_CHECKING:
@@ -8,20 +11,55 @@ if TYPE_CHECKING:
 
 class Member(User):
     """
-    Represents a member of a guild sent with an interaction, subclassed from :class:`User`.
+    Represents a member of a guild, subclassed from :class:`User`.
     """
 
     def __init__(self, client: "Client", data: Dict[str, Any]):
         super().__init__(client, data)
-        self.nick = data.get("nick")
-        self.roles = data.get("roles")
-        self.joined_at = data.get("joined_at")
-        self.premium_since = data.get("premium_since")
-        self.pending = data.get("pending")
-        self.is_pending = data.get("is_pending")
-        self.flags = data.get("flags")
-        self.guild_id = data.get("guild_id")
-        self.communication_disabled_until = data.get("communication_disabled_until")
+
+    @property
+    def guild_id(self) -> str:
+        return self.data["guild_id"]
+
+    @property
+    def nick(self) -> str:
+        return self.data.get("nick") or self.name
+
+    @property
+    def roles(self) -> List[PartialRole]:
+        ids = self.data.get("roles")
+        return [PartialRole(self.client, {"id": i, "guild_id": self.guild_id}) for i in ids]
+
+    @property
+    def joined_at(self) -> str:
+        return self.data["joined_at"]
+
+    @property
+    def premium_since(self) -> Optional[str]:
+        return self.data.get("premium_since")
+
+    @property
+    def permissions(self) -> int:
+        return int(self.data.get("permissions", "0"))
+
+    @property
+    def pending(self) -> bool:
+        return self.data.get("pending", False)
+
+    @property
+    def disabled_until(self) -> Optional[str]:
+        return self.data.get("communication_disabled_until")
+
+    @property
+    def flags(self) -> int:
+        return self.data["flags"]
+
+    @property
+    def avatar(self) -> Asset:
+        av_hash = self.data.get("avatar")
+        if not av_hash:
+            return super().avatar
+        return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
 
     @property
     def mention(self) -> str:
@@ -29,6 +67,9 @@ class Member(User):
         Returns a string that allows you to mention the member.
         """
         return f"<@!{self.id}>"
+
+    def has_permission(self, permission: Permission) -> bool:
+        return Permission.check(self.permissions, permission)
 
     async def add_role(self, role_id: str):
         """

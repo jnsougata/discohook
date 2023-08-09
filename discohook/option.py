@@ -1,9 +1,9 @@
 from typing import Any, Dict, List, Optional, Union
-
+from typing_extensions import TypedDict
 from .enums import ApplicationCommandOptionType, ChannelType
 
 
-class Choice:
+class Choice(TypedDict):
     """
     Represents a choice for a string, integer, or number option.
 
@@ -18,13 +18,8 @@ class Choice:
     -----
     The value of the choice must be of the same type as the option.
     """
-
-    def __init__(self, name: str, value: Union[str, int, float]):
-        self.name = name
-        self.value = value
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {"name": self.name, "value": self.value}
+    name: str
+    value: Union[str, int, float]
 
 
 class Option:
@@ -54,7 +49,7 @@ class Option:
         self.name = name
         self.description = description
         self.required = required
-        self.type = type.value
+        self.type = type
         self.data: Dict[str, Any] = {
             "name": self.name,
             "description": self.description,
@@ -82,7 +77,7 @@ class StringOption(Option):
         The maximum length of the string.
     min_length: int
         The minimum length of the string.
-    choices: List[Choice]
+    choices: List[Choice] | None
         The choices for the string.
     autocomplete: bool
         Whether the string should be auto completed or not.
@@ -107,7 +102,7 @@ class StringOption(Option):
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.to_dict() for choice in self.choices]
+            self.data["choices"] = self.choices
         if self.autocomplete:
             self.data["autocomplete"] = self.autocomplete
         if self.max_length:
@@ -133,7 +128,7 @@ class IntegerOption(Option):
         The maximum value of the integer.
     min_value: int
         The minimum value of the integer.
-    choices: List[Choice]
+    choices: List[Choice] | None
         The choices for the integer.
     autocomplete: bool
         Whether the integer should be auto completed or not.
@@ -158,7 +153,7 @@ class IntegerOption(Option):
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.to_dict() for choice in self.choices]
+            self.data["choices"] = self.choices
         if self.autocomplete:
             self.data["autocomplete"] = self.autocomplete
         if self.max_value is not None:
@@ -184,7 +179,7 @@ class NumberOption(Option):
         The maximum value of the number.
     min_value: float
         The minimum value of the number.
-    choices: List[Choice]
+    choices: List[Choice] | None
         The choices for the number.
     autocomplete: bool
         Whether the number should be auto completed or not.
@@ -209,7 +204,7 @@ class NumberOption(Option):
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = [choice.to_dict() for choice in self.choices]
+            self.data["choices"] = self.choices
         if self.autocomplete:
             self.data["autocomplete"] = self.autocomplete
         if self.max_value is not None:
@@ -304,7 +299,7 @@ class ChannelOption(Option):
 
     def to_dict(self) -> Dict[str, Any]:
         if self.channel_types:
-            self.data["channel_types"] = [ct.value for ct in self.channel_types]
+            self.data["channel_types"] = self.channel_types
         return self.data
 
 

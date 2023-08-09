@@ -1,9 +1,7 @@
-# pylint: disable=invalid-name
-
 from enum import Enum
 
 
-class Permissions(Enum):
+class Permission(Enum):
     """
     Represents discord permission values.
     """
@@ -49,3 +47,7 @@ class Permissions(Enum):
     send_messages_in_threads = 1 << 38
     use_embedded_activities = 1 << 39
     moderate_members = 1 << 40
+
+    @staticmethod
+    def check(permissions: int, permission: "Permission") -> bool:
+        return bool(permissions & permission.value)

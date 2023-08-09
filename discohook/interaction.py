@@ -7,6 +7,7 @@ from .member import Member
 from .message import Message
 from .response import ResponseAdapter
 from .user import User
+from .utils import unwrap_user
 
 if TYPE_CHECKING:
     from .client import Client
@@ -188,7 +189,7 @@ class Interaction:
         return PartialChannel(self.client, self.channel_id, self.guild_id)
 
     @property
-    def author(self) -> Optional[Union[User, Member]]:
+    def author(self) -> Union[User, Member]:
         """
         The author of the interaction
 
@@ -196,15 +197,11 @@ class Interaction:
 
         Returns
         -------
-        Optional[Union[User, Member]]
+        Union[User, Member]
         """
-        member = self.payload.get("member")
-        user = self.payload.get("user")
-        if not member:
-            return User(self.client, user)
-        member.update(member.pop("user", {}))
-        member["guild_id"] = self.guild_id
-        return Member(self.client, member)
+        if not self.guild_id:
+            return User(self.client, self.payload["user"])
+        return Member(self.client, unwrap_user(self.payload["member"], self.guild_id))
 
     @property
     def guild(self) -> Optional[PartialGuild]:

@@ -5,6 +5,7 @@ from .emoji import PartialEmoji
 from .enums import ChannelType
 from .file import File
 from .message import Message
+from .models import AllowedMentions, MessageReference
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
 from .view import View
@@ -56,6 +57,8 @@ class PartialChannel:
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
+        allowed_mentions: Optional[AllowedMentions] = None,
+        message_reference: Optional[MessageReference] = None,
     ):
         """
         Sends a message to the channel.
@@ -76,6 +79,10 @@ class PartialChannel:
             A file to send with the message.
         files: Optional[List[File]]
             A list of files to send with the message.
+        allowed_mentions: Optional[:class:`AllowedMentions`]
+            The allowed mentions for the message.
+        message_reference: Optional[:class:`MessageReference`]
+            The message reference for the message.
         """
         if view:
             self.client.load_components(view)
@@ -88,6 +95,8 @@ class PartialChannel:
             tts=tts,
             file=file,
             files=files,
+            allowed_mentions=allowed_mentions,
+            message_reference=message_reference,
         )
 
         resp = await self.client.http.send_message(self.id, create_form(payload, merge_fields(file, files)))
@@ -203,7 +212,7 @@ class PartialChannel:
         if icon:
             payload["icon"] = icon
         if default_reaction_emoji:
-            payload["default_reaction_emoji"] = default_reaction_emoji.to_dict()
+            payload["default_reaction_emoji"] = default_reaction_emoji
         if default_thread_rate_limit_per_user:
             payload["default_thread_rate_limit_per_user"] = default_thread_rate_limit_per_user
         if default_sort_order:
@@ -212,7 +221,98 @@ class PartialChannel:
             payload["default_forum_layout"] = default_forum_layout
         resp = await self.client.http.edit_channel(self.id, payload)
         data = await resp.json()
-        return Channel(data, self.client)
+        return Channel(self.client, data)
+
+    async def fetch_message(self, message_id: str) -> Optional[Message]:
+        """
+        Fetches a message from the channel.
+
+        Parameters
+        ----------
+        message_id: :class:`str`
+            The id of the message to fetch.
+
+        Returns
+        -------
+        :class:`Message`
+            The fetched message.
+        """
+        resp = await self.client.http.fetch_channel_message(self.id, message_id)
+        data = await resp.json()
+        return Message(self.client, data)
+
+    async def fetch_messages(
+        self,
+        limit: int = 50,
+        *,
+        before: Optional[str] = None,
+        after: Optional[str] = None,
+        around: Optional[str] = None,
+    ) -> List[Message]:
+        """
+        Fetches messages from the channel.
+
+        Parameters
+        ----------
+        limit: Optional[:class:`int`]
+            The maximum amount of messages to fetch.
+        before: Optional[:class:`str`]
+            The id of the message to fetch before.
+        after: Optional[:class:`str`]
+            The id of the message to fetch after.
+        around: Optional[:class:`str`]
+            The id of the message to fetch around.
+
+        Returns
+        -------
+        List[:class:`Message`]
+            The fetched messages.
+        """
+        params = {"limit": limit}
+        if before:
+            params["before"] = before
+        if after:
+            params["after"] = after
+        if around:
+            params["around"] = around
+        resp = await self.client.http.fetch_channel_messages(self.id, params=params)
+        data = await resp.json()
+        return [Message(self.client, msg) for msg in data]
+
+    async def purge(
+        self,
+        limit: int = 50,
+        *,
+        before: Optional[str] = None,
+        after: Optional[str] = None,
+        around: Optional[str] = None,
+    ) -> List[Message]:
+        """
+        Deletes messages from the channel in bulk.
+
+        Parameters
+        ----------
+        limit: Optional[:class:`int`]
+            The maximum amount of messages to delete.
+        before: Optional[:class:`str`]
+            The id of the message to delete before.
+        after: Optional[:class:`str`]
+            The id of the message to delete after.
+        around: Optional[:class:`str`]
+            The id of the message to delete around.
+
+        Returns
+        -------
+        List[:class:`Message`]
+            The deleted messages.
+        """
+        messages = await self.fetch_messages(limit=limit, before=before, after=after, around=around)
+        ids = [msg.id for msg in messages]
+        if len(ids) < 2:
+            await self.client.http.delete_channel_message(self.id, ids[0])
+            return messages
+        await self.client.http.delete_channel_messages(self.id, {"messages": ids})
+        return messages
 
     async def delete(self):
         await self.client.http.delete_channel(self.id)
@@ -293,7 +393,7 @@ class Channel(PartialChannel):
 
     """
 
-    def __init__(self, data: dict, client: "Client"):
+    def __init__(self, client: "Client", data: dict):
         super().__init__(client, data["id"], data.get("guild_id"))
         self.type = data.get("type")
         self.guild_id = data.get("guild_id")

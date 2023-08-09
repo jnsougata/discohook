@@ -2,6 +2,7 @@ from typing import Any, List, Optional
 
 from .embed import Embed
 from .file import File
+from .models import AllowedMentions, MessageReference
 from .view import View
 
 MISSING = Any
@@ -26,7 +27,11 @@ def handle_send_params(
     file: Optional[File] = None,
     files: Optional[List[File]] = None,
     ephemeral: Optional[bool] = False,
+    allowed_mentions: Optional[AllowedMentions] = None,
+    message_reference: Optional[MessageReference] = None,
+    sticker_ids: Optional[List[str]] = None,
     suppress_embeds: Optional[bool] = False,
+    supress_notifications: Optional[bool] = False,
 ):
     payload = {}
     flag_value = 0
@@ -36,6 +41,8 @@ def handle_send_params(
         flag_value |= 1 << 6
     if suppress_embeds:
         flag_value |= 1 << 2
+    if supress_notifications:
+        flag_value |= 1 << 12
     if content:
         payload["content"] = str(content)
     if tts:
@@ -44,6 +51,12 @@ def handle_send_params(
         payload["embeds"] = [embed.to_dict() for embed in embeds]
     if view:
         payload["components"] = view.components
+    if allowed_mentions:
+        payload["allowed_mentions"] = allowed_mentions
+    if message_reference:
+        payload["message_reference"] = message_reference
+    if sticker_ids:
+        payload["sticker_ids"] = sticker_ids
     if files:
         payload["attachments"] = [
             {

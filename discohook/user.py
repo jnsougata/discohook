@@ -5,7 +5,6 @@ from .embed import Embed
 from .file import File
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
-from .permissions import Permissions
 
 if TYPE_CHECKING:
     from .client import Client
@@ -23,6 +22,8 @@ class User:
         The name of the user.
     discriminator: :class:`str`
         The discriminator of the user.
+    accent_color: Optional[:class:`int`]
+        The accent color of the user.
     avatar: :class:`Asset`
         The avatar of the user.
     system: :class:`bool`
@@ -58,17 +59,27 @@ class User:
         return self.data["username"]
 
     @property
+    def global_name(self) -> Optional[str]:
+        return self.data.get("global_name")
+
+    @property
     def discriminator(self) -> str:
         return self.data["discriminator"]
 
     @property
+    def accent_color(self) -> Optional[int]:
+        return self.data.get("accent_color")
+
+    @property
     def avatar(self) -> Asset:
         av_hash = self.data.get("avatar")
-        if not av_hash:
-            fragment = "embed/avatars/"
-            av_hash = str({int(self.discriminator) % 5})
-            return Asset(hash=av_hash, fragment=fragment)
-        return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
+        if av_hash:
+            return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
+        if self.discriminator == 0:
+            av_hash = str({(int(self.id) >> 22) % 6})
+        else:
+            av_hash = str(int(self.discriminator) % 5)
+        return Asset(hash=av_hash, fragment="embed/avatars")
 
     @property
     def system(self) -> bool:
@@ -103,6 +114,8 @@ class User:
         return self.data.get("public_flags")
 
     def __str__(self) -> str:
+        if self.discriminator == 0:
+            return self.name
         return f"{self.name}#{self.discriminator}"
 
     def __eq__(self, other):
@@ -153,87 +166,3 @@ class User:
         channel_id = data["id"]
         resp = await self.client.http.send_message(channel_id, create_form(payload, merge_fields(file, files)))
         return await resp.json()
-
-
-class ClientUser:
-    """
-    Represents a discord client user.
-
-    Properties
-    ----------
-    id: :class:`str`
-        The unique ID of the user.
-    name: :class:`str`
-        The name of the user.
-    icon_hash: Optional[:class:`str`]
-        The hash of the client user's icon.
-    icon_url: Optional[:class:`str`]
-        The URL of the client user's icon.
-    public: :class:`bool`
-        Whether the client user is public.
-    Require_code_grant: :class:`bool`
-        Whether the client user requires code grant.
-    permissions: :class:`str`
-        The permissions of the client user.
-    scopes: :class:`str`
-        The scopes of the client user.
-    owner: :class:`User`
-        The owner of the client user.
-    flags: :class:`int`
-        The flags of the client user.
-    """
-
-    def __init__(self, client: "Client", data: Dict[str, Any]) -> None:
-        self.data = data
-        self.client = client
-
-    @property
-    def id(self) -> str:
-        return self.data["id"]
-
-    @property
-    def name(self) -> str:
-        return self.data["name"]
-
-    @property
-    def icon_hash(self) -> Optional[str]:
-        return self.data.get("icon")
-
-    @property
-    def icon_url(self) -> Optional[str]:
-        return f"https://cdn.discordapp.com/app-icons/{self.id}/{self.icon_hash}.png"
-
-    @property
-    def public(self) -> bool:
-        return self.data["bot_public"]
-
-    @property
-    def require_code_grant(self) -> bool:
-        return self.data["bot_require_code_grant"]
-
-    @property
-    def permissions(self) -> str:
-        return self.data["install_params"]["permissions"]
-
-    @property
-    def scopes(self) -> str:
-        return self.data["install_params"]["scopes"]
-
-    @property
-    def owner(self) -> User:
-        return User(self.client, self.data["owner"])
-
-    @property
-    def flags(self) -> int:
-        return self.data["flags"]
-
-    def has_permission(self, permission: Permissions) -> bool:
-        """
-        Checks if the client user has a permission.
-
-        Parameters
-        ----------
-        permission: :class:`Permissions`
-            The permission to check.
-        """
-        return permission.value & int(self.permissions) == permission.value

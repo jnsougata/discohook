@@ -13,6 +13,7 @@ from .member import Member
 from .message import Message
 from .role import Role
 from .user import User
+from .utils import unwrap_user
 
 
 def handle_params_by_signature(
@@ -52,32 +53,31 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
         name = option["name"]
         value = option["value"]
         option_type = option["type"]
-        if option_type == ApplicationCommandOptionType.string.value:
+        if option_type == ApplicationCommandOptionType.string:
             options[name] = value
-        elif option_type == ApplicationCommandOptionType.integer.value:
+        elif option_type == ApplicationCommandOptionType.integer:
             options[name] = int(value)
-        elif option_type == ApplicationCommandOptionType.boolean.value:
+        elif option_type == ApplicationCommandOptionType.boolean:
             options[name] = bool(value)
-        elif option_type == ApplicationCommandOptionType.number.value:
+        elif option_type == ApplicationCommandOptionType.number:
             options[name] = float(value)
-        elif option_type == ApplicationCommandOptionType.user.value:
+        elif option_type == ApplicationCommandOptionType.user:
             user_data = interaction.data["resolved"]["users"][value]
             if interaction.guild_id:
                 member_data = interaction.data["resolved"]["members"][value]
-                if not member_data["avatar"]:
-                    member_data["avatar"] = user_data["avatar"]
-                user_data.update(member_data)
-                options[name] = Member(interaction.client, user_data)
+                member_data["user"] = user_data
+                member_data = unwrap_user(member_data, interaction.guild_id)
+                options[name] = Member(interaction.client, member_data)
             else:
                 options[name] = User(interaction.client, user_data)
-        elif option_type == ApplicationCommandOptionType.channel.value:
-            options[name] = Channel(interaction.data["resolved"]["channels"][value], interaction.client)
-        elif option_type == ApplicationCommandOptionType.role.value:
+        elif option_type == ApplicationCommandOptionType.channel:
+            options[name] = Channel(interaction.client, interaction.data["resolved"]["channels"][value])
+        elif option_type == ApplicationCommandOptionType.role:
             options[name] = Role(interaction.client, interaction.data["resolved"]["roles"][value])
-        elif option_type == ApplicationCommandOptionType.mentionable.value:
+        elif option_type == ApplicationCommandOptionType.mentionable:
             # TODO: this is a shit option type, not enough motivation to implement it
             pass
-        elif option_type == ApplicationCommandOptionType.attachment.value:
+        elif option_type == ApplicationCommandOptionType.attachment:
             options[name] = Attachment(interaction.data["resolved"]["attachments"][value])
     return options
 
@@ -86,7 +86,7 @@ def build_slash_command_prams(func: Callable, interaction: Interaction, skips: i
     command_options = interaction.data.get("options")
     if not command_options:
         return [], {}
-    if command_options[0]["type"] == ApplicationCommandOptionType.subcommand.value:
+    if command_options[0]["type"] == ApplicationCommandOptionType.subcommand:
         subcommand_options = command_options[0].get("options") or []
         parsed = parse_generic_options(subcommand_options, interaction)
     else:
@@ -95,7 +95,7 @@ def build_slash_command_prams(func: Callable, interaction: Interaction, skips: i
 
 
 def build_context_menu_param(interaction: Interaction):
-    if interaction.data["type"] == ApplicationCommandType.user.value:
+    if interaction.data["type"] == ApplicationCommandType.user:
         user_id = interaction.data["target_id"]
         user_resolved = interaction.data["resolved"]["users"][user_id]
         member_resolved = interaction.data["resolved"]["members"][user_id] if interaction.guild_id else {}
@@ -104,7 +104,7 @@ def build_context_menu_param(interaction: Interaction):
             user_resolved.update(member_resolved)
         return User(interaction.client, user_resolved)
 
-    if interaction.data["type"] == ApplicationCommandType.message.value:
+    if interaction.data["type"] == ApplicationCommandType.message:
         message_id = interaction.data["target_id"]
         message_data = interaction.data["resolved"]["messages"][message_id]
         return Message(interaction.client, message_data)
@@ -120,21 +120,21 @@ def build_modal_params(func: Callable, interaction: Interaction):
 
 
 def build_select_menu_values(interaction: Interaction) -> List[Any]:
-    if interaction.data["component_type"] == MessageComponentType.text_select.value:
+    if interaction.data["component_type"] == MessageComponentType.text_select:
         return interaction.data["values"]
-    if interaction.data["component_type"] == MessageComponentType.channel_select.value:
+    if interaction.data["component_type"] == MessageComponentType.channel_select:
         resolved = interaction.data["resolved"]["channels"]
-        return [Channel(resolved.pop(channel_id), interaction.client) for channel_id in interaction.data["values"]]
-    if interaction.data["component_type"] == MessageComponentType.user_select.value:
+        return [Channel(interaction.client, resolved.pop(channel_id)) for channel_id in interaction.data["values"]]
+    if interaction.data["component_type"] == MessageComponentType.user_select:
         resolved = interaction.data["resolved"]["users"]
         return [User(interaction.client, resolved.pop(user_id)) for user_id in interaction.data["values"]]
-    if interaction.data["component_type"] == MessageComponentType.role_select.value:
+    if interaction.data["component_type"] == MessageComponentType.role_select:
         resolved = interaction.data["resolved"]["roles"]
         roles = [resolved.pop(role_id) for role_id in interaction.data["values"]]
         for role in roles:
             role["guild_id"] = interaction.guild_id
         return [Role(interaction.client, role) for role in roles]
-    if interaction.data["component_type"] == MessageComponentType.mentionable_select.value:
+    if interaction.data["component_type"] == MessageComponentType.mentionable_select:
         raw_values = interaction.data["values"]
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})

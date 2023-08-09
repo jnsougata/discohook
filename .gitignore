@@ -128,13 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-main.py
 .idea/
 .deta/
 .detaignore
 .spaceignore
 .space/
-Spacefile
 bot/
 webhook.png
 ping.py

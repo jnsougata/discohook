@@ -16,29 +16,53 @@ pip install git+https://github.com/jnsougata/discohook
 ## Quickstart
 
 ```python
+import os
+
 import discohook
 
-
-APPLICATION_ID = "YOUR_APPLICATION_ID"
-APPLICATION_TOKEN = "YOUR_APPLICATION_TOKEN"
-APPLICATION_PUBLIC_KEY = "YOUR_APPLICATION_PUBLIC_KEY"
+DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
+PUBLIC_KEY = os.environ["PUBLIC_KEY"]
+APPLICATION_ID = os.environ["APPLICATION_ID"]
+APPLICATION_PASSWORD = os.environ["APPLICATION_PASSWORD"]
 
 app = discohook.Client(
     application_id=APPLICATION_ID,
-    token=APPLICATION_TOKEN,
-    public_key=APPLICATION_PUBLIC_KEY
+    public_key=PUBLIC_KEY,
+    token=DISCORD_TOKEN,
+    password=APPLICATION_PASSWORD,  # Must be provided if you want to use the dashboard.
+    default_help_command=True,  # This will enable your bot to use  default help command (/help).
 )
 
-@app.command(
-    name="help", 
-    description="basic help command for the bot"
-)
-async def help_command(interaction: discohook.Interaction):
-    await interaction.response.send(
-        "Hello, World!",
-        embed=discohook.Embed(title="Help", description="This is a help command"),
-        ephemeral=True,
-    )
+
+# adding a error handler
+@app.on_interaction_error()
+async def on_error(i: discohook.Interaction, err: Exception):
+    user_response = "Some error occurred! Please contact the developer."
+    if i.responded:
+        await i.response.followup(user_response, ephemeral=True)
+    else:
+        await i.response.send(user_response, ephemeral=True)
+
+    await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
+
+
+# If description is not provided, it will look for function's docstring.
+# If description is not provided and function's docstring is not found, it will raise ValueError.
+# If name is not provided, it will use the function name as the command name. (in this case, "ping")
+# If category is not provided, it will use ApplicationCommandType.slash as the command category.
+@app.command()
+async def ping(i: discohook.Interaction):
+    """Ping the bot."""
+    await i.response.send("Pong!")
+
+
+# Making user command
+@app.user_command()
+async def avatar(i: discohook.Interaction, user: discohook.User):
+    embed = discohook.Embed()
+    embed.set_image(url=user.avatar.url)
+    await i.response.send(embed=embed)
+
 ```
 ### Deployment
 Deploy the snippet above to your serverless function, and you're good to go to the next step.
@@ -61,14 +85,14 @@ We will talk about it later.
 
 #### Registering Commands
 You can sync commands by just visiting the dashboard.
-The dashboard will be available at `https://example.io/api/dash/<bot_token_here> `. 
+The dashboard will be available at `https://example.io/api/dash `. 
 
-![image](https://user-images.githubusercontent.com/53375272/229229047-38102ff8-16ea-4f57-8e33-4e00fed939a2.png)
+![image](https://github.com/jnsougata/discohook/assets/53375272/b174878b-7aac-4e05-83cc-62f00dfa8c80)
 
 Once you visit the dashboard, it will automatically register all the commands. 
 You can also register commands manually by using the bash command below.   
 ```bash
-curl -X GET https://example.io/api/sync/<bot_token_here>
+curl -d '{"password":  <sha256 hashed password>}' -X POST https://example.io/api/sync  
 ```
 
 **🎉 Boom!** You're done. Now you can test your bot by using ` /help ` command in your server.

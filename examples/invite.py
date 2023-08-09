@@ -26,7 +26,7 @@ duration: int
         )
     ],
     permissions=[
-        discohook.Permissions.create_instant_invite
+        discohook.Permission.create_instant_invite
     ]
 )
 async def invite(interaction: discohook.Interaction, duration: Union[int, None] = None):
@@ -43,4 +43,4 @@ async def invite(interaction: discohook.Interaction, duration: Union[int, None] 
         method="POST", path=f"/channels/{interaction.channel_id}/invites", use_auth=True, json=params)
 
     # Send result
-    await interaction.response(content=f"https://discord.gg/{(await inv.json())['code']}")
+    await interaction.response.followup(content=f"https://discord.gg/{(await inv.json())['code']}")
