@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Union, Callable, Tuple
+from typing import Any, Dict, List, Optional, Union, Callable
 import aiohttp
 from starlette.applications import Starlette
 from starlette.requests import Request
@@ -94,8 +94,6 @@ class Client(Starlette):
     ):
         super().__init__(**kwargs)
         self.token = token
-        self.docs_url = None
-        self.redoc_url = None
         self.public_key = public_key
         self.application_id = application_id
         self.password = password
@@ -553,4 +551,15 @@ class Client(Starlette):
         List[Dict[str, Any]]
         """
         resp = await self.http.fetch_global_application_commands(str(self.application_id))
+        return await resp.json()
+
+    async def current_application(self) -> Dict[str, Any]:
+        """
+        Returns the application object associated with the requesting client user.
+
+        Returns
+        -------
+        Dict[str, Any]
+        """
+        resp = await self.http.fetch_application()
         return await resp.json()

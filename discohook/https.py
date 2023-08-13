@@ -26,6 +26,9 @@ class HTTPClient:
             form.headers.add("Authorization", f"Bot {self.token}")
         return await self.session.request(method, f"/api/v10{path}", data=form, headers=form.headers)
 
+    async def fetch_application(self):
+        return await self.request("GET", "/applications/@me", use_auth=True)
+
     async def sync_commands(self, application_id: str, commands: List[Dict[str, Any]]):
         return await self.request("PUT", f"/applications/{application_id}/commands", json=commands, use_auth=True)
 
@@ -133,6 +136,9 @@ class HTTPClient:
     async def create_guild_channel(self, guild_id: str, payload: Dict[str, Any]):
         return await self.request("POST", f"/guilds/{guild_id}/channels", json=payload, use_auth=True)
 
+    async def crosspost_channel_message(self, channel_id: str, message_id: str):
+        return await self.request("POST", f"/channels/{channel_id}/messages/{message_id}/crosspost", use_auth=True)
+
     async def edit_channel(self, channel_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/channels/{channel_id}", json=payload, use_auth=True)
 
@@ -167,3 +173,15 @@ class HTTPClient:
 
     async def delete_webhook(self, webhook_id: str):
         return await self.request("DELETE", f"/webhooks/{webhook_id}", use_auth=True)
+
+    async def create_message_reaction(self, message_id: str, emoji: str):
+        return await self.request("PUT", f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/@me", use_auth=True)
+
+    async def delete_message_reaction(self, message_id: str, emoji: str, user_id: str):
+        return await self.request("DELETE", f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/{user_id}", use_auth=True)
+
+    async def delete_all_message_reactions(self, message_id: str, emoji: Optional[str] = None):
+        path = f"/channels/{message_id}/messages/{message_id}/reactions"
+        if emoji:
+            path += f"/{emoji}"
+        return await self.request("DELETE", path, use_auth=True)

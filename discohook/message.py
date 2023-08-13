@@ -1,9 +1,11 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from .embed import Embed
+from .emoji import PartialEmoji
 from .file import File
+from .models import AllowedMentions, MessageReference
 from .multipart import create_form
-from .params import MISSING, handle_edit_params, merge_fields
+from .params import MISSING, handle_edit_params, merge_fields, handle_send_params
 from .role import Role
 from .user import User
 from .view import View
@@ -283,3 +285,114 @@ class Message:
         Unpins the message from the channel.
         """
         return await self.client.http.unpin_channel_message(self.channel_id, self.id)
+
+    async def reply(
+        self,
+        content: Optional[str] = None,
+        *,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        view: Optional[View] = None,
+        tts: Optional[bool] = False,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
+        allowed_mentions: Optional[AllowedMentions] = None,
+        mention_author: Optional[bool] = None,
+    ):
+        """
+        Replies to the message.
+
+        Parameters
+        ----------
+        content: Optional[str]
+            The content of the message.
+        embed: Optional[Embed]
+            The embed of the message.
+        embeds: Optional[List[Embed]]
+            The embeds of the message.
+        view: Optional[View]
+            The view of the message.
+        tts: Optional[bool]
+            Whether the message should be sent with text-to-speech.
+        file: Optional[File]
+            A file to send with the message.
+        files: Optional[List[File]]
+            A list of files to send with the message.
+        allowed_mentions: Optional[AllowedMentions]
+            The allowed mentions for the message.
+        mention_author: Optional[bool]
+            Whether the author should be mentioned.
+
+        Returns
+        -------
+        Message
+        """
+        if mention_author is not None:
+            if not allowed_mentions:
+                allowed_mentions = AllowedMentions(replied_user=True)
+            allowed_mentions["replied_user"] = True
+        data = handle_send_params(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            view=view,
+            tts=tts,
+            file=file,
+            files=files,
+            allowed_mentions=allowed_mentions,
+            message_reference=MessageReference(message_id=self.id, channel_id=self.channel_id)
+        )
+        if view and view is not MISSING:
+            self.client.load_components(view)
+        resp = await self.client.http.send_message(self.channel_id, create_form(data, merge_fields(file, files)))
+        data = await resp.json()
+        return Message(self.client, data)
+
+    async def add_reaction(self, emoji: Union[PartialEmoji, str]):
+        """
+        Creates a reaction on the message.
+
+        Parameters
+        ----------
+        emoji: Union[Emoji, str]
+            The emoji to react with.
+        """
+        from urllib.parse import quote
+
+        if isinstance(emoji, PartialEmoji):
+            encoded = f'{emoji["name"]}:{emoji["id"]}'
+        else:
+            encoded = quote(emoji)
+        return await self.client.http.create_message_reaction(self.channel_id, self.id, encoded)
+
+    async def remove_reaction(self, emoji: Union[PartialEmoji, str], user_id: Optional[str] = None):
+        """
+        Removes a reaction on the message.
+
+        Parameters
+        ----------
+        emoji: Union[Emoji, str]
+            The emoji to delete.
+        user_id: Optional[str]
+            The user to delete the reaction of.
+        """
+        from urllib.parse import quote
+
+        if isinstance(emoji, PartialEmoji):
+            encoded = f'{emoji["name"]}:{emoji["id"]}'
+        else:
+            encoded = quote(emoji)
+        return await self.client.http.delete_message_reaction(
+            self.channel_id, self.id, encoded, user_id or "@me"
+        )
+
+    async def remove_reactions(self, emoji: Union[PartialEmoji, str, None] = None):
+        """
+        Removes all reactions on the message.
+
+        Parameters
+        ----------
+        emoji: Union[Emoji, str, None]
+            The emoji to remove reactions of.
+        """
+        return await self.client.http.delete_all_message_reactions(self.id, self.channel_id, emoji)
