@@ -386,7 +386,7 @@ class Message:
             self.channel_id, self.id, encoded, user_id or "@me"
         )
 
-    async def remove_reactions(self, emoji: Union[PartialEmoji, str, None] = None):
+    async def remove_reactions(self, emoji: Optional[Union[PartialEmoji, str]] = None):
         """
         Removes all reactions on the message.
 
