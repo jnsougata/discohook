@@ -179,7 +179,8 @@ async def dashboard(_):
                     method: "DELETE",
                     body: JSON.stringify({
                         password: password,
-                        id: command.id
+                        id: command.id, 
+                        guild_id: command.guild_id || null
                     })
                 })
                 if (resp.status === 204) {

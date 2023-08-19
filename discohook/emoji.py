@@ -1,4 +1,4 @@
-from typing_extensions import TypedDict, NotRequired
+from .bcompat import TypedDict, NotRequired
 
 
 class PartialEmoji(TypedDict):

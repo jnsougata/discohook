@@ -42,7 +42,11 @@ async def _handler(request: Request):
             return JSONResponse({"type": InteractionCallbackType.pong}, status_code=200)
 
         elif interaction.type == InteractionType.app_command:
-            key = f"{interaction.data['name']}:{interaction.data['type']}"
+            specific_source_guild = interaction.data.get("guild_id")
+            if specific_source_guild:
+                key = f"{interaction.data['name']}:{specific_source_guild}:{interaction.data['type']}"
+            else:
+                key = f"{interaction.data['name']}:{interaction.data['type']}"
             cmd: ApplicationCommand = request.app.application_commands.get(key)
             if not cmd:
                 raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")

@@ -86,7 +86,7 @@ async def color(i: discohook.Interaction):
         )
     ],
     dm_access=False,
-    permissions=[discohook.Permission.manage_messages]
+    permissions=[discohook.Permission.manage_messages],
 )
 async def purge(i: discohook.Interaction, limit: int):
     """Purge messages from the channel."""
@@ -101,7 +101,7 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
     await i.response.send(embed=embed)
 
 
-@app.message_command()
+@app.message_command(guild_id=os.environ["GUILD_ID"])
 async def echo(i: discohook.Interaction, message: discohook.Message):
     if message.content:
         await i.response.send(message.content)

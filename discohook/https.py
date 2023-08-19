@@ -8,6 +8,9 @@ if TYPE_CHECKING:
 
 class HTTPClient:
     """Represents an HTTP client for Discord's API."""
+
+    DISCORD_API_VERSION: int = 10
+
     def __init__(self, client: "Client", token: str, session: aiohttp.ClientSession):
         self.token = token
         self.client = client
@@ -19,7 +22,7 @@ class HTTPClient:
             headers["Authorization"] = f"Bot {self.token}"
         headers["Content-Type"] = "application/json"
         kwargs["headers"] = headers
-        return await self.session.request(method, f"/api/v10{path}", **kwargs)
+        return await self.session.request(method, f"/api/v{self.DISCORD_API_VERSION}{path}", **kwargs)
 
     async def multipart(self, method: str, path: str, *, form: aiohttp.MultipartWriter, use_auth: bool = False):
         if use_auth:
@@ -29,8 +32,11 @@ class HTTPClient:
     async def fetch_application(self):
         return await self.request("GET", "/applications/@me", use_auth=True)
 
-    async def sync_commands(self, application_id: str, commands: List[Dict[str, Any]]):
+    async def sync_global_commands(self, application_id: str, commands: List[Dict[str, Any]]):
         return await self.request("PUT", f"/applications/{application_id}/commands", json=commands, use_auth=True)
+
+    async def sync_guild_commands(self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]):
+        return await self.request("PUT", f"/applications/{application_id}/guilds/{guild_id}/commands", json=commands, use_auth=True)
 
     async def fetch_global_application_commands(self, application_id: str):
         return await self.request("GET", f"/applications/{application_id}/commands", use_auth=True)
@@ -38,7 +44,9 @@ class HTTPClient:
     async def edit_client(self, payload: Dict[str, Any]):
         return await self.request("PATCH", "/users/@me", json=payload, use_auth=True)
 
-    async def delete_command(self, application_id: str, command_id: str):
+    async def delete_command(self, application_id: str, command_id: str, guild_id: Optional[str] = None):
+        if guild_id:
+            return await self.request("DELETE", f"/applications/{application_id}/guilds/{guild_id}/commands/{command_id}", use_auth=True)
         return await self.request("DELETE", f"/applications/{application_id}/commands/{command_id}", use_auth=True)
 
     async def send_message(self, channel_id: str, form: aiohttp.MultipartWriter):

@@ -1,4 +1,5 @@
 import asyncio
+from operator import add
 from typing import Any, Dict, List, Optional, Union, Callable
 import aiohttp
 from starlette.applications import Starlette
@@ -30,9 +31,10 @@ async def delete_cmd(request: Request):
     data = await request.json()
     password = data.get("password")
     command_id = data.get("id")
+    guild_id = data.get("guild_id")
     if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    resp = await request.app.delete_command(command_id)
+    resp = await request.app.delete_command(command_id, guild_id=guild_id)
     if resp.status == 204:
         return JSONResponse({"success": True}, status_code=resp.status)
     return JSONResponse({"error": "Failed to delete command"}, status_code=resp.status)
@@ -45,8 +47,13 @@ async def sync(request: Request):
     password = data.get("password")
     if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    resp = await request.app.sync()
-    return JSONResponse(await resp.json(), status_code=resp.status)
+    responses: List[aiohttp.ClientResponse] = await request.app.sync()
+    if not any([resp.status == 200 for resp in responses]):
+        erred_first_response = next((resp for resp in responses if resp.status != 200), None)
+        return JSONResponse(await erred_first_response.json(), status_code=500)
+
+    payloads = [await resp.json() for resp in responses]
+    return JSONResponse(add(*payloads), status_code=200)
 
 
 async def authenticate(request: Request):
@@ -169,7 +176,8 @@ class Client(Starlette):
         permissions: Optional[List[Permission]] = None,
         dm_access: bool = True,
         nsfw: bool = False,
-        category: ApplicationCommandType = ApplicationCommandType.slash,
+        kind: ApplicationCommandType = ApplicationCommandType.slash,
+        guild_id: Optional[str] = None,
     ):
         """
         A decorator to register a command.
@@ -188,8 +196,10 @@ class Client(Starlette):
             Whether the command can be used in DMs. Defaults to True.
         nsfw: bool
             Whether the command is age restricted. Defaults to False.
-        category: AppCmdType
+        kind: ApplicationCommandType
             The category of the command. Defaults to slash commands.
+        guild_id: Optional[str]
+            The guild ID to register the command in. Defaults to None.
 
         Raises
         ------
@@ -206,11 +216,12 @@ class Client(Starlette):
                 options=options,
                 permissions=permissions,
                 dm_access=dm_access,
-                category=category,
+                kind=kind,
                 nsfw=nsfw,
+                guild_id=guild_id,
             )
             cmd.callback = callback
-            if category == ApplicationCommandType.slash:
+            if kind == ApplicationCommandType.slash:
                 cmd.description = auto_description(description, callback)
             self.application_commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
@@ -225,6 +236,7 @@ class Client(Starlette):
         permissions: Optional[List[Permission]] = None,
         dm_access: bool = True,
         nsfw: bool = False,
+        guild_id: Optional[str] = None,
     ):
         """
         A decorator to register a user command.
@@ -239,6 +251,8 @@ class Client(Starlette):
             Whether the command can be used in DMs. Defaults to True.
         nsfw: bool
             Whether the command is age restricted. Defaults to False.
+        guild_id: Optional[str]
+            The guild ID to register the command in. Defaults to None.
 
         Raises
         ------
@@ -253,8 +267,9 @@ class Client(Starlette):
                 name or callback.__name__,
                 permissions=permissions,
                 dm_access=dm_access,
-                category=ApplicationCommandType.user,
+                kind=ApplicationCommandType.user,
                 nsfw=nsfw,
+                guild_id=guild_id,
             )
             cmd.callback = callback
             self.application_commands[cmd.key] = cmd
@@ -270,6 +285,7 @@ class Client(Starlette):
         permissions: Optional[List[Permission]] = None,
         dm_access: bool = True,
         nsfw: bool = False,
+        guild_id: Optional[str] = None,
     ):
         """
         A decorator to register a message command.
@@ -284,6 +300,8 @@ class Client(Starlette):
             Whether the command can be used in DMs. Defaults to True.
         nsfw: bool
             Whether the command is age restricted. Defaults to False.
+        guild_id: Optional[str]
+            The guild ID to register the command in. Defaults to None.
 
         Raises
         ------
@@ -298,8 +316,9 @@ class Client(Starlette):
                 name or callback.__name__,
                 permissions=permissions,
                 dm_access=dm_access,
-                category=ApplicationCommandType.message,
+                kind=ApplicationCommandType.message,
                 nsfw=nsfw,
+                guild_id=guild_id,
             )
             cmd.callback = callback
             self.application_commands[cmd.key] = cmd
@@ -320,15 +339,18 @@ class Client(Starlette):
         self.application_commands.update({command.key: command for command in commands})  # noqa
         self._sync_queue.extend(commands)
 
-    async def delete_command(self, command_id: str):
+    async def delete_command(self, command_id: str, *, guild_id: Optional[str] = None):
         """
         Delete a command from the client.
 
         Parameters
         ----------
         command_id: str
+            The id of the command to delete.
+        guild_id: str | None
+            The id of the guild to delete the command from. Defaults to None.
         """
-        return await self.http.delete_command(str(self.application_id), command_id)
+        return await self.http.delete_command(str(self.application_id), command_id, guild_id)
 
     def load_modules(self, directory: str):
         """
@@ -454,13 +476,26 @@ class Client(Starlette):
             payload["avatar"] = avatar
         await self.http.edit_client(payload)
 
-    async def sync(self):
+    async def sync(self) -> List[aiohttp.ClientResponse]:
         """
         Sync the commands to the client.
 
         This method is used internally by the client. You should not use this method.
         """
-        return await self.http.sync_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue])
+        responses = []
+        guild_commands = {}
+        for cmd in self._sync_queue:
+            if cmd.guild_id:
+                guild_commands.setdefault(cmd.guild_id, []).append(cmd)
+        if guild_commands:
+            tasks = []
+            for guild_id, commands in guild_commands.items():
+                tasks.append(self.http.sync_guild_commands(str(self.application_id), guild_id, [cmd.to_dict() for cmd in commands]))
+            responses.extend(await asyncio.gather(*tasks))
+            self._sync_queue = [cmd for cmd in self._sync_queue if not cmd.guild_id]
+        if self._sync_queue:
+            responses.append(await self.http.sync_global_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue]))
+        return responses
 
     async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
         """

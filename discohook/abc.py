@@ -19,6 +19,7 @@ class Interactable:
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
             self.checks.append(coro)
+            return coro
 
         return decorator
 

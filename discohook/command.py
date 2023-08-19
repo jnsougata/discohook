@@ -95,7 +95,7 @@ class ApplicationCommand(Interactable):
         Whether the command is age restricted. Defaults to False.
     permissions: List[Permission] | None
         The default permissions of the command.
-    category: ApplicationCommandType
+    kind: ApplicationCommandType
         The category of the command. Defaults to slash commands.
     """
 
@@ -108,18 +108,23 @@ class ApplicationCommand(Interactable):
         dm_access: bool = True,
         nsfw: bool = False,
         permissions: Optional[List[Permission]] = None,
-        category: ApplicationCommandType = ApplicationCommandType.slash,
+        kind: ApplicationCommandType = ApplicationCommandType.slash,
+        guild_id: Optional[str] = None,
     ):
         super().__init__()
-        self.key = f"{name}:{category.value}"
+        if not guild_id:
+            self.key = f"{name}:{kind.value}"
+        else:
+            self.key = f"{name}:{guild_id}:{kind.value}"
         self.name = name
         self.description = description
         self.options: List[Union[Option, SubCommand]] = options
         self.dm_access = dm_access
         self.nsfw = nsfw
         self.application_id = None
-        self.category = category
+        self.category = kind
         self.permissions = permissions
+        self.guild_id = guild_id
         self.callback: Optional[AsyncFunc] = None
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
@@ -236,7 +241,7 @@ def command(
     permissions: Optional[List[Permission]] = None,
     dm_access: bool = True,
     nsfw: bool = False,
-    category: ApplicationCommandType = ApplicationCommandType.slash,
+    kind: ApplicationCommandType = ApplicationCommandType.slash,
 ):
     """
     A decorator to register a command.
@@ -255,7 +260,7 @@ def command(
         Whether the command is age-restricted. Defaults to False.
     permissions: Optional[List[Permission]]
         The default permissions of the command.
-    category: AppCmdType
+    kind: ApplicationCommandType
         The category of the command. Defaults to slash commands.
     """
 
@@ -268,7 +273,7 @@ def command(
             options=options,
             dm_access=dm_access,
             permissions=permissions,
-            category=category,
+            kind=kind,
             nsfw=nsfw
         )
         cmd.callback = callback

@@ -1,5 +1,5 @@
 from typing import List
-from typing_extensions import NotRequired, TypedDict
+from .bcompat import TypedDict, NotRequired
 from .enums import AllowedMentionsTypes
 
 
