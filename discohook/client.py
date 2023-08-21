@@ -1,5 +1,4 @@
 import asyncio
-from operator import add
 from typing import Any, Dict, List, Optional, Union, Callable
 import aiohttp
 from starlette.applications import Starlette
@@ -51,9 +50,10 @@ async def sync(request: Request):
     if not any([resp.status == 200 for resp in responses]):
         erred_first_response = next((resp for resp in responses if resp.status != 200), None)
         return JSONResponse(await erred_first_response.json(), status_code=500)
-
-    payloads = [await resp.json() for resp in responses]
-    return JSONResponse(add(*payloads), status_code=200)
+    commands = []
+    for resp in responses:
+        commands.extend(await resp.json())
+    return JSONResponse(commands, status_code=200)
 
 
 async def authenticate(request: Request):
