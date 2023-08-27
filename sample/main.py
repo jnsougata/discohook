@@ -107,3 +107,20 @@ async def echo(i: discohook.Interaction, message: discohook.Message):
         await i.response.send(message.content)
     else:
         await i.response.send("Message does not have text content.", ephemeral=True)
+
+
+@app.command(
+    options=[
+        discohook.AttachmentOption("file", "The file to save.", required=True)
+    ]
+)
+async def save(i: discohook.Interaction, file: discohook.Attachment):
+    """Save a file to Deta Drive."""
+    import deta
+
+    deta = deta.Deta(env="DETA_PROJECT_KEY")
+    drive = deta.drive("files")
+    await i.response.defer()
+    await drive.put(await file.read(), save_as=file.filename, content_type=file.content_type)
+    await i.response.followup(f"File saved as `{file.filename}` to Deta Drive.")
+
