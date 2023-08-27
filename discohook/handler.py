@@ -20,6 +20,13 @@ from .resolver import (
 )
 
 
+def _command_key(interaction: Interaction) -> str:
+    specific_source_guild = interaction.data.get("guild_id")
+    if specific_source_guild:
+        return f"{interaction.data['name']}:{specific_source_guild}:{interaction.data['type']}"
+    return f"{interaction.data['name']}:{interaction.data['type']}"
+
+
 # noinspection PyProtectedMember
 async def _handler(request: Request):
     """
@@ -42,12 +49,7 @@ async def _handler(request: Request):
             return JSONResponse({"type": InteractionCallbackType.pong}, status_code=200)
 
         elif interaction.type == InteractionType.app_command:
-            specific_source_guild = interaction.data.get("guild_id")
-            if specific_source_guild:
-                key = f"{interaction.data['name']}:{specific_source_guild}:{interaction.data['type']}"
-            else:
-                key = f"{interaction.data['name']}:{interaction.data['type']}"
-            cmd: ApplicationCommand = request.app.application_commands.get(key)
+            cmd: ApplicationCommand = request.app.commands.get(_command_key(interaction))
             if not cmd:
                 raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
             try:
@@ -78,8 +80,7 @@ async def _handler(request: Request):
                 await cmd._error_handler(interaction, e)
 
         elif interaction.type == InteractionType.autocomplete:
-            key = f"{interaction.data['name']}:{interaction.data['type']}"
-            cmd: ApplicationCommand = request.app.application_commands.get(key)
+            cmd: ApplicationCommand = request.app.commands.get(_command_key(interaction))
             if not cmd:
                 raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
             if interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand:

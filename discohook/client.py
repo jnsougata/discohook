@@ -107,7 +107,7 @@ class Client(Starlette):
         self.http = HTTPClient(self, token, aiohttp.ClientSession("https://discord.com"))
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
-        self.application_commands: Dict[str, ApplicationCommand] = {}
+        self.commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, _handler, methods=["POST"], include_in_schema=False)
         self.add_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
         self.add_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
@@ -223,7 +223,7 @@ class Client(Starlette):
             cmd.callback = callback
             if kind == ApplicationCommandType.slash:
                 cmd.description = auto_description(description, callback)
-            self.application_commands[cmd.key] = cmd
+            self.commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
             return cmd
 
@@ -272,7 +272,7 @@ class Client(Starlette):
                 guild_id=guild_id,
             )
             cmd.callback = callback
-            self.application_commands[cmd.key] = cmd
+            self.commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
             return cmd
 
@@ -321,7 +321,7 @@ class Client(Starlette):
                 guild_id=guild_id,
             )
             cmd.callback = callback
-            self.application_commands[cmd.key] = cmd
+            self.commands[cmd.key] = cmd
             self._sync_queue.append(cmd)
             return cmd
 
@@ -336,7 +336,7 @@ class Client(Starlette):
         *commands: ApplicationCommand
             The commands to add to the client.
         """
-        self.application_commands.update({command.key: command for command in commands})  # noqa
+        self.commands.update({command.key: command for command in commands})  # noqa
         self._sync_queue.extend(commands)
 
     async def delete_command(self, command_id: str, *, guild_id: Optional[str] = None):
@@ -490,11 +490,13 @@ class Client(Starlette):
         if guild_commands:
             tasks = []
             for guild_id, commands in guild_commands.items():
-                tasks.append(self.http.sync_guild_commands(str(self.application_id), guild_id, [cmd.to_dict() for cmd in commands]))
+                tasks.append(self.http.sync_guild_commands(
+                    str(self.application_id), guild_id, [cmd.to_dict() for cmd in commands]))
             responses.extend(await asyncio.gather(*tasks))
             self._sync_queue = [cmd for cmd in self._sync_queue if not cmd.guild_id]
         if self._sync_queue:
-            responses.append(await self.http.sync_global_commands(str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue]))
+            responses.append(await self.http.sync_global_commands(
+                str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue]))
         return responses
 
     async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
