@@ -45,6 +45,7 @@ class TextInput:
         style: TextInputFieldLength = TextInputFieldLength.short,
     ):
         self.label = label
+        assert field_id.isidentifier(), "field_id must be a valid python identifier"
         self.field_id = field_id
         self.required = required
         self.hint = hint
@@ -128,6 +129,7 @@ class Modal(Component):
         style: TextInputFieldLength
             The style of the field.
         """
+        assert field_id.isidentifier(), "field_id must be a valid python identifier"
         self.rows.append(
             {
                 "type": MessageComponentType.action_row.value,
@@ -185,7 +187,7 @@ def modal(
         If the callback is not a coroutine.
     """
 
-    def decorator(coro: Callable[["Interaction", ...], Any]):
+    def decorator(coro: Callable[["Interaction", Any], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         mdl = Modal(title, custom_id=custom_id)

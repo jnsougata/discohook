@@ -34,7 +34,7 @@ class Option:
         The description of the option.
     required: bool
         Whether the option is required or not.
-    type: AppCmdOptionType
+    kind: AppCmdOptionType
         The type of the option.
     """
 
@@ -44,12 +44,13 @@ class Option:
         description: str,
         required: bool = False,
         *,
-        type: ApplicationCommandOptionType,
+        kind: ApplicationCommandOptionType,
     ):
         self.name = name
+        assert self.name.isidentifier(), "name must be a valid python identifier"
         self.description = description
         self.required = required
-        self.type = type
+        self.type = kind
         self.data: Dict[str, Any] = {
             "name": self.name,
             "description": self.description,
@@ -94,7 +95,7 @@ class StringOption(Option):
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.string)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.string)
         self.choices = choices
         self.max_length = max_length
         self.min_length = min_length
@@ -145,7 +146,7 @@ class IntegerOption(Option):
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.integer)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.integer)
         self.choices = choices
         self.autocomplete = autocomplete
         self.max_value = max_value
@@ -196,7 +197,7 @@ class NumberOption(Option):
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.number)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.number)
         self.choices = choices
         self.max_value = max_value
         self.min_value = min_value
@@ -236,7 +237,7 @@ class BooleanOption(Option):
         required: bool
             Whether the option is required or not.
         """
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.boolean)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.boolean)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
@@ -264,7 +265,7 @@ class UserOption(Option):
         required: bool
             Whether the option is required or not.
         """
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.user)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.user)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
@@ -294,7 +295,7 @@ class ChannelOption(Option):
         required: Optional[bool] = False,
         channel_types: Optional[List[ChannelType]] = None,
     ):
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.channel)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.channel)
         self.channel_types = channel_types
 
     def to_dict(self) -> Dict[str, Any]:
@@ -315,7 +316,7 @@ class RoleOption(Option):
         *,
         required: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.role)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.role)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
@@ -342,7 +343,7 @@ class MentionableOption(Option):
         *,
         required: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.mentionable)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.mentionable)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
@@ -369,7 +370,7 @@ class AttachmentOption(Option):
         *,
         required: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, type=ApplicationCommandOptionType.attachment)
+        super().__init__(name, description, required, kind=ApplicationCommandOptionType.attachment)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.data
