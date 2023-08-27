@@ -1,6 +1,8 @@
 import os
 import random
 import traceback
+
+import deta
 import discohook
 
 
@@ -111,16 +113,35 @@ async def echo(i: discohook.Interaction, message: discohook.Message):
 
 @app.command(
     options=[
-        discohook.AttachmentOption("file", "The file to save.", required=True)
+        discohook.AttachmentOption("file", "The file to upload.", required=True)
     ]
 )
-async def save(i: discohook.Interaction, file: discohook.Attachment):
-    """Save a file to Deta Drive."""
-    import deta
-
-    deta = deta.Deta(env="DETA_PROJECT_KEY")
-    drive = deta.drive("files")
+async def upload(i: discohook.Interaction, file: discohook.Attachment):
+    """Upload a file to Deta Drive."""
+    drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
     await i.response.defer()
     await drive.put(await file.read(), save_as=file.filename, content_type=file.content_type)
-    await i.response.followup(f"File saved as `{file.filename}` to Deta Drive.")
+    await i.response.followup(f"File `{file.filename}` uploaded to drive.")
 
+
+@app.command(
+    options=[
+        discohook.StringOption("filename", "The file to download.", autocomplete=True, required=True)
+    ]
+)
+async def download(i: discohook.Interaction, filename: str):
+    """Download a file from Deta Drive."""
+    drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
+    await i.response.defer()
+    file = await drive.get(filename)
+    await i.response.followup(file=discohook.File(filename, content=await file.read()))
+
+
+@download.autocomplete("filename")
+async def download_autocomplete(i: discohook.Interaction, filename: str):
+    if not filename:
+        return
+    drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
+    files = await drive.files(prefix=filename)
+    choices = [discohook.Choice(name=file, value=file) for file in files["names"]]
+    await i.response.autocomplete(choices)
