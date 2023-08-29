@@ -3,10 +3,12 @@ app_name: Gear
 icon: ./sample/assets/gear.png
 micros:
   - name: backend
-    src: ./sample
+    src: .
     engine: python3.9
     primary: true
     public: true
+    commands:
+        - mv sample/* .
     presets:
       env:
         - name: PASSWORD
