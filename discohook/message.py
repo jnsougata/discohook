@@ -359,7 +359,7 @@ class Message:
         """
         from urllib.parse import quote
 
-        if isinstance(emoji, PartialEmoji):
+        if isinstance(emoji, dict):
             encoded = f'{emoji["name"]}:{emoji["id"]}'
         else:
             encoded = quote(emoji)
@@ -378,7 +378,7 @@ class Message:
         """
         from urllib.parse import quote
 
-        if isinstance(emoji, PartialEmoji):
+        if isinstance(emoji, dict):
             encoded = f'{emoji["name"]}:{emoji["id"]}'
         else:
             encoded = quote(emoji)
