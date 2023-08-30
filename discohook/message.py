@@ -357,12 +357,11 @@ class Message:
         emoji: Union[Emoji, str]
             The emoji to react with.
         """
-        from urllib.parse import quote
 
         if isinstance(emoji, dict):
             encoded = f'{emoji["name"]}:{emoji["id"]}'
         else:
-            encoded = quote(emoji)
+            encoded = "".join(f"%{byte:02x}" for byte in emoji.encode("utf-8"))
         return await self.client.http.create_message_reaction(self.channel_id, self.id, encoded)
 
     async def remove_reaction(self, emoji: Union[PartialEmoji, str], user_id: Optional[str] = None):
@@ -376,15 +375,12 @@ class Message:
         user_id: Optional[str]
             The user to delete the reaction of.
         """
-        from urllib.parse import quote
 
         if isinstance(emoji, dict):
             encoded = f'{emoji["name"]}:{emoji["id"]}'
         else:
-            encoded = quote(emoji)
-        return await self.client.http.delete_message_reaction(
-            self.channel_id, self.id, encoded, user_id or "@me"
-        )
+            encoded = "".join(f"%{byte:02x}" for byte in emoji.encode("utf-8"))
+        return await self.client.http.delete_message_reaction(self.channel_id, self.id, encoded, user_id or "@me")
 
     async def remove_reactions(self, emoji: Optional[Union[PartialEmoji, str]] = None):
         """

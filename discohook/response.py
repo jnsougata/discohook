@@ -284,7 +284,8 @@ class ResponseAdapter:
         suppress_embeds: Optional[bool] = MISSING,
     ) -> None:
         """
-        Edits the message, the component was attached to
+        Edits the message, the component was attached to.
+        This method is only available for component interactions.
 
         Parameters
         ----------
@@ -321,7 +322,7 @@ class ResponseAdapter:
         if view and view is not MISSING:
             self.inter.client.load_components(view)
         payload = {"type": InteractionCallbackType.update_component_message, "data": data}
-        await self.inter.client.http.send_interaction_mp_callback(
+        return await self.inter.client.http.send_interaction_mp_callback(
             self.inter.id, self.inter.token, create_form(payload, merge_fields(file, files))
         )
 

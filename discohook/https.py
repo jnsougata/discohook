@@ -36,7 +36,8 @@ class HTTPClient:
         return await self.request("PUT", f"/applications/{application_id}/commands", json=commands, use_auth=True)
 
     async def sync_guild_commands(self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]):
-        return await self.request("PUT", f"/applications/{application_id}/guilds/{guild_id}/commands", json=commands, use_auth=True)
+        return await self.request(
+            "PUT", f"/applications/{application_id}/guilds/{guild_id}/commands", json=commands, use_auth=True)
 
     async def fetch_global_application_commands(self, application_id: str):
         return await self.request("GET", f"/applications/{application_id}/commands", use_auth=True)
@@ -46,7 +47,8 @@ class HTTPClient:
 
     async def delete_command(self, application_id: str, command_id: str, guild_id: Optional[str] = None):
         if guild_id:
-            return await self.request("DELETE", f"/applications/{application_id}/guilds/{guild_id}/commands/{command_id}", use_auth=True)
+            return await self.request(
+                "DELETE", f"/applications/{application_id}/guilds/{guild_id}/commands/{command_id}", use_auth=True)
         return await self.request("DELETE", f"/applications/{application_id}/commands/{command_id}", use_auth=True)
 
     async def send_message(self, channel_id: str, form: aiohttp.MultipartWriter):
@@ -124,11 +126,6 @@ class HTTPClient:
     ):
         return await self.multipart("POST", f"/interactions/{interaction_id}/{interaction_token}/callback", form=form)
 
-    async def edit_interaction_mp_callback(
-        self, interaction_id: str, interaction_token: str, form: aiohttp.MultipartWriter
-    ):
-        return await self.multipart("PATCH", f"/interactions/{interaction_id}/{interaction_token}/callback", form=form)
-
     async def fetch_guild(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}?with_counts=true", use_auth=True)
 
@@ -183,10 +180,12 @@ class HTTPClient:
         return await self.request("DELETE", f"/webhooks/{webhook_id}", use_auth=True)
 
     async def create_message_reaction(self, channel_id: str, message_id: str, emoji: str):
-        return await self.request("PUT", f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me", use_auth=True)
+        return await self.request(
+            "PUT", f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me", use_auth=True)
 
     async def delete_message_reaction(self, message_id: str, emoji: str, user_id: str):
-        return await self.request("DELETE", f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/{user_id}", use_auth=True)
+        return await self.request(
+            "DELETE", f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/{user_id}", use_auth=True)
 
     async def delete_all_message_reactions(self, message_id: str, emoji: Optional[str] = None):
         path = f"/channels/{message_id}/messages/{message_id}/reactions"
