@@ -182,8 +182,8 @@ class HTTPClient:
     async def delete_webhook(self, webhook_id: str):
         return await self.request("DELETE", f"/webhooks/{webhook_id}", use_auth=True)
 
-    async def create_message_reaction(self, message_id: str, emoji: str):
-        return await self.request("PUT", f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/@me", use_auth=True)
+    async def create_message_reaction(self, channel_id: str, message_id: str, emoji: str):
+        return await self.request("PUT", f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me", use_auth=True)
 
     async def delete_message_reaction(self, message_id: str, emoji: str, user_id: str):
         return await self.request("DELETE", f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/{user_id}", use_auth=True)
