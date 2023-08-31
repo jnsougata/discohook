@@ -4,8 +4,7 @@ from typing import Any, Dict, List, Optional, Union, Callable, TYPE_CHECKING
 
 from .abc import Interactable
 from .emoji import PartialEmoji
-from .enums import ButtonStyle, ChannelType, MessageComponentType, SelectType
-from .utils import AsyncFunc
+from .enums import ButtonStyle, ChannelType, ComponentType, SelectType
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -17,15 +16,15 @@ class Component(Interactable):
 
     Parameters
     ----------
-    type: :class:`MessageComponentType`
+    kind: :class:`ComponentType`
         The type of the component.
     """
 
-    def __init__(self, type: Optional[MessageComponentType] = None, custom_id: Optional[str] = None):
+    def __init__(self, kind: Optional[ComponentType] = None, custom_id: Optional[str] = None):
         super().__init__()
-        self.type = type
-        self.callback: Optional[Callable[["Interaction", ...], Any]] = None
-        self.custom_id = custom_id or secrets.token_urlsafe(16)
+        self.kind = kind
+        self.callback: Optional[Callable[["Interaction", Any], Any]] = None
+        self.custom_id = custom_id or secrets.token_urlsafe(8)
 
     def on_interaction(self):
         """
@@ -78,12 +77,67 @@ class Button(Component):
         emoji: Optional[Union[str, PartialEmoji]] = None,
         custom_id: Optional[str] = None,
     ):
-        super().__init__(MessageComponentType.button, custom_id)
+        super().__init__(ComponentType.button, custom_id)
         self.url = url
         self.label = label
         self.style = style
         self.disabled = disabled
         self.emoji = PartialEmoji(name=emoji) if isinstance(emoji, str) else emoji
+
+    @classmethod
+    def link(cls, label: str, url: str):
+        """
+        A decorator that creates a link button.
+
+        Parameters
+        ----------
+        label: str
+            The text to be displayed on the button.
+        url: str
+            The url to be opened when the button is clicked.
+        """
+        return cls(label=label, url=url, style=ButtonStyle.link)
+
+    @classmethod
+    def new(
+        cls,
+        label: str,
+        *,
+        style: ButtonStyle = ButtonStyle.blurple,
+        disabled: bool = False,
+        emoji: Optional[Union[str, PartialEmoji]] = None,
+        custom_id: Optional[str] = None,
+    ):
+        """
+        A decorator that creates a button and registers a callback.
+
+        Parameters
+        ----------
+        label: str
+            The text to be displayed on the button.
+        style: :class:`ButtonStyle`
+            The style of the button.
+        disabled: :class:`bool`
+            Whether the button is disabled or not.
+        emoji: :class:`str` | :class:`PartialEmoji` | None
+            The emoji to be displayed on the button.
+        custom_id: Optional[:class:`str`]
+            The custom id of the button.
+        """
+        def decorator(coro: Callable[["Interaction"], Any]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Callback must be a coroutine.")
+            self = cls(
+                label=label,
+                style=style,
+                disabled=disabled,
+                emoji=emoji,
+                custom_id=custom_id,
+            )
+            self.callback = coro
+            return self
+
+        return decorator
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -97,7 +151,7 @@ class Button(Component):
             The dictionary representation of the button.
         """
         payload = {
-            "type": self.type,
+            "type": self.kind,
             "style": self.style,
             "disabled": self.disabled,
         }
@@ -173,10 +227,6 @@ class Select(Component):
 
     Parameters
     ----------
-    options: Optional[List[:class:`SelectOption`]]
-        The options to be displayed on the select menu.
-    channel_types: Optional[List[:class:`ChannelType`]]
-        The channel types to be displayed on the select menu if the type is set to :attr:`SelectMenuType.channel`.
     placeholder: Optional[:class:`str`]
         The placeholder to be displayed on the select menu.
     min_values: Optional[:class:`int`]
@@ -185,30 +235,178 @@ class Select(Component):
         The maximum number of options that can be selected.
     disabled: Optional[:class:`bool`]
         Whether the select menu is disabled or not.
-    type: :class:`SelectType`
+    kind: :class:`SelectType`
         The type of the select menu.
     """
 
     def __init__(
         self,
-        options: Optional[List[SelectOption]] = None,
+        kind: SelectType,
         *,
         placeholder: Optional[str] = None,
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
-        channel_types: Optional[List[ChannelType]] = None,
-        type: Union[MessageComponentType, SelectType] = MessageComponentType.text_select,
         disabled: Optional[bool] = False,
         custom_id: Optional[str] = None,
     ):
-        super().__init__(type, custom_id)
-        self.data = {"type": type.value, "custom_id": self.custom_id}
-        self.options: Optional[List[SelectOption]] = options
-        self.channel_types: Optional[List[ChannelType]] = channel_types
+        kind = ComponentType(kind.value)
+        super().__init__(kind, custom_id)
         self.placeholder: Optional[str] = placeholder
         self.min_values: Optional[int] = min_values
         self.max_values: Optional[int] = max_values
         self.disabled: Optional[bool] = disabled
+        self.options: Optional[List[SelectOption]] = None
+        self.channel_types: Optional[List[ChannelType]] = None
+
+    @classmethod
+    def text(
+        cls,
+        *options: SelectOption,
+        placeholder: Optional[str] = None,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        custom_id: Optional[str] = None,
+    ):
+        """
+        A decorator that creates a text select menu and registers a callback.
+
+        Parameters
+        ----------
+        options: List[:class:`SelectOption`]
+            The options to be displayed on the select menu.
+        placeholder: Optional[:class:`str`]
+            The placeholder to be displayed on the select menu.
+        min_values: Optional[:class:`int`]
+            The minimum number of options that can be selected.
+        max_values: Optional[:class:`int`]
+            The maximum number of options that can be selected.
+        disabled: Optional[:class:`bool`]
+            Whether the select menu is disabled or not.
+        custom_id: Optional[:class:`str`]
+            The custom id of the select menu.
+        """
+        def decorator(coro: Callable[["Interaction", List[Any]], Any]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Callback must be a coroutine.")
+            self = cls(
+                kind=SelectType.channel,
+                custom_id=custom_id,
+                placeholder=placeholder,
+                min_values=min_values,
+                max_values=max_values,
+                disabled=disabled,
+            )
+            self.options = options
+            self.callback = coro
+            return self
+
+        return decorator
+
+    @classmethod
+    def channel(
+        cls,
+        types: Optional[List[ChannelType]] = None,
+        *,
+        placeholder: Optional[str] = None,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        custom_id: Optional[str] = None,
+    ):
+        """
+        A decorator that creates a channel select menu and registers a callback.
+
+        Parameters
+        ----------
+        types: Optional[List[:class:`ChannelType`]]
+            The channel types to be displayed on the select menu.
+        placeholder: Optional[:class:`str`]
+            The placeholder to be displayed on the select menu.
+        min_values: Optional[:class:`int`]
+            The minimum number of options that can be selected.
+        max_values: Optional[:class:`int`]
+            The maximum number of options that can be selected.
+        disabled: Optional[:class:`bool`]
+            Whether the select menu is disabled or not.
+        custom_id: Optional[:class:`str`]
+            The custom id of the select menu.
+        """
+        def decorator(coro: Callable[["Interaction", List[Any]], Any]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Callback must be a coroutine.")
+            self = cls(
+                kind=SelectType.channel,
+                custom_id=custom_id,
+                placeholder=placeholder,
+                min_values=min_values,
+                max_values=max_values,
+                disabled=disabled,
+            )
+            self.channel_types = types
+            self.callback = coro
+            return self
+
+        return decorator
+
+    @classmethod
+    def new(
+        cls,
+        placeholder: Optional[str] = None,
+        *,
+        options: Optional[List[SelectOption]] = None,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        custom_id: Optional[str] = None,
+        channel_types: Optional[List[ChannelType]] = None,
+        kind: SelectType = SelectType.text,
+    ):
+        """
+        A decorator that creates a select menu and registers a callback.
+
+        Parameters
+        ----------
+        options: Optional[List[:class:`SelectOption`]]
+            The options to be displayed on the select menu.
+        placeholder: Optional[:class:`str`]
+            The placeholder to be displayed on the select menu.
+        min_values: Optional[:class:`int`]
+            The minimum number of options that can be selected.
+        max_values: Optional[:class:`int`]
+            The maximum number of options that can be selected.
+        channel_types: Optional[List[:class:`ChannelType`]]
+            The channel types to be displayed on the select menu. Used only for channel select menus.
+        disabled: Optional[:class:`bool`]
+            Whether the select menu is disabled or not.
+        kind: :class:`SelectType`
+            The type of the select menu.
+        custom_id: Optional[:class:`str`]
+            The custom id of the select menu.
+
+        Raises
+        ------
+        TypeError
+            If the callback is not a coroutine.
+        """
+
+        def decorator(coro: Callable[["Interaction", List[Any]], Any]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("Callback must be a coroutine.")
+            self = cls(
+                kind=kind,
+                placeholder=placeholder,
+                min_values=min_values,
+                max_values=max_values,
+                disabled=disabled,
+                custom_id=custom_id,
+            )
+            self.options = options
+            self.channel_types = channel_types
+            self.callback = coro
+            return self
+
+        return decorator
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -221,20 +419,25 @@ class Select(Component):
         :class:`dict`
             The dictionary representation of the button.
         """
-        if self.options:
-            if self.type == MessageComponentType.text_select:
-                self.data["options"] = [option.to_dict() for option in self.options]
-            if self.type == MessageComponentType.channel_select and self.channel_types:
-                self.data["channel_types"] = [channel_type.value for channel_type in self.channel_types]
+        payload = {
+            "type": self.kind,
+            "custom_id": self.custom_id
+        }
+        if self.kind == ComponentType.select_text:
+            if not self.options:
+                raise ValueError("options must be provided for text select menus")
+            payload["options"] = [option.to_dict() for option in self.options]
+        if self.kind == ComponentType.select_channel and self.channel_types:
+            payload["channel_types"] = [x.value for x in self.channel_types]
         if self.placeholder:
-            self.data["placeholder"] = self.placeholder
+            payload["placeholder"] = self.placeholder
         if self.min_values:
-            self.data["min_values"] = self.min_values
+            payload["min_values"] = self.min_values
         if self.max_values:
-            self.data["max_values"] = self.max_values
+            payload["max_values"] = self.max_values
         if self.disabled:
-            self.data["disabled"] = self.disabled
-        return self.data
+            payload["disabled"] = self.disabled
+        return payload
 
 
 class View:
@@ -270,7 +473,7 @@ class View:
         for batch in batches:
             self.components.append(
                 {
-                    "type": MessageComponentType.action_row.value,
+                    "type": ComponentType.action_row.value,
                     "components": [btn.to_dict() for btn in batch],
                 }
             )
@@ -290,254 +493,8 @@ class View:
         """
         self.components.append(
             {
-                "type": MessageComponentType.action_row.value,
+                "type": ComponentType.action_row.value,
                 "components": [select.to_dict()],
             }
         )
         self.children.append(select)
-
-
-def button(
-    label: Optional[str] = None,
-    *,
-    url: Optional[str] = None,
-    style: ButtonStyle = ButtonStyle.blurple,
-    disabled: Optional[bool] = False,
-    emoji: Optional[Union[str, PartialEmoji]] = None,
-    custom_id: Optional[str] = None,
-):
-    """
-    A decorator that creates a button and registers a callback to be called when the button is clicked.
-
-    Parameters
-    ----------
-    label: Optional[:class:`str`]
-        The label of the button.
-    url: Optional[:class:`str`]
-        The url of the button. This is only used if the style is set to :attr:`ButtonStyle.link`.
-    style: :class:`ButtonStyle`
-        The style of the button.
-    disabled: Optional[:class:`bool`]
-        Whether the button is disabled or not.
-    emoji: Optional[Union[:class:`str`, :class:`PartialEmoji`]]
-        The emoji of the button.
-    custom_id: Optional[:class:`str`]
-        The custom id of the button.
-
-    Raises
-    ------
-    TypeError
-        If the callback is not a coroutine.
-    """
-
-    def decorator(coro: Callable[["Interaction"], Any]):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        btn = Button(label=label, style=style, url=url, disabled=disabled, emoji=emoji, custom_id=custom_id)
-        btn.callback = coro
-        return btn
-
-    return decorator
-
-
-def select(
-    placeholder: Optional[str] = None,
-    *,
-    options: Optional[List[SelectOption]] = None,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    channel_types: Optional[List[ChannelType]] = None,
-    disabled: Optional[bool] = False,
-    custom_id: Optional[str] = None,
-    type: Union[MessageComponentType, SelectType] = MessageComponentType.text_select,
-):
-    """
-    A decorator that creates a select menu and registers a callback.
-
-    Parameters
-    ----------
-    options: Optional[List[:class:`SelectOption`]]
-        The options to be displayed on the select menu.
-    placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    channel_types: Optional[List[:class:`ChannelType`]]
-        The channel types to be displayed on the select menu. Used only for channel select menus.
-    disabled: Optional[:class:`bool`]
-        Whether the select menu is disabled or not.
-    type: :class:`SelectType`
-        The type of the select menu.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-
-    Raises
-    ------
-    TypeError
-        If the callback is not a coroutine.
-    """
-
-    def decorator(coro: Callable[["Interaction", ...], Any]):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        menu = Select(
-            options=options,
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            channel_types=channel_types,
-            type=type,
-            disabled=disabled,
-            custom_id=custom_id,
-        )
-        menu.callback = coro
-        return menu
-
-    return decorator
-
-
-def user_select(
-    placeholder: Optional[str] = None,
-    *,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    custom_id: Optional[str] = None,
-):
-    """
-    A decorator that creates a user select menu and registers a callback.
-
-    Parameters
-    ----------
-    placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-
-    Returns
-    -------
-    :class:`Select`
-
-    Raises
-    ------
-    TypeError
-        If the callback is not a coroutine.
-    """
-
-    def decorator(coro: AsyncFunc):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        menu = Select(
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            type=SelectType.user,
-            custom_id=custom_id,
-        )
-        menu.callback = coro
-        return menu
-
-    return decorator
-
-
-def role_select(
-    placeholder: Optional[str] = None,
-    *,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    custom_id: Optional[str] = None,
-):
-    """
-    A decorator that creates a role select menu and registers a callback.
-
-    Parameters
-    ----------
-    placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-
-    Returns
-    -------
-    :class:`Select`
-
-    Raises
-    ------
-    TypeError
-        If the callback is not a coroutine.
-    """
-
-    def decorator(coro: AsyncFunc):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        menu = Select(
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            type=SelectType.role,
-            custom_id=custom_id,
-        )
-        menu.callback = coro
-        return menu
-
-    return decorator
-
-
-def channel_select(
-    placeholder: Optional[str] = None,
-    *,
-    channel_types: Optional[List[ChannelType]] = None,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    custom_id: Optional[str] = None,
-):
-    """
-    A decorator that creates a channel select menu and registers a callback.
-
-    Parameters
-    ----------
-    placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    channel_types: Optional[List[:class:`ChannelType`]]
-        The channel types to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-
-    Returns
-    -------
-    :class:`Select`
-
-    Raises
-    ------
-    TypeError
-        If the callback is not a coroutine.
-    """
-
-    def decorator(coro: AsyncFunc):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        menu = Select(
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            type=SelectType.channel,
-            custom_id=custom_id,
-            channel_types=channel_types,
-        )
-        menu.callback = coro
-        return menu
-
-    return decorator

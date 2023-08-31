@@ -107,7 +107,7 @@ class PartialChannel:
         self,
         *,
         name: Optional[str] = None,
-        type: Optional[ChannelType] = None,
+        kind: Optional[ChannelType] = None,
         position: Optional[int] = None,
         topic: Optional[str] = None,
         nsfw: Optional[bool] = None,
@@ -134,7 +134,7 @@ class PartialChannel:
         ----------
         name: Optional[:class:`str`]
             The new name of the channel.
-        type: Optional[:class:`ChannelType`]
+        kind: Optional[:class:`ChannelType`]
             The new type of the channel.
         position: Optional[:class:`int`]
             The new position of the channel.
@@ -181,8 +181,8 @@ class PartialChannel:
         payload = {}
         if name:
             payload["name"] = name
-        if type:
-            payload["type"] = type
+        if kind:
+            payload["type"] = kind
         if position:
             payload["position"] = position
         if topic:

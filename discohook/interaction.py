@@ -79,7 +79,7 @@ class Interaction:
         return self.payload["id"]
 
     @property
-    def type(self) -> Optional[InteractionType]:
+    def kind(self) -> Optional[InteractionType]:
         """
         The type of the interaction
 

@@ -9,7 +9,7 @@ from .enums import (
     ApplicationCommandType,
     InteractionCallbackType,
     InteractionType,
-    MessageComponentType,
+    ComponentType
 )
 from .interaction import Interaction
 from .resolver import (
@@ -45,10 +45,10 @@ async def _handler(request: Request):
     data = await request.json()
     interaction = Interaction(request.app, data)
     try:
-        if interaction.type == InteractionType.ping:
+        if interaction.kind == InteractionType.ping:
             return JSONResponse({"type": InteractionCallbackType.pong}, status_code=200)
 
-        elif interaction.type == InteractionType.app_command:
+        elif interaction.kind == InteractionType.app_command:
             cmd: ApplicationCommand = request.app.commands.get(_command_key(interaction))
             if not cmd:
                 raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
@@ -79,7 +79,7 @@ async def _handler(request: Request):
                     raise e
                 await cmd._error_handler(interaction, e)
 
-        elif interaction.type == InteractionType.autocomplete:
+        elif interaction.kind == InteractionType.autocomplete:
             cmd: ApplicationCommand = request.app.commands.get(_command_key(interaction))
             if not cmd:
                 raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
@@ -93,7 +93,7 @@ async def _handler(request: Request):
             if callback:
                 await callback(interaction, option["value"])
 
-        elif interaction.type in (InteractionType.component, InteractionType.modal_submit):
+        elif interaction.kind in (InteractionType.component, InteractionType.modal_submit):
             custom_id = interaction.data["custom_id"]
             if request.app._custom_id_parser:
                 custom_id = await request.app._custom_id_parser(interaction, custom_id)
@@ -109,19 +109,12 @@ async def _handler(request: Request):
                     if not all(results):
                         raise Exception("component checks failed")
 
-                if interaction.type == InteractionType.component:
-                    if interaction.data["component_type"] == MessageComponentType.button:
+                if interaction.kind == InteractionType.component:
+                    if interaction.data["component_type"] == ComponentType.button:
                         await component(interaction)
-                    if interaction.data["component_type"] in (
-                        MessageComponentType.text_select,
-                        MessageComponentType.user_select,
-                        MessageComponentType.role_select,
-                        MessageComponentType.channel_select,
-                        MessageComponentType.mentionable_select
-                    ):
+                    else:
                         await component(interaction, build_select_menu_values(interaction))
-
-                elif interaction.type == InteractionType.modal_submit:
+                elif interaction.kind == InteractionType.modal_submit:
                     args, kwargs = build_modal_params(component.callback, interaction)
                     await component(interaction, *args, **kwargs)
             except Exception as e:

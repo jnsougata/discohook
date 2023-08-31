@@ -22,8 +22,22 @@ app = discohook.Client(
 )
 
 
+@app.preload("experiment")
+@discohook.Select.channel(max_values=5, types=[discohook.ChannelType.guild_voice])
+async def exp_select(i: discohook.Interaction, values: list[discohook.Channel]):
+    await i.response.update_message(f"{' | '.join([channel.mention for channel in values])}")
+
+
+@app.command()
+async def experiment(i: discohook.Interaction):
+    """Experiment with library features."""
+    view = discohook.View()
+    view.add_select(exp_select)
+    await i.response.send(view=view)
+
+
 @app.preload("delete")
-@discohook.button("Delete", style=discohook.ButtonStyle.red)
+@discohook.Button.new("Delete", style=discohook.ButtonStyle.red)
 async def delete_button(i: discohook.Interaction):
     await i.response.defer()
     await i.message.delete()
@@ -63,7 +77,7 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
 
 
 @app.preload("regenerate")
-@discohook.button("Regenerate")
+@discohook.Button.new("Regenerate")
 async def generate_button(i: discohook.Interaction):
     await i.response.update_message(embed=make_random_color_card(i))
 

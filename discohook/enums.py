@@ -159,7 +159,7 @@ class InteractionCallbackType(int, Enum):
     modal = 9
 
 
-class MessageComponentType(int, Enum):
+class ComponentType(int, Enum):
     """
     The type of message component.
 
@@ -168,12 +168,12 @@ class MessageComponentType(int, Enum):
 
     action_row = 1
     button = 2
-    text_select = 3
+    select_text = 3
     text_input = 4
-    user_select = 5
-    role_select = 6
-    mentionable_select = 7
-    channel_select = 8
+    select_user = 5
+    select_role = 6
+    select_mentionable = 7
+    select_channel = 8
 
 
 class SelectType(int, Enum):

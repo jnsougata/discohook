@@ -28,7 +28,7 @@ from .enums import (
     ChannelType,
     InteractionCallbackType,
     InteractionType,
-    MessageComponentType,
+    ComponentType,
     ModalFieldType,
     SelectType,
     TextInputFieldLength,
@@ -40,7 +40,7 @@ from .interaction import Interaction
 from .member import Member
 from .message import Message
 from .response import FollowupResponse, InteractionResponse
-from .modal import Modal, TextInput, modal
+from .modal import Modal, TextInput
 from .models import AllowedMentions, MessageReference
 from .option import (
     AttachmentOption,
@@ -61,11 +61,6 @@ from .view import (
     Button,
     Select,
     SelectOption,
-    View,
-    button,
-    select,
-    user_select,
-    role_select,
-    channel_select,
+    View
 )
 from .webhook import Webhook, PartialWebhook

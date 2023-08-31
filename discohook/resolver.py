@@ -6,7 +6,7 @@ from .channel import Channel
 from .enums import (
     ApplicationCommandOptionType,
     ApplicationCommandType,
-    MessageComponentType,
+    ComponentType,
 )
 from .interaction import Interaction
 from .member import Member
@@ -120,21 +120,21 @@ def build_modal_params(func: Callable, interaction: Interaction):
 
 
 def build_select_menu_values(interaction: Interaction) -> List[Any]:
-    if interaction.data["component_type"] == MessageComponentType.text_select:
+    if interaction.data["component_type"] == ComponentType.select_text:
         return interaction.data["values"]
-    if interaction.data["component_type"] == MessageComponentType.channel_select:
+    if interaction.data["component_type"] == ComponentType.select_channel:
         resolved = interaction.data["resolved"]["channels"]
         return [Channel(interaction.client, resolved.pop(channel_id)) for channel_id in interaction.data["values"]]
-    if interaction.data["component_type"] == MessageComponentType.user_select:
+    if interaction.data["component_type"] == ComponentType.select_user:
         resolved = interaction.data["resolved"]["users"]
         return [User(interaction.client, resolved.pop(user_id)) for user_id in interaction.data["values"]]
-    if interaction.data["component_type"] == MessageComponentType.role_select:
+    if interaction.data["component_type"] == ComponentType.select_role:
         resolved = interaction.data["resolved"]["roles"]
         roles = [resolved.pop(role_id) for role_id in interaction.data["values"]]
         for role in roles:
             role["guild_id"] = interaction.guild_id
         return [Role(interaction.client, role) for role in roles]
-    if interaction.data["component_type"] == MessageComponentType.mentionable_select:
+    if interaction.data["component_type"] == ComponentType.select_mentionable:
         raw_values = interaction.data["values"]
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})

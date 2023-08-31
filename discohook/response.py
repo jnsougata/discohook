@@ -224,8 +224,8 @@ class ResponseAdapter:
         modal: Modal
             The modal to send
         """
-        if self.inter.type not in (InteractionType.component, InteractionType.app_command):
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
+        if self.inter.kind not in (InteractionType.component, InteractionType.app_command):
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
         self.inter.client.active_components[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
@@ -242,8 +242,8 @@ class ResponseAdapter:
         choices: List[Choice]
             The choices to send
         """
-        if self.inter.type != InteractionType.autocomplete:
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
+        if self.inter.kind != InteractionType.autocomplete:
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
         choices = choices[:25]
         payload = {"type": InteractionCallbackType.autocomplete, "data": {"choices": choices}}
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
@@ -258,14 +258,14 @@ class ResponseAdapter:
             Whether the successive responses should be ephemeral or not (only for Application Commands)
         """
         payload = {}
-        if self.inter.type == InteractionType.component:
+        if self.inter.kind == InteractionType.component:
             payload["type"] = InteractionCallbackType.deferred_update_component_message
-        elif self.inter.type == InteractionType.app_command or self.inter.type == InteractionType.modal_submit:
+        elif self.inter.kind == InteractionType.app_command or self.inter.kind == InteractionType.modal_submit:
             payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
             if ephemeral:
                 payload["data"] = {"flags": 64}
         else:
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
 
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
         self.inter._responded = True
@@ -306,8 +306,8 @@ class ResponseAdapter:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        if not (self.inter.type == InteractionType.component):
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
+        if not (self.inter.kind == InteractionType.component):
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
 
         data = handle_edit_params(
             content=content,
