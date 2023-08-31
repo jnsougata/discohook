@@ -306,7 +306,7 @@ class ResponseAdapter:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        if self.inter.type in (InteractionType.autocomplete, InteractionType.app_command):
+        if not (self.inter.type == InteractionType.component):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
 
         data = handle_edit_params(
