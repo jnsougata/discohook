@@ -34,7 +34,6 @@ from .enums import (
     TextInputFieldLength,
     AllowedMentionsTypes
 )
-from .errors import GlobalException
 from .file import File
 from .guild import Guild, PartialGuild
 from .interaction import Interaction

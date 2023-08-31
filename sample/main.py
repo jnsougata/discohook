@@ -65,15 +65,14 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
 @app.preload("regenerate")
 @discohook.button("Regenerate")
 async def generate_button(i: discohook.Interaction):
-    await i.response.defer()
-    await i.message.edit(embed=make_random_color_card(i))
+    await i.response.update_message(embed=make_random_color_card(i))
 
 
 @app.command()
 async def color(i: discohook.Interaction):
     """Generate a random color."""
     view = discohook.View()
-    view.add_buttons(generate_button, delete_button)
+    view.add_buttons(generate_button)
     await i.response.send(embed=make_random_color_card(i), view=view)
 
 
