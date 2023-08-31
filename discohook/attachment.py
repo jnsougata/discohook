@@ -15,6 +15,9 @@ class Attachment:
         self.height: Optional[int] = data.get("height")
         self.width: Optional[int] = data.get("width")
         self.ephemeral: bool = data.get("ephemeral", False)
+        self.duration_secs: Optional[int] = data.get("duration_secs")
+        self.waveform: Optional[str] = data.get("waveform")
+        self.flags: Optional[int] = data.get("flags")
 
     async def read(self) -> bytes:
         async with aiohttp.ClientSession() as session:

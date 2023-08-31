@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
+from .attachment import Attachment
 from .embed import Embed
 from .emoji import PartialEmoji
 from .file import File
@@ -31,11 +32,11 @@ class MessageInteraction:
         return self.data["id"]
 
     @property
-    def name(self) -> str:
+    def token(self) -> str:
         """
-        Name of the application command, including subcommands and subcommand groups
+        The token of the interaction.
         """
-        return self.data["name"]
+        return self.data["token"]
 
     @property
     def type(self) -> int:
@@ -142,12 +143,18 @@ class Message:
         return self.data.get("mention_channels")
 
     @property
-    def attachments(self) -> Optional[dict]:
-        return self.data.get("attachments")
+    def attachments(self) -> Optional[List[Attachment]]:
+        attachments = self.data.get("attachments")
+        if not attachments:
+            return
+        return [Attachment(x) for x in attachments]
 
     @property
-    def embeds(self) -> Optional[List[dict]]:
-        return self.data.get("embeds")
+    def embeds(self) -> Optional[List[Embed]]:
+        embeds = self.data.get("embeds")
+        if not embeds:
+            return
+        return [Embed.from_dict(x) for x in embeds]
 
     @property
     def reactions(self) -> Optional[List[dict]]:

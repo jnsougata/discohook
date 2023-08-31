@@ -39,6 +39,26 @@ class Embed:
         self.data: Dict[str, Any] = {}
         self.fields: List[Dict[str, Any]] = []
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Embed":
+        """
+        Creates an embed from a dictionary.
+        This method is handy when you want to create an embed manually.
+
+        Parameters
+        ----------
+        data: :class:`dict`
+            The dictionary to create the embed from.
+
+        Returns
+        -------
+        :class:`Embed`
+            The created embed.
+        """
+        embed = cls()
+        embed.data = data
+        return embed
+
     def author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
         """
         Sets the author of the embed.
