@@ -354,29 +354,25 @@ class Select(Component):
         cls,
         placeholder: Optional[str] = None,
         *,
-        options: Optional[List[SelectOption]] = None,
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
         custom_id: Optional[str] = None,
-        channel_types: Optional[List[ChannelType]] = None,
-        kind: SelectType = SelectType.text,
+        kind: SelectType,
     ):
         """
         A decorator that creates a select menu and registers a callback.
 
+        For text select menus, use :meth:`text` and for channel select menus, use :meth:`channel`.
+
         Parameters
         ----------
-        options: Optional[List[:class:`SelectOption`]]
-            The options to be displayed on the select menu.
         placeholder: Optional[:class:`str`]
             The placeholder to be displayed on the select menu.
         min_values: Optional[:class:`int`]
             The minimum number of options that can be selected.
         max_values: Optional[:class:`int`]
             The maximum number of options that can be selected.
-        channel_types: Optional[List[:class:`ChannelType`]]
-            The channel types to be displayed on the select menu. Used only for channel select menus.
         disabled: Optional[:class:`bool`]
             Whether the select menu is disabled or not.
         kind: :class:`SelectType`
@@ -401,8 +397,6 @@ class Select(Component):
                 disabled=disabled,
                 custom_id=custom_id,
             )
-            self.options = options
-            self.channel_types = channel_types
             self.callback = coro
             return self
 

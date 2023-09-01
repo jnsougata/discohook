@@ -14,11 +14,11 @@ duration: int
 """
 
 
-@discohook.command(
+@discohook.ApplicationCommand.slash(
     name="invite",
     description="Sends an invite link to the current channel.",
     options=[
-        discohook.IntegerOption(
+        discohook.Option.integer(
             name="duration",
             description="Duration of the invite (in days), write \"0\" for no expiration",
             max_value=7,  # Discord only allows up to 7 days

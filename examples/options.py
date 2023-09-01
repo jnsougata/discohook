@@ -14,11 +14,11 @@ Note: the IntegerOption parameter "name" must be in lowercase.
 """
 
 
-@discohook.command(
+@discohook.ApplicationCommand.slash(
     name="roll",
     description="Roll a dice",
     options=[
-        discohook.IntegerOption(
+        discohook.Option.integer(
             name="dice",
             description="Number of faces of the dice",
             required=True,
@@ -51,11 +51,11 @@ Note: the StringOption parameter "name" must be in lowercase and a valid python 
 """
 
 
-@discohook.command(
+@discohook.ApplicationCommand.slash(
     name="gamechoice",
     description="Test command for string select options",
     options=[
-        discohook.StringOption(
+        discohook.Option.string(
             name="videogame",
             description="Choose a videogame",
             required=True,
@@ -79,7 +79,7 @@ take any options. It just flips a coin and sends the result in an embed.
 """
 
 
-@discohook.command(
+@discohook.ApplicationCommand.slash(
     name="coinflip",
     description="Flip a coin"
 )

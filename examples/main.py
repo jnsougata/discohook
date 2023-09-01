@@ -1,6 +1,6 @@
 import os
 import discohook
-from button import random_num
+from component import random_num
 
 
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
@@ -23,17 +23,18 @@ app.add_commands(random_num)  # import a command from another file
 
 # adding a error handler
 @app.on_interaction_error()
-async def on_error(_, err: discohook.GlobalException):
+async def on_error(i: discohook.Interaction, err: Exception):
     user_response = "Some error occurred! Please contact the developer."
-    if err.interaction.responded:
-        await err.interaction.response.followup(user_response, ephemeral=True)
+    if i.responded:
+        await i.response.followup(user_response, ephemeral=True)
     else:
-        await err.interaction.response.send(user_response, ephemeral=True)
+        await i.response.send(user_response, ephemeral=True)
 
     await app.send("12345678910", f"Error: {err}")
 
 
-@app.load()
+@app.load
+@discohook.ApplicationCommand.slash()
 async def ping(i: discohook.Interaction):
     """Ping the bot."""
     await i.response.send("Pong!")

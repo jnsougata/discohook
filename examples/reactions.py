@@ -21,31 +21,31 @@ option_4: str
 """
 
 
-@discohook.command(
+@discohook.ApplicationCommand.slash(
     name="vote",
     description="Create a new poll",
     options=[
-        discohook.StringOption(
+        discohook.Option.string(
             name="enunciado",
             description="The motive of the poll",
             required=True
         ),
-        discohook.StringOption(
+        discohook.Option.string(
             name="option_1",
             description="The first option",
             required=True
         ),
-        discohook.StringOption(
+        discohook.Option.string(
             name="option_2",
             description="The second option",
             required=False
         ),
-        discohook.StringOption(
+        discohook.Option.string(
             name="option_3",
             description="The third option",
             required=False
         ),
-        discohook.StringOption(
+        discohook.Option.string(
             name="option_4",
             description="The fourth option",
             required=False
