@@ -110,41 +110,109 @@ class ApplicationCommand(Interactable):
         permissions: Optional[List[Permission]] = None,
         kind: ApplicationCommandType = ApplicationCommandType.slash,
         guild_id: Optional[str] = None,
+        callback: AsyncFunc,
     ):
         super().__init__()
+        self.name = name
         if not guild_id:
             self.key = f"{name}:{kind.value}"
         else:
             self.key = f"{name}:{guild_id}:{kind.value}"
-        self.name = name
         self.description = description
         self.options: List[Union[Option, SubCommand]] = options
         self.dm_access = dm_access
         self.nsfw = nsfw
         self.application_id = None
-        self.category = kind
+        self.kind = kind
         self.permissions = permissions
         self.guild_id = guild_id
-        self.callback: Optional[AsyncFunc] = None
+        self.callback: AsyncFunc = callback
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
         self.autocompletes: Dict[str, AsyncFunc] = {}
+
+    @classmethod
+    def slash(
+        cls,
+        name: Optional[str] = None,
+        *,
+        description: Optional[str] = None,
+        options: Optional[List[Option]] = None,
+        dm_access: bool = True,
+        nsfw: bool = False,
+        permissions: Optional[List[Permission]] = None,
+        guild_id: Optional[str] = None,
+    ):
+        """
+        A decorator to register a slash command with its callback.
+        """
+        def decorator(coro: AsyncFunc):
+            return cls(
+                name or coro.__name__,
+                description=auto_description(name, description, coro),
+                options=options,
+                dm_access=dm_access,
+                nsfw=nsfw,
+                permissions=permissions,
+                guild_id=guild_id,
+                callback=coro
+            )
+        return decorator
+
+    @classmethod
+    def user(
+        cls,
+        name: Optional[str] = None,
+        *,
+        dm_access: bool = True,
+        nsfw: bool = False,
+        permissions: Optional[List[Permission]] = None,
+        guild_id: Optional[str] = None
+    ):
+        """
+        A decorator to register a user command with its callback.
+        """
+        def decorator(coro: AsyncFunc):
+            return cls(
+                name or coro.__name__,
+                dm_access=dm_access,
+                nsfw=nsfw,
+                permissions=permissions,
+                guild_id=guild_id,
+                kind=ApplicationCommandType.user,
+                callback=coro
+            )
+        return decorator
+
+    @classmethod
+    def message(
+        cls,
+        name: Optional[str] = None,
+        *,
+        dm_access: bool = True,
+        nsfw: bool = False,
+        permissions: Optional[List[Permission]] = None,
+        guild_id: Optional[str] = None
+    ):
+        """
+        A decorator to register a message command with its callback.
+        """
+        def decorator(coro: AsyncFunc):
+            return cls(
+                name or coro.__name__,
+                dm_access=dm_access,
+                nsfw=nsfw,
+                permissions=permissions,
+                guild_id=guild_id,
+                kind=ApplicationCommandType.message,
+                callback=coro
+            )
+        return decorator
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
             raise RuntimeWarning(f"command `{self.key}` has no callback")
         return self.callback(*args, **kwargs)
-
-    def on_interaction(self, coro: AsyncFunc):
-        """
-        A decorator to register a callback for the command.
-
-        Parameters
-        ----------
-        coro: AsyncCallable
-            The callback to register.
-        """
-        self.callback = coro
 
     def autocomplete(self, name: str):
         """
@@ -214,13 +282,13 @@ class ApplicationCommand(Interactable):
         -------
         Dict[str, Any]
         """
-        self.data["type"] = self.category
-        if self.category is ApplicationCommandType.slash:
-            if self.description:
-                self.data["description"] = self.description
+        self.data["name"] = self.name
+        self.data["type"] = self.kind
+        if self.description:
+            self.data["description"] = self.description
+        if self.kind == ApplicationCommandType.slash:
             if self.options:
                 self.data["options"] = [option.to_dict() for option in self.options]
-        self.data["name"] = self.name
         if not self.dm_access:
             self.data["dm_permission"] = self.dm_access
         if self.permissions:
@@ -231,54 +299,3 @@ class ApplicationCommand(Interactable):
         if self.nsfw:
             self.data["nsfw"] = self.nsfw
         return self.data
-
-
-def command(
-    name: Optional[str] = None,
-    description: Optional[str] = None,
-    *,
-    options: Optional[List[Option]] = None,
-    permissions: Optional[List[Permission]] = None,
-    dm_access: bool = True,
-    nsfw: bool = False,
-    kind: ApplicationCommandType = ApplicationCommandType.slash,
-):
-    """
-    A decorator to register a command.
-
-    Parameters
-    ----------
-    name: str
-        The name of the command.
-    description: Optional[str]
-        The description of the command. Does not apply to user & message commands.
-    options: Optional[List[Option]]
-        The options of the command. Does not apply to user & message commands.
-    dm_access: bool
-        Whether the command can be used in DMs. Defaults to True.
-    nsfw: bool
-        Whether the command is age-restricted. Defaults to False.
-    permissions: Optional[List[Permission]]
-        The default permissions of the command.
-    kind: ApplicationCommandType
-        The category of the command. Defaults to slash commands.
-    """
-
-    def decorator(callback: AsyncFunc):
-        if not asyncio.iscoroutinefunction(callback):
-            raise TypeError("callback must be a coroutine")
-        cmd = ApplicationCommand(
-            name or callback.__name__,
-            description=description or callback.__doc__,
-            options=options,
-            dm_access=dm_access,
-            permissions=permissions,
-            kind=kind,
-            nsfw=nsfw
-        )
-        cmd.callback = callback
-        if cmd.category == ApplicationCommandType.slash:
-            cmd.description = auto_description(description, callback)
-        return cmd
-
-    return decorator

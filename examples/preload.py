@@ -41,7 +41,7 @@ async def regenerate_button(i: discohook.Interaction):
     await i.message.edit(embed=make_random_color_card(i))
 
 
-@app.command()
+@app.load()
 async def color(i: discohook.Interaction):
     """Generate a random color."""
     view = discohook.View()

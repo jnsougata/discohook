@@ -34,9 +34,9 @@ app = discohook.Client(
 )
 
 
-# adding a error handler
+# Adding a error handler for all interactions
 @app.on_interaction_error()
-async def on_error(i: discohook.Interaction, err: Exception):
+async def handler(i: discohook.Interaction, err: Exception):
     user_response = "Some error occurred! Please contact the developer."
     if i.responded:
         await i.response.followup(user_response, ephemeral=True)
@@ -44,23 +44,47 @@ async def on_error(i: discohook.Interaction, err: Exception):
         await i.response.send(user_response, ephemeral=True)
 
     await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
+    
+
+# Adding a error handler for any serverside exception
+@app.on_error()
+async def handler(_request, err: Exception):
+    # request: starlette.requests.Request
+    # err is the error object
+    await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
+    # If you don't have reference to `app` object, you can use `request.app` to get the app object.
 
 
-# If description is not provided, it will look for function's docstring.
-# If description is not provided and function's docstring is not found, it will raise ValueError.
-# If name is not provided, it will use the function name as the command name. (in this case, "ping")
-# If category is not provided, it will use ApplicationCommandType.slash as the command category.
-@app.command()
+# Note: ApplicationCommand is a decorator factory.
+# It will return a decorator which will register the function as a command.
+# The decorator for different command types are different and take a different set of arguments.
+# If name is not provided, it will use the callback function name as the command name
+# If command description is not provided for slash command and function's docstring is not found, it will raise ValueError.
+
+
+# Making slash command
+@app.load
+@discohook.ApplicationCommand.slash()
 async def ping(i: discohook.Interaction):
     """Ping the bot."""
     await i.response.send("Pong!")
 
 
 # Making user command
-@app.user_command()
+@app.load
+@discohook.ApplicationCommand.user()
 async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
     embed.set_image(url=user.avatar.url)
+    await i.response.send(embed=embed)
+
+# Making message command
+@app.load
+@discohook.ApplicationCommand.message()
+async def quote(i: discohook.Interaction, message: discohook.Message):
+    embed = discohook.Embed()
+    embed.author(name=message.author.name, icon_url=message.author.avatar.url)
+    embed.description = message.content
     await i.response.send(embed=embed)
 
 ```

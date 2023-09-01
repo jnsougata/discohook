@@ -28,7 +28,8 @@ async def exp_select(i: discohook.Interaction, values: list[discohook.Channel]):
     await i.response.update_message(f"{' | '.join([channel.mention for channel in values])}")
 
 
-@app.command()
+@app.load
+@discohook.ApplicationCommand.slash()
 async def experiment(i: discohook.Interaction):
     """Experiment with library features."""
     view = discohook.View()
@@ -82,7 +83,8 @@ async def generate_button(i: discohook.Interaction):
     await i.response.update_message(embed=make_random_color_card(i))
 
 
-@app.command()
+@app.load
+@discohook.ApplicationCommand.slash()
 async def color(i: discohook.Interaction):
     """Generate a random color."""
     view = discohook.View()
@@ -90,9 +92,10 @@ async def color(i: discohook.Interaction):
     await i.response.send(embed=make_random_color_card(i), view=view)
 
 
-@app.command(
+@app.load
+@discohook.ApplicationCommand.slash(
     options=[
-        discohook.IntegerOption(
+        discohook.Option.integer(
             "limit",
             "The number of messages to purge.",
             required=True,
@@ -109,14 +112,16 @@ async def purge(i: discohook.Interaction, limit: int):
     await i.channel.purge(limit)
 
 
-@app.user_command()
+@app.load
+@discohook.ApplicationCommand.user()
 async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
     embed.set_image(url=user.avatar.url)
     await i.response.send(embed=embed)
 
 
-@app.message_command(guild_id=os.environ["GUILD_ID"])
+@app.load
+@discohook.ApplicationCommand.message(guild_id=os.environ["GUILD_ID"])
 async def echo(i: discohook.Interaction, message: discohook.Message):
     if message.content:
         await i.response.send(message.content)
@@ -124,9 +129,10 @@ async def echo(i: discohook.Interaction, message: discohook.Message):
         await i.response.send("Message does not have text content.", ephemeral=True)
 
 
-@app.command(
+@app.load
+@discohook.ApplicationCommand.slash(
     options=[
-        discohook.AttachmentOption("file", "The file to upload.", required=True)
+        discohook.Option.attachment("file", "The file to upload.", required=True)
     ]
 )
 async def upload(i: discohook.Interaction, file: discohook.Attachment):
@@ -137,9 +143,10 @@ async def upload(i: discohook.Interaction, file: discohook.Attachment):
     await i.response.followup(f"File `{file.filename}` uploaded to drive.")
 
 
-@app.command(
+@app.load
+@discohook.ApplicationCommand.slash(
     options=[
-        discohook.StringOption("filename", "The file to download.", autocomplete=True, required=True)
+        discohook.Option.string("filename", "The file to download.", autocomplete=True, required=True)
     ]
 )
 async def download(i: discohook.Interaction, filename: str):

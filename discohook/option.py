@@ -42,101 +42,51 @@ class Option:
         self,
         name: str,
         description: str,
-        required: bool = False,
         *,
+        required: bool = False,
         kind: ApplicationCommandOptionType,
     ):
         self.name = name
         assert self.name.isidentifier(), "name must be a valid python identifier"
         self.description = description
         self.required = required
-        self.type = kind
+        self.kind = kind
         self.data: Dict[str, Any] = {
             "name": self.name,
             "description": self.description,
             "required": self.required,
-            "type": self.type,
+            "type": self.kind,
         }
+        self.max_length: Optional[int] = None
+        self.min_length: Optional[int] = None
+        self.max_value: Optional[Union[int, float]] = None
+        self.min_value: Optional[Union[int, float]] = None
+        self.choices: Optional[List[Choice]] = None
+        self.autocomplete: Optional[bool] = None
+        self.channel_types: Optional[List[ChannelType]] = None
 
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-
-class StringOption(Option):
-    """
-    Represents a string type option for an application command, subclassed from `Option`
-
-    Parameters
-    ----------
-    name: str
-        The name of the option.
-    description: str
-        The description of the option.
-    required: bool
-        Whether the option is required or not.
-    max_length: int
-        The maximum length of the string.
-    min_length: int
-        The minimum length of the string.
-    choices: List[Choice] | None
-        The choices for the string.
-    autocomplete: bool
-        Whether the string should be auto completed or not.
-    """
-
-    def __init__(
-        self,
+    @classmethod
+    def string(
+        cls,
         name: str,
         description: str,
         *,
         required: Optional[bool] = False,
-        max_length: Optional[int] = 100,
-        min_length: Optional[int] = 1,
+        max_length: Optional[int] = None,
+        min_length: Optional[int] = None,
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.string)
-        self.choices = choices
+        self = cls(name, description, required=required, kind=ApplicationCommandOptionType.string)
         self.max_length = max_length
         self.min_length = min_length
+        self.choices = choices
         self.autocomplete = autocomplete
+        return self
 
-    def to_dict(self) -> Dict[str, Any]:
-        if self.choices:
-            self.data["choices"] = self.choices
-        if self.autocomplete:
-            self.data["autocomplete"] = self.autocomplete
-        if self.max_length:
-            self.data["max_length"] = self.max_length
-        if self.min_length:
-            self.data["min_length"] = self.min_length
-        return self.data
-
-
-class IntegerOption(Option):
-    """
-    Represents an integer type option for an application command, subclassed from `Option`
-
-    Parameters
-    ----------
-    name: str
-        The name of the option.
-    description: str
-        The description of the option.
-    required: bool
-        Whether the option is required or not.
-    max_value: int
-        The maximum value of the integer.
-    min_value: int
-        The minimum value of the integer.
-    choices: List[Choice] | None
-        The choices for the integer.
-    autocomplete: bool
-        Whether the integer should be auto completed or not.
-    """
-
-    def __init__(
-        self,
+    @classmethod
+    def integer(
+        cls,
         name: str,
         description: str,
         *,
@@ -146,48 +96,16 @@ class IntegerOption(Option):
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.integer)
-        self.choices = choices
-        self.autocomplete = autocomplete
+        self = cls(name, description, required=required, kind=ApplicationCommandOptionType.integer)
         self.max_value = max_value
         self.min_value = min_value
+        self.choices = choices
+        self.autocomplete = autocomplete
+        return self
 
-    def to_dict(self) -> Dict[str, Any]:
-        if self.choices:
-            self.data["choices"] = self.choices
-        if self.autocomplete:
-            self.data["autocomplete"] = self.autocomplete
-        if self.max_value is not None:
-            self.data["max_value"] = self.max_value
-        if self.min_value is not None:
-            self.data["min_value"] = self.min_value
-        return self.data
-
-
-class NumberOption(Option):
-    """
-    Represents a number type option for an application command, subclassed from `Option`
-
-    Parameters
-    ----------
-    name: str
-        The name of the option.
-    description: str
-        The description of the option.
-    required: bool
-        Whether the option is required or not.
-    max_value: float
-        The maximum value of the number.
-    min_value: float
-        The minimum value of the number.
-    choices: List[Choice] | None
-        The choices for the number.
-    autocomplete: bool
-        Whether the number should be auto completed or not.
-    """
-
-    def __init__(
-        self,
+    @classmethod
+    def number(
+        cls,
         name: str,
         description: str,
         *,
@@ -197,180 +115,98 @@ class NumberOption(Option):
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.number)
-        self.choices = choices
+        self = cls(name, description, required=required, kind=ApplicationCommandOptionType.number)
         self.max_value = max_value
         self.min_value = min_value
+        self.choices = choices
         self.autocomplete = autocomplete
+        return self
+
+    @classmethod
+    def boolean(
+        cls,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+    ):
+        return cls(name, description, required=required, kind=ApplicationCommandOptionType.boolean)
+
+    @classmethod
+    def user(
+        cls,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+    ):
+        return cls(name, description, required=required, kind=ApplicationCommandOptionType.user)
+
+    @classmethod
+    def channel(
+        cls,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+        types: Optional[List[ChannelType]] = None,
+    ):
+        self = cls(name, description, required=required, kind=ApplicationCommandOptionType.channel)
+        self.channel_types = types
+        return self
+
+    @classmethod
+    def role(
+        cls,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+    ):
+        return cls(name, description, required=required, kind=ApplicationCommandOptionType.role)
+
+    @classmethod
+    def mentionable(
+        cls,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+    ):
+        return cls(name, description, required=required, kind=ApplicationCommandOptionType.mentionable)
+
+    @classmethod
+    def attachment(
+        cls,
+        name: str,
+        description: str,
+        *,
+        required: Optional[bool] = False,
+    ):
+        return cls(name, description, required=required, kind=ApplicationCommandOptionType.attachment)
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
             self.data["choices"] = self.choices
-        if self.autocomplete:
-            self.data["autocomplete"] = self.autocomplete
-        if self.max_value is not None:
-            self.data["max_value"] = self.max_value
-        if self.min_value is not None:
-            self.data["min_value"] = self.min_value
-        return self.data
-
-
-class BooleanOption(Option):
-    """
-    Represents a boolean type option for an application command, subclassed from `Option`
-    """
-
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        *,
-        required: Optional[bool] = False,
-    ):
-        """
-        Parameters
-        ----------
-        name: str
-            The name of the option.
-        description: str
-            The description of the option.
-        required: bool
-            Whether the option is required or not.
-        """
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.boolean)
-
-    def to_dict(self) -> Dict[str, Any]:
-        return self.data
-
-
-class UserOption(Option):
-    """
-    Represents a user type option for an application command, subclassed from `Option`
-    """
-
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        *,
-        required: Optional[bool] = False,
-    ):
-        """
-        Parameters
-        ----------
-        name: str
-            The name of the option.
-        description: str
-            The description of the option.
-        required: bool
-            Whether the option is required or not.
-        """
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.user)
-
-    def to_dict(self) -> Dict[str, Any]:
-        return self.data
-
-
-class ChannelOption(Option):
-    """
-    Represents a channel type option for an application command, subclassed from `Option`
-
-    Parameters
-    ----------
-    name: str
-        The name of the option.
-    description: str
-        The description of the option.
-    required: bool
-        Whether the option is required or not.
-    channel_types: List[ChannelType]
-        The channel types that are allowed for this option.
-    """
-
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        *,
-        required: Optional[bool] = False,
-        channel_types: Optional[List[ChannelType]] = None,
-    ):
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.channel)
-        self.channel_types = channel_types
-
-    def to_dict(self) -> Dict[str, Any]:
-        if self.channel_types:
+        if (
+                self.kind in
+                (
+                    ApplicationCommandOptionType.string,
+                    ApplicationCommandOptionType.integer,
+                    ApplicationCommandOptionType.number
+                )
+        ):
+            if self.autocomplete is not None:
+                self.data["autocomplete"] = self.autocomplete
+            if self.max_value is not None:
+                self.data["max_value"] = self.max_value
+            if self.min_value is not None:
+                self.data["min_value"] = self.min_value
+        if self.kind == ApplicationCommandOptionType.string:
+            if self.max_length:
+                self.data["max_length"] = self.max_length
+            if self.min_length:
+                self.data["min_length"] = self.min_length
+        if self.channel_types and self.kind == ApplicationCommandOptionType.channel:
             self.data["channel_types"] = self.channel_types
-        return self.data
-
-
-class RoleOption(Option):
-    """
-    Represents a role type option for an application command, subclassed from `Option`
-    """
-
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        *,
-        required: Optional[bool] = False,
-    ):
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.role)
-
-    def to_dict(self) -> Dict[str, Any]:
-        return self.data
-
-
-class MentionableOption(Option):
-    """
-    Represents a mentionable type option for an application command, subclassed from `Option`
-
-    Parameters
-    ----------
-    name: str
-        The name of the option.
-    description: str
-        The description of the option.
-    required: bool
-        Whether the option is required or not.
-    """
-
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        *,
-        required: Optional[bool] = False,
-    ):
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.mentionable)
-
-    def to_dict(self) -> Dict[str, Any]:
-        return self.data
-
-
-class AttachmentOption(Option):
-    """
-    Represents an attachment type option for an application command, subclassed from `Option`
-
-    Parameters
-    ----------
-    name: str
-        The name of the option.
-    description: str
-        The description of the option.
-    required: bool
-        Whether the option is required or not.
-    """
-
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        *,
-        required: Optional[bool] = False,
-    ):
-        super().__init__(name, description, required, kind=ApplicationCommandOptionType.attachment)
-
-    def to_dict(self) -> Dict[str, Any]:
         return self.data

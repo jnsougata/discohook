@@ -1,21 +1,24 @@
-from .command import command
+from .command import ApplicationCommand
 from .embed import Embed
 from .enums import ApplicationCommandType
 from .interaction import Interaction
 
 
-@command("help", "Shows this message.")
+@ApplicationCommand.slash("help")
 async def _help(i: Interaction):
+    """Shows this message."""
     embed = Embed()
     embed.author(name=i.author.name, icon_url=i.author.avatar.url)
     embed.description = "Here are the commands you can use:\n"
     commands = i.client.commands.values()
-    sorted_commands = sorted(commands, key=lambda x: x.category.value)
-    for cmd in sorted_commands:
-        if cmd.category == ApplicationCommandType.slash:
-            embed.description += f"\n**` /{cmd.name} `**  {cmd.description}\n"
+    commands = sorted(sorted(commands, key=lambda x: x.name), key=lambda x: x.kind.value)
+    for cmd in commands:
+        if cmd.guild_id and cmd.guild_id != i.guild_id:
+            continue
+        if cmd.kind == ApplicationCommandType.slash:
+            embed.description += f"\n**` /{cmd.name} `** {cmd.description}\n"
         else:
-            category = "user" if cmd.category == ApplicationCommandType.user else "message"
-            embed.description += f"\n**` {cmd.name} `**  (A {category} command)\n"
+            category = "user" if cmd.kind == ApplicationCommandType.user else "message"
+            embed.description += f"\n**` {cmd.name} `** {category.capitalize()} Command\n"
 
     await i.response.send(embed=embed)

@@ -33,7 +33,7 @@ async def on_error(_, err: discohook.GlobalException):
     await app.send("12345678910", f"Error: {err}")
 
 
-@app.command()
+@app.load()
 async def ping(i: discohook.Interaction):
     """Ping the bot."""
     await i.response.send("Pong!")

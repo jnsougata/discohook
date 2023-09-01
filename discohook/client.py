@@ -1,15 +1,14 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Union, Callable
+from typing import Any, Dict, List, Optional, Union, Callable, Tuple
 import aiohttp
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from .channel import PartialChannel, Channel
-from .command import ApplicationCommand, Option
+from .command import ApplicationCommand
 from .dash import dashboard
 from .embed import Embed
-from .enums import ApplicationCommandType
 from .file import File
 from .guild import Guild
 from .handler import _handler
@@ -17,9 +16,8 @@ from .help import _help
 from .https import HTTPClient
 from .interaction import Interaction
 from .message import Message
-from .permission import Permission
 from .user import User
-from .utils import compare_password, auto_description
+from .utils import compare_password
 from .view import Component, View
 from .webhook import Webhook
 
@@ -46,10 +44,12 @@ async def sync(request: Request):
     password = data.get("password")
     if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    responses: List[aiohttp.ClientResponse] = await request.app.sync()
+    responses, raw = await request.app.sync()
     if not any([resp.status == 200 for resp in responses]):
         erred_first_response = next((resp for resp in responses if resp.status != 200), None)
-        return JSONResponse(await erred_first_response.json(), status_code=500)
+        data = await erred_first_response.json()
+        data["raw_payload"] = raw
+        return JSONResponse(data, status_code=500)
     commands = []
     for resp in responses:
         commands.extend(await resp.json())
@@ -167,165 +167,13 @@ class Client(Starlette):
 
         return decorator
 
-    def command(
-        self,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        *,
-        options: Optional[List[Option]] = None,
-        permissions: Optional[List[Permission]] = None,
-        dm_access: bool = True,
-        nsfw: bool = False,
-        kind: ApplicationCommandType = ApplicationCommandType.slash,
-        guild_id: Optional[str] = None,
-    ):
+    def load(self, cmd: ApplicationCommand) -> ApplicationCommand:
         """
-        A decorator to register a command.
-
-        Parameters
-        ----------
-        name: str | None
-            The name of the command. Defaults to the name of the coroutine if not provided.
-        description: Optional[str]
-            The description of the command. Does not apply to user & message commands.
-        options: Optional[List[Option]]
-            The options of the command. Does not apply to user & message commands.
-        permissions: Optional[List[Permission]]
-            The default permissions of the command.
-        dm_access: bool
-            Whether the command can be used in DMs. Defaults to True.
-        nsfw: bool
-            Whether the command is age restricted. Defaults to False.
-        kind: ApplicationCommandType
-            The category of the command. Defaults to slash commands.
-        guild_id: Optional[str]
-            The guild ID to register the command in. Defaults to None.
-
-        Raises
-        ------
-        TypeError
-            If the callback is not a coroutine.
+        A decorator to load a command into the client.
         """
-
-        def decorator(callback: Callable[[Interaction, ...], Any]):
-            if not asyncio.iscoroutinefunction(callback):
-                raise TypeError("Callback must be a coroutine.")
-            cmd = ApplicationCommand(
-                name or callback.__name__,
-                description=description,
-                options=options,
-                permissions=permissions,
-                dm_access=dm_access,
-                kind=kind,
-                nsfw=nsfw,
-                guild_id=guild_id,
-            )
-            cmd.callback = callback
-            if kind == ApplicationCommandType.slash:
-                cmd.description = auto_description(description, callback)
-            self.commands[cmd.key] = cmd
-            self._sync_queue.append(cmd)
-            return cmd
-
-        return decorator
-
-    def user_command(
-        self,
-        name: Optional[str] = None,
-        *,
-        permissions: Optional[List[Permission]] = None,
-        dm_access: bool = True,
-        nsfw: bool = False,
-        guild_id: Optional[str] = None,
-    ):
-        """
-        A decorator to register a user command.
-
-        Parameters
-        ----------
-        name: str | None
-            The name of the command. Defaults to the name of the coroutine if not provided.
-        permissions: List[Permission] | None
-            The default permissions of the command.
-        dm_access: bool
-            Whether the command can be used in DMs. Defaults to True.
-        nsfw: bool
-            Whether the command is age restricted. Defaults to False.
-        guild_id: Optional[str]
-            The guild ID to register the command in. Defaults to None.
-
-        Raises
-        ------
-        TypeError
-            If the callback is not a coroutine.
-        """
-
-        def decorator(callback: Callable[[Interaction, User], Any]):
-            if not asyncio.iscoroutinefunction(callback):
-                raise TypeError("Callback must be a coroutine.")
-            cmd = ApplicationCommand(
-                name or callback.__name__,
-                permissions=permissions,
-                dm_access=dm_access,
-                kind=ApplicationCommandType.user,
-                nsfw=nsfw,
-                guild_id=guild_id,
-            )
-            cmd.callback = callback
-            self.commands[cmd.key] = cmd
-            self._sync_queue.append(cmd)
-            return cmd
-
-        return decorator
-
-    def message_command(
-        self,
-        name: Optional[str] = None,
-        *,
-        permissions: Optional[List[Permission]] = None,
-        dm_access: bool = True,
-        nsfw: bool = False,
-        guild_id: Optional[str] = None,
-    ):
-        """
-        A decorator to register a message command.
-
-        Parameters
-        ----------
-        name: str | None
-            The name of the command. Defaults to the name of the coroutine if not provided.
-        permissions: List[Permission] | None
-            The default permissions of the command.
-        dm_access: bool
-            Whether the command can be used in DMs. Defaults to True.
-        nsfw: bool
-            Whether the command is age restricted. Defaults to False.
-        guild_id: Optional[str]
-            The guild ID to register the command in. Defaults to None.
-
-        Raises
-        ------
-        TypeError
-            If the callback is not a coroutine.
-        """
-
-        def decorator(callback: Callable[[Interaction, Message], Any]):
-            if not asyncio.iscoroutinefunction(callback):
-                raise TypeError("Callback must be a coroutine.")
-            cmd = ApplicationCommand(
-                name or callback.__name__,
-                permissions=permissions,
-                dm_access=dm_access,
-                kind=ApplicationCommandType.message,
-                nsfw=nsfw,
-                guild_id=guild_id,
-            )
-            cmd.callback = callback
-            self.commands[cmd.key] = cmd
-            self._sync_queue.append(cmd)
-            return cmd
-
-        return decorator
+        self.commands[cmd.key] = cmd
+        self._sync_queue.append(cmd)
+        return cmd
 
     def add_commands(self, *commands: Union[ApplicationCommand, Any]):
         """
@@ -336,7 +184,8 @@ class Client(Starlette):
         *commands: ApplicationCommand
             The commands to add to the client.
         """
-        self.commands.update({command.key: command for command in commands})  # noqa
+        for command in commands:
+            self.commands[command.key] = command
         self._sync_queue.extend(commands)
 
     async def delete_command(self, command_id: str, *, guild_id: Optional[str] = None):
@@ -476,7 +325,7 @@ class Client(Starlette):
             payload["avatar"] = avatar
         await self.http.edit_client(payload)
 
-    async def sync(self) -> List[aiohttp.ClientResponse]:
+    async def sync(self) -> Tuple[List[aiohttp.ClientResponse], List[Dict[str, Any]]]:
         """
         Sync the commands to the client.
 
@@ -497,7 +346,7 @@ class Client(Starlette):
         if self._sync_queue:
             responses.append(await self.http.sync_global_commands(
                 str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue]))
-        return responses
+        return responses, [cmd.to_dict() for cmd in self._sync_queue]
 
     async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
         """

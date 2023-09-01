@@ -21,12 +21,12 @@ def color_parser(color: Union[int, str]) -> int:
     return int(color, 16)
 
 
-def auto_description(description: Any, callback: AsyncFunc) -> str:
+def auto_description(name: str, description: Any, callback: AsyncFunc) -> str:
     if description and isinstance(description, str):
         return description
     if callback.__doc__:
         return callback.__doc__.strip().split("\n")[0]
-    raise TypeError("description is required")
+    raise TypeError(f"description is required for slash command `{name}`")
 
 
 def unwrap_user(data: dict, guild_id: str) -> dict:
