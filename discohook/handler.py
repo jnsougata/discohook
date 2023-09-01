@@ -51,7 +51,7 @@ async def _handler(request: Request):
         elif interaction.kind == InteractionType.app_command:
             cmd: ApplicationCommand = request.app.commands.get(_command_key(interaction))
             if not cmd:
-                raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
+                raise NotImplementedError(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
             try:
                 if cmd.checks:
                     results = await asyncio.gather(*[check(interaction) for check in cmd.checks])
@@ -99,7 +99,7 @@ async def _handler(request: Request):
                 custom_id = await request.app._custom_id_parser(interaction, custom_id)
             component = request.app.active_components.get(custom_id)
             if not component:
-                raise Exception(f"component `{custom_id}` not found")
+                raise NotImplementedError(f"component `{custom_id}` not found")
             try:
                 if component.checks:
                     results = await asyncio.gather(*[check(interaction) for check in component.checks])
