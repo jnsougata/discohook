@@ -1,5 +1,6 @@
 import os
 import random
+import secrets
 import traceback
 
 import deta
@@ -139,8 +140,25 @@ async def upload(i: discohook.Interaction, file: discohook.Attachment):
     """Upload a file to Deta Drive."""
     drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
     await i.response.defer()
-    await drive.put(await file.read(), save_as=file.filename, content_type=file.content_type)
-    await i.response.followup(f"File `{file.filename}` uploaded to drive.")
+    parts = file.filename.split(".", maxsplit=1)
+    name = f"{parts[0]}_{secrets.token_urlsafe(4)}"
+    if len(parts) > 1:
+        name += f".{parts[1]}"
+    await drive.put(await file.read(), save_as=name, folder=i.author.id, content_type=file.content_type)
+    embed = discohook.Embed()
+    embed.author(name=str(i.author), icon_url=i.author.avatar.url)
+    embed.description = f"Uploaded ` {name} ` to drive."
+    await i.response.followup(embed=embed)
+
+
+async def filename_autocomplete(i: discohook.Interaction, filename: str):
+    drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
+    if not filename:
+        files = await drive.files(prefix=f"{i.author.id}")
+    else:
+        files = await drive.files(prefix=f"{i.author.id}/{filename}")
+    names = files.get("names", [])[:25]
+    await i.response.autocomplete([discohook.Choice(name=name, value=name) for name in names])
 
 
 @app.load
@@ -159,9 +177,26 @@ async def download(i: discohook.Interaction, filename: str):
 
 @download.autocomplete("filename")
 async def download_autocomplete(i: discohook.Interaction, filename: str):
-    if not filename:
-        return
+    await filename_autocomplete(i, filename)
+
+
+@app.load
+@discohook.ApplicationCommand.slash(
+    options=[
+        discohook.Option.string("filename", "The file to delete.", autocomplete=True, required=True)
+    ]
+)
+async def delete(i: discohook.Interaction, filename: str):
+    """Delete a file from Deta Drive."""
     drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
-    files = await drive.files(prefix=filename)
-    choices = [discohook.Choice(name=file, value=file) for file in files["names"]]
-    await i.response.autocomplete(choices)
+    await i.response.defer()
+    await drive.delete(filename)
+    embed = discohook.Embed()
+    embed.author(name=str(i.author), icon_url=i.author.avatar.url)
+    embed.description = f"Deleted ` {filename} ` from drive."
+    await i.response.followup(embed=embed)
+
+
+@delete.autocomplete("filename")
+async def delete_autocomplete(i: discohook.Interaction, filename: str):
+    await filename_autocomplete(i, filename)

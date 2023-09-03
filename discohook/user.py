@@ -63,8 +63,8 @@ class User:
         return self.data.get("global_name")
 
     @property
-    def discriminator(self) -> str:
-        return self.data["discriminator"]
+    def discriminator(self) -> int:
+        return int(self.data["discriminator"])
 
     @property
     def accent_color(self) -> Optional[int]:
@@ -115,7 +115,7 @@ class User:
 
     def __str__(self) -> str:
         if self.discriminator == 0:
-            return self.name
+            return self.global_name or self.name
         return f"{self.name}#{self.discriminator}"
 
     def __eq__(self, other):

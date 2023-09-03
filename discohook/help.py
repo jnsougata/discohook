@@ -6,10 +6,10 @@ from .interaction import Interaction
 
 @ApplicationCommand.slash("help")
 async def _help(i: Interaction):
-    """Shows this message."""
+    """Shows help message."""
     embed = Embed()
     embed.author(name=i.author.name, icon_url=i.author.avatar.url)
-    embed.description = "Here are the commands you can use:\n"
+    embed.description = "Here are the commands you can use\n"
     commands = i.client.commands.values()
     commands = sorted(sorted(commands, key=lambda x: x.name), key=lambda x: x.kind.value)
     for cmd in commands:
