@@ -75,8 +75,12 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
         elif option_type == ApplicationCommandOptionType.role:
             options[name] = Role(interaction.client, interaction.data["resolved"]["roles"][value])
         elif option_type == ApplicationCommandOptionType.mentionable:
-            # TODO: this is a shit option type, not enough motivation to implement it
-            pass
+            users = interaction.data["resolved"].get("users", {})
+            payload = users.get(value)
+            if payload:
+                options[name] = User(interaction.client, payload)
+            else:
+                options[name] = Role(interaction.client, interaction.data["resolved"]["roles"].get(value))
         elif option_type == ApplicationCommandOptionType.attachment:
             options[name] = Attachment(interaction.data["resolved"]["attachments"][value])
     return options
