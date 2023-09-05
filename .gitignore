@@ -139,3 +139,4 @@ ping.py
 !examples/*
 .vscode/
 cogs/
+main.py

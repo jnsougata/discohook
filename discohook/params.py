@@ -37,6 +37,9 @@ def handle_send_params(
     flag_value = 0
     embeds = merge_fields(embed, embeds)
     files = merge_fields(file, files)
+    for embed in embeds:
+        if embed.attachments:
+            files.extend(filter(lambda a: a not in files, embed.attachments))
     if ephemeral:
         flag_value |= 1 << 6
     if suppress_embeds:
@@ -96,6 +99,9 @@ def handle_edit_params(
         payload["attachments"] = []
     embeds = merge_fields(embed, embeds)
     files = merge_fields(file, files)
+    for embed in embeds:
+        if embed.attachments:
+            files.extend(filter(lambda a: a not in files, embed.attachments))
     if content is not MISSING:
         payload["content"] = content
     if tts is not MISSING:

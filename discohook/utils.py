@@ -21,7 +21,7 @@ def color_parser(color: Union[int, str]) -> int:
     return int(color, 16)
 
 
-def auto_description(name: str, description: Any, callback: AsyncFunc) -> str:
+def try_description(name: str, description: Any, callback: AsyncFunc) -> str:
     if description and isinstance(description, str):
         return description
     if callback.__doc__:

@@ -5,7 +5,7 @@ from .enums import InteractionType, try_enum
 from .guild import PartialGuild
 from .member import Member
 from .message import Message
-from .response import ResponseAdapter
+from .adapter import ResponseAdapter
 from .user import User
 from .utils import unwrap_user
 

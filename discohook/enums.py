@@ -11,7 +11,8 @@ __all__ = (
     "ModalFieldType",
     "SelectType",
     "TextInputFieldLength",
-    "AllowedMentionsTypes"
+    "AllowedMentionsTypes",
+    "try_enum"
 )
 
 

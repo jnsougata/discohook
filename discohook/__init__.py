@@ -27,7 +27,7 @@ from .guild import Guild, PartialGuild
 from .interaction import Interaction
 from .member import Member
 from .message import Message
-from .response import FollowupResponse, InteractionResponse
+from .adapter import FollowupResponse, InteractionResponse
 from .modal import Modal, TextInput
 from .models import AllowedMentions, MessageReference
 from .option import Choice, Option

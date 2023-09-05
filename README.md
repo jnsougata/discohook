@@ -44,7 +44,7 @@ async def handler(i: discohook.Interaction, err: Exception):
         await i.response.send(user_response, ephemeral=True)
 
     await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
-    
+
 
 # Adding a error handler for any serverside exception
 @app.on_error()
@@ -78,12 +78,13 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
     embed.set_image(url=user.avatar.url)
     await i.response.send(embed=embed)
 
+
 # Making message command
 @app.load
 @discohook.ApplicationCommand.message()
 async def quote(i: discohook.Interaction, message: discohook.Message):
     embed = discohook.Embed()
-    embed.author(name=message.author.name, icon_url=message.author.avatar.url)
+    embed.set_author(name=message.author.name, icon_url=message.author.avatar.url)
     embed.description = message.content
     await i.response.send(embed=embed)
 

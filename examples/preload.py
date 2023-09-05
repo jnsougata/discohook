@@ -26,7 +26,7 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
     embed = discohook.Embed(description=f"**`color: #{_hex}`**")
     embed.set_image(f"https://singlecolorimage.com/get/{_hex}/500x500")
     embed.color = _hex
-    embed.author(name=i.author.name, icon_url=i.author.avatar.url)
+    embed.set_author(name=i.author.name, icon_url=i.author.avatar.url)
     return embed
 
 

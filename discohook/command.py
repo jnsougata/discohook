@@ -5,7 +5,7 @@ from .abc import Interactable
 from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
 from .permission import Permission
-from .utils import AsyncFunc, auto_description
+from .utils import AsyncFunc, try_description
 
 
 class SubCommand:
@@ -149,7 +149,7 @@ class ApplicationCommand(Interactable):
         def decorator(coro: AsyncFunc):
             return cls(
                 name or coro.__name__,
-                description=auto_description(name, description, coro),
+                description=try_description(name, description, coro),
                 options=options,
                 dm_access=dm_access,
                 nsfw=nsfw,

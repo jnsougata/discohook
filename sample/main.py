@@ -74,7 +74,7 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
     _hex = f"{red:02x}{green:02x}{blue:02x}"
     embed = discohook.Embed(description=f"**`color: #{_hex}`**", color=_hex)
     embed.set_image(f"https://singlecolorimage.com/get/{_hex}/1280x720")
-    embed.author(name=i.author.name, icon_url=i.author.avatar.url)
+    embed.set_author(name=i.author.name, icon_url=i.author.avatar.url)
     return embed
 
 
@@ -117,7 +117,7 @@ async def purge(i: discohook.Interaction, limit: int):
 @discohook.ApplicationCommand.user()
 async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
-    embed.set_image(url=user.avatar.url)
+    embed.set_image(user.avatar.url)
     await i.response.send(embed=embed)
 
 
@@ -146,7 +146,7 @@ async def upload(i: discohook.Interaction, file: discohook.Attachment):
         name += f".{parts[1]}"
     await drive.put(await file.read(), save_as=name, folder=i.author.id, content_type=file.content_type)
     embed = discohook.Embed()
-    embed.author(name=str(i.author), icon_url=i.author.avatar.url)
+    embed.set_author(name=str(i.author), icon_url=i.author.avatar.url)
     embed.description = f"Uploaded ` {name} ` to drive."
     await i.response.followup(embed=embed)
 
@@ -192,7 +192,7 @@ async def delete(i: discohook.Interaction, filename: str):
     await i.response.defer()
     await drive.delete(filename)
     embed = discohook.Embed()
-    embed.author(name=str(i.author), icon_url=i.author.avatar.url)
+    embed.set_author(name=str(i.author), icon_url=i.author.avatar.url)
     embed.description = f"Deleted ` {filename} ` from drive."
     await i.response.followup(embed=embed)
 

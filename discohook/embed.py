@@ -38,6 +38,14 @@ class Embed:
         self.timestamp = timestamp
         self.data: Dict[str, Any] = {}
         self.fields: List[Dict[str, Any]] = []
+        self.__attachments: List[File] = []
+
+    @property
+    def attachments(self) -> List[File]:
+        """
+        Returns the attachments of the embed.
+        """
+        return self.__attachments
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Embed":
@@ -59,7 +67,7 @@ class Embed:
         embed.data = data
         return embed
 
-    def author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
+    def set_author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
         """
         Sets the author of the embed.
 
@@ -78,7 +86,7 @@ class Embed:
         if icon_url:
             self.data["author"]["icon_url"] = icon_url
 
-    def footer(self, text: str, *, icon_url: Optional[str] = None):
+    def set_footer(self, text: str, *, icon_url: Optional[str] = None):
         """
         Sets the footer of the embed.
 
@@ -93,49 +101,39 @@ class Embed:
         if icon_url:
             self.data["footer"]["icon_url"] = icon_url
 
-    def set_image(self, url: str):
+    def set_image(self, img: Union[str, File]):
         """
-        Sets the image of the embed.
+        Sets the image of the embed from a file attachment or url.
 
         Parameters
         ----------
-        url: :class:`str`
-            The url of the image.
+        img: :class:`str` | :class:`File`
+            The url or file attachment of the image.
         """
-        self.data["image"] = {"url": url}
+        if isinstance(img, str):
+            self.data["image"] = {"url": img}
+        elif isinstance(img, File):
+            self.__attachments.append(img)
+            self.data["image"] = {"url": f"attachment://{img.name}"}
+        else:
+            raise TypeError("img must be str or File")
 
-    def image_from_attachment(self, file: File):
-        """
-        Sets the image of the embed from a file attachment.
-
-        Parameters
-        ----------
-        file: :class:`File`
-            The file attachment.
-        """
-        self.data["image"] = {"url": f"attachment://{file.name}"}
-
-    def set_thumbnail(self, url: str):
+    def set_thumbnail(self, img: Union[str, File]):
         """
         Sets the thumbnail of the embed.
 
         Parameters
         ----------
-        url: :class:`str`
-            The url of the thumbnail.
+        img: :class:`str` | :class:`File`
+            The url or file attachment of the thumbnail.
         """
-        self.data["thumbnail"] = {"url": url}
-
-    def thumbnail_from_attachment(self, file: File):
-        """
-        Sets the thumbnail of the embed from a file attachment.
-
-        Parameters
-        ----------
-        file: :class:`File`
-            The file attachment.
-        """
-        self.data["thumbnail"] = {"url": f"attachment://{file.name}"}
+        if isinstance(img, str):
+            self.data["thumbnail"] = {"url": img}
+        elif isinstance(img, File):
+            self.__attachments.append(img)
+            self.data["thumbnail"] = {"url": f"attachment://{img.name}"}
+        else:
+            raise TypeError("img must be str or File")
 
     def add_field(self, name: str, value: str, *, inline: bool = False):
         """

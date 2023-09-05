@@ -66,7 +66,7 @@ async def vote(interaction: discohook.Interaction, enunciado: str):
     embed = discohook.Embed(title=f"{enunciado}", description="\n\n".join(formatted), color=0xb51ed4)
 
     # Add footer with author name and avatar
-    embed.footer("Poll created by " + interaction.author.name, icon_url=interaction.author.avatar.url)
+    embed.set_footer("Poll created by " + interaction.author.name, icon_url=interaction.author.avatar.url)
 
     # Send result
     await interaction.response.send(embed=embed)

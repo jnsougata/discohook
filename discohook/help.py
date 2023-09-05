@@ -8,7 +8,7 @@ from .interaction import Interaction
 async def _help(i: Interaction):
     """Shows help message."""
     embed = Embed()
-    embed.author(name=i.author.name, icon_url=i.author.avatar.url)
+    embed.set_author(name=i.author.name, icon_url=i.author.avatar.url)
     embed.description = "Here are the commands you can use\n"
     commands = i.client.commands.values()
     commands = sorted(sorted(commands, key=lambda x: x.name), key=lambda x: x.kind.value)
