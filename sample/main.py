@@ -200,3 +200,40 @@ async def delete(i: discohook.Interaction, filename: str):
 @delete.autocomplete("filename")
 async def delete_autocomplete(i: discohook.Interaction, filename: str):
     await filename_autocomplete(i, filename)
+
+
+@app.load
+@discohook.ApplicationCommand.message("exec")
+async def _exec(i: discohook.Interaction, message: discohook.Message):
+    """Execute a python script."""
+    from io import StringIO
+    import re
+    import sys
+
+    await i.response.defer()
+
+    pattern = re.compile("```(?:python|py)?\n([\s\S]*?)\n```")  # noqa
+    code = pattern.search(message.content)
+
+    if not code:
+        await i.response.followup("No code to execute.")
+        return
+
+    orig = sys.stdout
+    sys.stdout = stdout = StringIO()
+
+    try:
+        exec(
+            f'async def aexec(): ' + "".join(f"\n {line}" for line in code.group(1).split("\n")),
+        )
+        await locals()["aexec"]()
+        sys.stdout = orig
+    except Exception as err:
+        await i.response.followup(f"```py\n{err}\n```")
+    else:
+        view = discohook.View()
+        view.add_buttons(delete_button)
+        embed = discohook.Embed()
+        embed.set_author(name=str(i.author), icon_url=i.author.avatar.url)
+        embed.description = f"```\n{stdout.getvalue()}\n```"
+        await i.response.followup(embed=embed, view=view)
