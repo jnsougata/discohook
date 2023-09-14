@@ -1,10 +1,10 @@
-from .command import ApplicationCommand
+from .command import slash
 from .embed import Embed
 from .enums import ApplicationCommandType
 from .interaction import Interaction
 
 
-@ApplicationCommand.slash("help")
+@slash("help")
 async def _help(i: Interaction):
     """Shows help message."""
     embed = Embed()
