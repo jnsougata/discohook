@@ -77,6 +77,8 @@ class Button(Component):
         emoji: Optional[Union[str, PartialEmoji]] = None,
         custom_id: Optional[str] = None,
     ):
+        if not label and not emoji:
+            raise ValueError('Buttons must have either a label or emoji, they can\'t be blank.')
         super().__init__(ComponentType.button, custom_id)
         self.url = url
         self.label = label
@@ -101,7 +103,7 @@ class Button(Component):
     @classmethod
     def new(
         cls,
-        label: str,
+        label: Optional[str] = None,
         *,
         style: ButtonStyle = ButtonStyle.blurple,
         disabled: bool = False,
@@ -113,7 +115,7 @@ class Button(Component):
 
         Parameters
         ----------
-        label: str
+        label: str | None
             The text to be displayed on the button.
         style: :class:`ButtonStyle`
             The style of the button.
