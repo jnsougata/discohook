@@ -11,6 +11,7 @@ from .enums import (
     InteractionType,
     ComponentType
 )
+from .errors import CheckFailure, UnknownInteractionType
 from .interaction import Interaction
 from .resolver import (
     build_context_menu_param,
@@ -57,9 +58,9 @@ async def _handler(request: Request):
                     results = await asyncio.gather(*[check(interaction) for check in cmd.checks])
                     for result in results:
                         if not isinstance(result, bool):
-                            raise TypeError(f"check returned {type(result)}, expected bool")
+                            raise CheckFailure(f"check returned {type(result)}, expected bool")
                     if not all(results):
-                        raise Exception(f"command checks failed")
+                        raise CheckFailure(f"command checks failed")
 
                 if not (interaction.data["type"] == ApplicationCommandType.slash):
                     target_object = build_context_menu_param(interaction)
@@ -105,9 +106,9 @@ async def _handler(request: Request):
                     results = await asyncio.gather(*[check(interaction) for check in component.checks])
                     for result in results:
                         if not isinstance(result, bool):
-                            raise TypeError(f"check returned {type(result)}, expected bool")
+                            raise CheckFailure(f"check returned {type(result)}, expected bool")
                     if not all(results):
-                        raise Exception("component checks failed")
+                        raise CheckFailure("component checks failed")
 
                 if interaction.kind == InteractionType.component:
                     if interaction.data["component_type"] == ComponentType.button:
@@ -122,7 +123,7 @@ async def _handler(request: Request):
                     raise e
                 await component._error_handler(interaction, e)
         else:
-            raise Exception(f"unhandled interaction type", interaction)
+            raise UnknownInteractionType(f"unknown interaction type {interaction.kind}")
     except Exception as e:
         if request.app._interaction_error_handler:
             await request.app._interaction_error_handler(interaction, e)
