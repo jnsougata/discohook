@@ -20,3 +20,11 @@ class PartialEmoji:
         self.name = name
         self.id = id
         self.animated = animated
+
+    def to_dict(self) -> dict:
+        data = {"name": self.name}
+        if self.id:
+            data["id"] = self.id
+        if self.animated:
+            data["animated"] = self.animated
+        return data

@@ -17,7 +17,7 @@ from .resolver import (
     build_context_menu_param,
     build_modal_params,
     build_select_menu_values,
-    build_slash_command_prams,
+    build_slash_command_params,
 )
 
 
@@ -70,10 +70,10 @@ async def _handler(request: Request):
                     interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand
                 ):
                     subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
-                    args, kwargs = build_slash_command_prams(subcommand.callback, interaction)
+                    args, kwargs = build_slash_command_params(subcommand.callback, interaction)
                     await subcommand(interaction, *args, **kwargs)
                 else:
-                    args, kwargs = build_slash_command_prams(cmd.callback, interaction)
+                    args, kwargs = build_slash_command_params(cmd.callback, interaction)
                     await cmd(interaction, *args, **kwargs)
             except Exception as e:
                 if not cmd._error_handler:

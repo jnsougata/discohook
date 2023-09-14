@@ -86,7 +86,7 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
     return options
 
 
-def build_slash_command_prams(func: Callable, interaction: Interaction, skips: int = 1):
+def build_slash_command_params(func: Callable, interaction: Interaction, skips: int = 1):
     command_options = interaction.data.get("options")
     if not command_options:
         return [], {}
