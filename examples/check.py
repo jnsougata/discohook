@@ -11,9 +11,10 @@ app = discohook.Client(
 )
 
 async def interaction_owner_check(interaction):
-  if interaction.from_originator:
+    if not interaction.from_originator:
+        await interaction.response.send('{} This is not your interaction!'.format(interaction.author.mention), ephemeral=True)
+        return False
     return True
-  await interaction.response.send('{} This is not your interaction!'.format(interaction.author.mention), ephemeral = True)
 
 @discohook.Button.new('Say hello')
 async def hello_button(interaction):
