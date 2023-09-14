@@ -5,6 +5,7 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from .abc import Component
 from .channel import PartialChannel, Channel
 from .command import ApplicationCommand
 from .dash import dashboard
@@ -18,7 +19,7 @@ from .interaction import Interaction
 from .message import Message
 from .user import User
 from .utils import compare_password
-from .view import Component, View
+from .view import View
 from .webhook import Webhook
 
 

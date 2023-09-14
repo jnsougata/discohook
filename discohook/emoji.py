@@ -1,7 +1,8 @@
-from .bcompat import TypedDict, NotRequired
+from typing import Optional
 
 
-class PartialEmoji(TypedDict):
+# noinspection PyShadowingBuiltins
+class PartialEmoji:
     """
     Represents a discord PartialEmoji object.
 
@@ -14,6 +15,8 @@ class PartialEmoji(TypedDict):
     animated: :class:`bool`
         Whether the emoji is animated.
     """
-    id: NotRequired[str]
-    name: str
-    animated: NotRequired[bool]
+
+    def __init__(self, *, name: Optional[str] = None, id: Optional[str] = None, animated: Optional[bool] = None):
+        self.name = name
+        self.id = id
+        self.animated = animated

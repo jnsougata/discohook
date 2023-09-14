@@ -131,84 +131,6 @@ class ApplicationCommand(Interactable):
         self.subcommands: Dict[str, SubCommand] = {}
         self.autocompletes: Dict[str, AsyncFunc] = {}
 
-    @classmethod
-    def slash(
-        cls,
-        name: Optional[str] = None,
-        *,
-        description: Optional[str] = None,
-        options: Optional[List[Option]] = None,
-        dm_access: bool = True,
-        nsfw: bool = False,
-        permissions: Optional[List[Permission]] = None,
-        guild_id: Optional[str] = None,
-    ):
-        """
-        A decorator to register a slash command with its callback.
-        """
-        def decorator(coro: AsyncFunc):
-            return cls(
-                name or coro.__name__,
-                description=try_description(name, description, coro),
-                options=options,
-                dm_access=dm_access,
-                nsfw=nsfw,
-                permissions=permissions,
-                guild_id=guild_id,
-                callback=coro
-            )
-        return decorator
-
-    @classmethod
-    def user(
-        cls,
-        name: Optional[str] = None,
-        *,
-        dm_access: bool = True,
-        nsfw: bool = False,
-        permissions: Optional[List[Permission]] = None,
-        guild_id: Optional[str] = None
-    ):
-        """
-        A decorator to register a user command with its callback.
-        """
-        def decorator(coro: AsyncFunc):
-            return cls(
-                name or coro.__name__,
-                dm_access=dm_access,
-                nsfw=nsfw,
-                permissions=permissions,
-                guild_id=guild_id,
-                kind=ApplicationCommandType.user,
-                callback=coro
-            )
-        return decorator
-
-    @classmethod
-    def message(
-        cls,
-        name: Optional[str] = None,
-        *,
-        dm_access: bool = True,
-        nsfw: bool = False,
-        permissions: Optional[List[Permission]] = None,
-        guild_id: Optional[str] = None
-    ):
-        """
-        A decorator to register a message command with its callback.
-        """
-        def decorator(coro: AsyncFunc):
-            return cls(
-                name or coro.__name__,
-                dm_access=dm_access,
-                nsfw=nsfw,
-                permissions=permissions,
-                guild_id=guild_id,
-                kind=ApplicationCommandType.message,
-                callback=coro
-            )
-        return decorator
-
     def __call__(self, *args, **kwargs):
         if not self.callback:
             raise RuntimeWarning(f"command `{self.key}` has no callback")
@@ -299,3 +221,78 @@ class ApplicationCommand(Interactable):
         if self.nsfw:
             self.data["nsfw"] = self.nsfw
         return self.data
+
+
+def slash(
+    name: Optional[str] = None,
+    *,
+    description: Optional[str] = None,
+    options: Optional[List[Option]] = None,
+    dm_access: bool = True,
+    nsfw: bool = False,
+    permissions: Optional[List[Permission]] = None,
+    guild_id: Optional[str] = None,
+):
+    """
+    A decorator to register a slash command with its callback.
+    """
+    def decorator(coro: AsyncFunc):
+        return ApplicationCommand(
+            name or coro.__name__,
+            description=try_description(name, description, coro),
+            options=options,
+            dm_access=dm_access,
+            nsfw=nsfw,
+            permissions=permissions,
+            guild_id=guild_id,
+            callback=coro
+        )
+    return decorator
+
+
+def user(
+    name: Optional[str] = None,
+    *,
+    dm_access: bool = True,
+    nsfw: bool = False,
+    permissions: Optional[List[Permission]] = None,
+    guild_id: Optional[str] = None
+):
+    """
+    A decorator to register a user command with its callback.
+    """
+    def decorator(coro: AsyncFunc):
+        return ApplicationCommand(
+            name or coro.__name__,
+            dm_access=dm_access,
+            nsfw=nsfw,
+            permissions=permissions,
+            guild_id=guild_id,
+            kind=ApplicationCommandType.user,
+            callback=coro
+        )
+    return decorator
+
+
+def message(
+    name: Optional[str] = None,
+    *,
+    dm_access: bool = True,
+    nsfw: bool = False,
+    permissions: Optional[List[Permission]] = None,
+    guild_id: Optional[str] = None
+):
+    """
+    A decorator to register a message command with its callback.
+    """
+    def decorator(coro: AsyncFunc):
+        return ApplicationCommand(
+            name or coro.__name__,
+            dm_access=dm_access,
+            nsfw=nsfw,
+            permissions=permissions,
+            guild_id=guild_id,
+            kind=ApplicationCommandType.message,
+            callback=coro
+        )
+    return decorator

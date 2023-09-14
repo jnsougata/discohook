@@ -16,6 +16,7 @@ __author__ = "Sougata Jana"
 __version__ = "0.0.6a"
 
 from .attachment import Attachment
+from .button import Button
 from .channel import Channel, PartialChannel
 from .client import Client
 from .command import ApplicationCommand, SubCommand
@@ -33,6 +34,7 @@ from .models import AllowedMentions, MessageReference
 from .option import Choice, Option
 from .permission import Permission
 from .role import PartialRole, Role
+from .select import Select, SelectOption
 from .user import User
-from .view import Button, Select, SelectOption, View
+from .view import View
 from .webhook import Webhook, PartialWebhook

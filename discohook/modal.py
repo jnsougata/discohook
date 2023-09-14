@@ -1,8 +1,8 @@
 import asyncio
 from typing import Any, Dict, List, Optional, Callable, TYPE_CHECKING
 
+from .abc import Component
 from .enums import ComponentType, TextInputFieldLength
-from .view import Component
 
 if TYPE_CHECKING:
     from .interaction import Interaction

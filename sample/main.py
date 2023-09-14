@@ -24,13 +24,13 @@ app = discohook.Client(
 
 
 @app.preload("experiment")
-@discohook.Select.channel(max_values=5, types=[discohook.ChannelType.guild_voice])
+@discohook.select.channel(max_values=5, types=[discohook.ChannelType.guild_voice])
 async def exp_select(i: discohook.Interaction, values: list[discohook.Channel]):
     await i.response.update_message(f"{'  '.join([channel.mention for channel in values])}")
 
 
 @app.load
-@discohook.ApplicationCommand.slash()
+@discohook.command.slash()
 async def experiment(i: discohook.Interaction):
     """Experiment with library features."""
     view = discohook.View()
@@ -39,7 +39,7 @@ async def experiment(i: discohook.Interaction):
 
 
 @app.preload("delete")
-@discohook.Button.new("Delete", style=discohook.ButtonStyle.red)
+@discohook.button.new("Delete", style=discohook.ButtonStyle.red)
 async def delete_button(i: discohook.Interaction):
     await i.response.defer()
     await i.message.delete()
@@ -79,13 +79,13 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
 
 
 @app.preload("regenerate")
-@discohook.Button.new("Regenerate")
+@discohook.button.new("Regenerate")
 async def generate_button(i: discohook.Interaction):
     await i.response.update_message(embed=make_random_color_card(i))
 
 
 @app.load
-@discohook.ApplicationCommand.slash()
+@discohook.command.slash()
 async def color(i: discohook.Interaction):
     """Generate a random color."""
     view = discohook.View()
@@ -94,7 +94,7 @@ async def color(i: discohook.Interaction):
 
 
 @app.load
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     options=[
         discohook.Option.integer(
             "limit",
@@ -114,7 +114,7 @@ async def purge(i: discohook.Interaction, limit: int):
 
 
 @app.load
-@discohook.ApplicationCommand.user()
+@discohook.command.user()
 async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
     embed.set_image(user.avatar.url)
@@ -122,7 +122,7 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
 
 
 @app.load
-@discohook.ApplicationCommand.message(guild_id=os.environ["GUILD_ID"])
+@discohook.command.message(guild_id=os.environ["GUILD_ID"])
 async def echo(i: discohook.Interaction, message: discohook.Message):
     if message.content:
         await i.response.send(message.content)
@@ -131,7 +131,7 @@ async def echo(i: discohook.Interaction, message: discohook.Message):
 
 
 @app.load
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     options=[
         discohook.Option.attachment("file", "The file to upload.", required=True)
     ]
@@ -162,7 +162,7 @@ async def filename_autocomplete(i: discohook.Interaction, filename: str):
 
 
 @app.load
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     options=[
         discohook.Option.string("filename", "The file to download.", autocomplete=True, required=True)
     ]
@@ -181,7 +181,7 @@ async def download_autocomplete(i: discohook.Interaction, filename: str):
 
 
 @app.load
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     options=[
         discohook.Option.string("filename", "The file to delete.", autocomplete=True, required=True)
     ]
@@ -203,7 +203,7 @@ async def delete_autocomplete(i: discohook.Interaction, filename: str):
 
 
 @app.load
-@discohook.ApplicationCommand.message("exec")
+@discohook.command.message("exec")
 async def _exec(i: discohook.Interaction, message: discohook.Message):
     """Execute a python script."""
     from io import StringIO
