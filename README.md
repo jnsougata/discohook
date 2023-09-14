@@ -64,7 +64,7 @@ async def handler(_request, err: Exception):
 
 # Making slash command
 @app.load
-@discohook.ApplicationCommand.slash()
+@discohook.command.slash()
 async def ping(i: discohook.Interaction):
     """Ping the bot."""
     await i.response.send("Pong!")
@@ -72,16 +72,16 @@ async def ping(i: discohook.Interaction):
 
 # Making user command
 @app.load
-@discohook.ApplicationCommand.user()
+@discohook.command.user()
 async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
-    embed.set_image(url=user.avatar.url)
+    embed.set_image(img=user.avatar.url)
     await i.response.send(embed=embed)
 
 
 # Making message command
 @app.load
-@discohook.ApplicationCommand.message()
+@discohook.command.message()
 async def quote(i: discohook.Interaction, message: discohook.Message):
     embed = discohook.Embed()
     embed.set_author(name=message.author.name, icon_url=message.author.avatar.url)
