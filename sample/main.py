@@ -26,7 +26,7 @@ app = discohook.Client(
 @app.preload("experiment")
 @discohook.Select.channel(max_values=5, types=[discohook.ChannelType.guild_voice])
 async def exp_select(i: discohook.Interaction, values: list[discohook.Channel]):
-    await i.response.update_message(f"{' | '.join([channel.mention for channel in values])}")
+    await i.response.update_message(f"{'  '.join([channel.mention for channel in values])}")
 
 
 @app.load

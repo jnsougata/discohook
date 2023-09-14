@@ -439,7 +439,7 @@ class Client(Starlette):
         resp = await self.http.fetch_global_application_commands(str(self.application_id))
         return await resp.json()
 
-    async def current_application(self) -> Dict[str, Any]:
+    async def fetch_info(self) -> Dict[str, Any]:
         """
         Returns the application object associated with the requesting client user.
 
