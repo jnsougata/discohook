@@ -55,9 +55,9 @@ def handle_send_params(
     if view:
         payload["components"] = view.components
     if allowed_mentions:
-        payload["allowed_mentions"] = allowed_mentions
+        payload["allowed_mentions"] = allowed_mentions.to_dict()
     if message_reference:
-        payload["message_reference"] = message_reference
+        payload["message_reference"] = message_reference.to_dict()
     if sticker_ids:
         payload["sticker_ids"] = sticker_ids
     if files:

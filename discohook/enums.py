@@ -11,7 +11,7 @@ __all__ = (
     "ModalFieldType",
     "SelectType",
     "TextInputFieldLength",
-    "AllowedMentionsTypes",
+    "AllowedMentionsType",
     "try_enum"
 )
 
@@ -238,7 +238,7 @@ class WebhookType(int, Enum):
     application = 3
 
 
-class AllowedMentionsTypes(str, Enum):
+class AllowedMentionsType(str, Enum):
     """
     The type of mentions allowed in a message.
 

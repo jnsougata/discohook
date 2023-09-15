@@ -1,25 +1,17 @@
 from typing import Any, Dict, List, Optional, Union
-from .bcompat import TypedDict
 from .enums import ApplicationCommandOptionType, ChannelType
 
 
-class Choice(TypedDict):
-    """
-    Represents a choice for a string, integer, or number option.
+class Choice:
+    def __init__(self, name: str, value: Union[str, int, float]):
+        self.name = name
+        self.value = value
 
-    Parameters
-    ----------
-    name: str
-        The name of the choice.
-    value: str| int| float
-        The value of the choice.
-
-    Notes
-    -----
-    The value of the choice must be of the same type as the option.
-    """
-    name: str
-    value: Union[str, int, float]
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "value": self.value
+        }
 
 
 class Option:
@@ -187,11 +179,10 @@ class Option:
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
-            self.data["choices"] = self.choices
+            self.data["choices"] = [choice.to_dict() for choice in self.choices]
         if (
                 self.kind in
                 (
-                    ApplicationCommandOptionType.string,
                     ApplicationCommandOptionType.integer,
                     ApplicationCommandOptionType.number
                 )
