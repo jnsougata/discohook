@@ -183,7 +183,8 @@ def channel(
 
 
 def text(
-    *options: SelectOption,
+    options: List[SelectOption],
+    *,
     placeholder: Optional[str] = None,
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,

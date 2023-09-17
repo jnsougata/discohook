@@ -149,46 +149,6 @@ class Modal(Component):
             }
         )
 
-    @classmethod
-    def new(
-        cls,
-        title: str,
-        *fields: TextInput,
-        custom_id: Optional[str] = None,
-    ):
-        """
-        A decorator that creates a modal and registers a callback.
-
-        Parameters
-        ----------
-        title: str
-            The title of the modal.
-        *fields: TextInput
-            The fields to be added to the modal.
-        custom_id: Optional[str]
-            The custom id of the modal. If not provided, it will be generated automatically.
-
-        Returns
-        -------
-        :class:`Modal`
-
-        Raises
-        ------
-        TypeError
-            If the callback is not a coroutine.
-        """
-
-        def decorator(coro: Callable[["Interaction", Any], Any]):
-            if not asyncio.iscoroutinefunction(coro):
-                raise TypeError("Callback must be a coroutine.")
-            self = cls(title, custom_id=custom_id)
-            for field in fields:
-                self.rows.append(field.to_dict())
-            self.callback = coro
-            return self
-
-        return decorator
-
     def to_dict(self):
         """
         Convert the modal to a dict to be sent to discord. For internal use only.
@@ -197,3 +157,43 @@ class Modal(Component):
         if self.rows:
             data["components"].extend(self.rows)
         return data
+
+
+def new(
+    title: str,
+    *,
+    fields: List[TextInput],
+    custom_id: Optional[str] = None,
+):
+    """
+    A decorator that creates a modal and registers a callback.
+
+    Parameters
+    ----------
+    title: str
+        The title of the modal.
+    fields: List[TextInput]
+        The fields to be added to the modal.
+    custom_id: Optional[str]
+        The custom id of the modal. If not provided, it will be generated automatically.
+
+    Returns
+    -------
+    :class:`Modal`
+
+    Raises
+    ------
+    TypeError
+        If the callback is not a coroutine.
+    """
+
+    def decorator(coro: Callable[["Interaction", Any], Any]):
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("Callback must be a coroutine.")
+        self = Modal(title, custom_id=custom_id)
+        for field in fields:
+            self.rows.append(field.to_dict())
+        self.callback = coro
+        return self
+
+    return decorator

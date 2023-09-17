@@ -11,9 +11,9 @@ from .models import AllowedMentions
 from .option import Choice
 from .params import (
     MISSING,
+    merge_fields,
     handle_edit_params,
-    handle_send_params,
-    merge_fields
+    handle_send_params
 )
 from .view import View
 
@@ -306,7 +306,7 @@ class ResponseAdapter:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        if not (self.inter.kind == InteractionType.component):
+        if not (self.inter.kind == InteractionType.component or self.inter.kind == InteractionType.modal_submit):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
 
         data = handle_edit_params(

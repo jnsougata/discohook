@@ -23,10 +23,15 @@ app = discohook.Client(
 )
 
 
+@discohook.modal.new("Test Modal", fields=[discohook.TextInput("text", "text_field", required=True)])
+async def test_modal(i: discohook.Interaction, text_field: str):
+    await i.response.update_message(content=f"Value: {text_field}")
+
+
 @app.preload("experiment")
-@discohook.select.channel(max_values=5, types=[discohook.ChannelType.guild_voice])
-async def exp_select(i: discohook.Interaction, values: list[discohook.Channel]):
-    await i.response.update_message(f"{'  '.join([channel.mention for channel in values])}")
+@discohook.button.new("Modal")
+async def exp_button(i: discohook.Interaction):
+    await i.response.send_modal(test_modal)
 
 
 @app.load
@@ -34,7 +39,7 @@ async def exp_select(i: discohook.Interaction, values: list[discohook.Channel]):
 async def experiment(i: discohook.Interaction):
     """Experiment with library features."""
     view = discohook.View()
-    view.add_select(exp_select)
+    view.add_select(exp_button)
     await i.response.send(view=view)
 
 
