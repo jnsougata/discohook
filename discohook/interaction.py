@@ -49,7 +49,7 @@ class Interaction:
     data: Dict[str, Any]
         The interaction data payload
     client: Client
-        The request object from fastapi
+        The stateful client
     """
 
     def __init__(self, client: "Client", data: Dict[str, Any]):
