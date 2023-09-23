@@ -76,7 +76,7 @@ class PartialWebhook:
         if view:
             self.client.load_components(view)
         form = create_form(payload, merge_fields(file, files))
-        await self.client.http.execute_webhook(self.id, self.token, form=form)
+        return await self.client.http.execute_webhook(self.id, self.token, form=form)
 
 
 class Webhook:
@@ -271,7 +271,7 @@ class Webhook:
         if view:
             self.client.load_components(view)
         form = create_form(payload, merge_fields(file, files))
-        await self.client.http.send_webhook_message(self.id, self.token, form)
+        return await self.client.http.send_webhook_message(self.id, self.token, form)
 
     async def edit_message(
         self,
