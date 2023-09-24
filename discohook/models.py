@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 from .enums import AllowedMentionsType
 
 
@@ -92,6 +93,7 @@ class MessageReference:
         :class:`dict`
             The dictionary representation of the message reference object.
         """
+
         data = {}
         if self.message_id:
             data["message_id"] = self.message_id
@@ -102,3 +104,46 @@ class MessageReference:
         if self.fail_if_not_exists:
             data["fail_if_not_exists"] = self.fail_if_not_exists
         return data
+
+
+# noinspection PyShadowingBuiltins
+class PermissionOverwrite:
+    """
+    Represents a permission overwrite object.
+
+    Parameters
+    ----------
+    id: str
+        The id of the role or user.
+    type: str
+        The type of the overwrite.
+    allow: int
+        The permissions allowed by the overwrite.
+    deny: int
+        The permissions denied by the overwrite.
+    """
+
+    def __init__(self, id: str, type: str, allow: int, deny: int):
+        self.id = id
+        self.type = type
+        self.allow = int(allow)
+        self.deny = int(deny)
+
+    def to_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the permission overwrite object.
+
+        This is used internally by the library. You should not need to use this method.
+
+        Returns
+        -------
+        :class:`dict`
+            The dictionary representation of the permission overwrite object.
+        """
+
+        return {
+            "id": self.id,
+            "type": self.type,
+            "allow": self.allow,
+            "deny": self.deny
+        }

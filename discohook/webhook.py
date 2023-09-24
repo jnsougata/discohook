@@ -36,7 +36,7 @@ class PartialWebhook:
             tts: bool = False,
             view: Optional[View] = None,
             thread_name: Optional[str] = None,
-    ) -> None:
+    ):
         """
         Sends a message to the webhook.
         Parameters
@@ -231,7 +231,7 @@ class Webhook:
         tts: bool = False,
         view: Optional[View] = None,
         thread_name: Optional[str] = None,
-    ) -> None:
+    ):
         """
         Sends a message to the webhook.
         Parameters
@@ -319,6 +319,7 @@ class Webhook:
     async def delete_message(self, message_id: str) -> None:
         """
         Deletes a message from the webhook.
+
         Parameters
         ----------
         message_id: :class:`str`
