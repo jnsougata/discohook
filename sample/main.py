@@ -40,6 +40,7 @@ async def experiment(i: discohook.Interaction):
     """Experiment with library features."""
     view = discohook.View()
     view.add_buttons(exp_button)
+    await i.response.send("Experimenting...", view=view)
 
 
 @app.preload("delete")
