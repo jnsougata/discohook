@@ -38,12 +38,8 @@ async def exp_button(i: discohook.Interaction):
 @discohook.command.slash()
 async def experiment(i: discohook.Interaction):
     """Experiment with library features."""
-    channel = await i.client.fetch_channel(i.channel_id)
-    if channel.check_permission_for(i.author.id, discohook.Permission.manage_messages):
-        await i.response.send("You have the manage messages permission.")
-    else:
-        await i.response.send("You do not have the manage messages permission.")
-
+    view = discohook.View()
+    view.add_buttons(exp_button)
 
 
 @app.preload("delete")
