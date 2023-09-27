@@ -213,7 +213,7 @@ def text(
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         self = Select(
-            kind=SelectType.channel,
+            kind=SelectType.text,
             custom_id=custom_id,
             placeholder=placeholder,
             min_values=min_values,
