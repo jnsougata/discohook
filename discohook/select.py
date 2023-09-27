@@ -64,7 +64,7 @@ class SelectOption:
             "default": self.default,
         }
         if self.emoji:
-            payload["emoji"] = self.emoji
+            payload["emoji"] = self.emoji.to_dict()
         return payload
 
 
