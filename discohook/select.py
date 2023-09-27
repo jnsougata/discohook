@@ -37,13 +37,13 @@ class SelectOption:
         value: str,
         *,
         description: Optional[str] = None,
-        emoji: Optional[PartialEmoji] = None,
+        emoji: Optional[Union[PartialEmoji, str]] = None,
         default: bool = False,
     ):
         self.label = label
         self.value = value
         self.description = description
-        self.emoji = emoji
+        self.emoji = emoji if isinstance(emoji, PartialEmoji) else PartialEmoji(name=emoji)
         self.default = default
 
     def to_dict(self) -> Dict[str, Any]:
