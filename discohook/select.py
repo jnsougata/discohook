@@ -43,7 +43,7 @@ class SelectOption:
         self.label = label
         self.value = value
         self.description = description
-        self.emoji = emoji if isinstance(emoji, PartialEmoji) else PartialEmoji(name=emoji)
+        self.emoji = emoji
         self.default = default
 
     def to_dict(self) -> Dict[str, Any]:
@@ -64,6 +64,7 @@ class SelectOption:
             "default": self.default,
         }
         if self.emoji:
+            self.emoji = self.emoji if isinstance(self.emoji, PartialEmoji) else PartialEmoji(name=self.emoji)
             payload["emoji"] = self.emoji.to_dict()
         return payload
 
