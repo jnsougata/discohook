@@ -18,13 +18,28 @@ class HTTPClient:
 
     async def request(self, method: str, path: str, *, use_auth: bool = False, **kwargs):
         headers = kwargs.pop("headers", {})
+        reason = kwargs.pop("reason", None)
         if use_auth:
             headers["Authorization"] = f"Bot {self.token}"
+        if reason:
+            headers["X-Audit-Log-Reason"] = reason
         headers["Content-Type"] = "application/json"
         kwargs["headers"] = headers
         return await self.session.request(method, f"/api/v{self.DISCORD_API_VERSION}{path}", **kwargs)
 
-    async def multipart(self, method: str, path: str, *, form: aiohttp.MultipartWriter, use_auth: bool = False):
+    async def multipart(
+            self, method: str,
+            path: str,
+            *,
+            form: aiohttp.MultipartWriter,
+            use_auth: bool = False,
+            **kwargs
+    ):
+        for key, value in kwargs.pop("headers", {}).items():
+            form.headers.add(key, value)
+        reason = kwargs.pop("reason", None)
+        if reason:
+            form.headers.add("X-Audit-Log-Reason", reason)
         if use_auth:
             form.headers.add("Authorization", f"Bot {self.token}")
         return await self.session.request(method, f"/api/v10{path}", data=form, headers=form.headers)
@@ -99,9 +114,8 @@ class HTTPClient:
         return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original")
 
     async def add_role(self, guild_id: str, user_id: str, role_id: str, *, reason: Optional[str] = None):
-        headers = {"X-Audit-Log-Reason": reason} if reason else {}
         return await self.request(
-            "PUT", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", headers=headers, use_auth=True)
+            "PUT", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", reason=reason, use_auth=True)
 
     async def remove_role(self, guild_id: str, user_id: str, role_id: str):
         return await self.request("DELETE", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", use_auth=True)
