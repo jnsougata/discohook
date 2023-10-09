@@ -98,8 +98,10 @@ class HTTPClient:
     async def fetch_original_webhook_message(self, webhook_id: str, webhook_token: str):
         return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original")
 
-    async def add_role(self, guild_id: str, user_id: str, role_id: str):
-        return await self.request("PUT", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", use_auth=True)
+    async def add_role(self, guild_id: str, user_id: str, role_id: str, *, reason: Optional[str] = None):
+        headers = {"X-Audit-Log-Reason": reason} if reason else {}
+        return await self.request(
+            "PUT", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", headers=headers, use_auth=True)
 
     async def remove_role(self, guild_id: str, user_id: str, role_id: str):
         return await self.request("DELETE", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", use_auth=True)

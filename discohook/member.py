@@ -71,7 +71,7 @@ class Member(User):
     def has_permission(self, permission: Permission) -> bool:
         return Permission.check(self.permissions, permission)
 
-    async def add_role(self, role_id: str):
+    async def add_role(self, role_id: str, *, reason: Optional[str] = None):
         """
         Add a role to the member.
 
@@ -79,8 +79,10 @@ class Member(User):
         ----------
         role_id : str
             The ID of the role.
+        reason: Optional[str]
+            The reason for adding the role to be logged.
         """
-        return await self.client.http.add_role(self.guild_id, self.id, role_id)
+        return await self.client.http.add_role(self.guild_id, self.id, role_id, reason=reason)
 
     async def remove_role(self, role_id: str):
         """
