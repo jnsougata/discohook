@@ -117,7 +117,7 @@ The dashboard will be available at `https://example.io/api/dash `.
 Once you visit the dashboard, it will automatically register all the commands. 
 You can also register commands manually by using the bash command below.   
 ```bash
-curl -d '{"password":  <sha256 hashed password>}' -X POST https://example.io/api/sync  
+curl -d "{\"password\":  \"$(echo -n very_secure_password | sha256sum | awk '{ print $1 }')\"}" -X POST https://example.io/api/sync
 ```
 
 **🎉 Boom!** You're done. Now you can test your bot by using ` /help ` command in your server.
