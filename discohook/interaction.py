@@ -7,7 +7,7 @@ from .member import Member
 from .message import Message
 from .adapter import ResponseAdapter
 from .user import User
-from .utils import unwrap_user
+from .utils import snowflake_time, unwrap_user
 
 if TYPE_CHECKING:
     from .client import Client
@@ -41,6 +41,8 @@ class Interaction:
         The locale of the interaction
     guild_locale: Optional[str]
         The guild locale of the interaction
+    created_at: int
+        The timestamp when the interaction was created
 
     Parameters
     ----------
@@ -176,6 +178,17 @@ class Interaction:
         Optional[str]
         """
         return self.payload.get("guild_locale")
+
+    @property
+    def created_at(self) -> int:
+        """
+        The timestamp when the interaction was created
+
+        Returns
+        -------
+        int
+        """
+        return snowflake_time(self.id)
 
     @property
     def channel(self) -> PartialChannel:
