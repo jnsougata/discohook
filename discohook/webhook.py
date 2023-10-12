@@ -77,6 +77,10 @@ class PartialWebhook:
             self.client.load_components(view)
         form = create_form(payload, merge_fields(file, files))
         return await self.client.http.execute_webhook(self.id, self.token, form=form)
+        
+    @classmethod
+    def from_url(cls, client: "Client", url: str) -> "PartialWebhook":
+        return cls(client, *url.split('/')[-2:])
 
 
 class Webhook:
