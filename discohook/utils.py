@@ -21,6 +21,11 @@ def color_parser(color: Union[int, str]) -> int:
     return int(color, 16)
 
 
+def snowflake_time(snowflake_id):
+    discord_epoch = 1420070400000
+    return ((int(snowflake_id) >> 22) + discord_epoch) / 1000
+
+
 def try_description(name: str, description: Any, callback: AsyncFunc) -> str:
     if description and isinstance(description, str):
         return description
