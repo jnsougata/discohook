@@ -9,7 +9,6 @@ from .models import AllowedMentions, MessageReference
 from .multipart import create_form
 from .params import handle_send_params, merge_fields
 from .view import View
-from .webhook import Webhook
 
 if TYPE_CHECKING:
     from .client import Client
@@ -326,7 +325,7 @@ class PartialChannel:
     async def fetch_webhooks(self):
         resp = await self.client.http.fetch_channel_webhooks(self.id)
         data = await resp.json()
-        return [Webhook(self.client, i) for i in data]
+        return data
 
 
 class Channel(PartialChannel):
