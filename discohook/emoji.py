@@ -21,6 +21,11 @@ class PartialEmoji:
         self.id = id
         self.animated = animated
 
+    @classmethod
+    def from_str(cls, value: str):
+        values = value.strip('<>').split(':')
+        return cls(name=values[1], id=values[2], animated=bool(values[0]))
+
     def to_dict(self) -> dict:
         data = {"name": self.name}
         if self.id:
