@@ -63,8 +63,9 @@ class Embed:
         :class:`Embed`
             The created embed.
         """
-        embed = cls()
+        embed = cls(**data)
         embed.data = data
+        embed.fields = data.pop("fields", [])
         return embed
 
     def set_author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):

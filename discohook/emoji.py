@@ -22,9 +22,17 @@ class PartialEmoji:
         self.animated = animated
 
     @classmethod
-    def from_str(cls, value: str):
-        values = value.strip('<>').split(':')
-        return cls(name=values[1], id=values[2], animated=bool(values[0]))
+    def from_str(cls, value: str) -> "PartialEmoji":
+        """
+        Creates a partial emoji from a string formatted emoji.
+
+        Parameters
+        ----------
+        value: :class:`str`
+            The string formatted emoji.
+        """
+        animated, name, id = value.strip('<>').split(':')
+        return cls(name=name, id=id, animated=bool(animated))
 
     def to_dict(self) -> dict:
         data = {"name": self.name}
