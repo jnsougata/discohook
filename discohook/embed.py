@@ -63,8 +63,13 @@ class Embed:
         :class:`Embed`
             The created embed.
         """
-        embed = cls(**data)
+        embed = cls()
         embed.data = data
+        embed.title = data.pop("title", None)
+        embed.description = data.pop("description", None)
+        embed.url = data.pop("url", None)
+        embed.color = data.pop("color", None)
+        embed.timestamp = data.pop("timestamp", None)
         embed.fields = data.pop("fields", [])
         return embed
 
