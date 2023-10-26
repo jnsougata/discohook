@@ -208,3 +208,18 @@ class HTTPClient:
         if emoji:
             path += f"/{emoji}"
         return await self.request("DELETE", path, use_auth=True)
+        
+    async def create_test_entitlement(self, application_id: str, payload: Dict[str, Any]):
+        return await self.request("POST", f"/applications/{application_id}/entitlements", json=payload, use_auth=True)
+
+    async def delete_test_entitlement(self, application_id: str, entitlement_id: str):
+        return await self.request("DELETE", f"/applications/{application_id}/entitlements/{entitlement_id}", use_auth=True)
+
+    async def fetch_entitlement(self, application_id: str, entitlement_id: str):
+        return await self.request("GET", f"/applications/{application_id}/entitlements/{entitlement_id}", use_auth=True)
+
+    async def fetch_entitlements(self, application_id: str, params: Dict[str, Any]):
+        return await self.request("GET", f"/applications/{application_id}/entitlements", params=params, use_auth=True)
+
+    async def fetch_skus(self, application_id: str):
+        return await self.request("GET", f"/applications/{application_id}/skus", use_auth=True)
