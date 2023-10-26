@@ -75,3 +75,9 @@ class Component(Interactable):
         if not self.callback:
             raise RuntimeWarning("No callback registered for this component.")
         return self.callback(*args, **kwargs)
+
+    def to_dict(self):
+        """
+        Convert the component to a dict to be sent to discord. For internal use only.
+        """
+        ...

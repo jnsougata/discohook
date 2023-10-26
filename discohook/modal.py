@@ -91,10 +91,6 @@ class Modal(Component):
         # self.components: List[Component] = []
         self.rows: List[Dict[str, Any]] = []
 
-    # def add_select_menu(self, menu: SelectMenu):
-    #     self.components.append(menu)
-    #     self.rows.append(menu.to_dict())
-
     def add_field(
         self,
         label: str,

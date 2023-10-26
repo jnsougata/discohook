@@ -83,6 +83,7 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
                 options[name] = Role(interaction.client, interaction.data["resolved"]["roles"].get(value))
         elif option_type == ApplicationCommandOptionType.attachment:
             options[name] = Attachment(interaction.data["resolved"]["attachments"][value])
+    interaction.parsed_options = options
     return options
 
 

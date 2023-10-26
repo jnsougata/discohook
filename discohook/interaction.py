@@ -56,7 +56,17 @@ class Interaction:
         self.payload = data
         self._responded = False
         self.client: "Client" = client
-        self.data: Optional[Dict[str, Any]] = data.get("data")
+
+    @property
+    def data(self) -> Dict[str, Any]:
+        """
+        The command data payload (if the interaction is a command)
+
+        Returns
+        -------
+        Dict[str, Any]
+        """
+        return self.payload.get("data", {})
 
     @property
     def responded(self) -> bool:

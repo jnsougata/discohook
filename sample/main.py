@@ -23,7 +23,10 @@ app = discohook.Client(
 )
 
 
-@discohook.modal.new("Test Modal", fields=[discohook.TextInput("text", "text_field", required=True)])
+@discohook.modal.new(
+    "Test Modal",
+    fields=[discohook.TextInput("text", "text_field", required=True)],
+)
 async def test_modal(i: discohook.Interaction, text_field: str):
     await i.response.update_message(content=f"Value: {text_field}")
 
@@ -228,9 +231,7 @@ async def _exec(i: discohook.Interaction, message: discohook.Message):
     sys.stdout = stdout = StringIO()
 
     try:
-        exec(
-            f'async def aexec(): ' + "".join(f"\n {line}" for line in code.group(1).split("\n")),
-        )
+        exec(f'async def aexec(): ' + "".join(f"\n {line}" for line in code.group(1).split("\n")))
         await locals()["aexec"]()
         sys.stdout = orig
     except Exception as err:
