@@ -271,6 +271,20 @@ class ResponseAdapter:
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
+   async def require_premium(self):
+        """
+        Prompts the user that a premium purchase is required for this interaction
+        This method is only available for applications with a premium SKU set up
+        """
+        if self.inter.kind == InteractionType.autocomplete:
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
+        payload = {
+            "data": {},
+            "type": InteractionCallbackType.premium_required,
+        }
+        self.inter._responded = True
+        await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
+
     async def update_message(
         self,
         content: Optional[str] = MISSING,
