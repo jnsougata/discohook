@@ -5,7 +5,7 @@ from .abc import Interactable
 from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
 from .permission import Permission
-from .utils import AsyncFunc, try_description
+from .utils import Handler, try_description
 
 
 class SubCommand:
@@ -30,13 +30,13 @@ class SubCommand:
         description: str,
         options: Optional[List[Option]] = None,
         *,
-        callback: Optional[AsyncFunc] = None,
+        callback: Optional[Handler] = None,
     ):
         self.name = name
         self.options = options
         self.callback = callback
         self.description = description
-        self.autocompletes: Dict[str, AsyncFunc] = {}
+        self.autocompletes: Dict[str, Handler] = {}
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -56,7 +56,7 @@ class SubCommand:
             The name of the option to register the autocomplete for.
         """
 
-        def decorator(coro: AsyncFunc):
+        def decorator(coro: Handler):
             self.autocompletes[name] = coro
 
         return decorator
@@ -110,7 +110,7 @@ class ApplicationCommand(Interactable):
         permissions: Optional[List[Permission]] = None,
         kind: ApplicationCommandType = ApplicationCommandType.slash,
         guild_id: Optional[str] = None,
-        callback: AsyncFunc,
+        callback: Handler,
     ):
         super().__init__()
         self.name = name
@@ -126,10 +126,10 @@ class ApplicationCommand(Interactable):
         self.kind = kind
         self.permissions = permissions
         self.guild_id = guild_id
-        self.callback: AsyncFunc = callback
+        self.callback: Handler = callback
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
-        self.autocompletes: Dict[str, AsyncFunc] = {}
+        self.autocompletes: Dict[str, Handler] = {}
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -146,7 +146,7 @@ class ApplicationCommand(Interactable):
             The name of the option to register the autocomplete for.
         """
 
-        def decorator(coro: AsyncFunc):
+        def decorator(coro: Handler):
             self.autocompletes[name] = coro
 
         return decorator
@@ -181,7 +181,7 @@ class ApplicationCommand(Interactable):
             If the callback is not a coroutine.
         """
 
-        def decorator(coro: AsyncFunc):
+        def decorator(coro: Handler):
             subcommand = SubCommand(name, description, options, callback=coro)
             if self.options:
                 self.options.append(subcommand)
@@ -236,7 +236,7 @@ def slash(
     """
     A decorator to register a slash command with its callback.
     """
-    def decorator(coro: AsyncFunc):
+    def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
             description=try_description(name, description, coro),
@@ -261,7 +261,7 @@ def user(
     """
     A decorator to register a user command with its callback.
     """
-    def decorator(coro: AsyncFunc):
+    def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
             dm_access=dm_access,
@@ -285,7 +285,7 @@ def message(
     """
     A decorator to register a message command with its callback.
     """
-    def decorator(coro: AsyncFunc):
+    def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
             dm_access=dm_access,

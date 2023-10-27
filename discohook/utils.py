@@ -4,7 +4,7 @@ import secrets
 from typing import Any, Callable, Coroutine, Union
 
 
-AsyncFunc = Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
+Handler = Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
 
 
 def compare_password(local: str, remote: str) -> bool:
@@ -26,7 +26,7 @@ def snowflake_time(snowflake_id):
     return ((int(snowflake_id) >> 22) + discord_epoch) / 1000
 
 
-def try_description(name: str, description: Any, callback: AsyncFunc) -> str:
+def try_description(name: str, description: Any, callback: Handler) -> str:
     if description and isinstance(description, str):
         return description
     if callback.__doc__:

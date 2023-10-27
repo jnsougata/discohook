@@ -23,27 +23,40 @@ app = discohook.Client(
 )
 
 
-@discohook.modal.new(
-    "Test Modal",
-    fields=[discohook.TextInput("text", "text_field", required=True)],
-)
-async def test_modal(i: discohook.Interaction, text_field: str):
-    await i.response.update_message(content=f"Value: {text_field}")
+async def exec_code_and_respond(i: discohook.Interaction, code: str):
+    from io import StringIO
+    import re
+    import sys
+    import os
 
+    os.environ.clear()
 
-@app.preload("experiment")
-@discohook.button.new("Modal")
-async def exp_button(i: discohook.Interaction):
-    await i.response.send_modal(test_modal)
+    await i.response.defer()
 
-
-@app.load
-@discohook.command.slash()
-async def experiment(i: discohook.Interaction):
-    """Experiment with library features."""
     view = discohook.View()
-    view.add_buttons(exp_button)
-    await i.response.send("Experimenting...", view=view)
+    view.add_buttons(delete_button)
+
+    pattern = re.compile("```(?:python|py)?\n([\s\S]*?)\n```")  # noqa
+    code = pattern.search(i.message.content)
+    if not code:
+        return await i.response.followup("No code to execute.")
+    orig = sys.stdout
+    sys.stdout = stdout = StringIO()
+    try:
+        exec(f'async def aexec(): ' + "".join(f"\n {line}" for line in code.group(1).split("\n")))
+        await locals()["aexec"]()
+        sys.stdout = orig
+    except Exception as err:
+        await i.response.followup(f"```py\n{err}\n```", view=view)
+    else:
+        value = stdout.getvalue()
+        if len(value) > 2000:
+            file = discohook.File("output.txt", content=value.encode("utf-8"))
+            return await i.response.followup(file=file, view=view)
+        embed = discohook.Embed("Output")
+        embed.set_author(name=str(i.author), icon_url=i.author.avatar.url)
+        embed.description = f"```\n{value}\n```"
+        await i.response.followup(embed=embed, view=view)
 
 
 @app.preload("delete")
@@ -51,6 +64,40 @@ async def experiment(i: discohook.Interaction):
 async def delete_button(i: discohook.Interaction):
     await i.response.defer()
     await i.message.delete()
+
+
+@app.preload("execute_code")
+@discohook.button.new("Execute", style=discohook.ButtonStyle.green)
+async def exec_button(i: discohook.Interaction):
+    await exec_code_and_respond(i, i.message.content)
+
+
+@discohook.modal.new(
+    "Code Runner",
+    fields=[
+        discohook.TextInput("code", "field", required=True, style=discohook.TextInputFieldLength.long)
+    ]
+)
+async def code_input_modal(i: discohook.Interaction, field: str):
+    view = discohook.View()
+    view.add_buttons(rewrite_code_button, exec_button, delete_button)
+    if i.message:
+        await i.response.update_message(content=f"```py\n{field}\n```", view=view)
+    else:
+        await i.response.send(f"```py\n{field}\n```", view=view)
+
+
+@app.preload("rewrite_code")
+@discohook.button.new("Rewrite")
+async def rewrite_code_button(i: discohook.Interaction):
+    await i.response.send_modal(code_input_modal)
+
+
+@app.load
+@discohook.command.slash()
+async def run(i: discohook.Interaction):
+    """Run python code snippets"""
+    await i.response.send_modal(code_input_modal)
 
 
 @app.on_error()
@@ -214,32 +261,4 @@ async def delete_autocomplete(i: discohook.Interaction, filename: str):
 @discohook.command.message("exec")
 async def _exec(i: discohook.Interaction, message: discohook.Message):
     """Execute a python script."""
-    from io import StringIO
-    import re
-    import sys
-
-    await i.response.defer()
-
-    pattern = re.compile("```(?:python|py)?\n([\s\S]*?)\n```")  # noqa
-    code = pattern.search(message.content)
-
-    if not code:
-        await i.response.followup("No code to execute.")
-        return
-
-    orig = sys.stdout
-    sys.stdout = stdout = StringIO()
-
-    try:
-        exec(f'async def aexec(): ' + "".join(f"\n {line}" for line in code.group(1).split("\n")))
-        await locals()["aexec"]()
-        sys.stdout = orig
-    except Exception as err:
-        await i.response.followup(f"```py\n{err}\n```")
-    else:
-        view = discohook.View()
-        view.add_buttons(delete_button)
-        embed = discohook.Embed()
-        embed.set_author(name=str(i.author), icon_url=i.author.avatar.url)
-        embed.description = f"```\n{stdout.getvalue()}\n```"
-        await i.response.followup(embed=embed, view=view)
+    await exec_code_and_respond(i, message.content)

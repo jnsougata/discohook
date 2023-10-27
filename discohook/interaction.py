@@ -223,7 +223,6 @@ class Interaction:
     def author(self) -> Union[User, Member]:
         """
         The author of the interaction
-
         If the interaction was triggered in a guild, this will return a member object else it will return user object.
 
         Returns
