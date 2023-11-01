@@ -65,12 +65,12 @@ class Embed:
         """
         embed = cls()
         embed.data = data
-        embed.title = data.pop("title", None)
-        embed.description = data.pop("description", None)
-        embed.url = data.pop("url", None)
-        embed.color = data.pop("color", None)
-        embed.timestamp = data.pop("timestamp", None)
-        embed.fields = data.pop("fields", [])
+        embed.title = data.get("title")
+        embed.description = data.get("description")
+        embed.url = data.get("url")
+        embed.color = data.get("color")
+        embed.timestamp = data.get("timestamp")
+        embed.fields = data.get("fields", [])
         return embed
 
     def set_author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
