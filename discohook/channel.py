@@ -6,8 +6,7 @@ from .enums import ChannelType
 from .file import File
 from .message import Message
 from .models import AllowedMentions, MessageReference
-from .multipart import create_form
-from .params import handle_send_params, merge_fields
+from .params import _SendingPayload
 from .view import View
 
 if TYPE_CHECKING:
@@ -87,7 +86,7 @@ class PartialChannel:
         if view:
             self.client.load_components(view)
 
-        payload = handle_send_params(
+        payload = _SendingPayload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -99,8 +98,7 @@ class PartialChannel:
             message_reference=message_reference,
         )
 
-        resp = await self.client.http.send_message(
-            self.id, create_form(payload, merge_fields(file, files), merge_fields(embed, embeds)))
+        resp = await self.client.http.send_message(self.id, payload.to_form())
         data = await resp.json()
         return Message(self.client, data)
 

@@ -1,13 +1,14 @@
 from typing import TYPE_CHECKING, List, Optional
 
+import aiohttp
+
 from .asset import Asset
 from .channel import PartialChannel
 from .embed import Embed
 from .file import File
 from .guild import PartialGuild
 from .message import Message
-from .multipart import create_form
-from .params import MISSING, handle_edit_params, handle_send_params, merge_fields
+from .params import MISSING, _SendingPayload, _EditingPayload
 from .user import User
 from .view import View
 
@@ -24,18 +25,18 @@ class PartialWebhook:
         self.client = client
 
     async def send(
-            self,
-            content: Optional[str] = None,
-            *,
-            username: Optional[str] = None,
-            avatar_url: Optional[str] = None,
-            embed: Optional[Embed] = None,
-            embeds: Optional[List[Embed]] = None,
-            file: Optional[File] = None,
-            files: Optional[List[File]] = None,
-            tts: bool = False,
-            view: Optional[View] = None,
-            thread_name: Optional[str] = None,
+        self,
+        content: Optional[str] = None,
+        *,
+        username: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+        embed: Optional[Embed] = None,
+        embeds: Optional[List[Embed]] = None,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
+        tts: bool = False,
+        view: Optional[View] = None,
+        thread_name: Optional[str] = None,
     ):
         """
         Sends a message to the webhook.
@@ -64,9 +65,10 @@ class PartialWebhook:
 
         Returns
         -------
-        None
+        aiohttp.ClientResponse
         """
-        payload = handle_send_params(content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        payload = _SendingPayload(
+            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view).to_dict()
         if username:
             payload["username"] = username
         if avatar_url:
@@ -75,7 +77,7 @@ class PartialWebhook:
             payload["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        form = create_form(payload, merge_fields(file, files), merge_fields(embed, embeds))
+        form = _SendingPayload.form_with_data(payload, files=files, embeds=embeds, file=file, embed=embed)
         return await self.client.http.execute_webhook(self.id, self.token, form=form)
         
     @classmethod
@@ -265,7 +267,8 @@ class Webhook:
         -------
         None
         """
-        payload = handle_send_params(content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        payload = _SendingPayload(
+            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view).to_dict()
         if username:
             payload["username"] = username
         if avatar_url:
@@ -274,7 +277,7 @@ class Webhook:
             payload["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        form = create_form(payload, merge_fields(file, files), merge_fields(embed, embeds))
+        form = _SendingPayload.form_with_data(payload, files=files, embeds=embeds, file=file, embed=embed)
         return await self.client.http.send_webhook_message(self.id, self.token, form)
 
     async def edit_message(
@@ -312,15 +315,14 @@ class Webhook:
         -------
         :class:`Message`
         """
-        payload = handle_edit_params(content, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        payload = _EditingPayload(content=content, embed=embed, embeds=embeds, file=file, files=files, view=view)
         if view:
             self.client.load_components(view)
-        form = create_form(payload, merge_fields(file, files), merge_fields(embed, embeds))
-        resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, form)
+        resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, payload.to_form())
         data = await resp.json()
         return Message(self.client, data)
 
-    async def delete_message(self, message_id: str) -> None:
+    async def delete_message(self, message_id: str) -> aiohttp.ClientResponse:
         """
         Deletes a message from the webhook.
 
@@ -331,6 +333,6 @@ class Webhook:
 
         Returns
         -------
-        None
+        aiohttp.ClientResponse
         """
-        await self.client.http.delete_webhook_message(self.id, self.token, message_id)
+        return await self.client.http.delete_webhook_message(self.id, self.token, message_id)

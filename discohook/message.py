@@ -5,8 +5,7 @@ from .embed import Embed
 from .emoji import PartialEmoji
 from .file import File
 from .models import AllowedMentions, MessageReference
-from .multipart import create_form
-from .params import MISSING, handle_edit_params, merge_fields, handle_send_params
+from .params import MISSING, _EditingPayload, _SendingPayload
 from .role import Role
 from .user import User
 from .view import View
@@ -263,7 +262,7 @@ class Message:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        data = handle_edit_params(
+        payload = _EditingPayload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -275,10 +274,8 @@ class Message:
         )
         if view and view is not MISSING:
             self.client.load_components(view)
-        resp = await self.client.http.edit_channel_message(
-            self.channel_id, self.id, create_form(data, merge_fields(file, files), merge_fields(embed, embeds)))
-        data = await resp.json()
-        return Message(self.client, data)
+        resp = await self.client.http.edit_channel_message(self.channel_id, self.id, payload.to_form())
+        return Message(self.client, await resp.json())
 
     async def pin(self):
         """
@@ -337,7 +334,7 @@ class Message:
             if not allowed_mentions:
                 allowed_mentions = AllowedMentions(replied_user=True)
             allowed_mentions.replied_user = True
-        data = handle_send_params(
+        payload = _SendingPayload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -350,10 +347,8 @@ class Message:
         )
         if view and view is not MISSING:
             self.client.load_components(view)
-        resp = await self.client.http.send_message(
-            self.channel_id, create_form(data, merge_fields(file, files), merge_fields(embed, embeds)))
-        data = await resp.json()
-        return Message(self.client, data)
+        resp = await self.client.http.send_message(self.channel_id, payload.to_form())
+        return Message(self.client, await resp.json())
 
     async def add_reaction(self, emoji: Union[PartialEmoji, str]):
         """

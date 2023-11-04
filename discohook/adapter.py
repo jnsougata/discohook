@@ -4,17 +4,11 @@ from .embed import Embed
 from .errors import InteractionTypeMismatch
 from .enums import InteractionCallbackType, InteractionType
 from .file import File
-from .multipart import create_form
 from .message import Message
 from .modal import Modal
 from .models import AllowedMentions
 from .option import Choice
-from .params import (
-    MISSING,
-    merge_fields,
-    handle_edit_params,
-    handle_send_params
-)
+from .params import MISSING, _EditingPayload, _SendingPayload
 from .view import View
 
 if TYPE_CHECKING:
@@ -56,7 +50,7 @@ class InteractionResponse:
         ----------
         same as :meth:`Message.edit`
         """
-        data = handle_edit_params(
+        payload = _EditingPayload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -72,8 +66,7 @@ class InteractionResponse:
             self.inter.application_id,
             self.inter.token,
             "@original",
-            create_form(
-                data, merge_fields(file, files), merge_fields(embed, embeds))
+            payload.to_form(),
         )
         data = await resp.json()
         return Message(self.inter.client, data)
@@ -117,7 +110,7 @@ class FollowupResponse:
         ----------
         same as :meth:`Message.edit`
         """
-        data = handle_edit_params(
+        payload = _EditingPayload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -133,7 +126,7 @@ class FollowupResponse:
             self.interaction.application_id,
             self.interaction.token,
             self.message.id,
-            create_form(data, merge_fields(file, files), merge_fields(embed, embeds))
+            payload.to_form(),
         )
         data = await resp.json()
         return Message(self.interaction.client, data)
@@ -191,7 +184,7 @@ class ResponseAdapter:
         -------
         InteractionResponse
         """
-        data = handle_send_params(
+        payload = _SendingPayload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -207,12 +200,12 @@ class ResponseAdapter:
             self.inter.client.load_components(view)
 
         payload = {
-            "data": data,
+            "data": payload.to_dict(),
             "type": InteractionCallbackType.channel_message_with_source,
         }
         await self.inter.client.http.send_interaction_mp_callback(
-            self.inter.id, self.inter.token, create_form(
-                payload, merge_fields(file, files), merge_fields(embed, embeds))
+            self.inter.id, self.inter.token, _SendingPayload.form_with_data(
+                payload, file=file, files=files, embeds=embeds, embed=embed)
         )
         self.inter._responded = True
         return InteractionResponse(self.inter)
@@ -311,7 +304,7 @@ class ResponseAdapter:
         if not (self.inter.kind == InteractionType.component or self.inter.kind == InteractionType.modal_submit):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
 
-        data = handle_edit_params(
+        payload = _EditingPayload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -323,10 +316,10 @@ class ResponseAdapter:
         )
         if view and view is not MISSING:
             self.inter.client.load_components(view)
-        payload = {"type": InteractionCallbackType.update_component_message, "data": data}
+        payload = {"type": InteractionCallbackType.update_component_message, "data": payload.to_dict()}
         return await self.inter.client.http.send_interaction_mp_callback(
-            self.inter.id, self.inter.token, create_form(
-                payload, merge_fields(file, files), merge_fields(embed, embeds))
+            self.inter.id, self.inter.token, _EditingPayload.form_with_data(
+                payload, file=file, files=files, embed=embed, embeds=embeds)
         )
 
     async def followup(
@@ -369,7 +362,7 @@ class ResponseAdapter:
         suppress_embeds: Optional[bool]
             Whether the message should suppress embeds or not
         """
-        payload = handle_send_params(
+        payload = _SendingPayload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -384,8 +377,7 @@ class ResponseAdapter:
         if view:
             self.inter.client.load_components(view)
         resp = await self.inter.client.http.send_webhook_message(
-            self.inter.application_id, self.inter.token, create_form(
-                payload, merge_fields(file, files), merge_fields(embed, embeds))
+            self.inter.application_id, self.inter.token, payload.to_form()
         )
         data = await resp.json()
         return FollowupResponse(data, self.inter)

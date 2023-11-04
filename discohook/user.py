@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
+import aiohttp
+
 from .asset import Asset
 from .embed import Embed
 from .file import File
-from .multipart import create_form
-from .params import handle_send_params, merge_fields
+from .params import _SendingPayload
 
 if TYPE_CHECKING:
     from .client import Client
@@ -134,7 +135,7 @@ class User:
         embeds: Optional[List[Embed]] = None,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
-    ) -> Dict[str, Any]:
+    ) -> aiohttp.ClientResponse:
         """
         Sends a message to the user.
 
@@ -153,7 +154,7 @@ class User:
         files: Optional[:class:`List`[:class:`File`]`]
             The files to be sent with the message.
         """
-        payload = handle_send_params(
+        payload = _SendingPayload(
             content=content,
             tts=tts,
             embed=embed,
@@ -164,6 +165,4 @@ class User:
         resp = await self.client.http.create_dm_channel({"recipient_id": self.id})
         data = await resp.json()
         channel_id = data["id"]
-        resp = await self.client.http.send_message(
-            channel_id, create_form(payload, merge_fields(file, files), merge_fields(embed, embeds)))
-        return await resp.json()
+        return await self.client.http.send_message(channel_id, payload.to_form())
