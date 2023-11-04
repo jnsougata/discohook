@@ -164,5 +164,6 @@ class User:
         resp = await self.client.http.create_dm_channel({"recipient_id": self.id})
         data = await resp.json()
         channel_id = data["id"]
-        resp = await self.client.http.send_message(channel_id, create_form(payload, merge_fields(file, files)))
+        resp = await self.client.http.send_message(
+            channel_id, create_form(payload, merge_fields(file, files), merge_fields(embed, embeds)))
         return await resp.json()

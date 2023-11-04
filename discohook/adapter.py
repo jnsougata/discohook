@@ -72,7 +72,8 @@ class InteractionResponse:
             self.inter.application_id,
             self.inter.token,
             "@original",
-            create_form(data, merge_fields(file, files)),
+            create_form(
+                data, merge_fields(file, files), merge_fields(embed, embeds))
         )
         data = await resp.json()
         return Message(self.inter.client, data)
@@ -132,7 +133,7 @@ class FollowupResponse:
             self.interaction.application_id,
             self.interaction.token,
             self.message.id,
-            create_form(data, merge_fields(file, files)),
+            create_form(data, merge_fields(file, files), merge_fields(embed, embeds))
         )
         data = await resp.json()
         return Message(self.interaction.client, data)
@@ -210,7 +211,8 @@ class ResponseAdapter:
             "type": InteractionCallbackType.channel_message_with_source,
         }
         await self.inter.client.http.send_interaction_mp_callback(
-            self.inter.id, self.inter.token, create_form(payload, merge_fields(file, files))
+            self.inter.id, self.inter.token, create_form(
+                payload, merge_fields(file, files), merge_fields(embed, embeds))
         )
         self.inter._responded = True
         return InteractionResponse(self.inter)
@@ -323,7 +325,8 @@ class ResponseAdapter:
             self.inter.client.load_components(view)
         payload = {"type": InteractionCallbackType.update_component_message, "data": data}
         return await self.inter.client.http.send_interaction_mp_callback(
-            self.inter.id, self.inter.token, create_form(payload, merge_fields(file, files))
+            self.inter.id, self.inter.token, create_form(
+                payload, merge_fields(file, files), merge_fields(embed, embeds))
         )
 
     async def followup(
@@ -381,7 +384,8 @@ class ResponseAdapter:
         if view:
             self.inter.client.load_components(view)
         resp = await self.inter.client.http.send_webhook_message(
-            self.inter.application_id, self.inter.token, create_form(payload, merge_fields(file, files))
+            self.inter.application_id, self.inter.token, create_form(
+                payload, merge_fields(file, files), merge_fields(embed, embeds))
         )
         data = await resp.json()
         return FollowupResponse(data, self.inter)

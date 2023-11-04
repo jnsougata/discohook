@@ -99,7 +99,8 @@ class PartialChannel:
             message_reference=message_reference,
         )
 
-        resp = await self.client.http.send_message(self.id, create_form(payload, merge_fields(file, files)))
+        resp = await self.client.http.send_message(
+            self.id, create_form(payload, merge_fields(file, files), merge_fields(embed, embeds)))
         data = await resp.json()
         return Message(self.client, data)
 

@@ -75,7 +75,7 @@ class PartialWebhook:
             payload["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        form = create_form(payload, merge_fields(file, files))
+        form = create_form(payload, merge_fields(file, files), merge_fields(embed, embeds))
         return await self.client.http.execute_webhook(self.id, self.token, form=form)
         
     @classmethod
@@ -274,7 +274,7 @@ class Webhook:
             payload["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        form = create_form(payload, merge_fields(file, files))
+        form = create_form(payload, merge_fields(file, files), merge_fields(embed, embeds))
         return await self.client.http.send_webhook_message(self.id, self.token, form)
 
     async def edit_message(
@@ -315,7 +315,7 @@ class Webhook:
         payload = handle_edit_params(content, embed=embed, embeds=embeds, file=file, files=files, view=view)
         if view:
             self.client.load_components(view)
-        form = create_form(payload, merge_fields(file, files))
+        form = create_form(payload, merge_fields(file, files), merge_fields(embed, embeds))
         resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, form)
         data = await resp.json()
         return Message(self.client, data)

@@ -276,8 +276,7 @@ class Message:
         if view and view is not MISSING:
             self.client.load_components(view)
         resp = await self.client.http.edit_channel_message(
-            self.channel_id, self.id, create_form(data, merge_fields(file, files))
-        )
+            self.channel_id, self.id, create_form(data, merge_fields(file, files), merge_fields(embed, embeds)))
         data = await resp.json()
         return Message(self.client, data)
 
@@ -337,7 +336,7 @@ class Message:
         if mention_author is not None:
             if not allowed_mentions:
                 allowed_mentions = AllowedMentions(replied_user=True)
-            allowed_mentions["replied_user"] = True
+            allowed_mentions.replied_user = True
         data = handle_send_params(
             content=content,
             embed=embed,
@@ -351,7 +350,8 @@ class Message:
         )
         if view and view is not MISSING:
             self.client.load_components(view)
-        resp = await self.client.http.send_message(self.channel_id, create_form(data, merge_fields(file, files)))
+        resp = await self.client.http.send_message(
+            self.channel_id, create_form(data, merge_fields(file, files), merge_fields(embed, embeds)))
         data = await resp.json()
         return Message(self.client, data)
 
