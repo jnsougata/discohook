@@ -68,17 +68,17 @@ class PartialWebhook:
         aiohttp.ClientResponse
         """
         payload = _SendingPayload(
-            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view).to_dict()
+            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        extras = {}
         if username:
-            payload["username"] = username
+            extras["username"] = username
         if avatar_url:
-            payload["avatar_url"] = avatar_url
+            extras["avatar_url"] = avatar_url
         if thread_name:
-            payload["thread_name"] = thread_name
+            extras["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        form = _SendingPayload.form_with_data(payload, files=files, embeds=embeds, file=file, embed=embed)
-        return await self.client.http.execute_webhook(self.id, self.token, form=form)
+        return await self.client.http.execute_webhook(self.id, self.token, form=payload.to_form(**extras))
         
     @classmethod
     def from_url(cls, client: "Client", url: str) -> "PartialWebhook":
@@ -268,17 +268,17 @@ class Webhook:
         None
         """
         payload = _SendingPayload(
-            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view).to_dict()
+            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        extras = {}
         if username:
-            payload["username"] = username
+            extras["username"] = username
         if avatar_url:
-            payload["avatar_url"] = avatar_url
+            extras["avatar_url"] = avatar_url
         if thread_name:
-            payload["thread_name"] = thread_name
+            extras["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        form = _SendingPayload.form_with_data(payload, files=files, embeds=embeds, file=file, embed=embed)
-        return await self.client.http.send_webhook_message(self.id, self.token, form)
+        return await self.client.http.send_webhook_message(self.id, self.token, payload.to_form(**extras))
 
     async def edit_message(
         self,

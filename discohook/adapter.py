@@ -198,15 +198,8 @@ class ResponseAdapter:
         )
         if view:
             self.inter.client.load_components(view)
-
-        payload = {
-            "data": payload.to_dict(),
-            "type": InteractionCallbackType.channel_message_with_source,
-        }
-        await self.inter.client.http.send_interaction_mp_callback(
-            self.inter.id, self.inter.token, _SendingPayload.form_with_data(
-                payload, file=file, files=files, embeds=embeds, embed=embed)
-        )
+        payload = payload.to_form(InteractionCallbackType.channel_message_with_source)
+        await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
@@ -316,11 +309,8 @@ class ResponseAdapter:
         )
         if view and view is not MISSING:
             self.inter.client.load_components(view)
-        payload = {"type": InteractionCallbackType.update_component_message, "data": payload.to_dict()}
-        return await self.inter.client.http.send_interaction_mp_callback(
-            self.inter.id, self.inter.token, _EditingPayload.form_with_data(
-                payload, file=file, files=files, embed=embed, embeds=embeds)
-        )
+        payload = payload.to_form(InteractionCallbackType.update_component_message)
+        return await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
 
     async def followup(
         self,
@@ -377,7 +367,6 @@ class ResponseAdapter:
         if view:
             self.inter.client.load_components(view)
         resp = await self.inter.client.http.send_webhook_message(
-            self.inter.application_id, self.inter.token, payload.to_form()
-        )
+            self.inter.application_id, self.inter.token, payload.to_form())
         data = await resp.json()
         return FollowupResponse(data, self.inter)
