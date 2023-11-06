@@ -61,4 +61,4 @@ class Asset:
         :class:`str`
 
         """
-        return f"{self.base_url}/{self._fragment}.{format}?size={size}"
+        return f"{self.base_url}/{self._fragment}/{self._hash}.{format}?size={size}"
