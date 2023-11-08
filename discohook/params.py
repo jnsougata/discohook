@@ -55,8 +55,7 @@ class _SendingPayload:
         if self.embed and self.embed is not MISSING:
             self.embeds.append(self.embed)
         for embed in self.embeds:
-            if embed.attachments:
-                self.files.extend(embed.attachments)
+            self.files.extend(embed.attachments)
 
     @staticmethod
     def _create_form(
