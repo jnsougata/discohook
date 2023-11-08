@@ -48,11 +48,11 @@ class _SendingPayload:
     def _merge_fields(self):
         if not self.files or self.files is MISSING:
             self.files = []
-        if self.file:
-            self.files.append(self.file)
         if not self.embeds or self.embeds is MISSING:
             self.embeds = []
-        if self.embed:
+        if self.file and self.file is not MISSING:
+            self.files.append(self.file)
+        if self.embed and self.embed is not MISSING:
             self.embeds.append(self.embed)
         for embed in self.embeds:
             if embed.attachments:
