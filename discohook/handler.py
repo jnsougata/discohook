@@ -89,7 +89,9 @@ async def _handler(request: Request):
                 option = interaction.data["options"][0]["options"][0]
                 callback = cmd.subcommands[subcommand_name].autocompletes.get(option["name"])
             else:
-                option = interaction.data["options"][0]
+                for option in interaction.data["options"]:
+                  if "focused" in option:
+                    break
                 callback = cmd.autocompletes.get(option["name"])
             if callback:
                 await callback(interaction, option["value"])
