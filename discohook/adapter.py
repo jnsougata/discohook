@@ -271,7 +271,7 @@ class ResponseAdapter:
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
-   async def require_premium(self):
+    async def require_premium(self):
         """
         Prompts the user that a premium purchase is required for this interaction
         This method is only available for applications with a premium SKU set up
