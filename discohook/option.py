@@ -184,7 +184,8 @@ class Option:
                 self.kind in
                 (
                     ApplicationCommandOptionType.integer,
-                    ApplicationCommandOptionType.number
+                    ApplicationCommandOptionType.number,
+                    ApplicationCommandOptionType.string
                 )
         ):
             if self.autocomplete is not None:
