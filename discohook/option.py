@@ -184,8 +184,7 @@ class Option:
                 self.kind in
                 (
                     ApplicationCommandOptionType.integer,
-                    ApplicationCommandOptionType.number,
-                    ApplicationCommandOptionType.string
+                    ApplicationCommandOptionType.number
                 )
         ):
             if self.autocomplete is not None:
@@ -195,6 +194,8 @@ class Option:
             if self.min_value is not None:
                 self.data["min_value"] = self.min_value
         if self.kind == ApplicationCommandOptionType.string:
+            if self.autocomplete is not None:
+                self.data["autocomplete"] = self.autocomplete
             if self.max_length:
                 self.data["max_length"] = self.max_length
             if self.min_length:
