@@ -45,7 +45,7 @@ async def sync(request: Request):
     password = data.get("password")
     if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    responses, raw = await request.app.sync()
+    responses, raw = await request.app._sync()  # noqa
     if not any([resp.status == 200 for resp in responses]):
         erred_first_response = next((resp for resp in responses if resp.status != 200), None)
         data = await erred_first_response.json()
@@ -326,7 +326,7 @@ class Client(Starlette):
             payload["avatar"] = avatar
         await self.http.edit_client(payload)
 
-    async def sync(self) -> Tuple[List[aiohttp.ClientResponse], List[Dict[str, Any]]]:
+    async def _sync(self) -> Tuple[List[aiohttp.ClientResponse], List[Dict[str, Any]]]:
         """
         Sync the commands to the client.
 
