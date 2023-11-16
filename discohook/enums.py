@@ -170,6 +170,7 @@ class InteractionCallbackType(int, Enum):
     update_component_message = 7
     autocomplete = 8
     modal = 9
+    premium_required = 10
 
 
 class ComponentType(int, Enum):
