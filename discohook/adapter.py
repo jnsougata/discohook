@@ -233,7 +233,7 @@ class ResponseAdapter:
         if self.inter.kind != InteractionType.autocomplete:
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
         choices = choices[:25]
-        payload = {"type": InteractionCallbackType.autocomplete, "data": {"choices": choices}}
+        payload = {"type": InteractionCallbackType.autocomplete, "data": {"choices": [i.to_dict() for i in choices]}}
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
 
     async def defer(self, ephemeral: bool = False) -> InteractionResponse:
