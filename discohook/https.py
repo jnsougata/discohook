@@ -75,8 +75,8 @@ class HTTPClient:
     async def fetch_channel(self, channel_id: str):
         return await self.request("GET", f"/channels/{channel_id}", use_auth=True)
 
-    async def delete_channel(self, channel_id: str):
-        return await self.request("DELETE", f"/channels/{channel_id}", use_auth=True)
+    async def delete_channel(self, channel_id: str, *, reason: Optional[str] = None):
+        return await self.request("DELETE", f"/channels/{channel_id}", reason=reason, use_auth=True)
 
     async def fetch_channel_message(self, channel_id: str, message_id: str):
         return await self.request("GET", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
@@ -84,17 +84,17 @@ class HTTPClient:
     async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
         return await self.request("GET", f"/channels/{channel_id}/messages", params=params, use_auth=True)
 
-    async def delete_channel_message(self, channel_id: str, message_id: str):
-        await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}", use_auth=True)
+    async def delete_channel_message(self, channel_id: str, message_id: str, *, reason: Optional[str] = None):
+        await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}", reason=reason, use_auth=True)
 
-    async def delete_channel_messages(self, channel_id: str, payload: Dict[str, Any]):
-        await self.request("POST", f"/channels/{channel_id}/messages/bulk-delete", json=payload, use_auth=True)
+    async def delete_channel_messages(self, channel_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
+        await self.request("POST", f"/channels/{channel_id}/messages/bulk-delete", json=payload, reason=reason, use_auth=True)
 
-    async def pin_channel_message(self, channel_id: str, message_id: str):
-        await self.request("PUT", f"/channels/{channel_id}/messages/{message_id}/pin", use_auth=True)
+    async def pin_channel_message(self, channel_id: str, message_id: str, *, reason: Optional[str] = None):
+        await self.request("PUT", f"/channels/{channel_id}/messages/{message_id}/pin", reason=reason, use_auth=True)
 
-    async def unpin_channel_message(self, channel_id: str, message_id: str):
-        await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}/pin", use_auth=True)
+    async def unpin_channel_message(self, channel_id: str, message_id: str, *, reason: Optional[str] = None):
+        await self.request("DELETE", f"/channels/{channel_id}/messages/{message_id}/pin", reason=reason, use_auth=True)
 
     async def edit_channel_message(self, channel_id: str, message_id: str, form: aiohttp.MultipartWriter):
         return await self.multipart("PATCH", f"/channels/{channel_id}/messages/{message_id}", form=form, use_auth=True)
@@ -117,19 +117,20 @@ class HTTPClient:
         return await self.request(
             "PUT", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", reason=reason, use_auth=True)
 
-    async def remove_role(self, guild_id: str, user_id: str, role_id: str):
-        return await self.request("DELETE", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", use_auth=True)
+    async def remove_role(self, guild_id: str, user_id: str, role_id: str, *, reason: Optional[str] = None):
+        return await self.request("DELETE", f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}", reason=reason, use_auth=True)
 
     async def fetch_user(self, user_id: str):
         return await self.request("GET", f"/users/{user_id}", use_auth=True)
     
-    async def kick_user(self, guild_id: str, user_id: str):
-        return await self.request("DELETE", f"/guilds/{guild_id}/members/{user_id}", use_auth=True)
+    async def kick_user(self, guild_id: str, user_id: str, *, reason: Optional[str] = None):
+        return await self.request("DELETE", f"/guilds/{guild_id}/members/{user_id}", reason=reason, use_auth=True)
 
-    async def ban_user(self, guild_id: str, user_id: str, delete_message_seconds: int = 0):
+    async def ban_user(self, guild_id: str, user_id: str, delete_message_seconds: int = 0, *, reason: Optional[str] = None):
         return await self.request(
             "PUT",
             f"/guilds/{guild_id}/bans/{user_id}",
+            reason=reason,
             use_auth=True,
             json={"delete_message_seconds": delete_message_seconds},
         )
@@ -154,46 +155,46 @@ class HTTPClient:
     async def fetch_guild_roles(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}/roles", use_auth=True)
 
-    async def create_guild_channel(self, guild_id: str, payload: Dict[str, Any]):
-        return await self.request("POST", f"/guilds/{guild_id}/channels", json=payload, use_auth=True)
+    async def create_guild_channel(self, guild_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
+        return await self.request("POST", f"/guilds/{guild_id}/channels", json=payload, reason=reason, use_auth=True)
 
     async def crosspost_channel_message(self, channel_id: str, message_id: str):
         return await self.request("POST", f"/channels/{channel_id}/messages/{message_id}/crosspost", use_auth=True)
 
-    async def edit_channel(self, channel_id: str, payload: Dict[str, Any]):
-        return await self.request("PATCH", f"/channels/{channel_id}", json=payload, use_auth=True)
+    async def edit_channel(self, channel_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
+        return await self.request("PATCH", f"/channels/{channel_id}", json=payload, reason=reason, use_auth=True)
 
     async def edit_guild_channel_position(self, guild_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/guilds/{guild_id}/channels", json=payload, use_auth=True)
 
-    async def create_guild_role(self, guild_id: str, payload: Dict[str, Any]):
-        return await self.request("POST", f"/guilds/{guild_id}/roles", json=payload, use_auth=True)
+    async def create_guild_role(self, guild_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
+        return await self.request("POST", f"/guilds/{guild_id}/roles", json=payload, reason=reason, use_auth=True)
 
-    async def edit_guild_role_position(self, guild_id: str, payload: Dict[str, Any]):
+    async def edit_guild_role_position(self, guild_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
         return await self.request("PATCH", f"/guilds/{guild_id}/roles", json=payload, use_auth=True)
 
-    async def edit_guild_role(self, guild_id: str, role_id: str, payload: Dict[str, Any]):
-        return await self.request("PATCH", f"/guilds/{guild_id}/roles/{role_id}", json=payload, use_auth=True)
+    async def edit_guild_role(self, guild_id: str, role_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
+        return await self.request("PATCH", f"/guilds/{guild_id}/roles/{role_id}", json=payload, reason=reason, use_auth=True)
 
-    async def create_guild_emoji(self, guild_id: str, payload: Dict[str, Any]):
-        return await self.request("POST", f"/guilds/{guild_id}/emojis", json=payload, use_auth=True)
+    async def create_guild_emoji(self, guild_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
+        return await self.request("POST", f"/guilds/{guild_id}/emojis", json=payload, reason=reason, use_auth=True)
 
-    async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
-        return await self.request("POST", f"/channels/{channel_id}/webhooks", json=payload, use_auth=True)
+    async def create_webhook(self, channel_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
+        return await self.request("POST", f"/channels/{channel_id}/webhooks", json=payload, reason=reason, use_auth=True)
 
     async def execute_webhook(self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter):
         return await self.multipart("POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form)
 
-    async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any]):
-        return await self.request("PATCH", f"/webhooks/{webhook_id}", json=payload, use_auth=True)
+    async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None):
+        return await self.request("PATCH", f"/webhooks/{webhook_id}", json=payload, reason=reason, use_auth=True)
 
     async def fetch_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
         if webhook_token:
             return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
         return await self.request("GET", f"/webhooks/{webhook_id}", use_auth=True)
 
-    async def delete_webhook(self, webhook_id: str):
-        return await self.request("DELETE", f"/webhooks/{webhook_id}", use_auth=True)
+    async def delete_webhook(self, webhook_id: str, *, reason: Optional[str] = None):
+        return await self.request("DELETE", f"/webhooks/{webhook_id}", reason=reason, use_auth=True)
 
     async def create_message_reaction(self, channel_id: str, message_id: str, emoji: str):
         return await self.request(
