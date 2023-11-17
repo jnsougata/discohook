@@ -10,9 +10,6 @@ from .multipart import create_form
 from .params import handle_send_params, merge_fields
 from .view import View
 
-if TYPE_CHECKING:
-    from .client import Client
-
 
 class PartialChannel:
     """
@@ -323,9 +320,7 @@ class PartialChannel:
         return Message(self.client, data)
     
     async def fetch_webhooks(self):
-        resp = await self.client.http.fetch_channel_webhooks(self.id)
-        data = await resp.json()
-        return data
+        return await self.client.http.fetch_channel_webhooks(self.id)
 
 
 class Channel(PartialChannel):
