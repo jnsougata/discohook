@@ -12,18 +12,18 @@ class Asset:
         The fragment of the asset path.
     """
 
-    base_url = "https://cdn.discordapp.com"
+    BASE_URL = "https://cdn.discordapp.com"
 
     def __init__(self, *, hash: str, fragment: str) -> None:  # noqa
-        self._hash = hash
-        self._fragment = fragment
+        self.hash = hash
+        self.fragment = fragment
 
     def __str__(self) -> str:
         if self.dynamic:
-            return f"{self.base_url}/{self._fragment}/{self._hash}.gif?size=1024"
+            return f"{self.BASE_URL}/{self.fragment}/{self.hash}.gif?size=1024"
         if self.default:
-            return f"{self.base_url}/{self._fragment}/{self._hash}.png"
-        return f"{self.base_url}/{self._fragment}/{self._hash}.webp?size=1024"
+            return f"{self.BASE_URL}/{self.fragment}/{self.hash}.webp?size=1024"
+        return f"{self.BASE_URL}/{self.fragment}/{self.hash}.webp?size=1024"
 
     @property
     def dynamic(self) -> bool:
@@ -34,7 +34,7 @@ class Asset:
         -------
         :class:`bool`
         """
-        return self._hash.startswith("a_")
+        return self.hash.startswith("a_")
 
     @property
     def default(self) -> bool:
@@ -45,7 +45,7 @@ class Asset:
         -------
         :class:`bool`
         """
-        return len(self._hash) == 1
+        return len(self.hash) == 1
         
     @property
     def url(self) -> str:
@@ -58,7 +58,7 @@ class Asset:
         """
         return str(self)
 
-    def url_as(self, *, size: int = 1024, format: str = "png") -> str:  # noqa
+    def url_as(self, *, format: str = "png", size: int = 1024) -> str:  # noqa
         """
         Returns the URL of the asset in the specified size and format.
 
@@ -74,4 +74,4 @@ class Asset:
         :class:`str`
 
         """
-        return f"{self.base_url}/{self._fragment}/{self._hash}.{format}?size={size}"
+        return f"{self.BASE_URL}/{self.fragment}/{self.hash}.{format}?size={size}"
