@@ -21,6 +21,8 @@ class Asset:
     def __str__(self) -> str:
         if self.dynamic:
             return f"{self.base_url}/{self._fragment}/{self._hash}.gif?size=1024"
+        if self.default:
+            return f"{self.base_url}/{self._fragment}/{self._hash}.png"
         return f"{self.base_url}/{self._fragment}/{self._hash}.webp?size=1024"
 
     @property
@@ -34,6 +36,17 @@ class Asset:
         """
         return self._hash.startswith("a_")
 
+    @property
+    def default(self) -> bool:
+        """
+        Checks if the asset is a default avatar.
+
+        Returns
+        -------
+        :class:`bool`
+        """
+        return len(self._hash) == 1
+        
     @property
     def url(self) -> str:
         """

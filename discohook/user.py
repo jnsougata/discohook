@@ -77,7 +77,7 @@ class User:
         if av_hash:
             return Asset(hash=av_hash, fragment=f"avatars/{self.id}")
         if self.discriminator == 0:
-            av_hash = str({(int(self.id) >> 22) % 6})
+            av_hash = str((int(self.id) >> 22) % 6)
         else:
             av_hash = str(int(self.discriminator) % 5)
         return Asset(hash=av_hash, fragment="embed/avatars")
