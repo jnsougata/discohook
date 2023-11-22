@@ -22,7 +22,7 @@ class Asset:
         if self.dynamic:
             return f"{self.BASE_URL}/{self.fragment}/{self.hash}.gif?size=1024"
         if self.default:
-            return f"{self.BASE_URL}/{self.fragment}/{self.hash}.webp?size=1024"
+            return f"{self.BASE_URL}/{self.fragment}/{self.hash}.png"
         return f"{self.BASE_URL}/{self.fragment}/{self.hash}.webp?size=1024"
 
     @property
