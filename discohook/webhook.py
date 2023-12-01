@@ -84,7 +84,10 @@ class PartialWebhook:
             extras["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        resp = await self.client.http.execute_webhook(self.id, self.token, form=payload.to_form(**extras), wait=wait, thread_id=thread_id)
+        params = {"wait": int(wait)}
+        if thread_id:
+            params["thread_id"] = thread_id
+        resp = await self.client.http.execute_webhook(self.id, self.token, form=payload.to_form(**extras), params=params)
         if wait:
             data = await resp.json()
             return Message(self.client, data)
