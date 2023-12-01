@@ -37,6 +37,8 @@ class PartialWebhook:
         tts: bool = False,
         view: Optional[View] = None,
         thread_name: Optional[str] = None,
+        wait: bool = False,
+        thread_id: Optional[str] = None
     ):
         """
         Sends a message to the webhook.
@@ -62,6 +64,10 @@ class PartialWebhook:
             The view to be sent with the message.
         thread_name: Optional[:class:`str`]
             The name of the thread to create.
+        wait: :class:`bool`
+            Waits for server confirmation of the message.
+        thread_id: Optional[:class:`str`]
+            Whether to send to a specified thread within the webhook's channel.
 
         Returns
         -------
@@ -78,7 +84,14 @@ class PartialWebhook:
             extras["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        return await self.client.http.execute_webhook(self.id, self.token, form=payload.to_form(**extras))
+        params = {"wait": int(wait)}
+        if thread_id:
+            params["thread_id"] = thread_id
+        resp = await self.client.http.execute_webhook(self.id, self.token, form=payload.to_form(**extras), params=params)
+        if wait:
+            data = await resp.json()
+            return Message(self.client, data)
+        return resp
         
     @classmethod
     def from_url(cls, client: "Client", url: str) -> "PartialWebhook":
