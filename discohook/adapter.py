@@ -220,6 +220,8 @@ class ResponseAdapter:
             "type": InteractionCallbackType.modal,
         }
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
+        self.inter._responded = True
+        return InteractionResponse(self.inter)
 
     async def autocomplete(self, choices: List[Choice]):
         """
@@ -270,8 +272,9 @@ class ResponseAdapter:
             "data": {},
             "type": InteractionCallbackType.premium_required,
         }
-        self.inter._responded = True
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
+        self.inter._responded = True
+        return InteractionResponse(self.inter)
 
     async def update_message(
         self,
@@ -325,6 +328,8 @@ class ResponseAdapter:
             self.inter.client.load_components(view)
         payload = payload.to_form(InteractionCallbackType.update_component_message)
         return await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
+        self.inter._responded = True
+        return InteractionResponse(self.inter)
 
     async def followup(
         self,
