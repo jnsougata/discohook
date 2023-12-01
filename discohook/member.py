@@ -66,7 +66,7 @@ class Member(User):
         """
         Returns a string that allows you to mention the member.
         """
-        return f"<@!{self.id}>"
+        return f"<@{self.id}>"
 
     def has_permission(self, permission: Permission) -> bool:
         return Permission.check(self.permissions, permission)

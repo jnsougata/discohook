@@ -398,3 +398,11 @@ class Message:
         else:
             encoded = "".join(f"%{byte:02x}" for byte in emoji.encode("utf-8"))
         return await self.client.http.delete_all_message_reactions(self.id, self.channel_id, encoded)
+        
+    async def crosspost(self):
+        """
+        Crossposts the message.
+        """
+        resp = await self.client.http.crosspost_channel_message(self.channel_id, self.id)
+        data = await resp.json()
+        return Message(self.client, data)

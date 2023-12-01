@@ -42,6 +42,7 @@ class HTTPClient:
             *,
             form: aiohttp.MultipartWriter,
             use_auth: bool = False,
+            params: Optional[Dict[str, Any]] = None,
             **kwargs
     ):
         for key, value in kwargs.pop("headers", {}).items():
@@ -51,7 +52,8 @@ class HTTPClient:
             form.headers.add("X-Audit-Log-Reason", reason)
         if use_auth:
             form.headers.add("Authorization", f"Bot {self.token}")
-        resp = await self.session.request(method, f"/api/v10{path}", data=form, headers=form.headers)
+            
+        resp = await self.session.request(method, f"/api/v10{path}", data=form, headers=form.headers, params=params)
         if resp.status >= 400:
             if resp.headers.get("content-type") == "application/json":
                 text = await resp.json()
@@ -59,7 +61,7 @@ class HTTPClient:
                 text = await resp.text()
             raise HTTPException(resp, text)
         return resp
-
+      
     async def fetch_application(self):
         return await self.request("GET", "/applications/@me", use_auth=True)
 
@@ -197,8 +199,8 @@ class HTTPClient:
     async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
         return await self.request("POST", f"/channels/{channel_id}/webhooks", json=payload, use_auth=True)
 
-    async def execute_webhook(self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter):
-        return await self.multipart("POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form)
+    async def execute_webhook(self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter, params: Dict[str, Any]):
+        return await self.multipart("POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form, params=params)
 
     async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any]):
         return await self.request("PATCH", f"/webhooks/{webhook_id}", json=payload, use_auth=True)
