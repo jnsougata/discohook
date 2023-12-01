@@ -2,6 +2,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import aiohttp
 
+from .errors import HTTPException
+
 if TYPE_CHECKING:
     from .client import Client
 
@@ -25,7 +27,14 @@ class HTTPClient:
             headers["X-Audit-Log-Reason"] = reason
         headers["Content-Type"] = "application/json"
         kwargs["headers"] = headers
-        return await self.session.request(method, f"/api/v{self.DISCORD_API_VERSION}{path}", **kwargs)
+        resp = await self.session.request(method, f"/api/v{self.DISCORD_API_VERSION}{path}", **kwargs)
+        if resp.status >= 400:
+            if resp.headers.get("content-type") == "application/json":
+                text = await resp.json()
+            else:
+                text = await resp.text()
+            raise HTTPException(resp, text)
+        return resp
 
     async def multipart(
             self, method: str,
@@ -42,7 +51,14 @@ class HTTPClient:
             form.headers.add("X-Audit-Log-Reason", reason)
         if use_auth:
             form.headers.add("Authorization", f"Bot {self.token}")
-        return await self.session.request(method, f"/api/v10{path}", data=form, headers=form.headers)
+        resp = await self.session.request(method, f"/api/v10{path}", data=form, headers=form.headers)
+        if resp.status >= 400:
+            if resp.headers.get("content-type") == "application/json":
+                text = await resp.json()
+            else:
+                text = await resp.text()
+            raise HTTPException(resp, text)
+        return resp
 
     async def fetch_application(self):
         return await self.request("GET", "/applications/@me", use_auth=True)
