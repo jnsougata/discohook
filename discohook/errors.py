@@ -28,4 +28,4 @@ class HTTPException(Exception):
     def __init__(self, resp, message):
         self.resp = resp
         self.message = message
-        super().init__(message)
+        super().__init__(message)
