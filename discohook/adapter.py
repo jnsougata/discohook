@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING, Optional, List, Union, Any, Dict
 
-import aiohttp
-
 from .embed import Embed
 from .errors import InteractionTypeMismatch
 from .enums import InteractionCallbackType, InteractionType
@@ -205,7 +203,7 @@ class ResponseAdapter:
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
-    async def send_modal(self, modal: Union[Modal, Any]):
+    async def send_modal(self, modal: Union[Modal, Any]) -> InteractionResponse:
         """
         Sends a modal to the interaction
 
@@ -213,6 +211,10 @@ class ResponseAdapter:
         ----------
         modal: Modal
             The modal to send
+
+        Returns
+        -------
+        InteractionResponse
         """
         if self.inter.kind not in (InteractionType.component, InteractionType.app_command):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
@@ -299,7 +301,7 @@ class ResponseAdapter:
         file: Optional[File] = MISSING,
         files: Optional[List[File]] = MISSING,
         suppress_embeds: Optional[bool] = MISSING,
-    ) -> aiohttp.ClientResponse:
+    ) -> InteractionResponse:
         """
         Edits the message, the component was attached to.
         This method is only available for component interactions.
@@ -325,8 +327,7 @@ class ResponseAdapter:
 
         Returns
         -------
-        aiohttp.ClientResponse
-            The response from the API.
+        InteractionResponse
         """
         if not (self.inter.kind == InteractionType.component or self.inter.kind == InteractionType.modal_submit):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
@@ -344,8 +345,9 @@ class ResponseAdapter:
         if view and view is not MISSING:
             self.inter.client.load_components(view)
         payload = payload.to_form(InteractionCallbackType.update_component_message)
+        await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
         self.inter._responded = True
-        return await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
+        return InteractionResponse(self.inter)
 
     async def followup(
         self,

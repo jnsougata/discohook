@@ -1,3 +1,6 @@
+import aiohttp
+
+
 class InteractionTypeMismatch(Exception):
     """Raised when the interaction type is not the expected type."""
 
@@ -25,7 +28,7 @@ class UnknownInteractionType(Exception):
 class HTTPException(Exception):
     """Raised when an HTTP request operation fails."""
     
-    def __init__(self, resp, message):
+    def __init__(self, resp: aiohttp.ClientResponse, message: str):
         self.resp = resp
         self.message = message
         super().__init__(message)
