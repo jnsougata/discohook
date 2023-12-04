@@ -238,19 +238,27 @@ class ResponseAdapter:
         payload = {"type": InteractionCallbackType.autocomplete, "data": {"choices": [i.to_dict() for i in choices]}}
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
 
-    async def defer(self, ephemeral: bool = False) -> InteractionResponse:
+    async def defer(self, ephemeral: bool = False, thinking: bool = False) -> InteractionResponse:
         """
         Defers the interaction
 
         Parameters
         ----------
         ephemeral: bool
-            Whether the successive responses should be ephemeral or not (only for Application Commands)
+            Whether the successive responses should be ephemeral or not (only for Application Commands or `thinking` is `True`)
+        thinking: bool
+            Whether to send a new "is thinking..." message to be edited later (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) or do nothing 
+            to edit the original message later (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
         """
         payload = {}
-        if self.inter.kind == InteractionType.component:
-            payload["type"] = InteractionCallbackType.deferred_update_component_message
-        elif self.inter.kind == InteractionType.app_command or self.inter.kind == InteractionType.modal_submit:
+        if self.inter.kind is InteractionType.component or self.inter.kind is InteractionType.modal_submit:
+            if thinking:
+                payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
+                if ephemeral:
+                    payload["data"] = {"flags": 64}
+            else:
+                payload["type"] = InteractionCallbackType.deferred_update_component_message
+        elif self.inter.kind == InteractionType.app_command:
             payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
             if ephemeral:
                 payload["data"] = {"flags": 64}
