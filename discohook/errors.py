@@ -20,3 +20,12 @@ class UnknownInteractionType(Exception):
     def __init__(self, message: str):
         self.message = message
         super().__init__(message)
+
+
+class HTTPException(Exception):
+    """Raised when an HTTP request operation fails."""
+    
+    def __init__(self, resp, message):
+        self.resp = resp
+        self.message = message
+        super().__init__(message)
