@@ -40,7 +40,7 @@ async def invite(interaction: discohook.Interaction, duration: Union[int, None] 
     }
 
     inv = await interaction.client.http.request(
-        method="POST", path=f"/channels/{interaction.channel_id}/invites", use_auth=True, json=params)
+        method="POST", path=f"/channels/{interaction.channel_id}/invites", authorize=True, json=params)
 
     # Send result
     await interaction.response.followup(content=f"https://discord.gg/{(await inv.json())['code']}")

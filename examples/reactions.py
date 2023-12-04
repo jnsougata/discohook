@@ -82,7 +82,7 @@ async def vote(interaction: discohook.Interaction, enunciado: str):
         # Create new reaction for the message
         await interaction.client.http.request(
             method="PUT",
-            path=f"/channels/{interaction.channel_id}/messages/{msg.id}/reactions/{emoji}/@me", use_auth=True)
+            path=f"/channels/{interaction.channel_id}/messages/{msg.id}/reactions/{emoji}/@me", authorize=True)
 
         # Wait a moment between each reaction to avoid rate limit
         await asyncio.sleep(0.2)

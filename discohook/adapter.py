@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Optional, List, Union, Any, Dict
 
+import aiohttp
+
 from .embed import Embed
 from .errors import InteractionTypeMismatch
 from .enums import InteractionCallbackType, InteractionType
@@ -245,10 +247,12 @@ class ResponseAdapter:
         Parameters
         ----------
         ephemeral: bool
-            Whether the successive responses should be ephemeral or not (only for Application Commands or `thinking` is `True`)
+            Whether the successive responses should be ephemeral or not
+            (only for Application Commands or `thinking` is `True`)
         thinking: bool
-            Whether to send a new "is thinking..." message to be edited later (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) or do nothing 
-            to edit the original message later (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
+            Whether to send a new "is thinking..." message to be edited later
+            (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) or do nothing to edit the original message later
+            (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
         """
         payload = {}
         if self.inter.kind is InteractionType.component or self.inter.kind is InteractionType.modal_submit:
@@ -295,7 +299,7 @@ class ResponseAdapter:
         file: Optional[File] = MISSING,
         files: Optional[List[File]] = MISSING,
         suppress_embeds: Optional[bool] = MISSING,
-    ) -> None:
+    ) -> aiohttp.ClientResponse:
         """
         Edits the message, the component was attached to.
         This method is only available for component interactions.
@@ -318,6 +322,11 @@ class ResponseAdapter:
             A list of files to send with the message.
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
+
+        Returns
+        -------
+        aiohttp.ClientResponse
+            The response from the API.
         """
         if not (self.inter.kind == InteractionType.component or self.inter.kind == InteractionType.modal_submit):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
@@ -335,9 +344,8 @@ class ResponseAdapter:
         if view and view is not MISSING:
             self.inter.client.load_components(view)
         payload = payload.to_form(InteractionCallbackType.update_component_message)
-        await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
         self.inter._responded = True
-        return InteractionResponse(self.inter)
+        return await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
 
     async def followup(
         self,
