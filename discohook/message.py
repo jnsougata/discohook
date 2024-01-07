@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
+import aiohttp
+
 from .attachment import Attachment
 from .embed import Embed
 from .emoji import PartialEmoji
@@ -406,3 +408,36 @@ class Message:
         resp = await self.client.http.crosspost_channel_message(self.channel_id, self.id)
         data = await resp.json()
         return Message(self.client, data)
+
+    async def start_thread(
+        self,
+        name: str,
+        *,
+        auto_archive_duration: int = 60,
+        rate_limit_per_user: int = 0,
+        reason: Optional[str] = None
+    ) -> aiohttp.ClientResponse:
+        """
+        Starts a thread from the message.
+
+        Parameters
+        ----------
+        name: str
+            The name of the thread.
+        auto_archive_duration: int
+            The duration of the thread in minutes.
+        rate_limit_per_user: int
+            The rate limit per user in seconds.
+        reason: Optional[str]
+            The reason for starting the thread.
+
+        Returns
+        -------
+        aiohttp.ClientResponse
+        """
+        payload = {
+            "name": name,
+            "auto_archive_duration": auto_archive_duration,
+            "rate_limit_per_user": rate_limit_per_user,
+        }
+        return await self.client.http.start_thread_with_message(self.channel_id, self.id, payload, reason)

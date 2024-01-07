@@ -239,3 +239,14 @@ class HTTPClient:
 
     async def fetch_skus(self, application_id: str):
         return await self.request("GET", f"/applications/{application_id}/skus", authorize=True)
+
+    async def start_thread_without_message(
+            self, channel_id: str, payload: Dict[str, Any], reason: Optional[str] = None):
+        return await self.request(
+            "POST", f"/channels/{channel_id}/threads", json=payload, authorize=True, reason=reason)
+
+    async def start_thread_with_message(
+            self, channel_id: str, message_id: str, payload: Dict[str, Any], reason: Optional[str] = None):
+        return await self.request(
+            "POST",
+            f"/channels/{channel_id}/messages/{message_id}/threads", json=payload, authorize=True, reason=reason)

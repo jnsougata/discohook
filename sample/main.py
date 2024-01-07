@@ -1,17 +1,17 @@
 import os
 import random
 import secrets
-import traceback
 
 import deta
 import discohook
+
+from eh import debugger
 
 
 PASSWORD = os.environ["PASSWORD"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 APPLICATION_ID = os.environ["APPLICATION_ID"]
-LOG_CHANNEL_ID = os.environ["LOG_CHANNEL_ID"]
 
 
 app = discohook.Client(
@@ -21,6 +21,8 @@ app = discohook.Client(
     token=DISCORD_TOKEN,
     default_help_command=True,
 )
+
+app.on_interaction_error()(debugger)
 
 
 async def exec_code_and_respond(i: discohook.Interaction, code: str):
@@ -43,8 +45,8 @@ async def exec_code_and_respond(i: discohook.Interaction, code: str):
     orig = sys.stdout
     sys.stdout = stdout = StringIO()
     try:
-        exec(f'async def aexec(): ' + "".join(f"\n {line}" for line in code.group(1).split("\n")))
-        await locals()["aexec"]()
+        exec(f'async def _a_exec(): ' + "".join(f"\n {line}" for line in code.group(1).split("\n")))
+        await locals()["_a_exec"]()
         sys.stdout = orig
     except Exception as err:
         await i.response.followup(f"```py\n{err}\n```", view=view)
@@ -98,28 +100,6 @@ async def rewrite_code_button(i: discohook.Interaction):
 async def run(i: discohook.Interaction):
     """Run python code snippets"""
     await i.response.send_modal(code_input_modal)
-
-
-@app.on_error()
-async def debugger(_, err: Exception):
-    stack = "\n".join(traceback.format_exception(type(err), err, err.__traceback__))
-    embed = discohook.Embed(title="Exception", description=f"```py\n{stack}```")
-    view = discohook.View()
-    view.add_buttons(delete_button)
-    await app.send(LOG_CHANNEL_ID, embed=embed, view=view)
-
-
-@app.on_interaction_error()
-async def interaction_error(i: discohook.Interaction, err: Exception):
-    if i.responded:
-        await i.response.followup("An error occurred while processing your interaction.", ephemeral=True)
-    else:
-        await i.response.send("An error occurred while processing your interaction.", ephemeral=True)
-    stack = "\n".join(traceback.format_exception(type(err), err, err.__traceback__))
-    embed = discohook.Embed(title="Exception", description=f"```py\n{stack}\n```")
-    view = discohook.View()
-    view.add_buttons(delete_button)
-    await app.send(LOG_CHANNEL_ID, embed=embed, view=view)
 
 
 def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
@@ -179,10 +159,9 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
 @app.load
 @discohook.command.message(guild_id=os.environ["GUILD_ID"])
 async def echo(i: discohook.Interaction, message: discohook.Message):
-    if message.content:
-        await i.response.send(message.content)
-    else:
-        await i.response.send("Message does not have text content.", ephemeral=True)
+    await i.response.send("Creating thread...", ephemeral=True)
+    thread = discohook.Channel.from_response(i.client, await message.start_thread("hello"))
+    await thread.send("Hello!")
 
 
 @app.load
@@ -230,9 +209,7 @@ async def download(i: discohook.Interaction, filename: str):
     await i.response.followup(file=discohook.File(filename, content=await file.read()))
 
 
-@download.autocomplete("filename")
-async def download_autocomplete(i: discohook.Interaction, filename: str):
-    await filename_autocomplete(i, filename)
+download.autocomplete("filename")(filename_autocomplete)
 
 
 @app.load
@@ -251,10 +228,7 @@ async def delete(i: discohook.Interaction, filename: str):
     embed.description = f"Deleted ` {filename} ` from drive."
     await i.response.followup(embed=embed)
 
-
-@delete.autocomplete("filename")
-async def delete_autocomplete(i: discohook.Interaction, filename: str):
-    await filename_autocomplete(i, filename)
+delete.autocomplete("filename")(filename_autocomplete)
 
 
 @app.load

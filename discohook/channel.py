@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
+import aiohttp
+
 from .embed import Embed
 from .emoji import PartialEmoji
 from .enums import ChannelType
@@ -321,6 +323,45 @@ class PartialChannel:
         data = await resp.json()
         return Message(self.client, data)
 
+    async def start_thread(
+        self,
+        name: str,
+        *,
+        auto_archive_duration: int = 60,
+        invitable: bool = True,
+        rate_limit_per_user: int = 0,
+        reason: Optional[str] = None,
+    ) -> "Channel":
+        """
+        Creates a thread from the channel.
+
+        Parameters
+        ----------
+        name: :class:`str`
+            The name of the thread.
+        auto_archive_duration: Optional[:class:`int`]
+            The duration in minutes to automatically archive the thread after recent activity.
+        invitable: Optional[:class:`bool`]
+            Whether non-moderators can add other non-moderators to the thread.
+        rate_limit_per_user: Optional[:class:`int`]
+            Amount of seconds a user has to wait before sending another message (0-21600)
+        reason
+
+        Returns
+        -------
+
+        """
+        payload = {
+            "name": name,
+            "auto_archive_duration": auto_archive_duration,
+            "type": ChannelType.private_thread,
+            "invitable": invitable,
+            "rate_limit_per_user": rate_limit_per_user,
+        }
+        resp = await self.client.http.start_thread_without_message(self.id, payload, reason=reason)
+        data = await resp.json()
+        return Channel(self.client, data)
+
 
 class Channel(PartialChannel):
     """
@@ -433,3 +474,11 @@ class Channel(PartialChannel):
         self.default_thread_rate_limit_per_user = data.get("default_thread_rate_limit_per_user")
         self.default_sort_order = data.get("default_sort_order")
         self.default_forum_layout = data.get("default_forum_layout")
+
+    @classmethod
+    async def from_response(cls, client: "Client", response: aiohttp.ClientResponse):
+        return cls(client, await response.json())
+
+    @classmethod
+    def from_dict(cls, client: "Client", data: dict):
+        return cls(client, data)
