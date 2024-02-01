@@ -57,6 +57,7 @@ class Interaction:
         self._responded = False
         self.client: "Client" = client
         self._parsed_options = None
+        self.focused_option_name: Optional[str] = None
 
     @property
     def data(self) -> Dict[str, Any]:

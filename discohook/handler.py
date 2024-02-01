@@ -85,14 +85,16 @@ async def _handler(request: Request):
             if not cmd:
                 raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
             if interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand:
-                subcommand_name = interaction.data["options"][0]["name"]
-                option = interaction.data["options"][0]["options"][0]
-                callback = cmd.subcommands[subcommand_name].autocompletes.get(option["name"])
+                subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
+                args, kwargs = build_slash_command_params(subcommand.autocompletion_handler, interaction)
+                await subcommand.autocompletion_handler(interaction, *args, **kwargs)
+            elif not cmd.autocompletion_handler:
+                raise Exception(
+                    f"command `{interaction.data['name']}` ({interaction.data['id']}) has no autocompletion handler"
+                )
             else:
-                option = interaction.data["options"][0]
-                callback = cmd.autocompletes.get(option["name"])
-            if callback:
-                await callback(interaction, option["value"])
+                args, kwargs = build_slash_command_params(cmd.autocompletion_handler, interaction)
+                await cmd.autocompletion_handler(interaction, *args, **kwargs)
 
         elif interaction.kind in (InteractionType.component, InteractionType.modal_submit):
             custom_id = interaction.data["custom_id"]

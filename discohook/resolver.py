@@ -55,12 +55,18 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
         option_type = option["type"]
         if option_type == ApplicationCommandOptionType.string:
             options[name] = value
+            if option.get("focused"):
+                interaction.focused_option_name = name
         elif option_type == ApplicationCommandOptionType.integer:
             options[name] = int(value)
+            if option.get("focused"):
+                interaction.focused_option_name = name
         elif option_type == ApplicationCommandOptionType.boolean:
             options[name] = bool(value)
         elif option_type == ApplicationCommandOptionType.number:
             options[name] = float(value)
+            if option.get("focused"):
+                interaction.focused_option_name = name
         elif option_type == ApplicationCommandOptionType.user:
             user_data = interaction.data["resolved"]["users"][value]
             if interaction.guild_id:

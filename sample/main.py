@@ -1,11 +1,8 @@
 import os
 import random
-import secrets
-
-import deta
 import discohook
 
-from eh import debugger
+from debugger import tracer
 
 
 PASSWORD = os.environ["PASSWORD"]
@@ -22,7 +19,7 @@ app = discohook.Client(
     default_help_command=True,
 )
 
-app.on_interaction_error()(debugger)
+app.on_interaction_error()(tracer)
 
 
 async def exec_code_and_respond(i: discohook.Interaction, code: str):
@@ -115,7 +112,7 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
 
 @app.preload("regenerate")
 @discohook.button.new("Regenerate")
-async def generate_button(i: discohook.Interaction):
+async def regenerate_button(i: discohook.Interaction):
     await i.response.update_message(embed=make_random_color_card(i))
 
 
@@ -124,7 +121,7 @@ async def generate_button(i: discohook.Interaction):
 async def color(i: discohook.Interaction):
     """Generate a random color."""
     view = discohook.View()
-    view.add_buttons(generate_button)
+    view.add_buttons(regenerate_button)
     await i.response.send(embed=make_random_color_card(i), view=view)
 
 
@@ -157,82 +154,75 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
 
 
 @app.load
-@discohook.command.message(guild_id=os.environ["GUILD_ID"])
-async def echo(i: discohook.Interaction, message: discohook.Message):
-    await i.response.send("Creating thread...", ephemeral=True)
-    thread = discohook.Channel.from_response(i.client, await message.start_thread("hello"))
-    await thread.send("Hello!")
-
-
-@app.load
-@discohook.command.slash(
-    options=[
-        discohook.Option.attachment("file", "The file to upload.", required=True)
-    ]
-)
-async def upload(i: discohook.Interaction, file: discohook.Attachment):
-    """Upload a file to Deta Drive."""
-    drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
-    await i.response.defer()
-    parts = file.filename.split(".", maxsplit=1)
-    name = f"{parts[0]}_{secrets.token_urlsafe(4)}"
-    if len(parts) > 1:
-        name += f".{parts[1]}"
-    await drive.put(await file.read(), save_as=name, folder=i.author.id, content_type=file.content_type)
-    embed = discohook.Embed()
-    embed.set_author(name=str(i.author), icon_url=i.author.avatar.url)
-    embed.description = f"Uploaded ` {name} ` to drive."
-    await i.response.followup(embed=embed)
-
-
-async def filename_autocomplete(i: discohook.Interaction, filename: str):
-    drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
-    if not filename:
-        files = await drive.files(prefix=f"{i.author.id}")
-    else:
-        files = await drive.files(prefix=f"{i.author.id}/{filename}")
-    names = files.get("names", [])[:25]
-    await i.response.autocomplete([discohook.Choice(name=name, value=name) for name in names])
-
-
-@app.load
-@discohook.command.slash(
-    options=[
-        discohook.Option.string("filename", "The file to download.", autocomplete=True, required=True)
-    ]
-)
-async def download(i: discohook.Interaction, filename: str):
-    """Download a file from Deta Drive."""
-    drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
-    await i.response.defer()
-    file = await drive.get(filename)
-    await i.response.followup(file=discohook.File(filename, content=await file.read()))
-
-
-download.autocomplete("filename")(filename_autocomplete)
-
-
-@app.load
-@discohook.command.slash(
-    options=[
-        discohook.Option.string("filename", "The file to delete.", autocomplete=True, required=True)
-    ]
-)
-async def delete(i: discohook.Interaction, filename: str):
-    """Delete a file from Deta Drive."""
-    drive = deta.Deta(env="DETA_PROJECT_KEY").drive("files")
-    await i.response.defer()
-    await drive.delete(filename)
-    embed = discohook.Embed()
-    embed.set_author(name=str(i.author), icon_url=i.author.avatar.url)
-    embed.description = f"Deleted ` {filename} ` from drive."
-    await i.response.followup(embed=embed)
-
-delete.autocomplete("filename")(filename_autocomplete)
-
-
-@app.load
 @discohook.command.message("exec")
 async def _exec(i: discohook.Interaction, message: discohook.Message):
     """Execute a python script."""
     await exec_code_and_respond(i, message.content)
+
+
+@app.load
+@discohook.command.slash(
+    options=[
+        discohook.Option.integer(
+            "red",
+            "The red value of the color.",
+            required=True,
+            max_value=255,
+            min_value=0,
+            autocomplete=True
+        ),
+        discohook.Option.integer(
+            "green",
+            "The green value of the color.",
+            required=True,
+            max_value=255,
+            min_value=0,
+            autocomplete=True
+        ),
+        discohook.Option.integer(
+            "blue",
+            "The blue value of the color.",
+            required=True,
+            max_value=255,
+            min_value=0,
+            autocomplete=True
+        ),
+    ]
+)
+async def colormix(i: discohook.Interaction, red: int, green: int, blue: int):
+    """Generates a range of numbers."""
+    hex_value = f"{red:02x}{green:02x}{blue:02x}"
+    embed = discohook.Embed(title=f"0x{hex_value}")
+    embed.set_image(f"https://singlecolorimage.com/get/{hex_value}/1280x720")
+    embed.set_author(name=i.author.name, icon_url=i.author.avatar.url)
+    await i.response.send(embed=embed)
+
+
+@colormix.on_autocomplete
+async def handler(i: discohook.Interaction, red: int, green: int, blue: int):
+
+    choices = []
+
+    if i.focused_option_name == "red":
+        green = green or '_'
+        blue = blue or '_'
+        original_color = f"RGB({red}, {green}, {blue})"
+        random_colors = [f"RGB({red}, {green}, {blue})" for red in range(0, 256, 24)]
+        random_colors = [original_color] + random_colors
+        choices = [discohook.Choice(name=_color, value=red) for _color in random_colors]
+    if i.focused_option_name == "green":
+        red = red or '_'
+        blue = blue or '_'
+        original_color = f"RGB({red}, {green}, {blue})"
+        random_colors = [f"RGB({red}, {green}, {blue})" for green in range(0, 256, 24)]
+        random_colors = [original_color] + random_colors
+        choices = [discohook.Choice(name=_color, value=green) for _color in random_colors]
+    if i.focused_option_name == "blue":
+        red = red or '_'
+        green = green or '_'
+        original_color = f"RGB({red}, {green}, {blue})"
+        random_colors = [f"RGB({red}, {green}, {blue})" for blue in range(0, 256, 24)]
+        random_colors = [original_color] + random_colors
+        choices = [discohook.Choice(name=_color, value=blue) for _color in random_colors]
+
+    await i.response.autocomplete(choices)

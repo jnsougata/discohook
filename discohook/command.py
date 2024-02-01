@@ -36,7 +36,7 @@ class SubCommand:
         self.options = options
         self.callback = callback
         self.description = description
-        self.autocompletes: Dict[str, Handler] = {}
+        self.autocompletion_handler: Optional[Handler] = None
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -46,20 +46,12 @@ class SubCommand:
             )
         return self.callback(*args, **kwargs)
 
-    def autocomplete(self, name: str):
+    def on_autocomplete(self, coro: Handler):
         """
         A decorator to register a callback for the subcommand's autocomplete options.
-
-        Parameters
-        ----------
-        name: str
-            The name of the option to register the autocomplete for.
         """
-
-        def decorator(coro: Handler):
-            self.autocompletes[name] = coro
-
-        return decorator
+        self.autocompletion_handler = coro
+        return coro
 
     def to_dict(self) -> Dict[str, Any]:
         payload = {
@@ -129,27 +121,19 @@ class ApplicationCommand(Interactable):
         self.callback: Handler = callback
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
-        self.autocompletes: Dict[str, Handler] = {}
+        self.autocompletion_handler: Optional[Handler] = None
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
             raise RuntimeWarning(f"command `{self.key}` has no callback")
         return self.callback(*args, **kwargs)
 
-    def autocomplete(self, name: str):
+    def on_autocomplete(self, coro: Handler):
         """
         A decorator to register a callback for the command's autocomplete options.
-
-        Parameters
-        ----------
-        name: str
-            The name of the option to register the autocomplete for.
         """
-
-        def decorator(coro: Handler):
-            self.autocompletes[name] = coro
-
-        return decorator
+        self.autocompletion_handler = coro
+        return coro
 
     def subcommand(
         self,
