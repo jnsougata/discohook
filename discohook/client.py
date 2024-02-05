@@ -105,7 +105,6 @@ class Client(Starlette):
         self.public_key = public_key
         self.application_id = application_id
         self.password = password
-        self.http = HTTPClient(self, token, aiohttp.ClientSession("https://discord.com"))
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.commands: Dict[str, ApplicationCommand] = {}
@@ -119,6 +118,12 @@ class Client(Starlette):
             self.add_commands(_help)
         self._interaction_error_handler: Optional[Callable[[Interaction, Exception], Any]] = None
 
+    @property
+    def http(self):
+        if not self._http:
+            self._http = HTTPClient(self, token, aiohttp.ClientSession("https://discord.com"))
+        return self._http
+    
     def on_error(self):
         """
         A decorator to add an error handler for any server errors.
