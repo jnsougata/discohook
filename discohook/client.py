@@ -122,7 +122,7 @@ class Client(Starlette):
     @property
     def http(self):
         if not self._http:
-            self._http = HTTPClient(self, token, aiohttp.ClientSession("https://discord.com"))
+            self._http = HTTPClient(self, self.token, aiohttp.ClientSession("https://discord.com"))
         return self._http
     
     def on_error(self):
