@@ -108,6 +108,7 @@ class Client(Starlette):
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.commands: Dict[str, ApplicationCommand] = {}
+        self._http = None # This will be created on first request
         self.add_route(route, _handler, methods=["POST"], include_in_schema=False)
         self.add_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
         self.add_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
