@@ -63,8 +63,7 @@ async def _handler(request: Request):
                         raise CheckFailure(f"command checks failed")
 
                 if not (interaction.data["type"] == ApplicationCommandType.slash):
-                    target_object = build_context_menu_param(interaction)
-                    await cmd(interaction, target_object)
+                    await cmd(interaction, build_context_menu_param(interaction))
 
                 elif interaction.data.get("options") and (
                     interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand

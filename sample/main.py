@@ -4,12 +4,10 @@ import discohook
 
 from debugger import tracer
 
-
 PASSWORD = os.environ["PASSWORD"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 APPLICATION_ID = os.environ["APPLICATION_ID"]
-
 
 app = discohook.Client(
     application_id=APPLICATION_ID,
@@ -22,7 +20,7 @@ app = discohook.Client(
 app.on_interaction_error()(tracer)
 
 
-async def exec_code_and_respond(i: discohook.Interaction, code: str):
+async def exec_code_and_respond(i: discohook.Interaction, content: str):
     from io import StringIO
     import re
     import sys
@@ -36,7 +34,7 @@ async def exec_code_and_respond(i: discohook.Interaction, code: str):
     view.add_buttons(delete_button)
 
     pattern = re.compile("```(?:python|py)?\n([\s\S]*?)\n```")  # noqa
-    code = pattern.search(i.message.content)
+    code = pattern.search(content)
     if not code:
         return await i.response.followup("No code to execute.")
     orig = sys.stdout
@@ -158,71 +156,3 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
 async def _exec(i: discohook.Interaction, message: discohook.Message):
     """Execute a python script."""
     await exec_code_and_respond(i, message.content)
-
-
-@app.load
-@discohook.command.slash(
-    options=[
-        discohook.Option.integer(
-            "red",
-            "The red value of the color.",
-            required=True,
-            max_value=255,
-            min_value=0,
-            autocomplete=True
-        ),
-        discohook.Option.integer(
-            "green",
-            "The green value of the color.",
-            required=True,
-            max_value=255,
-            min_value=0,
-            autocomplete=True
-        ),
-        discohook.Option.integer(
-            "blue",
-            "The blue value of the color.",
-            required=True,
-            max_value=255,
-            min_value=0,
-            autocomplete=True
-        ),
-    ]
-)
-async def colormix(i: discohook.Interaction, red: int, green: int, blue: int):
-    """Generates a range of numbers."""
-    hex_value = f"{red:02x}{green:02x}{blue:02x}"
-    embed = discohook.Embed(title=f"0x{hex_value}")
-    embed.set_image(f"https://singlecolorimage.com/get/{hex_value}/1280x720")
-    embed.set_author(name=i.author.name, icon_url=i.author.avatar.url)
-    await i.response.send(embed=embed)
-
-
-@colormix.on_autocomplete
-async def handler(i: discohook.Interaction, red: int, green: int, blue: int):
-
-    choices = []
-
-    if i.focused_option_name == "red":
-        green = green or '_'
-        blue = blue or '_'
-        original_color = f"RGB({red}, {green}, {blue})"
-        random_colors = [f"RGB({red}, {green}, {blue})" for red in range(0, 256, 24)]
-        random_colors = [original_color] + random_colors
-        choices = [discohook.Choice(name=_color, value=red) for _color in random_colors]
-    if i.focused_option_name == "green":
-        red = red or '_'
-        blue = blue or '_'
-        original_color = f"RGB({red}, {green}, {blue})"
-        random_colors = [f"RGB({red}, {green}, {blue})" for green in range(0, 256, 24)]
-        random_colors = [original_color] + random_colors
-        choices = [discohook.Choice(name=_color, value=green) for _color in random_colors]
-    if i.focused_option_name == "blue":
-        red = red or '_'
-        green = green or '_'
-        original_color = f"RGB({red}, {green}, {blue})"
-        random_colors = [f"RGB({red}, {green}, {blue})" for blue in range(0, 256, 24)]
-        random_colors = [original_color] + random_colors
-        choices = [discohook.Choice(name=_color, value=blue) for _color in random_colors]
-
-    await i.response.autocomplete(choices)

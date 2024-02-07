@@ -106,19 +106,18 @@ def build_slash_command_params(func: Callable, interaction: Interaction, skips: 
 
 
 def build_context_menu_param(interaction: Interaction):
+    target_id = interaction.data["target_id"]
     if interaction.data["type"] == ApplicationCommandType.user:
-        user_id = interaction.data["target_id"]
-        user_resolved = interaction.data["resolved"]["users"][user_id]
-        member_resolved = interaction.data["resolved"]["members"][user_id] if interaction.guild_id else {}
-        if member_resolved:
-            member_resolved["avatar"] = user_resolved["avatar"]
-            user_resolved.update(member_resolved)
-        return User(interaction.client, user_resolved)
+        user = interaction.data["resolved"]["users"][target_id]
+        member = interaction.data["resolved"]["members"][target_id] if interaction.guild_id else {}
+        if member:
+            member["avatar"] = user["avatar"]
+            user.update(member)
+        return User(interaction.client, user)
 
     if interaction.data["type"] == ApplicationCommandType.message:
-        message_id = interaction.data["target_id"]
-        message_data = interaction.data["resolved"]["messages"][message_id]
-        return Message(interaction.client, message_data)
+        message = interaction.data["resolved"]["messages"][target_id]
+        return Message(interaction.client, message)
 
 
 def build_modal_params(func: Callable, interaction: Interaction):
