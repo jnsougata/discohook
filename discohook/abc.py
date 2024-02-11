@@ -38,19 +38,20 @@ class Interactable:
         return decorator
 
 
+# noinspection PyShadowingBuiltins
 class Component(Interactable):
     """
     Represents a discord component.
 
     Parameters
     ----------
-    kind: :class:`ComponentType`
+    type: :class:`ComponentType`
         The type of the component.
     """
 
-    def __init__(self, kind: Optional[ComponentType] = None, custom_id: Optional[str] = None):
+    def __init__(self, type: Optional[ComponentType] = None, custom_id: Optional[str] = None):
         super().__init__()
-        self.kind = kind
+        self.type = type
         self.callback: Optional[Callable[["Interaction", Any], Any]] = None
         self.custom_id = custom_id or secrets.token_urlsafe(8)
 

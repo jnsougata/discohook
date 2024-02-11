@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Callable, TYPE_CHECKING, Union
 
 from .abc import Component
 from .emoji import PartialEmoji
-from .enums import ComponentType, SelectType, ChannelType
+from .enums import ComponentType, SelectType, ChannelType, SelectDefaultValueType
 
 
 if TYPE_CHECKING:
@@ -11,6 +11,42 @@ if TYPE_CHECKING:
     from .channel import PartialChannel
     from .role import PartialRole
     from .user import User
+
+
+# noinspection PyShadowingBuiltins
+class DefaultSelectOption:
+    """
+    Represents a discord select menu default option object.
+    Only applicable for non string select menus.
+
+    Parameters
+    ----------
+    id: :class:`str`
+        The id of the user, role or channel.
+    type: :class:`SelectDefaultValueType`
+        The type of the default value.
+    """
+
+    def __init__(self, id: str, type: SelectDefaultValueType):
+        self.id = id
+        self.type = type
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Returns a dictionary representation of the button.
+
+        This is used internally by the library. You should not need to use this method.
+
+        Returns
+        -------
+        :class:`dict`
+            The dictionary representation of the button.
+        """
+        payload = {
+            "id": self.id,
+            "type": self.type
+        }
+        return payload
 
 
 class SelectOption:
@@ -68,6 +104,7 @@ class SelectOption:
         return payload
 
 
+# noinspection PyShadowingBuiltins
 class Select(Component):
     """
     Represents a discord select menu component.
@@ -82,13 +119,13 @@ class Select(Component):
         The maximum number of options that can be selected.
     disabled: Optional[:class:`bool`]
         Whether the select menu is disabled or not.
-    kind: :class:`SelectType`
+    type: :class:`SelectType`
         The type of the select menu.
     """
 
     def __init__(
         self,
-        kind: SelectType,
+        type: SelectType,
         *,
         placeholder: Optional[str] = None,
         min_values: Optional[int] = None,
@@ -96,14 +133,14 @@ class Select(Component):
         disabled: Optional[bool] = False,
         custom_id: Optional[str] = None,
     ):
-        kind = ComponentType(kind.value)
-        super().__init__(kind, custom_id)
+        super().__init__(ComponentType(type.value), custom_id)
         self.placeholder: Optional[str] = placeholder
         self.min_values: Optional[int] = min_values
         self.max_values: Optional[int] = max_values
         self.disabled: Optional[bool] = disabled
         self.options: Optional[List[SelectOption]] = None
         self.channel_types: Optional[List[ChannelType]] = None
+        self.default_values: Optional[List[DefaultSelectOption]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -117,14 +154,16 @@ class Select(Component):
             The dictionary representation of the button.
         """
         payload = {
-            "type": self.kind,
+            "type": self.type,
             "custom_id": self.custom_id
         }
-        if self.kind == ComponentType.select_text:
+        if self.type == ComponentType.select_text:
             if not self.options:
                 raise ValueError("options must be provided for text select menus")
             payload["options"] = [option.to_dict() for option in self.options]
-        if self.kind == ComponentType.select_channel and self.channel_types:
+        elif self.type != ComponentType.select_text and self.default_values:
+            payload["default_values"] = [value.to_dict() for value in self.default_values]
+        if self.type == ComponentType.select_channel and self.channel_types:
             payload["channel_types"] = [x.value for x in self.channel_types]
         if self.placeholder:
             payload["placeholder"] = self.placeholder
@@ -168,7 +207,7 @@ def channel(
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         self = Select(
-            kind=SelectType.channel,
+            type=SelectType.channel,
             custom_id=custom_id,
             placeholder=placeholder,
             min_values=min_values,
@@ -213,7 +252,7 @@ def text(
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         self = Select(
-            kind=SelectType.text,
+            type=SelectType.text,
             custom_id=custom_id,
             placeholder=placeholder,
             min_values=min_values,
@@ -263,7 +302,7 @@ def role(
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         self = Select(
-            kind=SelectType.role,
+            type=SelectType.role,
             placeholder=placeholder,
             min_values=min_values,
             max_values=max_values,
@@ -304,7 +343,7 @@ def user(
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         self = Select(
-            kind=SelectType.user,
+            type=SelectType.user,
             placeholder=placeholder,
             min_values=min_values,
             max_values=max_values,
@@ -345,7 +384,7 @@ def mentionable(
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         self = Select(
-            kind=SelectType.mentionable,
+            type=SelectType.mentionable,
             placeholder=placeholder,
             min_values=min_values,
             max_values=max_values,

@@ -12,7 +12,8 @@ __all__ = (
     "SelectType",
     "TextInputFieldLength",
     "AllowedMentionsType",
-    "try_enum"
+    "try_enum",
+    "SelectDefaultValueType"
 )
 
 
@@ -249,3 +250,14 @@ class AllowedMentionsType(str, Enum):
     roles = "roles"
     users = "users"
     everyone = "everyone"
+
+
+class SelectDefaultValueType(str, Enum):
+    """
+    The type of default value for a select menu.
+
+    Used internally by the library. You should not need to use this.
+    """
+    user = "user"
+    role = "role"
+    channel = "channel"

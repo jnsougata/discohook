@@ -63,40 +63,6 @@ async def delete_button(i: discohook.Interaction):
     await i.message.delete()
 
 
-@app.preload("execute_code")
-@discohook.button.new("Execute", style=discohook.ButtonStyle.green)
-async def exec_button(i: discohook.Interaction):
-    await exec_code_and_respond(i, i.message.content)
-
-
-@discohook.modal.new(
-    "Code Runner",
-    fields=[
-        discohook.TextInput("code", "field", required=True, style=discohook.TextInputFieldLength.long)
-    ]
-)
-async def code_input_modal(i: discohook.Interaction, field: str):
-    view = discohook.View()
-    view.add_buttons(rewrite_code_button, exec_button, delete_button)
-    if i.message:
-        await i.response.update_message(content=f"```py\n{field}\n```", view=view)
-    else:
-        await i.response.send(f"```py\n{field}\n```", view=view)
-
-
-@app.preload("rewrite_code")
-@discohook.button.new("Rewrite")
-async def rewrite_code_button(i: discohook.Interaction):
-    await i.response.send_modal(code_input_modal)
-
-
-@app.load
-@discohook.command.slash()
-async def run(i: discohook.Interaction):
-    """Run python code snippets"""
-    await i.response.send_modal(code_input_modal)
-
-
 def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
     red = random.randint(0, 255)
     green = random.randint(0, 255)

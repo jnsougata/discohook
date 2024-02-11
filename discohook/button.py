@@ -58,7 +58,7 @@ class Button(Component):
         """
         assert self.label or self.emoji, "label or emoji must be provided"
         payload = {
-            "type": self.kind,
+            "type": self.type,
             "style": self.style,
             "disabled": self.disabled,
         }
