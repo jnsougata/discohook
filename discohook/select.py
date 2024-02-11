@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 # noinspection PyShadowingBuiltins
-class DefaultSelectOption:
+class SelectDefaultValue:
     """
     Represents a discord select menu default option object.
     Only applicable for non string select menus.
@@ -140,7 +140,7 @@ class Select(Component):
         self.disabled: Optional[bool] = disabled
         self.options: Optional[List[SelectOption]] = None
         self.channel_types: Optional[List[ChannelType]] = None
-        self.default_values: Optional[List[DefaultSelectOption]] = None
+        self.default_values: Optional[List[SelectDefaultValue]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """
