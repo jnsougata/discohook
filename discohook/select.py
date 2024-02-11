@@ -183,6 +183,7 @@ def channel(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
+    default_values: Optional[List[SelectDefaultValue]] = None,
     custom_id: Optional[str] = None,
 ):
     """
@@ -200,6 +201,8 @@ def channel(
         The maximum number of options that can be selected.
     disabled: Optional[:class:`bool`]
         Whether the select menu is disabled or not.
+    default_values: Optional[List[:class:`SelectDefaultValue`]]
+        The default values of the select menu.
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
     """
@@ -215,6 +218,7 @@ def channel(
             disabled=disabled,
         )
         self.channel_types = types
+        self.default_values = default_values
         self.callback = coro
         return self
 
@@ -272,6 +276,7 @@ def role(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
+    default_values: Optional[List[SelectDefaultValue]] = None,
     custom_id: Optional[str] = None,
 ):
     """
@@ -289,6 +294,8 @@ def role(
         The maximum number of options that can be selected.
     disabled: Optional[:class:`bool`]
         Whether the select menu is disabled or not.
+    default_values: Optional[List[:class:`SelectDefaultValue`]]
+        The default values of the select menu.
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
 
@@ -309,6 +316,7 @@ def role(
             disabled=disabled,
             custom_id=custom_id,
         )
+        self.default_values = default_values
         self.callback = coro
         return self
 
@@ -321,6 +329,7 @@ def user(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
+    default_values: Optional[List[SelectDefaultValue]] = None,
     custom_id: Optional[str] = None,
 ):
     """
@@ -336,6 +345,8 @@ def user(
         The maximum number of options that can be selected.
     disabled: Optional[:class:`bool`]
         Whether the select menu is disabled or not.
+    default_values: Optional[List[:class:`SelectDefaultValue`]]
+        The default values of the select menu.
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
     """
@@ -350,6 +361,7 @@ def user(
             disabled=disabled,
             custom_id=custom_id,
         )
+        self.default_values = default_values
         self.callback = coro
         return self
 
@@ -362,6 +374,7 @@ def mentionable(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
+    default_values: Optional[List[SelectDefaultValue]] = None,
     custom_id: Optional[str] = None,
 ):
     """
@@ -377,6 +390,8 @@ def mentionable(
         The maximum number of options that can be selected.
     disabled: Optional[:class:`bool`]
         Whether the select menu is disabled or not.
+    default_values: Optional[List[:class:`SelectDefaultValue`]]
+        The default values of the select menu.
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
     """
@@ -391,6 +406,7 @@ def mentionable(
             disabled=disabled,
             custom_id=custom_id,
         )
+        self.default_values = default_values
         self.callback = coro
         return self
 
