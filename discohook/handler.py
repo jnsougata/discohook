@@ -1,6 +1,7 @@
 import asyncio
 
-import ed25519
+from nacl.signing import VerifyKey
+from nacl.exceptions import BadSignatureError
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
@@ -40,8 +41,8 @@ async def _handler(request: Request):
     message = timestamp.encode() + await request.body()
     public_key = bytes.fromhex(request.app.public_key)
     try:
-        ed25519.VerifyingKey(public_key).verify(signature, message)
-    except ed25519.BadSignatureError:
+        VerifyKey(public_key).verify(signature, message)
+    except BadSignatureError:
         return Response(content="BadSignature", status_code=401)
     data = await request.json()
     interaction = Interaction(request.app, data)
