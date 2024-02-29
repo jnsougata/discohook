@@ -15,10 +15,10 @@ async def _help(i: Interaction):
     for cmd in commands:
         if cmd.guild_id and cmd.guild_id != i.guild_id:
             continue
-        if cmd.kind == ApplicationCommandType.slash:
+        if cmd.type == ApplicationCommandType.slash:
             embed.description += f"\n**` /{cmd.name} `** {cmd.description}\n"
         else:
-            category = "user" if cmd.kind == ApplicationCommandType.user else "message"
+            category = "user" if cmd.type == ApplicationCommandType.user else "message"
             embed.description += f"\n**` {cmd.name} `** {category.capitalize()} Command\n"
 
     await i.response.send(embed=embed)

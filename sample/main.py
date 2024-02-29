@@ -20,7 +20,7 @@ app = discohook.Client(
 app.on_interaction_error()(tracer)
 
 
-async def exec_code_and_respond(i: discohook.Interaction, content: str):
+async def exec_and_respond(i: discohook.Interaction, content: str):
     from io import StringIO
     import re
     import sys
@@ -121,4 +121,4 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
 @discohook.command.message("exec")
 async def _exec(i: discohook.Interaction, message: discohook.Message):
     """Execute a python script."""
-    await exec_code_and_respond(i, message.content)
+    await exec_and_respond(i, message.content)

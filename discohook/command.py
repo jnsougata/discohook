@@ -115,7 +115,7 @@ class ApplicationCommand(Interactable):
         self.dm_access = dm_access
         self.nsfw = nsfw
         self.application_id = None
-        self.kind = kind
+        self.type = kind
         self.permissions = permissions
         self.guild_id = guild_id
         self.callback: Handler = callback
@@ -189,10 +189,10 @@ class ApplicationCommand(Interactable):
         Dict[str, Any]
         """
         self.data["name"] = self.name
-        self.data["type"] = self.kind
+        self.data["type"] = self.type
         if self.description:
             self.data["description"] = self.description
-        if self.kind == ApplicationCommandType.slash:
+        if self.type == ApplicationCommandType.slash:
             if self.options:
                 self.data["options"] = [option.to_dict() for option in self.options]
         if not self.dm_access:
