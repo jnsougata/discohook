@@ -1,17 +1,19 @@
+![image](https://github.com/jnsougata/discohook/assets/53375272/3bf58705-24c8-47ba-98f8-dffca05c1f82)
+
 # discohook
 
 ### Installation
 
 ```bash
-pip install git+https://github.com/jnsougata/discohook
+pip install git+https://github.com/jnsougata/discohook.git
 ```
 - ⚠️ `pip install discohook` won't install this library. Use the git method mentioned above.
 
 ### Links
-
-- [Docs](https://discohook.readthedocs.io/en/latest/)
+- [Documentation](https://discohook.readthedocs.io/en/latest/)
 - [Discord](https://discord.gg/5PwqKbM7wu)
 - [Examples](examples)
+
 
 ## Quickstart
 
