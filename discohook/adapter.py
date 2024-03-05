@@ -61,7 +61,7 @@ class InteractionResponse:
             suppress_embeds=suppress_embeds,
         )
         if view and view is not MISSING:
-            self.inter.client.load_components(view)
+            self.inter.client.load_view(view)
         resp = await self.inter.client.http.edit_webhook_message(
             self.inter.application_id,
             self.inter.token,
@@ -121,7 +121,7 @@ class FollowupResponse:
             suppress_embeds=suppress_embeds,
         )
         if view and view is not MISSING:
-            self.interaction.client.load_components(view)
+            self.interaction.client.load_view(view)
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
             self.interaction.token,
@@ -197,7 +197,7 @@ class ResponseAdapter:
             allowed_mentions=allowed_mentions,
         )
         if view:
-            self.inter.client.load_components(view)
+            self.inter.client.load_view(view)
         payload = payload.to_form(InteractionCallbackType.channel_message_with_source)
         await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
         self.inter._responded = True
@@ -343,7 +343,7 @@ class ResponseAdapter:
             suppress_embeds=suppress_embeds,
         )
         if view and view is not MISSING:
-            self.inter.client.load_components(view)
+            self.inter.client.load_view(view)
         payload = payload.to_form(InteractionCallbackType.update_component_message)
         await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
         self.inter._responded = True
@@ -402,7 +402,7 @@ class ResponseAdapter:
             allowed_mentions=allowed_mentions,
         )
         if view:
-            self.inter.client.load_components(view)
+            self.inter.client.load_view(view)
         resp = await self.inter.client.http.send_webhook_message(
             self.inter.application_id, self.inter.token, payload.to_form())
         data = await resp.json()

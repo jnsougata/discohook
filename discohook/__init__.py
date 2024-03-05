@@ -35,6 +35,7 @@ from .option import Choice, Option
 from .permission import Permission
 from .role import PartialRole, Role
 from .select import Select, SelectOption
+from .tree import CommandTree
 from .user import User
 from .view import View
 from .webhook import Webhook, PartialWebhook

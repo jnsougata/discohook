@@ -5,7 +5,7 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .abc import Component
+from .base import Component
 from .channel import PartialChannel, Channel
 from .command import ApplicationCommand
 from .dash import dashboard
@@ -18,6 +18,7 @@ from .https import HTTPClient
 from .interaction import Interaction
 from .message import Message
 from .user import User
+from .tree import CommandTree
 from .utils import compare_password
 from .view import View
 from .webhook import Webhook
@@ -130,7 +131,23 @@ class Client(Starlette):
 
         return decorator
 
-    def load_components(self, view: View):
+    def load_trees(self, *trees: CommandTree):
+        """
+        Load multiple command trees into the client.
+
+        Parameters
+        ----------
+        *trees: Tuple[CommandTree]
+            The command trees to load into the client.
+        """
+        for tr in trees:
+            for cmd in tr.commands:
+                self.load(cmd)
+            for c in tr.components:
+                self.load_view(c)
+            self.active_components.update(tr.active_components)
+
+    def load_view(self, view: View):
         """
         Loads multiple components into the client.
         Do not use this method unless you know what you are doing.
