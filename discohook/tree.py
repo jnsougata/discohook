@@ -14,7 +14,7 @@ class CommandTree:
         self.components = []
         self.active_components = {}
 
-    def preload_component(self, custom_id: Optional[str]):
+    def preload(self, custom_id: Optional[str]):
         def decorator(component: Component):
             if not custom_id or not isinstance(custom_id, str):
                 raise ValueError("Invalid custom id provided.")

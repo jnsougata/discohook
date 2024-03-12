@@ -1,5 +1,4 @@
 import hashlib
-import json
 import secrets
 from typing import Any, Callable, Coroutine, Union
 
@@ -31,12 +30,4 @@ def try_description(name: str, description: Any, callback: Handler) -> str:
         return description
     if callback.__doc__:
         return callback.__doc__.strip().split("\n")[0]
-    raise TypeError(f"description is required for slash command `{name}`")
-
-
-def unwrap_user(data: dict, guild_id: str) -> dict:
-    member = json.loads(json.dumps(data))
-    user: dict = member.pop("user")
-    member.update(user)
-    member["guild_id"] = guild_id
-    return member
+    raise ValueError(f"description is required for slash command `{name}`")

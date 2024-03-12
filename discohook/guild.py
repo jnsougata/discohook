@@ -6,7 +6,6 @@ from .enums import ChannelType
 from .permission import Permission
 from .role import Role
 from .member import Member
-from .utils import unwrap_user
 
 if TYPE_CHECKING:
     from .client import Client
@@ -38,7 +37,8 @@ class PartialGuild:
         data = await resp.json()
         if not data.get("user"):
             return
-        return Member(self.client, unwrap_user(data, self.id))
+        data["guild_id"] = self.id
+        return Member(self.client, data)
 
     async def fetch_channels(self) -> List[Channel]:
         """
@@ -64,6 +64,7 @@ class PartialGuild:
         data = await resp.json()
         return [Role(self.client, r) for r in data]
 
+    # noinspection PyShadowingBuiltins
     async def create_channel(
         self,
         name: str,

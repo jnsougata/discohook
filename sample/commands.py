@@ -6,13 +6,13 @@ import discohook
 command_tree = discohook.CommandTree()
 
 
-@command_tree.preload_component("regenerate")
+@command_tree.preload("regenerate")
 @discohook.button.new("Regenerate")
 async def regenerate_button(i: discohook.Interaction):
     await i.response.update_message(embed=make_random_color_card(i))
 
 
-@command_tree.preload_component("delete")
+@command_tree.preload("delete")
 @discohook.button.new("Delete", style=discohook.ButtonStyle.red)
 async def delete_button(i: discohook.Interaction):
     await i.response.defer()
@@ -49,7 +49,7 @@ async def color(i: discohook.Interaction):
         )
     ],
     dm_access=False,
-    permissions=[discohook.Permission.manage_messages],
+    permissions=[discohook.Permission.manage_messages]
 )
 async def purge(i: discohook.Interaction, limit: int):
     """Purge messages from the channel."""
@@ -61,6 +61,7 @@ async def purge(i: discohook.Interaction, limit: int):
 async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
     embed.set_image(user.avatar.url)
+    embed.set_thumbnail(i.author.avatar.url)
     await i.response.send(embed=embed)
 
 
