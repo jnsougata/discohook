@@ -1,7 +1,7 @@
 import os
 import discohook
 
-from commands import command_tree
+from commands import tree
 from debugger import tracer
 
 
@@ -19,4 +19,4 @@ app = discohook.Client(
 )
 
 app.on_interaction_error()(tracer)
-app.load_trees(command_tree)
+app.load_trees(tree)

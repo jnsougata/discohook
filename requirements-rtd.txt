@@ -1,4 +1,4 @@
 aiohttp
-ed25519
+pynacl
 furo
 starlette
