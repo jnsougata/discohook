@@ -1,4 +1,4 @@
-from .command import ApplicationCommand, Option, try_description
+from .command import ApplicationCommand, Option, find_description
 from .base import Component
 from .enums import ApplicationCommandType
 from .permission import Permission
@@ -14,7 +14,7 @@ class CommandTree:
         self.components = []
         self.active_components = {}
 
-    def preload(self, custom_id: Optional[str]):
+    def preload(self, custom_id: str):
         def decorator(component: Component):
             if not custom_id or not isinstance(custom_id, str):
                 raise ValueError("Invalid custom id provided.")
@@ -42,7 +42,7 @@ class CommandTree:
         def decorator(coro: Handler):
             cmd = ApplicationCommand(
                 name or coro.__name__,
-                description=try_description(name, description, coro),
+                description=find_description(name, description, coro),
                 options=options,
                 dm_access=dm_access,
                 nsfw=nsfw,

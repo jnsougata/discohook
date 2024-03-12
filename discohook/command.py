@@ -5,7 +5,7 @@ from .base import Interactable
 from .enums import ApplicationCommandOptionType, ApplicationCommandType
 from .option import Option
 from .permission import Permission
-from .utils import Handler, try_description
+from .utils import Handler, find_description
 
 
 class SubCommand:
@@ -223,7 +223,7 @@ def slash(
     def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
-            description=try_description(name, description, coro),
+            description=find_description(name, description, coro),
             options=options,
             dm_access=dm_access,
             nsfw=nsfw,
