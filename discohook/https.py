@@ -111,6 +111,9 @@ class HTTPClient:
         return await self.request(
             "PATCH", f"/channels/{channel_id}/messages/{message_id}", form=form, authorize=True)
 
+    async def fetch_channel_webhooks(self, channel_id: str):
+        return await self.request("GET", f"/channels/{channel_id}/webhooks", use_auth=True)
+
     async def send_webhook_message(self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter):
         return await self.request("POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form)
 
