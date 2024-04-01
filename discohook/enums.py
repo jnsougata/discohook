@@ -13,7 +13,8 @@ __all__ = (
     "TextInputFieldLength",
     "AllowedMentionsType",
     "try_enum",
-    "SelectDefaultValueType"
+    "SelectDefaultValueType",
+    "InteractionContextType"
 )
 
 
