@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from .channel import PartialChannel
-from .enums import InteractionType, try_enum
+from .enums import InteractionType, try_enum, InteractionContextType
 from .guild import PartialGuild
 from .member import Member
 from .message import Message
@@ -208,6 +208,20 @@ class Interaction:
         float
         """
         return snowflake_time(self.id)
+
+    @property
+    def context(self) -> Optional[InteractionContextType]:
+        """
+        Context where the interaction was triggered from.
+
+        Returns
+        -------
+        InteractionContextType | None
+        """
+        ctx = self.payload.get("context")
+        if ctx is None:
+            return
+        return InteractionContextType(int(ctx))
 
     @property
     def channel(self) -> PartialChannel:

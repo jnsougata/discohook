@@ -261,3 +261,12 @@ class SelectDefaultValueType(str, Enum):
     user = "user"
     role = "role"
     channel = "channel"
+
+
+class InteractionContextType(int, Enum):
+    """
+    The type of interaction context.
+    """
+    guild = 0
+    bot_dm = 1
+    private_channel = 2
