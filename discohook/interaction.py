@@ -199,13 +199,13 @@ class Interaction:
         return self.payload.get("guild_locale")
 
     @property
-    def created_at(self) -> int:
+    def created_at(self) -> float:
         """
         The timestamp when the interaction was created
 
         Returns
         -------
-        int
+        float
         """
         return snowflake_time(self.id)
 
