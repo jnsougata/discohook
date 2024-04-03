@@ -17,3 +17,4 @@ micros:
         - name: APPLICATION_ID
         - name: LOG_CHANNEL_ID
         - name: GUILD_ID
+        - name: GEMINI_API_KEY

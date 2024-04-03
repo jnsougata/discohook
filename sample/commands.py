@@ -115,3 +115,42 @@ async def exec_and_respond(i: discohook.Interaction, content: str):
 async def _exec(i: discohook.Interaction, message: discohook.Message):
     """Execute a python script."""
     await exec_and_respond(i, message.content)
+
+
+@tree.message(
+    "Translate [EN]",
+    integration_types=[
+        discohook.ApplicationIntegrationType.user,
+        discohook.ApplicationIntegrationType.guild
+    ],
+    contexts=[
+        discohook.InteractionContextType.guild,
+        discohook.InteractionContextType.bot_dm,
+        discohook.InteractionContextType.private_channel
+    ]
+)
+async def translate(i: discohook.Interaction, message: discohook.Message):
+    """Translate a text to English."""
+    await i.response.defer(ephemeral=True)
+    if not message.content:
+        return await i.response.followup("Failed: Message doesn't have any text content :/", ephemeral=True)
+
+    import os
+    import json
+    from urllib.request import urlopen, Request
+
+    api_key = os.environ["GEMINI_API_KEY"]
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+
+    req = Request(
+        url,
+        method="POST",
+        data=json.dumps({
+            "contents": [{"parts": [{"text": f"Translate the following text message to en-us:\n{message.content}"}]}]}
+        ).encode(),
+        headers={"Content-Type": "application/json"}
+    )
+    data = json.loads(urlopen(req).read())
+    texts = [part["text"] for part in data["candidates"][0]["content"]["parts"]]
+    await i.response.followup(" ".join(texts), ephemeral=True)
