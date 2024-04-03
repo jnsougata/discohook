@@ -30,7 +30,17 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
     return embed
 
 
-@tree.slash()
+@tree.slash(
+    integration_types=[
+        discohook.ApplicationIntegrationType.user,
+        discohook.ApplicationIntegrationType.guild
+    ],
+    contexts=[
+        discohook.InteractionContextType.guild,
+        discohook.InteractionContextType.bot_dm,
+        discohook.InteractionContextType.private_channel
+    ],
+)
 async def color(i: discohook.Interaction):
     """Generate a random color."""
     view = discohook.View()

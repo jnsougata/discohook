@@ -127,10 +127,8 @@ class ApplicationCommand(Interactable):
         self.nsfw = nsfw
         self.application_id = None
         self.type = type
-        if contexts is None:
-            self.contexts = [InteractionContextType.guild]
-        if integration_types is None:
-            self.integration_types = [ApplicationIntegrationType.guild]
+        self.contexts = [InteractionContextType.guild] if contexts is None else contexts
+        self.integration_types = [ApplicationIntegrationType.guild] if integration_types is None else integration_types
         self.permissions = permissions
         self.guild_id = guild_id
         self.callback: Handler = callback

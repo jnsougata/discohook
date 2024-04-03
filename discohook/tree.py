@@ -1,6 +1,6 @@
 from .command import ApplicationCommand, Option, find_description
 from .base import Component
-from .enums import ApplicationCommandType
+from .enums import ApplicationCommandType, InteractionContextType, ApplicationIntegrationType
 from .permission import Permission
 from .utils import Handler
 
@@ -34,6 +34,8 @@ class CommandTree:
         nsfw: bool = False,
         permissions: Optional[List[Permission]] = None,
         guild_id: Optional[str] = None,
+        integration_types: Optional[List[ApplicationIntegrationType]] = None,
+        contexts: Optional[List[InteractionContextType]] = None
     ):
         """
         A decorator to register a slash command with its callback.
@@ -48,6 +50,8 @@ class CommandTree:
                 nsfw=nsfw,
                 permissions=permissions,
                 guild_id=guild_id,
+                integration_types=integration_types,
+                contexts=contexts,
                 callback=coro
             )
             self.commands.append(cmd)
@@ -62,7 +66,9 @@ class CommandTree:
         dm_access: bool = True,
         nsfw: bool = False,
         permissions: Optional[List[Permission]] = None,
-        guild_id: Optional[str] = None
+        guild_id: Optional[str] = None,
+        integration_types: Optional[List[ApplicationIntegrationType]] = None,
+        contexts: Optional[List[InteractionContextType]] = None
     ):
         """
         A decorator to register a user command with its callback.
@@ -75,6 +81,8 @@ class CommandTree:
                 nsfw=nsfw,
                 permissions=permissions,
                 guild_id=guild_id,
+                integration_types=integration_types,
+                contexts=contexts,
                 type=ApplicationCommandType.user,
                 callback=coro
             )
@@ -90,7 +98,9 @@ class CommandTree:
         dm_access: bool = True,
         nsfw: bool = False,
         permissions: Optional[List[Permission]] = None,
-        guild_id: Optional[str] = None
+        guild_id: Optional[str] = None,
+        integration_types: Optional[List[ApplicationIntegrationType]] = None,
+        contexts: Optional[List[InteractionContextType]] = None
     ):
         """
         A decorator to register a message command with its callback.
@@ -103,6 +113,8 @@ class CommandTree:
                 nsfw=nsfw,
                 permissions=permissions,
                 guild_id=guild_id,
+                integration_types=integration_types,
+                contexts=contexts,
                 type=ApplicationCommandType.message,
                 callback=coro
             )
