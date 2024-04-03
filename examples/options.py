@@ -1,6 +1,6 @@
 import random
-import discohook
 
+import discohook
 
 # roll command
 """
@@ -14,7 +14,7 @@ Note: the IntegerOption parameter "name" must be in lowercase.
 """
 
 
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     name="roll",
     description="Roll a dice",
     options=[
@@ -23,9 +23,9 @@ Note: the IntegerOption parameter "name" must be in lowercase.
             description="Number of faces of the dice",
             required=True,
             min_value=3,
-            max_value=100
+            max_value=100,
         )
-    ]
+    ],
 )
 async def roll(interaction: discohook.Interaction, dice: int):
 
@@ -33,7 +33,7 @@ async def roll(interaction: discohook.Interaction, dice: int):
     result = random.randint(1, dice)
 
     # Initialize embed
-    embed = discohook.Embed(title=f"The result was: **{result}**", color=0xffffff)
+    embed = discohook.Embed(title=f"The result was: **{result}**", color=0xFFFFFF)
     embed.set_image("https://i.gifer.com/2eRd.gif")
     embed.add_field(name="Dice used", value=f"{dice} faces (d{dice})")
 
@@ -51,7 +51,7 @@ Note: the StringOption parameter "name" must be in lowercase and a valid python 
 """
 
 
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     name="gamechoice",
     description="Test command for string select options",
     options=[
@@ -62,10 +62,10 @@ Note: the StringOption parameter "name" must be in lowercase and a valid python 
             choices=[
                 discohook.Choice(name="Persona 5", value="Persona 5"),
                 discohook.Choice(name="Zero Escape", value="Zero Escape"),
-                discohook.Choice(name="Danganronpa", value="Danganronpa")
-            ]
+                discohook.Choice(name="Danganronpa", value="Danganronpa"),
+            ],
         )
-    ]
+    ],
 )
 async def gamechoice(interaction: discohook.Interaction, videogame: str):
     await interaction.response.send(content=f"You have chosen `{videogame}`")
@@ -79,16 +79,13 @@ take any options. It just flips a coin and sends the result in an embed.
 """
 
 
-@discohook.ApplicationCommand.slash(
-    name="coinflip",
-    description="Flip a coin"
-)
+@discohook.ApplicationCommand.slash(name="coinflip", description="Flip a coin")
 async def coinflip(interaction: discohook.Interaction):
     # Throw the coin
     result = random.choice(["heads", "tails"])
 
     # Initialize embed
-    embed = discohook.Embed(title=f"The result was: **{result}**", color=0xaba924)
+    embed = discohook.Embed(title=f"The result was: **{result}**", color=0xABA924)
     embed.set_image("https://i.gifer.com/Fw3P.gif")
 
     # Send result
