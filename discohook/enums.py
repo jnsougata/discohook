@@ -14,7 +14,8 @@ __all__ = (
     "AllowedMentionsType",
     "try_enum",
     "SelectDefaultValueType",
-    "InteractionContextType"
+    "InteractionContextType",
+    "ApplicationIntegrationType"
 )
 
 
@@ -271,3 +272,11 @@ class InteractionContextType(int, Enum):
     guild = 0
     bot_dm = 1
     private_channel = 2
+
+
+class ApplicationIntegrationType(int, Enum):
+    """
+    Installation context(s) where the command is available.
+    """
+    guild = 0
+    user = 1

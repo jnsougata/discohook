@@ -2,7 +2,12 @@ import asyncio
 from typing import Any, Dict, List, Optional, Union
 
 from .base import Interactable
-from .enums import ApplicationCommandOptionType, ApplicationCommandType
+from .enums import (
+    ApplicationCommandOptionType,
+    ApplicationCommandType,
+    ApplicationIntegrationType,
+    InteractionContextType
+)
 from .option import Option
 from .permission import Permission
 from .utils import Handler, find_description
@@ -87,8 +92,12 @@ class ApplicationCommand(Interactable):
         Whether the command is age restricted. Defaults to False.
     permissions: List[Permission] | None
         The default permissions of the command.
-    kind: ApplicationCommandType
+    type: ApplicationCommandType
         The category of the command. Defaults to slash commands.
+    integration_types: List[ApplicationIntegrationType] | None
+         Installation context(s) where the command is available. only for globally-scoped commands.
+    contexts: List[InteractionContextType] | None
+         Interaction context(s) where the command can be used, only for globally-scoped commands.
     """
 
     def __init__(
@@ -99,23 +108,29 @@ class ApplicationCommand(Interactable):
         options: Optional[List[Option]] = None,
         dm_access: bool = True,
         nsfw: bool = False,
+        integration_types: Optional[List[ApplicationIntegrationType]] = None,
+        contexts: Optional[List[InteractionContextType]] = None,
         permissions: Optional[List[Permission]] = None,
-        kind: ApplicationCommandType = ApplicationCommandType.slash,
+        type: ApplicationCommandType = ApplicationCommandType.slash,
         guild_id: Optional[str] = None,
         callback: Handler,
     ):
         super().__init__()
         self.name = name
         if not guild_id:
-            self.key = f"{name}:{kind.value}"
+            self.key = f"{name}:{type.value}"
         else:
-            self.key = f"{name}:{guild_id}:{kind.value}"
+            self.key = f"{name}:{guild_id}:{type.value}"
         self.description = description
         self.options: List[Union[Option, SubCommand]] = options
         self.dm_access = dm_access
         self.nsfw = nsfw
         self.application_id = None
-        self.type = kind
+        self.type = type
+        if contexts is None:
+            self.contexts = [InteractionContextType.guild]
+        if integration_types is None:
+            self.integration_types = [ApplicationIntegrationType.guild]
         self.permissions = permissions
         self.guild_id = guild_id
         self.callback: Handler = callback
@@ -204,6 +219,8 @@ class ApplicationCommand(Interactable):
             self.data["default_member_permissions"] = str(base)
         if self.nsfw:
             self.data["nsfw"] = self.nsfw
+        self.data["integration_types"] = self.integration_types
+        self.data["contexts"] = self.contexts
         return self.data
 
 
@@ -216,6 +233,8 @@ def slash(
     nsfw: bool = False,
     permissions: Optional[List[Permission]] = None,
     guild_id: Optional[str] = None,
+    integration_types: Optional[List[ApplicationIntegrationType]] = None,
+    contexts: Optional[List[InteractionContextType]] = None,
 ):
     """
     A decorator to register a slash command with its callback.
@@ -229,6 +248,8 @@ def slash(
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,
+            integration_types=integration_types,
+            contexts=contexts,
             callback=coro
         )
     return decorator
@@ -240,7 +261,9 @@ def user(
     dm_access: bool = True,
     nsfw: bool = False,
     permissions: Optional[List[Permission]] = None,
-    guild_id: Optional[str] = None
+    guild_id: Optional[str] = None,
+    integration_types: Optional[List[ApplicationIntegrationType]] = None,
+    contexts: Optional[List[InteractionContextType]] = None
 ):
     """
     A decorator to register a user command with its callback.
@@ -252,7 +275,9 @@ def user(
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,
-            kind=ApplicationCommandType.user,
+            type=ApplicationCommandType.user,
+            integration_types=integration_types,
+            contexts=contexts,
             callback=coro
         )
     return decorator
@@ -264,7 +289,9 @@ def message(
     dm_access: bool = True,
     nsfw: bool = False,
     permissions: Optional[List[Permission]] = None,
-    guild_id: Optional[str] = None
+    guild_id: Optional[str] = None,
+    integration_types: Optional[List[ApplicationIntegrationType]] = None,
+    contexts: Optional[List[InteractionContextType]] = None
 ):
     """
     A decorator to register a message command with its callback.
@@ -276,7 +303,9 @@ def message(
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,
-            kind=ApplicationCommandType.message,
+            type=ApplicationCommandType.message,
+            integration_types=integration_types,
+            contexts=contexts,
             callback=coro
         )
     return decorator

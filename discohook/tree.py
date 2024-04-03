@@ -75,7 +75,7 @@ class CommandTree:
                 nsfw=nsfw,
                 permissions=permissions,
                 guild_id=guild_id,
-                kind=ApplicationCommandType.user,
+                type=ApplicationCommandType.user,
                 callback=coro
             )
             self.commands.append(cmd)
@@ -103,7 +103,7 @@ class CommandTree:
                 nsfw=nsfw,
                 permissions=permissions,
                 guild_id=guild_id,
-                kind=ApplicationCommandType.message,
+                type=ApplicationCommandType.message,
                 callback=coro
             )
             self.commands.append(cmd)
