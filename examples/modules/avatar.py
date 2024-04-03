@@ -1,9 +1,6 @@
 import discohook
 
-tree = discohook.CommandTree()
 
-
-@tree.load
 @discohook.command.slash(
     integration_types=[discohook.ApplicationCommandType.user],
     permissions=[discohook.Permission.send_messages],
