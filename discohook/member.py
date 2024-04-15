@@ -15,7 +15,7 @@ class Member(User):
     """
 
     def __init__(self, client: "Client", data: Dict[str, Any]):
-        super().__init__(client, data["user"])
+        super().__init__(client, data)
 
     @property
     def guild_id(self) -> str:
