@@ -71,7 +71,7 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
             if interaction.guild_id:
                 member_data = interaction.data["resolved"]["members"][value]
                 member_data["user"] = user_data
-                member_data["guild_id"] = interaction.guild_id
+                member_data = unwrap_user(member_data, interaction.guild_id)
                 options[name] = Member(interaction.client, member_data)
             else:
                 options[name] = User(interaction.client, user_data)
