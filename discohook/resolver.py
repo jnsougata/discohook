@@ -13,6 +13,7 @@ from .member import Member
 from .message import Message
 from .role import Role
 from .user import User
+from .utils import unwrap_user
 
 
 def handle_params_by_signature(
