@@ -31,3 +31,11 @@ def find_description(name: str, description: Any, callback: Handler) -> str:
     if callback.__doc__:
         return callback.__doc__.strip().split("\n")[0]
     raise ValueError(f"description is required for slash command `{name}`")
+
+
+def unwrap_user(data: dict, guild_id: str) -> dict:
+    member = json.loads(json.dumps(data))
+    user: dict = member.pop("user")
+    member.update(user)
+    member["guild_id"] = guild_id
+    return member

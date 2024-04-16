@@ -7,7 +7,7 @@ from .member import Member
 from .message import Message
 from .adapter import ResponseAdapter
 from .user import User
-from .utils import snowflake_time
+from .utils import snowflake_time, unwrap_user
 
 if TYPE_CHECKING:
     from .client import Client
@@ -246,8 +246,7 @@ class Interaction:
         """
         if not self.guild_id:
             return User(self.client, self.payload["user"])
-        self.payload["member"]["guild_id"] = self.guild_id
-        return Member(self.client, self.payload["member"])
+        return Member(self.client, unwrap_user(self.payload["member"], self.guild_id))
 
     @property
     def guild(self) -> Optional[PartialGuild]:
