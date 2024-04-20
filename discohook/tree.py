@@ -30,7 +30,6 @@ class CommandTree:
         *,
         description: Optional[str] = None,
         options: Optional[List[Option]] = None,
-        dm_access: bool = True,
         nsfw: bool = False,
         permissions: Optional[List[Permission]] = None,
         guild_id: Optional[str] = None,
@@ -46,7 +45,6 @@ class CommandTree:
                 name or coro.__name__,
                 description=find_description(name, description, coro),
                 options=options,
-                dm_access=dm_access,
                 nsfw=nsfw,
                 permissions=permissions,
                 guild_id=guild_id,
@@ -63,7 +61,6 @@ class CommandTree:
         self,
         name: Optional[str] = None,
         *,
-        dm_access: bool = True,
         nsfw: bool = False,
         permissions: Optional[List[Permission]] = None,
         guild_id: Optional[str] = None,
@@ -77,7 +74,6 @@ class CommandTree:
         def decorator(coro: Handler):
             cmd = ApplicationCommand(
                 name or coro.__name__,
-                dm_access=dm_access,
                 nsfw=nsfw,
                 permissions=permissions,
                 guild_id=guild_id,
@@ -95,7 +91,6 @@ class CommandTree:
         self,
         name: Optional[str] = None,
         *,
-        dm_access: bool = True,
         nsfw: bool = False,
         permissions: Optional[List[Permission]] = None,
         guild_id: Optional[str] = None,
@@ -109,7 +104,6 @@ class CommandTree:
         def decorator(coro: Handler):
             cmd = ApplicationCommand(
                 name or coro.__name__,
-                dm_access=dm_access,
                 nsfw=nsfw,
                 permissions=permissions,
                 guild_id=guild_id,
