@@ -86,8 +86,6 @@ class ApplicationCommand(Interactable):
         The description of the command. Does not apply to user & message commands.
     options: List[Option] | None
         The options of the command. Does not apply to user & message commands.
-    dm_access: bool
-        Whether the command can be used in DMs. Defaults to True.
     nsfw: bool
         Whether the command is age restricted. Defaults to False.
     permissions: List[Permission] | None
@@ -106,7 +104,6 @@ class ApplicationCommand(Interactable):
         *,
         description: Optional[str] = None,
         options: Optional[List[Option]] = None,
-        dm_access: bool = True,
         nsfw: bool = False,
         integration_types: Optional[List[ApplicationIntegrationType]] = None,
         contexts: Optional[List[InteractionContextType]] = None,
@@ -123,7 +120,6 @@ class ApplicationCommand(Interactable):
             self.key = f"{name}:{guild_id}:{type.value}"
         self.description = description
         self.options: List[Union[Option, SubCommand]] = options
-        self.dm_access = dm_access
         self.nsfw = nsfw
         self.application_id = None
         self.type = type
@@ -208,8 +204,6 @@ class ApplicationCommand(Interactable):
         if self.type == ApplicationCommandType.slash:
             if self.options:
                 self.data["options"] = [option.to_dict() for option in self.options]
-        if not self.dm_access:
-            self.data["dm_permission"] = self.dm_access
         if self.permissions:
             base = 0
             for permission in self.permissions:
@@ -227,7 +221,6 @@ def slash(
     *,
     description: Optional[str] = None,
     options: Optional[List[Option]] = None,
-    dm_access: bool = True,
     nsfw: bool = False,
     permissions: Optional[List[Permission]] = None,
     guild_id: Optional[str] = None,
@@ -242,7 +235,6 @@ def slash(
             name or coro.__name__,
             description=find_description(name, description, coro),
             options=options,
-            dm_access=dm_access,
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,
@@ -256,7 +248,6 @@ def slash(
 def user(
     name: Optional[str] = None,
     *,
-    dm_access: bool = True,
     nsfw: bool = False,
     permissions: Optional[List[Permission]] = None,
     guild_id: Optional[str] = None,
@@ -269,7 +260,6 @@ def user(
     def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
-            dm_access=dm_access,
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,
@@ -284,7 +274,6 @@ def user(
 def message(
     name: Optional[str] = None,
     *,
-    dm_access: bool = True,
     nsfw: bool = False,
     permissions: Optional[List[Permission]] = None,
     guild_id: Optional[str] = None,
@@ -297,7 +286,6 @@ def message(
     def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
-            dm_access=dm_access,
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,

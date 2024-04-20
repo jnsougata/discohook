@@ -3,8 +3,7 @@ import discohook
 
 @discohook.command(
     kind=discohook.ApplicationCommandType.user,
-    permissions=[discohook.Permission.send_messages],
-    dm_access=False,
+    permissions=[discohook.Permission.send_messages]
 )
 async def avatar(inter: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed(title=f"{user.global_name}")

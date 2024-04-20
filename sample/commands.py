@@ -58,7 +58,6 @@ async def color(i: discohook.Interaction):
             min_value=2
         )
     ],
-    dm_access=False,
     permissions=[discohook.Permission.manage_messages]
 )
 async def purge(i: discohook.Interaction, limit: int):
