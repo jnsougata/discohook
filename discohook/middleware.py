@@ -1,10 +1,11 @@
 import aiohttp
 from starlette.middleware.base import BaseHTTPMiddleware
 
+
 class SingleUseSessionMiddleware(BaseHTTPMiddleware):
     """ This middleware creates a new aiohttp.ClientSession
         to handle this request.
-        This is helpful for some serverless prviders
+        This is helpful for some serverless providers
         that handle each request in a new event loop
         but keep the same app instance
     """
