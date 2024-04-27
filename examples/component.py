@@ -1,8 +1,9 @@
 import random
+
 import discohook
 
 
-@discohook.Button.new("Delete", style=discohook.ButtonStyle.red)
+@discohook.button.new("Delete", style=discohook.ButtonStyle.red)
 async def delete(i: discohook.Interaction):
     if i.from_originator:
         await i.message.delete()
@@ -10,13 +11,12 @@ async def delete(i: discohook.Interaction):
         await i.response.send("You can't delete this message!", ephemeral=True)
 
 
-@discohook.Select.new("Select a user to poke", kind=discohook.SelectType.user, max_values=1)
+@discohook.select.user("Select a user to poke", max_values=1)
 async def user_select(i: discohook.Interaction, users: list[discohook.User]):
-    user = users[0]
-    await i.response.update_message(f"You selected {user.mention}")
+    await i.response.update_message(f"You selected {users[0].mention}")
 
 
-@discohook.ApplicationCommand.slash()
+@discohook.command.slash()
 async def poke(i: discohook.Interaction):
     """Poke a user."""
     view = discohook.View()
@@ -24,7 +24,7 @@ async def poke(i: discohook.Interaction):
     await i.response.send(view=view)
 
 
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     name="randint",
     description="Get a random number within a range",
     options=[

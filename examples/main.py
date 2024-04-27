@@ -1,7 +1,7 @@
 import os
+
 import discohook
 from component import random_num
-
 
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]
@@ -34,7 +34,7 @@ async def on_error(i: discohook.Interaction, err: Exception):
 
 
 @app.load
-@discohook.ApplicationCommand.slash()
+@discohook.command.slash()
 async def ping(i: discohook.Interaction):
     """Ping the bot."""
     await i.response.send("Pong!")

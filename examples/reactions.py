@@ -1,4 +1,5 @@
 import asyncio
+
 import discohook
 
 # vote command
@@ -21,7 +22,7 @@ option_4: str
 """
 
 
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     name="vote",
     description="Create a new poll",
     options=[

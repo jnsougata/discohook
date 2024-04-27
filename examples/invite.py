@@ -1,4 +1,5 @@
 from typing import Union
+
 import discohook
 
 # invite command
@@ -14,7 +15,7 @@ duration: int
 """
 
 
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     name="invite",
     description="Sends an invite link to the current channel.",
     options=[

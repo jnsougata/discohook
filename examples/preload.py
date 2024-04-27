@@ -3,7 +3,6 @@ import random
 
 import discohook
 
-
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]
 APPLICATION_ID = os.environ["APPLICATION_ID"]
@@ -35,14 +34,14 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
 # changing the button's id will cause the older buttons with the same id to stop working.
 # changing the button's style, label, color will not affect the functionality of older buttons with the same id.
 @app.preload("regenerate")
-@discohook.Button.new("Regenerate")
+@discohook.button.new("Regenerate")
 async def regenerate_button(i: discohook.Interaction):
     await i.response.defer()  # you should always defer the response if you are not planning to respond in 4s.
     await i.message.edit(embed=make_random_color_card(i))
 
 
 @app.load
-@discohook.ApplicationCommand.slash()
+@discohook.command.slash()
 async def color(i: discohook.Interaction):
     """Generate a random color."""
     view = discohook.View()

@@ -1,6 +1,6 @@
 import random
-import discohook
 
+import discohook
 
 # roll command
 """
@@ -14,7 +14,7 @@ Note: the IntegerOption parameter "name" must be in lowercase.
 """
 
 
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     name="roll",
     description="Roll a dice",
     options=[
@@ -51,7 +51,7 @@ Note: the StringOption parameter "name" must be in lowercase and a valid python 
 """
 
 
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     name="gamechoice",
     description="Test command for string select options",
     options=[
@@ -79,7 +79,7 @@ take any options. It just flips a coin and sends the result in an embed.
 """
 
 
-@discohook.ApplicationCommand.slash(
+@discohook.command.slash(
     name="coinflip",
     description="Flip a coin"
 )

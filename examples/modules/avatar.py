@@ -1,10 +1,7 @@
 import discohook
 
 
-@discohook.command(
-    kind=discohook.ApplicationCommandType.user,
-    permissions=[discohook.Permission.send_messages]
-)
+@discohook.command.user(permissions=[discohook.Permission.send_messages])
 async def avatar(inter: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed(title=f"{user.global_name}")
     embed.set_image(user.avatar.url)
