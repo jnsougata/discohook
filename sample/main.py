@@ -1,7 +1,7 @@
 import os
 
 import discohook
-from debugger import tracer
+from debugger import send_error
 from wrapper import (
     regenerate_button,
     delete_button,
@@ -25,7 +25,7 @@ app = discohook.Client(
     default_help_command=True,
 )
 
-app.on_interaction_error()(tracer)
+app.on_interaction_error()(send_error)
 app.preload("regenerate")(regenerate_button)
 app.preload("delete")(delete_button)
 app.add_commands(color, purge, avatar, _exec, translate)
