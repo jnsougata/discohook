@@ -16,8 +16,6 @@ app = discohook.Client(
     default_help_command=True,  # This will enable your bot to use  default help command (/help).
 )
 
-app.load_modules("modules")  # load a command from a module in a directory named modules
-
 app.add_commands(random_num)  # import a command from another file
 
 

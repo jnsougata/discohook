@@ -3,16 +3,11 @@ import random
 import discohook
 
 
-tree = discohook.CommandTree()
-
-
-@tree.preload("regenerate")
 @discohook.button.new("Regenerate")
 async def regenerate_button(i: discohook.Interaction):
     await i.response.update_message(embed=make_random_color_card(i))
 
 
-@tree.preload("delete")
 @discohook.button.new("Delete", style=discohook.ButtonStyle.red)
 async def delete_button(i: discohook.Interaction):
     await i.response.defer()
@@ -30,7 +25,7 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
     return embed
 
 
-@tree.slash(
+@discohook.command.slash(
     integration_types=[
         discohook.ApplicationIntegrationType.user,
         discohook.ApplicationIntegrationType.guild
@@ -48,7 +43,7 @@ async def color(i: discohook.Interaction):
     await i.response.send(embed=make_random_color_card(i), view=view)
 
 
-@tree.slash(
+@discohook.command.slash(
     options=[
         discohook.Option.integer(
             "limit",
@@ -66,7 +61,7 @@ async def purge(i: discohook.Interaction, limit: int):
     await i.channel.purge(limit)
 
 
-@tree.user()
+@discohook.command.user()
 async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
     embed.set_image(user.avatar.url)
@@ -110,13 +105,13 @@ async def exec_and_respond(i: discohook.Interaction, content: str):
         await i.response.followup(embed=embed, view=view)
 
 
-@tree.message("exec")
+@discohook.command.message("exec")
 async def _exec(i: discohook.Interaction, message: discohook.Message):
     """Execute a python script."""
     await exec_and_respond(i, message.content)
 
 
-@tree.message(
+@discohook.command.message(
     "Translate [EN]",
     integration_types=[
         discohook.ApplicationIntegrationType.user,

@@ -1,9 +1,16 @@
 import os
+
 import discohook
-
-from commands import tree
 from debugger import tracer
-
+from wrapper import (
+    regenerate_button,
+    delete_button,
+    color,
+    purge,
+    avatar,
+    _exec,
+    translate
+)
 
 PASSWORD = os.environ["PASSWORD"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]
@@ -19,4 +26,6 @@ app = discohook.Client(
 )
 
 app.on_interaction_error()(tracer)
-app.load_trees(tree)
+app.preload("regenerate")(regenerate_button)
+app.preload("delete")(delete_button)
+app.add_commands(color, purge, avatar, _exec, translate)

@@ -1,5 +1,6 @@
 import asyncio
 from typing import Any, Dict, List, Optional, Union, Callable, Tuple
+
 import aiohttp
 from starlette.applications import Starlette
 from starlette.requests import Request
@@ -18,7 +19,6 @@ from .https import HTTPClient
 from .interaction import Interaction
 from .message import Message
 from .user import User
-from .tree import CommandTree
 from .utils import compare_password
 from .view import View
 from .webhook import Webhook
@@ -131,22 +131,6 @@ class Client(Starlette):
 
         return decorator
 
-    def load_trees(self, *trees: CommandTree):
-        """
-        Load multiple command trees into the client.
-
-        Parameters
-        ----------
-        *trees: Tuple[CommandTree]
-            The command trees to load into the client.
-        """
-        for tr in trees:
-            for cmd in tr.commands:
-                self.load(cmd)
-            for c in tr.components:
-                self.load_view(c)
-            self.active_components.update(tr.active_components)
-
     def load_view(self, view: View):
         """
         Loads multiple components into the client.
@@ -219,23 +203,23 @@ class Client(Starlette):
         """
         return await self.http.delete_command(str(self.application_id), command_id, guild_id)
 
-    def load_modules(self, directory: str):
-        """
-        Loads multiple command from modules within directory by walking through it.
-
-        Parameters
-        ----------
-        directory: str
-            The directory to load the modules from.
-        """
-        import importlib
-        import pathlib
-        from os import sep
-
-        globs = pathlib.Path(directory).glob(f"**{sep}*.py")
-        modules = [str(path).replace(sep, ".")[:-3] for path in globs]
-        for module in modules:
-            importlib.import_module(module).setup(self)
+    # def load_modules(self, directory: str):
+    #     """
+    #     Loads multiple command from modules within directory by walking through it.
+    #
+    #     Parameters
+    #     ----------
+    #     directory: str
+    #         The directory to load the modules from.
+    #     """
+    #     import importlib
+    #     import pathlib
+    #     from os import sep
+    #
+    #     globs = pathlib.Path(directory).glob(f"**{sep}*.py")
+    #     modules = [str(path).replace(sep, ".")[:-3] for path in globs]
+    #     for module in modules:
+    #         importlib.import_module(module).setup(self)
 
     def on_interaction_error(self):
         """
