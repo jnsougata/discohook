@@ -11,9 +11,6 @@ from .models import AllowedMentions, MessageReference
 from .params import _SendingPayload
 from .view import View
 
-if TYPE_CHECKING:
-    from .client import Client
-
 
 class PartialChannel:
     """
@@ -322,6 +319,9 @@ class PartialChannel:
         resp = await self.client.http.crosspost_channel_message(self.id, message_id)
         data = await resp.json()
         return Message(self.client, data)
+    
+    async def fetch_webhooks(self):
+        return await self.client.http.fetch_channel_webhooks(self.id)
 
     async def start_thread(
         self,
