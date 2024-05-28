@@ -275,7 +275,7 @@ class Message:
             suppress_embeds=suppress_embeds,
         )
         if view and view is not MISSING:
-            self.client.load_components(view)
+            self.client.load_view(view)
         resp = await self.client.http.edit_channel_message(self.channel_id, self.id, payload.to_form())
         return Message(self.client, await resp.json())
 
@@ -348,7 +348,7 @@ class Message:
             message_reference=MessageReference(message_id=self.id, channel_id=self.channel_id)
         )
         if view and view is not MISSING:
-            self.client.load_components(view)
+            self.client.load_view(view)
         resp = await self.client.http.send_message(self.channel_id, payload.to_form())
         return Message(self.client, await resp.json())
 
