@@ -83,7 +83,7 @@ class PartialWebhook:
         if thread_name:
             extras["thread_name"] = thread_name
         if view:
-            self.client.load_components(view)
+            self.client.load_view(view)
         params = {"wait": int(wait)}
         if thread_id:
             params["thread_id"] = thread_id
@@ -291,7 +291,7 @@ class Webhook:
         if thread_name:
             extras["thread_name"] = thread_name
         if view:
-            self.client.load_components(view)
+            self.client.load_view(view)
         return await self.client.http.send_webhook_message(self.id, self.token, payload.to_form(**extras))
 
     async def edit_message(
@@ -331,7 +331,7 @@ class Webhook:
         """
         payload = _EditingPayload(content=content, embed=embed, embeds=embeds, file=file, files=files, view=view)
         if view:
-            self.client.load_components(view)
+            self.client.load_view(view)
         resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, payload.to_form())
         data = await resp.json()
         return Message(self.client, data)
