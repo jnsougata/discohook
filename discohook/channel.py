@@ -86,7 +86,7 @@ class PartialChannel:
             The message reference for the message.
         """
         if view:
-            self.client.load_components(view)
+            self.client.load_view(view)
 
         payload = _SendingPayload(
             content=content,
