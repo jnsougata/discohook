@@ -106,7 +106,7 @@ class MessageReference:
         return data
 
 
-# noinspection PyShadowingBuiltins
+# noinspection PyShadowingBuiltins,GrazieInspection
 class PermissionOverwrite:
     """
     Represents a permission overwrite object.
