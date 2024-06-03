@@ -4,7 +4,7 @@ import discohook
 
 classes = [i for i in dir(discohook) if i[0].isupper()]
 
-with open("./docs/index.rst", "w") as f:
+with open("./index.rst", "w") as f:
     block = (f"Documentation"
              f"\n============="
              f"\n"
