@@ -30,7 +30,9 @@ class PartialChannel:
         The client that the channel belongs to.
     """
 
-    def __init__(self, client: "Client", channel_id: str, guild_id: Optional[str] = None):
+    def __init__(
+        self, client: "Client", channel_id: str, guild_id: Optional[str] = None
+    ):
         self.client = client
         self.id: str = channel_id
         self.guild_id = guild_id
@@ -59,7 +61,7 @@ class PartialChannel:
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
-            poll: Optional[Poll] = None,
+        poll: Optional[Poll] = None,
         allowed_mentions: Optional[AllowedMentions] = None,
         message_reference: Optional[MessageReference] = None,
     ):
@@ -220,7 +222,9 @@ class PartialChannel:
         if default_reaction_emoji:
             payload["default_reaction_emoji"] = default_reaction_emoji.to_dict()
         if default_thread_rate_limit_per_user:
-            payload["default_thread_rate_limit_per_user"] = default_thread_rate_limit_per_user
+            payload["default_thread_rate_limit_per_user"] = (
+                default_thread_rate_limit_per_user
+            )
         if default_sort_order:
             payload["default_sort_order"] = default_sort_order
         if default_forum_layout:
@@ -312,7 +316,9 @@ class PartialChannel:
         List[:class:`Message`]
             The deleted messages.
         """
-        messages = await self.fetch_messages(limit=limit, before=before, after=after, around=around)
+        messages = await self.fetch_messages(
+            limit=limit, before=before, after=after, around=around
+        )
         ids = [msg.id for msg in messages]
         if len(ids) < 2:
             await self.client.http.delete_channel_message(self.id, ids[0])
@@ -363,7 +369,9 @@ class PartialChannel:
             "invitable": invitable,
             "rate_limit_per_user": rate_limit_per_user,
         }
-        resp = await self.client.http.start_thread_without_message(self.id, payload, reason=reason)
+        resp = await self.client.http.start_thread_without_message(
+            self.id, payload, reason=reason
+        )
         data = await resp.json()
         return Channel(self.client, data)
 
@@ -476,7 +484,9 @@ class Channel(PartialChannel):
         self.available_tags = data.get("available_tags")
         self.applied_tags = data.get("applied_tags")
         self.default_reaction_emoji = data.get("default_reaction_emoji")
-        self.default_thread_rate_limit_per_user = data.get("default_thread_rate_limit_per_user")
+        self.default_thread_rate_limit_per_user = data.get(
+            "default_thread_rate_limit_per_user"
+        )
         self.default_sort_order = data.get("default_sort_order")
         self.default_forum_layout = data.get("default_forum_layout")
 

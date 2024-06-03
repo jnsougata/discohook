@@ -1,7 +1,7 @@
 import json
 import mimetypes
 from enum import Enum, IntEnum
-from typing import Any, List, Optional, Dict
+from typing import Any, Dict, List, Optional
 
 import aiohttp
 
@@ -31,7 +31,7 @@ class _SendingPayload:
         sticker_ids: Optional[List[str]] = None,
         suppress_embeds: Optional[bool] = False,
         supress_notifications: Optional[bool] = False,
-            poll: Optional[Poll] = None,
+        poll: Optional[Poll] = None,
     ):
         self.content = content
         self.embed = embed
@@ -62,8 +62,7 @@ class _SendingPayload:
 
     @staticmethod
     def _create_form(
-        payload: Dict[str, Any],
-        files: Optional[List[File]] = None
+        payload: Dict[str, Any], files: Optional[List[File]] = None
     ) -> aiohttp.MultipartWriter:
         form = aiohttp.MultipartWriter("form-data")
         # noinspection PyTypeChecker
@@ -72,7 +71,7 @@ class _SendingPayload:
             headers={
                 "Content-Disposition": 'form-data; name="payload_json"',
                 "Content-Type": "application/json",
-            }
+            },
         )
         if not files:
             files = []
@@ -84,7 +83,7 @@ class _SendingPayload:
                 headers={
                     "Content-Disposition": f'form-data; name="files[{i}]"; filename="{file.name}"',
                     "Content-Type": mime or "application/octet-stream",
-                }
+                },
             )
         return form
 
@@ -135,7 +134,9 @@ class _SendingPayload:
             return data
         return {"data": data, "type": int(payload_type.value)}
 
-    def to_form(self, payload_type: Optional[Enum] = None, **kwargs) -> aiohttp.MultipartWriter:
+    def to_form(
+        self, payload_type: Optional[Enum] = None, **kwargs
+    ) -> aiohttp.MultipartWriter:
         return self._create_form(self.to_dict(payload_type, **kwargs), self.files)
 
 
@@ -199,12 +200,16 @@ class _EditingPayload(_SendingPayload):
 
         return payload
 
-    def to_dict(self, payload_type: Optional[IntEnum] = None, **kwargs) -> Dict[str, Any]:
+    def to_dict(
+        self, payload_type: Optional[IntEnum] = None, **kwargs
+    ) -> Dict[str, Any]:
         data = self._handle_edit_params()
         data.update(kwargs)
         if payload_type is None:
             return data
         return {"data": data, "type": payload_type}
 
-    def to_form(self, payload_type: Optional[Enum] = None, **kwargs) -> aiohttp.MultipartWriter:
+    def to_form(
+        self, payload_type: Optional[Enum] = None, **kwargs
+    ) -> aiohttp.MultipartWriter:
         return self._create_form(self.to_dict(payload_type, **kwargs), self.files)

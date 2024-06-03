@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from .channel import Channel
 from .emoji import PartialEmoji
 from .enums import ChannelType
+from .member import Member
 from .permission import Permission
 from .role import Role
-from .member import Member
 from .utils import unwrap_user
 
 if TYPE_CHECKING:
@@ -185,7 +185,11 @@ class PartialGuild:
             The id of the parent category to move the channel to.
             If not provided, the channel will be moved to the root.
         """
-        payload = {"id": channel_id, "position": position, "lock_permissions": lock_permissions}
+        payload = {
+            "id": channel_id,
+            "position": position,
+            "lock_permissions": lock_permissions,
+        }
         if parent_id:
             payload["parent_id"] = parent_id
         await self.client.http.edit_guild_channel_position(self.id, payload)
@@ -221,7 +225,9 @@ class PartialGuild:
         data = await resp.json()
         return Role(self.client, data)
 
-    async def create_emoji(self, name: str, image: str, *, roles: Optional[List[str]] = None):
+    async def create_emoji(
+        self, name: str, image: str, *, roles: Optional[List[str]] = None
+    ):
         """
         Creates a new emoji for the guild.
 

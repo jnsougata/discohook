@@ -70,10 +70,10 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
 
 
 async def exec_and_respond(i: discohook.Interaction, content: str):
-    from io import StringIO
     import os
     import re
     import sys
+    from io import StringIO
 
     os.environ.clear()
 
@@ -129,9 +129,9 @@ async def translate(i: discohook.Interaction, message: discohook.Message):
     if not message.content:
         return await i.response.followup("Failed: Message doesn't have any text content :/", ephemeral=True)
 
-    import os
     import json
-    from urllib.request import urlopen, Request
+    import os
+    from urllib.request import Request, urlopen
 
     api_key = os.environ["GEMINI_API_KEY"]
 

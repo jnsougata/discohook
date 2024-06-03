@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Union, Callable, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import aiohttp
 from starlette.applications import Starlette
@@ -7,7 +7,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from .base import Component
-from .channel import PartialChannel, Channel
+from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
 from .dash import dashboard
 from .embed import Embed
@@ -27,7 +27,9 @@ from .webhook import Webhook
 
 async def delete_cmd(request: Request):
     if not request.app.password:
-        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+        return JSONResponse(
+            {"error": "Password not set inside the application"}, status_code=500
+        )
     data = await request.json()
     password = data.get("password")
     command_id = data.get("id")
@@ -42,14 +44,18 @@ async def delete_cmd(request: Request):
 
 async def sync(request: Request):
     if not request.app.password:
-        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+        return JSONResponse(
+            {"error": "Password not set inside the application"}, status_code=500
+        )
     data = await request.json()
     password = data.get("password")
     if not compare_password(request.app.password, password):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
     responses, raw = await request.app._sync()  # noqa
     if not any([resp.status == 200 for resp in responses]):
-        erred_first_response = next((resp for resp in responses if resp.status != 200), None)
+        erred_first_response = next(
+            (resp for resp in responses if resp.status != 200), None
+        )
         data = await erred_first_response.json()
         data["raw_payload"] = raw
         return JSONResponse(data, status_code=500)
@@ -61,7 +67,9 @@ async def sync(request: Request):
 
 async def authenticate(request: Request):
     if not request.app.password:
-        return JSONResponse({"error": "Password not set inside the application"}, status_code=500)
+        return JSONResponse(
+            {"error": "Password not set inside the application"}, status_code=500
+        )
     data = await request.json()
     password = data.get("password")
     if not compare_password(request.app.password, password):
@@ -107,19 +115,27 @@ class Client(Starlette):
         self.public_key = public_key
         self.application_id = application_id
         self.password = password
-        self.http = HTTPClient(self, token, aiohttp.ClientSession("https://discord.com"))
+        self.http = HTTPClient(
+            self, token, aiohttp.ClientSession("https://discord.com")
+        )
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, _handler, methods=["POST"], include_in_schema=False)
         self.add_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
         self.add_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
-        self.add_route("/api/verify", authenticate, methods=["POST"], include_in_schema=False)
-        self.add_route("/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False)
+        self.add_route(
+            "/api/verify", authenticate, methods=["POST"], include_in_schema=False
+        )
+        self.add_route(
+            "/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False
+        )
         self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
             self.add_commands(_help)
-        self._interaction_error_handler: Optional[Callable[[Interaction, Exception], Any]] = None
+        self._interaction_error_handler: Optional[
+            Callable[[Interaction, Exception], Any]
+        ] = None
 
     def on_error(self):
         """
@@ -202,7 +218,9 @@ class Client(Starlette):
         guild_id: str | None
             The id of the guild to delete the command from. Defaults to None.
         """
-        return await self.http.delete_command(str(self.application_id), command_id, guild_id)
+        return await self.http.delete_command(
+            str(self.application_id), command_id, guild_id
+        )
 
     # def load_modules(self, directory: str):
     #     """
@@ -258,7 +276,7 @@ class Client(Starlette):
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
         view: Optional[View] = None,
-            poll: Optional[Poll] = None,
+        poll: Optional[Poll] = None,
     ) -> Message:
         """
         Send a message to a channel using the ID of the channel.
@@ -345,16 +363,27 @@ class Client(Starlette):
         if guild_commands:
             tasks = []
             for guild_id, commands in guild_commands.items():
-                tasks.append(self.http.sync_guild_commands(
-                    str(self.application_id), guild_id, [cmd.to_dict() for cmd in commands]))
+                tasks.append(
+                    self.http.sync_guild_commands(
+                        str(self.application_id),
+                        guild_id,
+                        [cmd.to_dict() for cmd in commands],
+                    )
+                )
             responses.extend(await asyncio.gather(*tasks))
             self._sync_queue = [cmd for cmd in self._sync_queue if not cmd.guild_id]
         if self._sync_queue:
-            responses.append(await self.http.sync_global_commands(
-                str(self.application_id), [cmd.to_dict() for cmd in self._sync_queue]))
+            responses.append(
+                await self.http.sync_global_commands(
+                    str(self.application_id),
+                    [cmd.to_dict() for cmd in self._sync_queue],
+                )
+            )
         return responses, [cmd.to_dict() for cmd in self._sync_queue]
 
-    async def create_webhook(self, channel_id: str, *, name: str, image_base64: Optional[str] = None):
+    async def create_webhook(
+        self, channel_id: str, *, name: str, image_base64: Optional[str] = None
+    ):
         """
         Create a webhook in a channel.
 
@@ -371,11 +400,15 @@ class Client(Starlette):
         Webhook
 
         """
-        resp = await self.http.create_webhook(channel_id, {"name": name, "avatar": image_base64})
+        resp = await self.http.create_webhook(
+            channel_id, {"name": name, "avatar": image_base64}
+        )
         data = await resp.json()
         return Webhook(self, data)
 
-    async def fetch_webhook(self, webhook_id: str, *, webhook_token: Optional[str] = None):
+    async def fetch_webhook(
+        self, webhook_id: str, *, webhook_token: Optional[str] = None
+    ):
         """
         Fetch a webhook from the client.
         Parameters
@@ -442,7 +475,9 @@ class Client(Starlette):
         -------
         List[Dict[str, Any]]
         """
-        resp = await self.http.fetch_global_application_commands(str(self.application_id))
+        resp = await self.http.fetch_global_application_commands(
+            str(self.application_id)
+        )
         return await resp.json()
 
     async def fetch_info(self) -> Dict[str, Any]:

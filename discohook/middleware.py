@@ -1,5 +1,6 @@
 import aiohttp
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.middleware.base import (BaseHTTPMiddleware,
+                                       RequestResponseEndpoint)
 from starlette.requests import Request
 
 
@@ -12,5 +13,5 @@ class SingleUseSession(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, rre: RequestResponseEndpoint):
         await request.app.http.session.close()
-        request.app.http.session = aiohttp.ClientSession('https://discord.com')
+        request.app.http.session = aiohttp.ClientSession("https://discord.com")
         return await rre(request)

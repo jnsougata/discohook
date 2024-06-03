@@ -1,8 +1,7 @@
-import json
 import hashlib
+import json
 import secrets
 from typing import Any, Callable, Coroutine, Union
-
 
 Handler = Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
 

@@ -28,7 +28,9 @@ class Member(User):
     @property
     def roles(self) -> List[PartialRole]:
         ids = self.data.get("roles")
-        return [PartialRole(self.client, {"id": i, "guild_id": self.guild_id}) for i in ids]
+        return [
+            PartialRole(self.client, {"id": i, "guild_id": self.guild_id}) for i in ids
+        ]
 
     @property
     def joined_at(self) -> str:
@@ -82,7 +84,9 @@ class Member(User):
         reason: Optional[str]
             The reason for adding the role to be logged.
         """
-        return await self.client.http.add_role(self.guild_id, self.id, role_id, reason=reason)
+        return await self.client.http.add_role(
+            self.guild_id, self.id, role_id, reason=reason
+        )
 
     async def remove_role(self, role_id: str):
         """
@@ -112,4 +116,6 @@ class Member(User):
         """
         if delete_message_seconds > 604800:
             raise ValueError("You can only delete messages for up to last 7 days.")
-        return await self.client.http.ban_user(self.guild_id, self.id, delete_message_seconds)
+        return await self.client.http.ban_user(
+            self.guild_id, self.id, delete_message_seconds
+        )

@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from .adapter import ResponseAdapter
 from .channel import PartialChannel
-from .enums import InteractionType, try_enum, InteractionContextType
+from .enums import InteractionContextType, InteractionType, try_enum
 from .guild import PartialGuild
 from .member import Member
 from .message import Message
@@ -303,6 +303,8 @@ class Interaction:
         """
         if not self._responded:
             return
-        resp = await self.client.http.fetch_original_webhook_message(self.application_id, self.token)
+        resp = await self.client.http.fetch_original_webhook_message(
+            self.application_id, self.token
+        )
         data = await resp.json()
         return Message(self.client, data)

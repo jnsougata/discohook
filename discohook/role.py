@@ -7,7 +7,11 @@ if TYPE_CHECKING:
 
 
 class PartialRole:
-    def __init__(self, client: "Client", data: Dict[str, Any], ):
+    def __init__(
+        self,
+        client: "Client",
+        data: Dict[str, Any],
+    ):
         self.client = client
         self.id = data["id"]
         self.guild_id = data.get("guild_id")

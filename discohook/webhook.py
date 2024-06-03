@@ -8,7 +8,7 @@ from .embed import Embed
 from .file import File
 from .guild import PartialGuild
 from .message import Message
-from .params import MISSING, _SendingPayload, _EditingPayload
+from .params import MISSING, _EditingPayload, _SendingPayload
 from .user import User
 from .view import View
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 # noinspection PyShadowingBuiltins
 class PartialWebhook:
 
-    def __init__(self,  client: "Client", id: str, token: str):
+    def __init__(self, client: "Client", id: str, token: str):
         self.id = id
         self.token = token
         self.client = client
@@ -38,7 +38,7 @@ class PartialWebhook:
         view: Optional[View] = None,
         thread_name: Optional[str] = None,
         wait: bool = False,
-        thread_id: Optional[str] = None
+        thread_id: Optional[str] = None,
     ):
         """
         Sends a message to the webhook.
@@ -74,7 +74,14 @@ class PartialWebhook:
         aiohttp.ClientResponse
         """
         payload = _SendingPayload(
-            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
+            content=content,
+            tts=tts,
+            embed=embed,
+            embeds=embeds,
+            file=file,
+            files=files,
+            view=view,
+        )
         extras = {}
         if username:
             extras["username"] = username
@@ -88,15 +95,16 @@ class PartialWebhook:
         if thread_id:
             params["thread_id"] = thread_id
         resp = await self.client.http.execute_webhook(
-            self.id, self.token, form=payload.to_form(**extras), params=params)
+            self.id, self.token, form=payload.to_form(**extras), params=params
+        )
         if wait:
             data = await resp.json()
             return Message(self.client, data)
         return resp
-        
+
     @classmethod
     def from_url(cls, client: "Client", url: str) -> "PartialWebhook":
-        return cls(client, *url.split('/')[-2:])
+        return cls(client, *url.split("/")[-2:])
 
 
 class Webhook:
@@ -282,7 +290,14 @@ class Webhook:
         None
         """
         payload = _SendingPayload(
-            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files, view=view)
+            content=content,
+            tts=tts,
+            embed=embed,
+            embeds=embeds,
+            file=file,
+            files=files,
+            view=view,
+        )
         extras = {}
         if username:
             extras["username"] = username
@@ -292,7 +307,9 @@ class Webhook:
             extras["thread_name"] = thread_name
         if view:
             self.client.load_components(view)
-        return await self.client.http.send_webhook_message(self.id, self.token, payload.to_form(**extras))
+        return await self.client.http.send_webhook_message(
+            self.id, self.token, payload.to_form(**extras)
+        )
 
     async def edit_message(
         self,
@@ -329,10 +346,19 @@ class Webhook:
         -------
         :class:`Message`
         """
-        payload = _EditingPayload(content=content, embed=embed, embeds=embeds, file=file, files=files, view=view)
+        payload = _EditingPayload(
+            content=content,
+            embed=embed,
+            embeds=embeds,
+            file=file,
+            files=files,
+            view=view,
+        )
         if view:
             self.client.load_components(view)
-        resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, payload.to_form())
+        resp = await self.client.http.edit_webhook_message(
+            self.id, self.token, message_id, payload.to_form()
+        )
         data = await resp.json()
         return Message(self.client, data)
 
@@ -349,4 +375,6 @@ class Webhook:
         -------
         aiohttp.ClientResponse
         """
-        return await self.client.http.delete_webhook_message(self.id, self.token, message_id)
+        return await self.client.http.delete_webhook_message(
+            self.id, self.token, message_id
+        )

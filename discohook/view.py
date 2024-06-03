@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Union
 
 from .button import Button
-from .select import Select
 from .enums import ComponentType
+from .select import Select
 
 
 class View:
@@ -34,7 +34,7 @@ class View:
         *buttons: :class:`Button`
             The buttons to be added to the view.
         """
-        batches = [buttons[i: i + 5] for i in range(0, len(buttons), 5)]
+        batches = [buttons[i : i + 5] for i in range(0, len(buttons), 5)]
         for batch in batches:
             self.components.append(
                 {

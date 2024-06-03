@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, List, Union, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from .embed import Embed
 from .enums import InteractionCallbackType, InteractionType
@@ -154,7 +154,7 @@ class ResponseAdapter:
         allowed_mentions: Optional[AllowedMentions] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
-            poll: Optional[Poll] = None
+        poll: Optional[Poll] = None,
     ) -> InteractionResponse:
         """
         Sends a response to the interaction
@@ -199,12 +199,14 @@ class ResponseAdapter:
             ephemeral=ephemeral,
             suppress_embeds=suppress_embeds,
             allowed_mentions=allowed_mentions,
-            poll=poll
+            poll=poll,
         )
         if view:
             self.inter.client.load_view(view)
         payload = payload.to_form(InteractionCallbackType.channel_message_with_source)
-        await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
+        await self.inter.client.http.send_interaction_mp_callback(
+            self.inter.id, self.inter.token, payload
+        )
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
@@ -221,14 +223,19 @@ class ResponseAdapter:
         -------
         InteractionResponse
         """
-        if self.inter.type not in (InteractionType.component, InteractionType.app_command):
+        if self.inter.type not in (
+            InteractionType.component,
+            InteractionType.app_command,
+        ):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         self.inter.client.active_components[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal,
         }
-        await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
+        await self.inter.client.http.send_interaction_callback(
+            self.inter.id, self.inter.token, payload
+        )
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
@@ -244,10 +251,17 @@ class ResponseAdapter:
         if self.inter.type != InteractionType.autocomplete:
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         choices = choices[:25]
-        payload = {"type": InteractionCallbackType.autocomplete, "data": {"choices": [i.to_dict() for i in choices]}}
-        await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
+        payload = {
+            "type": InteractionCallbackType.autocomplete,
+            "data": {"choices": [i.to_dict() for i in choices]},
+        }
+        await self.inter.client.http.send_interaction_callback(
+            self.inter.id, self.inter.token, payload
+        )
 
-    async def defer(self, ephemeral: bool = False, thinking: bool = False) -> InteractionResponse:
+    async def defer(
+        self, ephemeral: bool = False, thinking: bool = False
+    ) -> InteractionResponse:
         """
         Defers the interaction
 
@@ -262,21 +276,32 @@ class ResponseAdapter:
             (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
         """
         payload = {}
-        if self.inter.type is InteractionType.component or self.inter.type is InteractionType.modal_submit:
+        if (
+            self.inter.type is InteractionType.component
+            or self.inter.type is InteractionType.modal_submit
+        ):
             if thinking:
-                payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
+                payload["type"] = (
+                    InteractionCallbackType.deferred_channel_message_with_source
+                )
                 if ephemeral:
                     payload["data"] = {"flags": 64}
             else:
-                payload["type"] = InteractionCallbackType.deferred_update_component_message
+                payload["type"] = (
+                    InteractionCallbackType.deferred_update_component_message
+                )
         elif self.inter.type == InteractionType.app_command:
-            payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
+            payload["type"] = (
+                InteractionCallbackType.deferred_channel_message_with_source
+            )
             if ephemeral:
                 payload["data"] = {"flags": 64}
         else:
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
 
-        await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
+        await self.inter.client.http.send_interaction_callback(
+            self.inter.id, self.inter.token, payload
+        )
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
@@ -291,7 +316,9 @@ class ResponseAdapter:
             "data": {},
             "type": InteractionCallbackType.premium_required,
         }
-        await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
+        await self.inter.client.http.send_interaction_callback(
+            self.inter.id, self.inter.token, payload
+        )
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
@@ -334,7 +361,10 @@ class ResponseAdapter:
         -------
         InteractionResponse
         """
-        if not (self.inter.type == InteractionType.component or self.inter.type == InteractionType.modal_submit):
+        if not (
+            self.inter.type == InteractionType.component
+            or self.inter.type == InteractionType.modal_submit
+        ):
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
 
         payload = _EditingPayload(
@@ -350,7 +380,9 @@ class ResponseAdapter:
         if view and view is not MISSING:
             self.inter.client.load_view(view)
         payload = payload.to_form(InteractionCallbackType.update_component_message)
-        await self.inter.client.http.send_interaction_mp_callback(self.inter.id, self.inter.token, payload)
+        await self.inter.client.http.send_interaction_mp_callback(
+            self.inter.id, self.inter.token, payload
+        )
         self.inter._responded = True
         return InteractionResponse(self.inter)
 
@@ -367,7 +399,7 @@ class ResponseAdapter:
         allowed_mentions: Optional[AllowedMentions] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
-            poll: Optional[Poll] = None,
+        poll: Optional[Poll] = None,
     ) -> FollowupResponse:
         """
         Sends a follow-up message to a deferred interaction
@@ -408,11 +440,12 @@ class ResponseAdapter:
             ephemeral=ephemeral,
             suppress_embeds=suppress_embeds,
             allowed_mentions=allowed_mentions,
-            poll=poll
+            poll=poll,
         )
         if view:
             self.inter.client.load_view(view)
         resp = await self.inter.client.http.send_webhook_message(
-            self.inter.application_id, self.inter.token, payload.to_form())
+            self.inter.application_id, self.inter.token, payload.to_form()
+        )
         data = await resp.json()
         return FollowupResponse(data, self.inter)

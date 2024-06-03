@@ -24,7 +24,7 @@ class AllowedMentions:
         parse: Optional[List[AllowedMentionsType]] = None,
         roles: Optional[List[str]] = None,
         users: Optional[List[str]] = None,
-        replied_user: Optional[bool] = None
+        replied_user: Optional[bool] = None,
     ):
         self.parse = parse
         self.roles = roles
@@ -75,7 +75,7 @@ class MessageReference:
         message_id: Optional[str] = None,
         channel_id: Optional[str] = None,
         guild_id: Optional[str] = None,
-        fail_if_not_exists: Optional[bool] = None
+        fail_if_not_exists: Optional[bool] = None,
     ):
         self.message_id = message_id
         self.channel_id = channel_id
@@ -145,5 +145,5 @@ class PermissionOverwrite:
             "id": self.id,
             "type": self.type,
             "allow": self.allow,
-            "deny": self.deny
+            "deny": self.deny,
         }

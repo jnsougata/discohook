@@ -1,14 +1,13 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Callable, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 from .base import Component
 from .emoji import PartialEmoji
-from .enums import ComponentType, SelectType, ChannelType, SelectDefaultValueType
-
+from .enums import ChannelType, ComponentType, SelectDefaultValueType, SelectType
 
 if TYPE_CHECKING:
-    from .interaction import Interaction
     from .channel import PartialChannel
+    from .interaction import Interaction
     from .role import PartialRole
     from .user import User
 
@@ -42,10 +41,7 @@ class SelectDefaultValue:
         :class:`dict`
             The dictionary representation of the button.
         """
-        payload = {
-            "id": self.id,
-            "type": self.type
-        }
+        payload = {"id": self.id, "type": self.type}
         return payload
 
 
@@ -153,16 +149,15 @@ class Select(Component):
         :class:`dict`
             The dictionary representation of the button.
         """
-        payload = {
-            "type": self.type,
-            "custom_id": self.custom_id
-        }
+        payload = {"type": self.type, "custom_id": self.custom_id}
         if self.type == ComponentType.select_text:
             if not self.options:
                 raise ValueError("options must be provided for text select menus")
             payload["options"] = [option.to_dict() for option in self.options]
         elif self.type != ComponentType.select_text and self.default_values:
-            payload["default_values"] = [value.to_dict() for value in self.default_values]
+            payload["default_values"] = [
+                value.to_dict() for value in self.default_values
+            ]
         if self.type == ComponentType.select_channel and self.channel_types:
             payload["channel_types"] = [x.value for x in self.channel_types]
         if self.placeholder:
@@ -206,6 +201,7 @@ def channel(
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
     """
+
     def decorator(coro: Callable[["Interaction", List["PartialChannel"]], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
@@ -252,6 +248,7 @@ def text(
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
     """
+
     def decorator(coro: Callable[["Interaction", List[str]], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
@@ -350,6 +347,7 @@ def user(
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
     """
+
     def decorator(coro: Callable[["Interaction", List["User"]], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
@@ -395,7 +393,10 @@ def mentionable(
     custom_id: Optional[:class:`str`]
         The custom id of the select menu.
     """
-    def decorator(coro: Callable[["Interaction", List[Union["User", "PartialRole"]]], Any]):
+
+    def decorator(
+        coro: Callable[["Interaction", List[Union["User", "PartialRole"]]], Any]
+    ):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
         self = Select(

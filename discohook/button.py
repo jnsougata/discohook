@@ -1,10 +1,9 @@
 import asyncio
-from typing import Any, Callable, Dict, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Union
 
 from .base import Component
 from .emoji import PartialEmoji
-from .enums import ComponentType, ButtonStyle
-
+from .enums import ButtonStyle, ComponentType
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -97,6 +96,7 @@ def new(
     custom_id: Optional[:class:`str`]
         The custom id of the button.
     """
+
     def decorator(coro: Callable[["Interaction"], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
@@ -113,7 +113,9 @@ def new(
     return decorator
 
 
-def link(label: Optional[str], *, url: str, emoji: Optional[Union[str, PartialEmoji]] = None):
+def link(
+    label: Optional[str], *, url: str, emoji: Optional[Union[str, PartialEmoji]] = None
+):
     """
     A decorator that creates a link button.
 

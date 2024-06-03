@@ -257,5 +257,5 @@ async def dashboard(_):
 </body>
 </html>
         """,
-        status_code=200
+        status_code=200,
     )

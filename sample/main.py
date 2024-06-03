@@ -1,17 +1,10 @@
 import os
 
-import discohook
-from commands import (
-    regenerate_button,
-    delete_button,
-    color,
-    purge,
-    avatar,
-    _exec,
-    translate,
-    poll
-)
+from commands import (_exec, avatar, color, delete_button, poll, purge,
+                      regenerate_button, translate)
 from debugger import send_error
+
+import discohook
 
 PASSWORD = os.environ["PASSWORD"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]

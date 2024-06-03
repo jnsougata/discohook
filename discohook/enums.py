@@ -16,7 +16,7 @@ __all__ = (
     "SelectDefaultValueType",
     "InteractionContextType",
     "ApplicationIntegrationType",
-    "PollLayoutType"
+    "PollLayoutType",
 )
 
 
@@ -261,6 +261,7 @@ class SelectDefaultValueType(str, Enum):
 
     Used internally by the library. You should not need to use this.
     """
+
     user = "user"
     role = "role"
     channel = "channel"
@@ -270,6 +271,7 @@ class InteractionContextType(int, Enum):
     """
     The type of interaction context.
     """
+
     guild = 0
     bot_dm = 1
     private_channel = 2
@@ -279,6 +281,7 @@ class ApplicationIntegrationType(int, Enum):
     """
     Installation context(s) where the command is available.
     """
+
     guild = 0
     user = 1
 

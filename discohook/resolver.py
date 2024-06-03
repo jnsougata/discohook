@@ -3,11 +3,7 @@ from typing import Any, Callable, Dict, List, Tuple
 
 from .attachment import Attachment
 from .channel import Channel
-from .enums import (
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-    ComponentType,
-)
+from .enums import ApplicationCommandOptionType, ApplicationCommandType, ComponentType
 from .interaction import Interaction
 from .member import Member
 from .message import Message
@@ -28,7 +24,9 @@ def handle_params_by_signature(
     default_kwargs = params.kwonlydefaults or {}
 
     args = []
-    positional_args = [None for _ in range(len(params.args[skips:]) - len(default_args))]
+    positional_args = [
+        None for _ in range(len(params.args[skips:]) - len(default_args))
+    ]
     positional_args.extend(default_args)
     for param, default in zip(params.args[skips:], positional_args):
         option = options.get(param)
@@ -77,23 +75,33 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
             else:
                 options[name] = User(interaction.client, user_data)
         elif option_type == ApplicationCommandOptionType.channel:
-            options[name] = Channel(interaction.client, interaction.data["resolved"]["channels"][value])
+            options[name] = Channel(
+                interaction.client, interaction.data["resolved"]["channels"][value]
+            )
         elif option_type == ApplicationCommandOptionType.role:
-            options[name] = Role(interaction.client, interaction.data["resolved"]["roles"][value])
+            options[name] = Role(
+                interaction.client, interaction.data["resolved"]["roles"][value]
+            )
         elif option_type == ApplicationCommandOptionType.mentionable:
             users = interaction.data["resolved"].get("users", {})
             payload = users.get(value)
             if payload:
                 options[name] = User(interaction.client, payload)
             else:
-                options[name] = Role(interaction.client, interaction.data["resolved"]["roles"].get(value))
+                options[name] = Role(
+                    interaction.client, interaction.data["resolved"]["roles"].get(value)
+                )
         elif option_type == ApplicationCommandOptionType.attachment:
-            options[name] = Attachment(interaction.data["resolved"]["attachments"][value])
+            options[name] = Attachment(
+                interaction.data["resolved"]["attachments"][value]
+            )
     interaction._parsed_options = options
     return options
 
 
-def build_slash_command_params(func: Callable, interaction: Interaction, skips: int = 1):
+def build_slash_command_params(
+    func: Callable, interaction: Interaction, skips: int = 1
+):
     command_options = interaction.data.get("options")
     if not command_options:
         return [], {}
@@ -109,7 +117,11 @@ def build_context_menu_param(interaction: Interaction):
     target_id = interaction.data["target_id"]
     if interaction.data["type"] == ApplicationCommandType.user:
         user = interaction.data["resolved"]["users"][target_id]
-        member = interaction.data["resolved"]["members"][target_id] if interaction.guild_id else {}
+        member = (
+            interaction.data["resolved"]["members"][target_id]
+            if interaction.guild_id
+            else {}
+        )
         if member:
             member["avatar"] = user["avatar"]
             user.update(member)
@@ -134,10 +146,16 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         return interaction.data["values"]
     if interaction.data["component_type"] == ComponentType.select_channel:
         resolved = interaction.data["resolved"]["channels"]
-        return [Channel(interaction.client, resolved.pop(channel_id)) for channel_id in interaction.data["values"]]
+        return [
+            Channel(interaction.client, resolved.pop(channel_id))
+            for channel_id in interaction.data["values"]
+        ]
     if interaction.data["component_type"] == ComponentType.select_user:
         resolved = interaction.data["resolved"]["users"]
-        return [User(interaction.client, resolved.pop(user_id)) for user_id in interaction.data["values"]]
+        return [
+            User(interaction.client, resolved.pop(user_id))
+            for user_id in interaction.data["values"]
+        ]
     if interaction.data["component_type"] == ComponentType.select_role:
         resolved = interaction.data["resolved"]["roles"]
         roles = [resolved.pop(role_id) for role_id in interaction.data["values"]]

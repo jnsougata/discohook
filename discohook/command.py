@@ -6,7 +6,7 @@ from .enums import (
     ApplicationCommandOptionType,
     ApplicationCommandType,
     ApplicationIntegrationType,
-    InteractionContextType
+    InteractionContextType,
 )
 from .option import Option
 from .permission import Permission
@@ -124,7 +124,11 @@ class ApplicationCommand(Interactable):
         self.application_id = None
         self.type = type
         self.contexts = [InteractionContextType.guild] if contexts is None else contexts
-        self.integration_types = [ApplicationIntegrationType.guild] if integration_types is None else integration_types
+        self.integration_types = (
+            [ApplicationIntegrationType.guild]
+            if integration_types is None
+            else integration_types
+        )
         self.permissions = permissions
         self.guild_id = guild_id
         self.callback: Handler = callback
@@ -230,6 +234,7 @@ def slash(
     """
     A decorator to register a slash command with its callback.
     """
+
     def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
@@ -240,8 +245,9 @@ def slash(
             guild_id=guild_id,
             integration_types=integration_types,
             contexts=contexts,
-            callback=coro
+            callback=coro,
         )
+
     return decorator
 
 
@@ -252,11 +258,12 @@ def user(
     permissions: Optional[List[Permission]] = None,
     guild_id: Optional[str] = None,
     integration_types: Optional[List[ApplicationIntegrationType]] = None,
-    contexts: Optional[List[InteractionContextType]] = None
+    contexts: Optional[List[InteractionContextType]] = None,
 ):
     """
     A decorator to register a user command with its callback.
     """
+
     def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
@@ -266,8 +273,9 @@ def user(
             type=ApplicationCommandType.user,
             integration_types=integration_types,
             contexts=contexts,
-            callback=coro
+            callback=coro,
         )
+
     return decorator
 
 
@@ -278,11 +286,12 @@ def message(
     permissions: Optional[List[Permission]] = None,
     guild_id: Optional[str] = None,
     integration_types: Optional[List[ApplicationIntegrationType]] = None,
-    contexts: Optional[List[InteractionContextType]] = None
+    contexts: Optional[List[InteractionContextType]] = None,
 ):
     """
     A decorator to register a message command with its callback.
     """
+
     def decorator(coro: Handler):
         return ApplicationCommand(
             name or coro.__name__,
@@ -292,6 +301,7 @@ def message(
             type=ApplicationCommandType.message,
             integration_types=integration_types,
             contexts=contexts,
-            callback=coro
+            callback=coro,
         )
+
     return decorator

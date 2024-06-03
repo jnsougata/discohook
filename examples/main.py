@@ -1,7 +1,8 @@
 import os
 
-import discohook
 from component import random_num
+
+import discohook
 
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]

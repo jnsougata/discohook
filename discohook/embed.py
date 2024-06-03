@@ -73,7 +73,9 @@ class Embed:
         embed.fields = data.get("fields", [])
         return embed
 
-    def set_author(self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None):
+    def set_author(
+        self, *, name: str, url: Optional[str] = None, icon_url: Optional[str] = None
+    ):
         """
         Sets the author of the embed.
 

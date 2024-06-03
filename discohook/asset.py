@@ -46,7 +46,7 @@ class Asset:
         :class:`bool`
         """
         return len(self.hash) == 1
-        
+
     @property
     def url(self) -> str:
         """

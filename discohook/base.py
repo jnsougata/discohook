@@ -1,6 +1,6 @@
 import asyncio
 import secrets
-from typing import TYPE_CHECKING, Callable, List, Any, Optional
+from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 from .enums import ComponentType
 
@@ -18,6 +18,7 @@ class Interactable:
         """
         A decorator that adds a check to a specific command or component.
         """
+
         def decorator(coro: Callable[["Interaction"], bool]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
@@ -30,6 +31,7 @@ class Interactable:
         """
         A decorator that adds an error handler to a specific command or component.
         """
+
         def decorator(coro: Callable[["Interaction", Exception], None]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("error handler must be a coroutine")
@@ -49,7 +51,9 @@ class Component(Interactable):
         The type of the component.
     """
 
-    def __init__(self, type: Optional[ComponentType] = None, custom_id: Optional[str] = None):
+    def __init__(
+        self, type: Optional[ComponentType] = None, custom_id: Optional[str] = None
+    ):
         super().__init__()
         self.type = type
         self.callback: Optional[Callable[["Interaction", Any], Any]] = None

@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional, Union
+
 from .enums import ApplicationCommandOptionType, ChannelType
 
 
@@ -8,10 +9,7 @@ class Choice:
         self.value = value
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
-            "name": self.name,
-            "value": self.value
-        }
+        return {"name": self.name, "value": self.value}
 
 
 class Option:
@@ -69,7 +67,12 @@ class Option:
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        self = cls(name, description, required=required, kind=ApplicationCommandOptionType.string)
+        self = cls(
+            name,
+            description,
+            required=required,
+            kind=ApplicationCommandOptionType.string,
+        )
         self.max_length = max_length
         self.min_length = min_length
         self.choices = choices
@@ -88,7 +91,12 @@ class Option:
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        self = cls(name, description, required=required, kind=ApplicationCommandOptionType.integer)
+        self = cls(
+            name,
+            description,
+            required=required,
+            kind=ApplicationCommandOptionType.integer,
+        )
         self.max_value = max_value
         self.min_value = min_value
         self.choices = choices
@@ -107,7 +115,12 @@ class Option:
         choices: Optional[List[Choice]] = None,
         autocomplete: Optional[bool] = False,
     ):
-        self = cls(name, description, required=required, kind=ApplicationCommandOptionType.number)
+        self = cls(
+            name,
+            description,
+            required=required,
+            kind=ApplicationCommandOptionType.number,
+        )
         self.max_value = max_value
         self.min_value = min_value
         self.choices = choices
@@ -122,7 +135,12 @@ class Option:
         *,
         required: Optional[bool] = False,
     ):
-        return cls(name, description, required=required, kind=ApplicationCommandOptionType.boolean)
+        return cls(
+            name,
+            description,
+            required=required,
+            kind=ApplicationCommandOptionType.boolean,
+        )
 
     @classmethod
     def user(
@@ -132,7 +150,9 @@ class Option:
         *,
         required: Optional[bool] = False,
     ):
-        return cls(name, description, required=required, kind=ApplicationCommandOptionType.user)
+        return cls(
+            name, description, required=required, kind=ApplicationCommandOptionType.user
+        )
 
     @classmethod
     def channel(
@@ -143,7 +163,12 @@ class Option:
         required: Optional[bool] = False,
         types: Optional[List[ChannelType]] = None,
     ):
-        self = cls(name, description, required=required, kind=ApplicationCommandOptionType.channel)
+        self = cls(
+            name,
+            description,
+            required=required,
+            kind=ApplicationCommandOptionType.channel,
+        )
         self.channel_types = types
         return self
 
@@ -155,7 +180,9 @@ class Option:
         *,
         required: Optional[bool] = False,
     ):
-        return cls(name, description, required=required, kind=ApplicationCommandOptionType.role)
+        return cls(
+            name, description, required=required, kind=ApplicationCommandOptionType.role
+        )
 
     @classmethod
     def mentionable(
@@ -165,7 +192,12 @@ class Option:
         *,
         required: Optional[bool] = False,
     ):
-        return cls(name, description, required=required, kind=ApplicationCommandOptionType.mentionable)
+        return cls(
+            name,
+            description,
+            required=required,
+            kind=ApplicationCommandOptionType.mentionable,
+        )
 
     @classmethod
     def attachment(
@@ -175,17 +207,19 @@ class Option:
         *,
         required: Optional[bool] = False,
     ):
-        return cls(name, description, required=required, kind=ApplicationCommandOptionType.attachment)
+        return cls(
+            name,
+            description,
+            required=required,
+            kind=ApplicationCommandOptionType.attachment,
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         if self.choices:
             self.data["choices"] = [choice.to_dict() for choice in self.choices]
-        if (
-                self.kind in
-                (
-                    ApplicationCommandOptionType.integer,
-                    ApplicationCommandOptionType.number
-                )
+        if self.kind in (
+            ApplicationCommandOptionType.integer,
+            ApplicationCommandOptionType.number,
         ):
             if self.autocomplete is not None:
                 self.data["autocomplete"] = self.autocomplete

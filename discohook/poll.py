@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from .emoji import PartialEmoji
 from .enums import PollLayoutType
@@ -122,26 +122,30 @@ class Poll:
 
     @classmethod
     def new(
-            cls,
-            question: str,
-            *answers: PollAnswer,
-            expiry: Optional[int] = None,
-            allow_multiselect: bool = False,
-            layout: int = PollLayoutType.default,
+        cls,
+        question: str,
+        *answers: PollAnswer,
+        expiry: Optional[int] = None,
+        allow_multiselect: bool = False,
+        layout: int = PollLayoutType.default,
     ) -> "Poll":
         assert question, "Polls must have a question."
         assert len(question) <= 300, "Poll question must be less than 300 characters."
         assert len(answers) > 0, "Polls must have at least one answer."
         assert len(answers) <= 10, "Polls can have at most 10 answers."
         for answer in answers:
-            assert len(answer.media.text) <= 55, "Poll answer must be less than 55 characters."
-        return cls({
-            "question": PollMedia({"text": question}).to_dict(),
-            "answers": [ans.to_dict() for ans in answers],
-            "expiry": expiry,
-            "allow_multiselect": allow_multiselect,
-            "layout_type": layout,
-        })
+            assert (
+                len(answer.media.text) <= 55
+            ), "Poll answer must be less than 55 characters."
+        return cls(
+            {
+                "question": PollMedia({"text": question}).to_dict(),
+                "answers": [ans.to_dict() for ans in answers],
+                "expiry": expiry,
+                "allow_multiselect": allow_multiselect,
+                "layout_type": layout,
+            }
+        )
 
     @property
     def question(self) -> Optional[str]:
@@ -164,17 +168,23 @@ class Poll:
 
     @property
     def layout(self) -> PollLayoutType:
-        return PollLayoutType(self._data.get("layout_type", PollLayoutType.default.value))
+        return PollLayoutType(
+            self._data.get("layout_type", PollLayoutType.default.value)
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         self._data["duration"] = self._data.pop("expiry", None)
         return self._data
 
-    async def fetch_voters(self, answer_id: int, *, after: Optional[str] = None, limit: int = 25):
+    async def fetch_voters(
+        self, answer_id: int, *, after: Optional[str] = None, limit: int = 25
+    ):
         params = {"limit": limit}
         if after:
             params["after"] = after
-        return self._client.http.fetch_answer_voters(self._channel_id, self._message_id, answer_id, params=params)
+        return self._client.http.fetch_answer_voters(
+            self._channel_id, self._message_id, answer_id, params=params
+        )
 
     async def end(self):
         return self._client.http.end_poll(self._channel_id, self._message_id)

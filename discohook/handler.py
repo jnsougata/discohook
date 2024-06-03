@@ -8,9 +8,9 @@ from starlette.responses import JSONResponse, Response
 from .command import ApplicationCommand, ApplicationCommandOptionType
 from .enums import (
     ApplicationCommandType,
+    ComponentType,
     InteractionCallbackType,
     InteractionType,
-    ComponentType
 )
 from .errors import CheckFailure, UnknownInteractionType
 from .interaction import Interaction
@@ -53,13 +53,19 @@ async def _handler(request: Request):
         elif interaction.type == InteractionType.app_command:
             cmd: ApplicationCommand = request.app.commands.get(_build_key(interaction))
             if not cmd:
-                raise NotImplementedError(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
+                raise NotImplementedError(
+                    f"command `{interaction.data['name']}` ({interaction.data['id']}) not found"
+                )
             try:
                 if cmd.checks:
-                    results = await asyncio.gather(*[check(interaction) for check in cmd.checks])
+                    results = await asyncio.gather(
+                        *[check(interaction) for check in cmd.checks]
+                    )
                     for result in results:
                         if not isinstance(result, bool):
-                            raise CheckFailure(f"check returned {type(result)}, expected bool")
+                            raise CheckFailure(
+                                f"check returned {type(result)}, expected bool"
+                            )
                     if not all(results):
                         raise CheckFailure(f"command checks failed")
 
@@ -67,10 +73,13 @@ async def _handler(request: Request):
                     await cmd(interaction, build_context_menu_param(interaction))
 
                 elif interaction.data.get("options") and (
-                    interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand
+                    interaction.data["options"][0]["type"]
+                    == ApplicationCommandOptionType.subcommand
                 ):
                     subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
-                    args, kwargs = build_slash_command_params(subcommand.callback, interaction)
+                    args, kwargs = build_slash_command_params(
+                        subcommand.callback, interaction
+                    )
                     await subcommand(interaction, *args, **kwargs)
                 else:
                     args, kwargs = build_slash_command_params(cmd.callback, interaction)
@@ -83,20 +92,32 @@ async def _handler(request: Request):
         elif interaction.type == InteractionType.autocomplete:
             cmd: ApplicationCommand = request.app.commands.get(_build_key(interaction))
             if not cmd:
-                raise Exception(f"command `{interaction.data['name']}` ({interaction.data['id']}) not found")
-            if interaction.data["options"][0]["type"] == ApplicationCommandOptionType.subcommand:
+                raise Exception(
+                    f"command `{interaction.data['name']}` ({interaction.data['id']}) not found"
+                )
+            if (
+                interaction.data["options"][0]["type"]
+                == ApplicationCommandOptionType.subcommand
+            ):
                 subcommand = cmd.subcommands[interaction.data["options"][0]["name"]]
-                args, kwargs = build_slash_command_params(subcommand.autocompletion_handler, interaction)
+                args, kwargs = build_slash_command_params(
+                    subcommand.autocompletion_handler, interaction
+                )
                 await subcommand.autocompletion_handler(interaction, *args, **kwargs)
             elif not cmd.autocompletion_handler:
                 raise Exception(
                     f"command `{interaction.data['name']}` ({interaction.data['id']}) has no autocompletion handler"
                 )
             else:
-                args, kwargs = build_slash_command_params(cmd.autocompletion_handler, interaction)
+                args, kwargs = build_slash_command_params(
+                    cmd.autocompletion_handler, interaction
+                )
                 await cmd.autocompletion_handler(interaction, *args, **kwargs)
 
-        elif interaction.type in (InteractionType.component, InteractionType.modal_submit):
+        elif interaction.type in (
+            InteractionType.component,
+            InteractionType.modal_submit,
+        ):
             custom_id = interaction.data["custom_id"]
             if request.app._custom_id_parser:
                 custom_id = await request.app._custom_id_parser(interaction, custom_id)
@@ -105,10 +126,14 @@ async def _handler(request: Request):
                 raise NotImplementedError(f"component `{custom_id}` not found")
             try:
                 if component.checks:
-                    results = await asyncio.gather(*[check(interaction) for check in component.checks])
+                    results = await asyncio.gather(
+                        *[check(interaction) for check in component.checks]
+                    )
                     for result in results:
                         if not isinstance(result, bool):
-                            raise CheckFailure(f"check returned {type(result)}, expected bool")
+                            raise CheckFailure(
+                                f"check returned {type(result)}, expected bool"
+                            )
                     if not all(results):
                         raise CheckFailure("component checks failed")
 
@@ -116,7 +141,9 @@ async def _handler(request: Request):
                     if interaction.data["component_type"] == ComponentType.button:
                         await component(interaction)
                     else:
-                        await component(interaction, build_select_menu_values(interaction))
+                        await component(
+                            interaction, build_select_menu_values(interaction)
+                        )
                 elif interaction.type == InteractionType.modal_submit:
                     args, kwargs = build_modal_params(component.callback, interaction)
                     await component(interaction, *args, **kwargs)
