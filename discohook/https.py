@@ -250,3 +250,11 @@ class HTTPClient:
         return await self.request(
             "POST",
             f"/channels/{channel_id}/messages/{message_id}/threads", json=payload, authorize=True, reason=reason)
+
+    async def fetch_answer_voters(
+            self, channel_id: str, message_id: str, answer_id: int, *, params: Dict[str, Any] = None):
+        return await self.request(
+            "GET", f"/channels/{channel_id}/polls/{message_id}/answers/{answer_id}", params=params, authorize=True)
+
+    async def end_poll(self, channel_id: str, message_id: str):
+        return await self.request("POST", f"/channels/{channel_id}/polls/{message_id}/expire", authorize=True)

@@ -148,3 +148,17 @@ async def translate(i: discohook.Interaction, message: discohook.Message):
     data = json.loads(urlopen(req).read())
     texts = [part["text"] for part in data["candidates"][0]["content"]["parts"]]
     await i.response.followup(" ".join(texts), ephemeral=True)
+
+
+@discohook.command.slash(contexts=[discohook.InteractionContextType.guild])
+async def poll(i: discohook.Interaction):
+    """
+    Creates poll to vote on favorite color.
+    """
+    p = discohook.Poll.new(
+        "What is your favorite color?",
+        discohook.PollAnswer.new(1, "Red"),
+        discohook.PollAnswer.new(1, "Green"),
+        discohook.PollAnswer.new(3, "Blue")
+    )
+    await i.response.send(poll=p)

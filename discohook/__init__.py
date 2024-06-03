@@ -33,6 +33,7 @@ from .modal import Modal, TextInput
 from .models import AllowedMentions, MessageReference
 from .option import Choice, Option
 from .permission import Permission
+from .poll import Poll, PollMedia, PollLayoutType, PollAnswer
 from .role import PartialRole, Role
 from .select import Select, SelectOption
 from .user import User

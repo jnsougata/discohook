@@ -1,14 +1,15 @@
 from typing import TYPE_CHECKING, Optional, List, Union, Any, Dict
 
 from .embed import Embed
-from .errors import InteractionTypeMismatch
 from .enums import InteractionCallbackType, InteractionType
+from .errors import InteractionTypeMismatch
 from .file import File
 from .message import Message
 from .modal import Modal
 from .models import AllowedMentions
 from .option import Choice
 from .params import MISSING, _EditingPayload, _SendingPayload
+from .poll import Poll
 from .view import View
 
 if TYPE_CHECKING:
@@ -153,6 +154,8 @@ class ResponseAdapter:
         allowed_mentions: Optional[AllowedMentions] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
+            poll: Optional[Poll] = None
+
     ) -> InteractionResponse:
         """
         Sends a response to the interaction
@@ -179,6 +182,8 @@ class ResponseAdapter:
             Whether the message should be ephemeral or not
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed or not
+        poll: Optional[Poll]
+            The poll to send with the message
 
         Returns
         -------
@@ -195,6 +200,7 @@ class ResponseAdapter:
             ephemeral=ephemeral,
             suppress_embeds=suppress_embeds,
             allowed_mentions=allowed_mentions,
+            poll=poll
         )
         if view:
             self.inter.client.load_view(view)
@@ -216,8 +222,8 @@ class ResponseAdapter:
         -------
         InteractionResponse
         """
-        if self.inter.kind not in (InteractionType.component, InteractionType.app_command):
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
+        if self.inter.type not in (InteractionType.component, InteractionType.app_command):
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         self.inter.client.active_components[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
@@ -236,8 +242,8 @@ class ResponseAdapter:
         choices: List[Choice]
             The choices to send
         """
-        if self.inter.kind != InteractionType.autocomplete:
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
+        if self.inter.type != InteractionType.autocomplete:
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         choices = choices[:25]
         payload = {"type": InteractionCallbackType.autocomplete, "data": {"choices": [i.to_dict() for i in choices]}}
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
@@ -257,19 +263,19 @@ class ResponseAdapter:
             (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
         """
         payload = {}
-        if self.inter.kind is InteractionType.component or self.inter.kind is InteractionType.modal_submit:
+        if self.inter.type is InteractionType.component or self.inter.type is InteractionType.modal_submit:
             if thinking:
                 payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
                 if ephemeral:
                     payload["data"] = {"flags": 64}
             else:
                 payload["type"] = InteractionCallbackType.deferred_update_component_message
-        elif self.inter.kind == InteractionType.app_command:
+        elif self.inter.type == InteractionType.app_command:
             payload["type"] = InteractionCallbackType.deferred_channel_message_with_source
             if ephemeral:
                 payload["data"] = {"flags": 64}
         else:
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
 
         await self.inter.client.http.send_interaction_callback(self.inter.id, self.inter.token, payload)
         self.inter._responded = True
@@ -280,8 +286,8 @@ class ResponseAdapter:
         Prompts the user that a premium purchase is required for this interaction
         This method is only available for applications with a premium SKU set up
         """
-        if self.inter.kind == InteractionType.autocomplete:
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
+        if self.inter.type == InteractionType.autocomplete:
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
         payload = {
             "data": {},
             "type": InteractionCallbackType.premium_required,
@@ -329,8 +335,8 @@ class ResponseAdapter:
         -------
         InteractionResponse
         """
-        if not (self.inter.kind == InteractionType.component or self.inter.kind == InteractionType.modal_submit):
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.kind}")
+        if not (self.inter.type == InteractionType.component or self.inter.type == InteractionType.modal_submit):
+            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
 
         payload = _EditingPayload(
             content=content,
@@ -362,6 +368,7 @@ class ResponseAdapter:
         allowed_mentions: Optional[AllowedMentions] = None,
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
+            poll: Optional[Poll] = None,
     ) -> FollowupResponse:
         """
         Sends a follow-up message to a deferred interaction
@@ -388,6 +395,8 @@ class ResponseAdapter:
             Whether the message should be ephemeral or not
         suppress_embeds: Optional[bool]
             Whether the message should suppress embeds or not
+        poll: Optional[Poll]
+            The poll to send with the message
         """
         payload = _SendingPayload(
             content=content,
@@ -400,6 +409,7 @@ class ResponseAdapter:
             ephemeral=ephemeral,
             suppress_embeds=suppress_embeds,
             allowed_mentions=allowed_mentions,
+            poll=poll
         )
         if view:
             self.inter.client.load_view(view)

@@ -8,6 +8,7 @@ from .emoji import PartialEmoji
 from .file import File
 from .models import AllowedMentions, MessageReference
 from .params import MISSING, _EditingPayload, _SendingPayload
+from .poll import Poll
 from .role import Role
 from .user import User
 from .view import View
@@ -151,6 +152,13 @@ class Message:
         return [Attachment(x) for x in attachments]
 
     @property
+    def poll(self) -> Optional[Poll]:
+        poll = self.data.get("poll")
+        if not poll:
+            return
+        return Poll._from_message(self.client, self)  # noqa
+
+    @property
     def embeds(self) -> Optional[List[Embed]]:
         embeds = self.data.get("embeds")
         if not embeds:
@@ -275,7 +283,7 @@ class Message:
             suppress_embeds=suppress_embeds,
         )
         if view and view is not MISSING:
-            self.client.load_components(view)
+            self.client.load_view(view)
         resp = await self.client.http.edit_channel_message(self.channel_id, self.id, payload.to_form())
         return Message(self.client, await resp.json())
 
@@ -303,6 +311,7 @@ class Message:
         files: Optional[List[File]] = None,
         allowed_mentions: Optional[AllowedMentions] = None,
         mention_author: Optional[bool] = None,
+            poll: Optional[Poll] = None
     ):
         """
         Replies to the message.
@@ -327,6 +336,8 @@ class Message:
             The allowed mentions for the message.
         mention_author: Optional[bool]
             Whether the author should be mentioned.
+        poll: Optional[Poll]
+            The poll to send with the message.
 
         Returns
         -------
@@ -345,10 +356,11 @@ class Message:
             file=file,
             files=files,
             allowed_mentions=allowed_mentions,
-            message_reference=MessageReference(message_id=self.id, channel_id=self.channel_id)
+            message_reference=MessageReference(message_id=self.id, channel_id=self.channel_id),
+            poll=poll
         )
         if view and view is not MISSING:
-            self.client.load_components(view)
+            self.client.load_view(view)
         resp = await self.client.http.send_message(self.channel_id, payload.to_form())
         return Message(self.client, await resp.json())
 

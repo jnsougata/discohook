@@ -15,7 +15,8 @@ __all__ = (
     "try_enum",
     "SelectDefaultValueType",
     "InteractionContextType",
-    "ApplicationIntegrationType"
+    "ApplicationIntegrationType",
+    "PollLayoutType"
 )
 
 
@@ -280,3 +281,16 @@ class ApplicationIntegrationType(int, Enum):
     """
     guild = 0
     user = 1
+
+
+class PollLayoutType(int, Enum):
+    """
+    The type of layout for a poll.
+
+    Attributes
+    ----------
+    default: :class:`int`
+        Used to specify the default layout.
+    """
+
+    default = 1

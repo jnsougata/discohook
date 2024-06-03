@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
+from .adapter import ResponseAdapter
 from .channel import PartialChannel
 from .enums import InteractionType, try_enum, InteractionContextType
 from .guild import PartialGuild
 from .member import Member
 from .message import Message
-from .adapter import ResponseAdapter
 from .user import User
 from .utils import snowflake_time, unwrap_user
 
@@ -100,7 +100,7 @@ class Interaction:
         return self.payload["id"]
 
     @property
-    def kind(self) -> Optional[InteractionType]:
+    def type(self) -> Optional[InteractionType]:
         """
         The type of the interaction
 
