@@ -155,7 +155,6 @@ class ResponseAdapter:
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
             poll: Optional[Poll] = None
-
     ) -> InteractionResponse:
         """
         Sends a response to the interaction

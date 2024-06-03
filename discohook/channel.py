@@ -9,6 +9,7 @@ from .file import File
 from .message import Message
 from .models import AllowedMentions, MessageReference
 from .params import _SendingPayload
+from .poll import Poll
 from .view import View
 
 if TYPE_CHECKING:
@@ -58,6 +59,7 @@ class PartialChannel:
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
+            poll: Optional[Poll] = None,
         allowed_mentions: Optional[AllowedMentions] = None,
         message_reference: Optional[MessageReference] = None,
     ):
@@ -80,13 +82,15 @@ class PartialChannel:
             A file to send with the message.
         files: Optional[List[File]]
             A list of files to send with the message.
+        poll: Optional[:class:`Poll`]
+            The poll to send with the message.
         allowed_mentions: Optional[:class:`AllowedMentions`]
             The allowed mentions for the message.
         message_reference: Optional[:class:`MessageReference`]
             The message reference for the message.
         """
         if view:
-            self.client.load_components(view)
+            self.client.load_view(view)
 
         payload = _SendingPayload(
             content=content,
@@ -96,6 +100,7 @@ class PartialChannel:
             tts=tts,
             file=file,
             files=files,
+            poll=poll,
             allowed_mentions=allowed_mentions,
             message_reference=message_reference,
         )

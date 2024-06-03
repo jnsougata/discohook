@@ -11,6 +11,13 @@ if TYPE_CHECKING:
 class PollMedia:
     """
     The question of the poll. Only text is supported.
+
+    Properties
+    ----------
+    text: Optional[:class:`str`]
+        The text of the media.
+    emoji: Optional[:class:`PartialEmoji`]
+        The emoji of the media.
     """
 
     def __init__(self, data: Dict[str, Any]):
@@ -50,6 +57,21 @@ class PollAnswer:
 
     @classmethod
     def new(cls, answer_id: int, media: Union[str, PollMedia]) -> "PollAnswer":
+        """
+        Create a new poll answer.
+        Parameters
+        ----------
+        answer_id: :class:`int`
+            The ID of the answer.
+        media: Union[:class:`str`, :class:`PollMedia`]
+            The media of the answer.
+
+        Returns
+        -------
+        :class:`PollAnswer`
+            The newly created poll answer.
+
+        """
         if isinstance(media, str):
             media = PollMedia.from_str(media)
         return cls({"answer": answer_id, "poll_media": media.to_dict()})

@@ -18,6 +18,7 @@ from .help import _help
 from .https import HTTPClient
 from .interaction import Interaction
 from .message import Message
+from .poll import Poll
 from .user import User
 from .utils import compare_password
 from .view import View
@@ -257,6 +258,7 @@ class Client(Starlette):
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
         view: Optional[View] = None,
+            poll: Optional[Poll] = None,
     ) -> Message:
         """
         Send a message to a channel using the ID of the channel.
@@ -279,6 +281,8 @@ class Client(Starlette):
             A list of files to be sent with message.
         view: Optional[View]
             The view to send with the message.
+        poll: Optional[Poll]
+            The poll to send with the message.
 
         Returns
         -------
@@ -296,7 +300,7 @@ class Client(Starlette):
             file=file,
             files=files,
             view=view,
-
+            poll=poll,
         )
 
     async def me(self) -> User:
