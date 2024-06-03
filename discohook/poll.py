@@ -89,6 +89,33 @@ class PollAnswer:
         return self._data
 
 
+class PollAnswerCount:
+    """
+    Represents the count of an answer in a poll.
+
+    Properties
+    ----------
+    answer_id: :class:`int`
+        The ID of the answer.
+    count: :class:`int`
+        The count of the answer.
+    """
+
+    def __init__(self, data: Dict[str, Any]):
+        self._data = data
+
+    @property
+    def answer_id(self) -> int:
+        return self._data["answer_id"]
+
+    @property
+    def count(self) -> int:
+        return self._data["count"]
+
+    def me_voted(self) -> bool:
+        return self._data["me_voted"]
+
+
 class Poll:
     """
     A poll object.
@@ -172,6 +199,18 @@ class Poll:
         return PollLayoutType(
             self._data.get("layout_type", PollLayoutType.default.value)
         )
+
+    @property
+    def is_finalized(self) -> bool:
+        return self._data.get("is_finalized", False)
+
+    @property
+    def answer_counts(self) -> Optional[List[PollAnswerCount]]:
+
+        counts = self._data.get("answer_counts")
+        if counts is None:
+            return None
+        return [PollAnswerCount(data) for data in counts]
 
     def to_dict(self) -> Dict[str, Any]:
         self._data["duration"] = self._data.pop("expiry", None)
