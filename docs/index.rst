@@ -85,6 +85,10 @@ Documentation
    :members:
    :show-inheritance:
 
+.. autoclass:: discohook.Poll
+   :members:
+   :show-inheritance:
+
 .. autoclass:: discohook.FollowupResponse
    :members:
    :show-inheritance:

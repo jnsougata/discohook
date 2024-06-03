@@ -141,7 +141,7 @@ class Poll:
         self._client = None
 
     @classmethod
-    def _from_message(cls, client: "Client", message: Message) -> "Poll":
+    def _from_message(cls, client: "Client", message: "Message") -> "Poll":
         poll = message.poll
         poll._message_id = message.id
         poll._channel_id = message.channel_id
