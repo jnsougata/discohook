@@ -14,11 +14,9 @@ with open('../discohook/__init__.py') as f:
 
 release = version
 
-
 templates_path = ['_templates']
 exclude_patterns = []
 
 html_theme = 'furo'
-html_static_path = ['_static']
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.napoleon']
