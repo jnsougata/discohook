@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from .emoji import PartialEmoji
 from .enums import PollLayoutType
+from .user import User
 
 if TYPE_CHECKING:
     from .client import Client
@@ -122,12 +123,12 @@ class Poll:
 
     @classmethod
     def new(
-        cls,
-        question: str,
-        *answers: PollAnswer,
-        expiry: Optional[int] = None,
-        allow_multiselect: bool = False,
-        layout: int = PollLayoutType.default,
+            cls,
+            question: str,
+            *answers: PollAnswer,
+            expiry: Optional[int] = None,
+            allow_multiselect: bool = False,
+            layout: int = PollLayoutType.default,
     ) -> "Poll":
         assert question, "Polls must have a question."
         assert len(question) <= 300, "Poll question must be less than 300 characters."
@@ -135,7 +136,7 @@ class Poll:
         assert len(answers) <= 10, "Polls can have at most 10 answers."
         for answer in answers:
             assert (
-                len(answer.media.text) <= 55
+                    len(answer.media.text) <= 55
             ), "Poll answer must be less than 55 characters."
         return cls(
             {
@@ -177,14 +178,39 @@ class Poll:
         return self._data
 
     async def fetch_voters(
-        self, answer_id: int, *, after: Optional[str] = None, limit: int = 25
-    ):
+            self, answer_id: int, *, after: Optional[str] = None, limit: int = 25
+    ) -> List[User]:
+        """
+        Fetch the voters of an answer with pagination.
+        Parameters
+        ----------
+        answer_id: :class:`int`
+            The ID of the answer.
+        after: Optional[:class:`str`]
+            The ID of the last user fetched.
+        limit: :class:`int`
+            The number of users to fetch. Maximum is 100.
+
+        Returns
+        -------
+        List[:class:`User`]
+        """
+
+        limit = limit if limit <= 100 else 100
         params = {"limit": limit}
         if after:
             params["after"] = after
-        return self._client.http.fetch_answer_voters(
+        resp = await self._client.http.fetch_answer_voters(
             self._channel_id, self._message_id, answer_id, params=params
         )
+        voters = await resp.json()
+        return [User(self._client, data) for data in voters]
 
     async def end(self):
-        return self._client.http.end_poll(self._channel_id, self._message_id)
+        """
+        End the poll.
+        Returns
+        -------
+
+        """
+        return await self._client.http.end_poll(self._channel_id, self._message_id)
