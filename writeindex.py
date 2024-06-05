@@ -1,15 +1,10 @@
-import os
-
 import discohook
 
 classes = [i for i in dir(discohook) if i[0].isupper()]
 
-with open("./index.rst", "w") as f:
-    block = (f"Documentation"
-             f"\n============="
+with open("./docs/index.rst", "w") as f:
+    block = (f".. automodule:: discohook"
              f"\n"
-             f"\n"
-             f".. automodule:: discohook"
              f"\n"
              f"\n")
     templ = ("\n.. autoclass:: discohook.{0}"
@@ -27,5 +22,3 @@ with open("./index.rst", "w") as f:
              f"\n* :ref:`search`"
              f"\n")
     f.write(block)
-
-os.system("make html")
