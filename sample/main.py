@@ -1,10 +1,9 @@
 import os
 
-from commands import (_exec, avatar, color, delete_button, poll, purge,
-                      regenerate_button, translate)
-from debugger import send_error
-
 import discohook
+from commands import (_exec, avatar, color, delete_button, poll, purge,
+                      regenerate_button, translate, end_poll)
+from debugger import send_error
 
 PASSWORD = os.environ["PASSWORD"]
 PUBLIC_KEY = os.environ["PUBLIC_KEY"]
@@ -22,4 +21,4 @@ app = discohook.Client(
 app.on_interaction_error()(send_error)
 app.preload("regenerate")(regenerate_button)
 app.preload("delete")(delete_button)
-app.add_commands(color, purge, avatar, _exec, translate, poll)
+app.add_commands(color, purge, avatar, _exec, translate, poll, end_poll)

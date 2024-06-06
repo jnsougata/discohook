@@ -28,12 +28,12 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
 @discohook.command.slash(
     integration_types=[
         discohook.ApplicationIntegrationType.user,
-        discohook.ApplicationIntegrationType.guild
+        discohook.ApplicationIntegrationType.guild,
     ],
     contexts=[
         discohook.InteractionContextType.guild,
         discohook.InteractionContextType.bot_dm,
-        discohook.InteractionContextType.private_channel
+        discohook.InteractionContextType.private_channel,
     ],
 )
 async def color(i: discohook.Interaction):
@@ -50,10 +50,10 @@ async def color(i: discohook.Interaction):
             "The number of messages to purge.",
             required=True,
             max_value=100,
-            min_value=2
+            min_value=2,
         )
     ],
-    permissions=[discohook.Permission.manage_messages]
+    permissions=[discohook.Permission.manage_messages],
 )
 async def purge(i: discohook.Interaction, limit: int):
     """Purge messages from the channel."""
@@ -89,7 +89,10 @@ async def exec_and_respond(i: discohook.Interaction, content: str):
     orig = sys.stdout
     sys.stdout = stdout = StringIO()
     try:
-        exec(f'async def _a_exec(): ' + "".join(f"\n {line}" for line in code.group(1).split("\n")))
+        exec(
+            f"async def _a_exec(): "
+            + "".join(f"\n {line}" for line in code.group(1).split("\n"))
+        )
         await locals()["_a_exec"]()
         sys.stdout = orig
     except Exception as err:
@@ -115,19 +118,21 @@ async def _exec(i: discohook.Interaction, message: discohook.Message):
     "Translate [EN]",
     integration_types=[
         discohook.ApplicationIntegrationType.user,
-        discohook.ApplicationIntegrationType.guild
+        discohook.ApplicationIntegrationType.guild,
     ],
     contexts=[
         discohook.InteractionContextType.guild,
         discohook.InteractionContextType.bot_dm,
-        discohook.InteractionContextType.private_channel
-    ]
+        discohook.InteractionContextType.private_channel,
+    ],
 )
 async def translate(i: discohook.Interaction, message: discohook.Message):
     """Translate a text to English."""
     await i.response.defer(ephemeral=True)
     if not message.content:
-        return await i.response.followup("Failed: Message doesn't have any text content :/", ephemeral=True)
+        return await i.response.followup(
+            "Failed: Message doesn't have any text content :/", ephemeral=True
+        )
 
     import json
     import os
@@ -140,10 +145,20 @@ async def translate(i: discohook.Interaction, message: discohook.Message):
     req = Request(
         url,
         method="POST",
-        data=json.dumps({
-            "contents": [{"parts": [{"text": f"Translate the following text message to en-us:\n{message.content}"}]}]}
+        data=json.dumps(
+            {
+                "contents": [
+                    {
+                        "parts": [
+                            {
+                                "text": f"Translate the following text message to en-us:\n{message.content}"
+                            }
+                        ]
+                    }
+                ]
+            }
         ).encode(),
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json"},
     )
     data = json.loads(urlopen(req).read())
     texts = [part["text"] for part in data["candidates"][0]["content"]["parts"]]
@@ -159,6 +174,22 @@ async def poll(i: discohook.Interaction):
         "What is your favorite color?",
         discohook.PollAnswer.new(1, "Red"),
         discohook.PollAnswer.new(1, "Green"),
-        discohook.PollAnswer.new(3, "Blue")
+        discohook.PollAnswer.new(3, "Blue"),
     )
     await i.response.send(poll=p)
+
+
+@discohook.command.message(
+    name="End Poll", contexts=[discohook.InteractionContextType.guild]
+)
+async def end_poll(i: discohook.Interaction, message: discohook.Message):
+    await i.response.defer(ephemeral=True)
+    if message.poll:
+        await message.poll.end()
+        voters = await message.poll.fetch_voters(2)
+        embed = discohook.Embed("Poll Ended")
+        embed.title = "Result"
+        embed.description = f"```py\n{voters}\n```"
+        await i.response.followup(embed=embed, ephemeral=True)
+    else:
+        await i.response.followup("No poll to end.")

@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+import asyncio
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, Tuple
 
 from .emoji import PartialEmoji
 from .enums import PollLayoutType
@@ -78,7 +79,7 @@ class PollAnswer:
         return cls({"answer": answer_id, "poll_media": media.to_dict()})
 
     @property
-    def answer_id(self) -> int:
+    def id(self) -> int:
         return self._data["answer_id"]
 
     @property
@@ -142,20 +143,21 @@ class Poll:
 
     @classmethod
     def _from_message(cls, client: "Client", message: "Message") -> "Poll":
-        poll = message.poll
+        data = message.data["poll"]
+        poll = cls(data)
+        poll._client = client
         poll._message_id = message.id
         poll._channel_id = message.channel_id
-        poll._client = client
         return poll
 
     @classmethod
     def new(
-            cls,
-            question: str,
-            *answers: PollAnswer,
-            expiry: Optional[int] = None,
-            allow_multiselect: bool = False,
-            layout: int = PollLayoutType.default,
+        cls,
+        question: str,
+        *answers: PollAnswer,
+        expiry: Optional[int] = None,
+        allow_multiselect: bool = False,
+        layout: int = PollLayoutType.default
     ) -> "Poll":
         assert question, "Polls must have a question."
         assert len(question) <= 300, "Poll question must be less than 300 characters."
@@ -163,11 +165,11 @@ class Poll:
         assert len(answers) <= 10, "Polls can have at most 10 answers."
         for answer in answers:
             assert (
-                    len(answer.media.text) <= 55
+                len(answer.media.text) <= 55
             ), "Poll answer must be less than 55 characters."
         return cls(
             {
-                "question": PollMedia({"text": question}).to_dict(),
+                "question": {"text": question},
                 "answers": [ans.to_dict() for ans in answers],
                 "expiry": expiry,
                 "allow_multiselect": allow_multiselect,
@@ -216,8 +218,38 @@ class Poll:
         self._data["duration"] = self._data.pop("expiry", None)
         return self._data
 
+    async def __fetch_voters(
+        self, answer_id: int, *, after: Optional[str] = None, limit: int = 25
+    ) -> Tuple[int, List[User]]:
+        limit = limit if limit <= 100 else 100
+        params = {"limit": limit}
+        assert (
+            self._channel_id and self._message_id and self._client
+        ), "Only polls fetched from a message can fetch voters."
+        if after:
+            params["after"] = after
+        resp = await self._client.http.fetch_answer_voters(
+            self._channel_id, self._message_id, answer_id, params=params
+        )
+        voters = await resp.json()
+        return answer_id, [User(self._client, data) for data in voters]
+
+    async def fetch_all_voters(self) -> Dict[int, List[User]]:
+        """
+        Fetch all the answers of the poll.
+        Returns
+        -------
+        Dict[:class:`int`, List[:class:`User`]]
+        """
+        answers_ids = [ans.id for ans in self.answers]
+        tasks = []
+        for id in answers_ids:
+            tasks.append(self.__fetch_voters(id))
+        voters = asyncio.gather(*tasks)
+        return dict(voters)
+
     async def fetch_voters(
-            self, answer_id: int, *, after: Optional[str] = None, limit: int = 25
+        self, answer_id: int, *, after: Optional[str] = None, limit: int = 25
     ) -> List[User]:
         """
         Fetch the voters of an answer with pagination.
@@ -234,22 +266,11 @@ class Poll:
         -------
         List[:class:`User`]
         """
-
-        limit = limit if limit <= 100 else 100
-        params = {"limit": limit}
-        if after:
-            params["after"] = after
-        resp = await self._client.http.fetch_answer_voters(
-            self._channel_id, self._message_id, answer_id, params=params
-        )
-        voters = await resp.json()
-        return [User(self._client, data) for data in voters]
+        _, users = self.__fetch_voters(answer_id, after=after, limit=limit)
+        return users
 
     async def end(self):
         """
-        End the poll.
-        Returns
-        -------
-
+        Ends the poll.
         """
         return await self._client.http.end_poll(self._channel_id, self._message_id)
