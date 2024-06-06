@@ -429,9 +429,9 @@ class Channel(PartialChannel):
     thread_metadata: Optional[:class:`dict`]
         The thread metadata of the channel.
     member: Optional[:class:`dict`]
-        The member of the channel.Appears in thread channels.
+        The member of the channel. Appears in thread channels.
     default_auto_archive_duration: Optional[:class:`int`]
-        The default auto archive duration of the channel.Appears in thread channels.
+        The default auto archive duration of the channel. Appears in thread channels.
     permissions: Optional[:class:`str`]
         The permissions of the channel.
     flags: Optional[:class:`int`]
@@ -439,11 +439,11 @@ class Channel(PartialChannel):
     total_message_sent: Optional[:class:`int`]
         The total message sent of the channel.
     available_tags: Optional[List[:class:`str`]]
-        A list of available tags of the channel.Appears in thread channels.
+        A list of available tags of the channel. Appears in thread channels.
     default_reaction_emoji: Optional[:class:`dict`]
-        The default reaction emoji of the channel.Appears in thread channels.
+        The default reaction emoji of the channel. Appears in thread channels.
     default_thread_rate_limit_per_user: Optional[:class:`int`]
-        The default rate limit per user of the channel.Appears in thread channels.
+        The default rate limit per user of the channel. Appears in thread channels.
     default_sort_order: Optional[:class:`int`]
         The default sort order of the channel.Appears in forum channels.
     default_forum_layout: Optional[:class:`int`]

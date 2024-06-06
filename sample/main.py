@@ -1,8 +1,17 @@
 import os
 
 import discohook
-from commands import (_exec, avatar, color, delete_button, poll, purge,
-                      regenerate_button, translate, end_poll)
+from commands import (
+    _exec,
+    avatar,
+    color,
+    delete_button,
+    poll,
+    purge,
+    regenerate_button,
+    translate,
+    end_poll,
+)
 from debugger import send_error
 
 PASSWORD = os.environ["PASSWORD"]
