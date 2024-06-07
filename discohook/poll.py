@@ -245,7 +245,7 @@ class Poll:
         tasks = []
         for id in answers_ids:
             tasks.append(self.__fetch_voters(id))
-        voters = asyncio.gather(*tasks)
+        voters = await asyncio.gather(*tasks)
         return dict(voters)
 
     async def fetch_voters(

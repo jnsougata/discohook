@@ -180,16 +180,22 @@ async def poll(i: discohook.Interaction):
 
 
 @discohook.command.message(
-    name="End Poll", contexts=[discohook.InteractionContextType.guild]
+    name="Fetch Votes", contexts=[discohook.InteractionContextType.guild]
 )
-async def end_poll(i: discohook.Interaction, message: discohook.Message):
+async def fetch_votes(i: discohook.Interaction, message: discohook.Message):
     await i.response.defer(ephemeral=True)
-    if message.poll:
-        await message.poll.end()
-        voters = await message.poll.fetch_voters(2)
+    if message.poll and message.poll.is_finalized:
+        voters = await message.poll.fetch_all_voters()
         embed = discohook.Embed("Poll Ended")
         embed.title = "Result"
         embed.description = f"```py\n{voters}\n```"
-        await i.response.followup(embed=embed, ephemeral=True)
+        await i.response.followup(embed=embed)
+    elif message.poll:
+        await message.poll.end()
+        voters = await message.poll.fetch_all_voters()
+        embed = discohook.Embed("Poll Ended")
+        embed.title = "Result"
+        embed.description = f"```py\n{voters}\n```"
+        await i.response.followup(embed=embed)
     else:
         await i.response.followup("No poll to end.")

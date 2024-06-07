@@ -10,7 +10,7 @@ from commands import (
     purge,
     regenerate_button,
     translate,
-    end_poll,
+    fetch_votes,
 )
 from debugger import send_error
 
@@ -30,4 +30,4 @@ app = discohook.Client(
 app.on_interaction_error()(send_error)
 app.preload("regenerate")(regenerate_button)
 app.preload("delete")(delete_button)
-app.add_commands(color, purge, avatar, _exec, translate, poll, end_poll)
+app.add_commands(color, purge, avatar, _exec, translate, poll, fetch_votes)
