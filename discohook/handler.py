@@ -43,11 +43,13 @@ async def _handler(request: Request):
     try:
         VerifyKey(public_key).verify(message, signature)
     except BadSignatureError:
+        await request.app.http.session.close()
         return Response(content="BadSignature", status_code=401)
     data = await request.json()
     interaction = Interaction(request.app, data)
     try:
         if interaction.type == InteractionType.ping:
+            await request.app.http.session.close()
             return JSONResponse({"type": InteractionCallbackType.pong}, status_code=200)
 
         elif interaction.type == InteractionType.app_command:
@@ -156,8 +158,10 @@ async def _handler(request: Request):
     except Exception as e:
         if request.app._interaction_error_handler:
             await request.app._interaction_error_handler(interaction, e)
+            await request.app.http.session.close()
             return Response(status_code=500)
         else:
             raise e from None
     else:
+        await request.app.http.session.close()
         return Response(status_code=200)

@@ -1,3 +1,5 @@
+from typing import Any
+
 import aiohttp
 
 
@@ -28,7 +30,7 @@ class UnknownInteractionType(Exception):
 class HTTPException(Exception):
     """Raised when an HTTP request operation fails."""
 
-    def __init__(self, resp: aiohttp.ClientResponse, message: str):
+    def __init__(self, resp: aiohttp.ClientResponse, data: Any):
         self.resp = resp
-        self.message = message
+        message = f"[{resp.method}] {resp.url.path} {resp.status} with code({data['code']}): {data['message']}"
         super().__init__(message)

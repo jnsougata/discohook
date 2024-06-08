@@ -49,18 +49,14 @@ class HTTPClient:
             json=json,
         )
         if resp.status >= 400:
-            if resp.headers.get("content-type") == "application/json":
-                text = await resp.json()
-            else:
-                text = await resp.text()
-            raise HTTPException(resp, text)
+            raise HTTPException(resp, await resp.json())
         return resp
 
     async def fetch_application(self):
         return await self.request("GET", "/applications/@me", authorize=True)
 
     async def sync_global_commands(
-            self, application_id: str, commands: List[Dict[str, Any]]
+        self, application_id: str, commands: List[Dict[str, Any]]
     ):
         return await self.request(
             "PUT",
@@ -70,7 +66,7 @@ class HTTPClient:
         )
 
     async def sync_guild_commands(
-            self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]
+        self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]
     ):
         return await self.request(
             "PUT",
@@ -88,7 +84,7 @@ class HTTPClient:
         return await self.request("PATCH", "/users/@me", json=payload, authorize=True)
 
     async def delete_command(
-            self, application_id: str, command_id: str, guild_id: Optional[str] = None
+        self, application_id: str, command_id: str, guild_id: Optional[str] = None
     ):
         if guild_id:
             return await self.request(
@@ -154,7 +150,7 @@ class HTTPClient:
         )
 
     async def edit_channel_message(
-            self, channel_id: str, message_id: str, form: aiohttp.MultipartWriter
+        self, channel_id: str, message_id: str, form: aiohttp.MultipartWriter
     ):
         return await self.request(
             "PATCH",
@@ -164,25 +160,25 @@ class HTTPClient:
         )
 
     async def send_webhook_message(
-            self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter
+        self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter
     ):
         return await self.request(
             "POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form
         )
 
     async def delete_webhook_message(
-            self, webhook_id: str, webhook_token: str, message_id: str
+        self, webhook_id: str, webhook_token: str, message_id: str
     ):
         await self.request(
             "DELETE", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"
         )
 
     async def edit_webhook_message(
-            self,
-            webhook_id: str,
-            webhook_token: str,
-            message_id: str,
-            form: aiohttp.MultipartWriter,
+        self,
+        webhook_id: str,
+        webhook_token: str,
+        message_id: str,
+        form: aiohttp.MultipartWriter,
     ):
         return await self.request(
             "PATCH",
@@ -196,7 +192,7 @@ class HTTPClient:
         )
 
     async def add_role(
-            self, guild_id: str, user_id: str, role_id: str, *, reason: Optional[str] = None
+        self, guild_id: str, user_id: str, role_id: str, *, reason: Optional[str] = None
     ):
         return await self.request(
             "PUT",
@@ -221,7 +217,7 @@ class HTTPClient:
         )
 
     async def ban_user(
-            self, guild_id: str, user_id: str, delete_message_seconds: int = 0
+        self, guild_id: str, user_id: str, delete_message_seconds: int = 0
     ):
         return await self.request(
             "PUT",
@@ -231,7 +227,7 @@ class HTTPClient:
         )
 
     async def send_interaction_callback(
-            self, interaction_id: str, interaction_token: str, data: dict
+        self, interaction_id: str, interaction_token: str, data: dict
     ):
         return await self.request(
             "POST",
@@ -297,7 +293,7 @@ class HTTPClient:
         )
 
     async def edit_guild_role(
-            self, guild_id: str, role_id: str, payload: Dict[str, Any]
+        self, guild_id: str, role_id: str, payload: Dict[str, Any]
     ):
         return await self.request(
             "PATCH", f"/guilds/{guild_id}/roles/{role_id}", json=payload, authorize=True
@@ -314,11 +310,11 @@ class HTTPClient:
         )
 
     async def execute_webhook(
-            self,
-            webhook_id: str,
-            webhook_token: str,
-            form: aiohttp.MultipartWriter,
-            params: Dict[str, Any],
+        self,
+        webhook_id: str,
+        webhook_token: str,
+        form: aiohttp.MultipartWriter,
+        params: Dict[str, Any],
     ):
         return await self.request(
             "POST", f"/webhooks/{webhook_id}/{webhook_token}", form=form, params=params
@@ -338,7 +334,7 @@ class HTTPClient:
         return await self.request("DELETE", f"/webhooks/{webhook_id}", authorize=True)
 
     async def create_message_reaction(
-            self, channel_id: str, message_id: str, emoji: str
+        self, channel_id: str, message_id: str, emoji: str
     ):
         return await self.request(
             "PUT",
@@ -354,7 +350,7 @@ class HTTPClient:
         )
 
     async def delete_all_message_reactions(
-            self, message_id: str, emoji: Optional[str] = None
+        self, message_id: str, emoji: Optional[str] = None
     ):
         path = f"/channels/{message_id}/messages/{message_id}/reactions"
         if emoji:
@@ -362,7 +358,7 @@ class HTTPClient:
         return await self.request("DELETE", path, authorize=True)
 
     async def create_test_entitlement(
-            self, application_id: str, payload: Dict[str, Any]
+        self, application_id: str, payload: Dict[str, Any]
     ):
         return await self.request(
             "POST",
@@ -399,7 +395,7 @@ class HTTPClient:
         )
 
     async def start_thread_without_message(
-            self, channel_id: str, payload: Dict[str, Any], reason: Optional[str] = None
+        self, channel_id: str, payload: Dict[str, Any], reason: Optional[str] = None
     ):
         return await self.request(
             "POST",
@@ -410,11 +406,11 @@ class HTTPClient:
         )
 
     async def start_thread_with_message(
-            self,
-            channel_id: str,
-            message_id: str,
-            payload: Dict[str, Any],
-            reason: Optional[str] = None,
+        self,
+        channel_id: str,
+        message_id: str,
+        payload: Dict[str, Any],
+        reason: Optional[str] = None,
     ):
         return await self.request(
             "POST",
@@ -425,12 +421,12 @@ class HTTPClient:
         )
 
     async def fetch_answer_voters(
-            self,
-            channel_id: str,
-            message_id: str,
-            answer_id: int,
-            *,
-            params: Dict[str, Any] = None,
+        self,
+        channel_id: str,
+        message_id: str,
+        answer_id: int,
+        *,
+        params: Dict[str, Any] = None,
     ):
         return await self.request(
             "GET",
