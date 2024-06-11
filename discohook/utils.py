@@ -1,4 +1,3 @@
-import asyncio
 import hashlib
 import json
 import secrets
@@ -40,6 +39,3 @@ def unwrap_user(data: dict, guild_id: str) -> dict:
     member.update(user)
     member["guild_id"] = guild_id
     return member
-
-
-run_sync = asyncio.get_event_loop().run_until_complete

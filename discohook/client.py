@@ -21,7 +21,7 @@ from .interaction import Interaction
 from .message import Message
 from .poll import Poll
 from .user import User
-from .utils import compare_password, run_sync
+from .utils import compare_password
 from .view import View
 from .webhook import Webhook
 
@@ -117,7 +117,11 @@ class Client(Starlette):
         self.application_id = application_id
         self.password = password
         session = aiohttp.ClientSession("https://discord.com")
-        atexit.register(run_sync, session.close)
+
+        @atexit.register
+        def close_session():
+            asyncio.get_event_loop().run_until_complete(session.close())
+
         self.http = HTTPClient(self, token, session)
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
