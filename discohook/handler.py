@@ -161,5 +161,3 @@ async def _handler(request: Request):
             raise e from None
     else:
         return Response(status_code=200)
-    finally:
-        await request.app.http.session.close()

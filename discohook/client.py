@@ -1,4 +1,5 @@
 import asyncio
+import atexit
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import aiohttp
@@ -20,7 +21,7 @@ from .interaction import Interaction
 from .message import Message
 from .poll import Poll
 from .user import User
-from .utils import compare_password
+from .utils import compare_password, run_sync
 from .view import View
 from .webhook import Webhook
 
@@ -115,9 +116,9 @@ class Client(Starlette):
         self.public_key = public_key
         self.application_id = application_id
         self.password = password
-        self.http = HTTPClient(
-            self, token, aiohttp.ClientSession("https://discord.com")
-        )
+        session = aiohttp.ClientSession("https://discord.com")
+        atexit.register(run_sync, session.close)
+        self.http = HTTPClient(self, token, session)
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.commands: Dict[str, ApplicationCommand] = {}
