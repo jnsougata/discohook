@@ -162,5 +162,4 @@ async def _handler(request: Request):
     else:
         return Response(status_code=200)
     finally:
-        if not request.app.http.session.closed:
-            await request.app.http.session.close()
+        await request.app.http.session.close()
