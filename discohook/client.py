@@ -1,5 +1,4 @@
 import asyncio
-import atexit
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import aiohttp
@@ -117,11 +116,6 @@ class Client(Starlette):
         self.application_id = application_id
         self.password = password
         session = aiohttp.ClientSession("https://discord.com")
-
-        @atexit.register
-        def close_session():
-            asyncio.get_event_loop().run_until_complete(session.close())
-
         self.http = HTTPClient(self, token, session)
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
