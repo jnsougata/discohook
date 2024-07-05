@@ -40,7 +40,7 @@ class HTTPClient:
         if form:
             for key, value in headers.items():
                 form.headers.add(key, value)
-        if self.session:
+        if not self.session:
             self.session = aiohttp.ClientSession("https://discord.com")
         resp = await self.session.request(
             method,
