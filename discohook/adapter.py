@@ -204,10 +204,10 @@ class ResponseAdapter:
         if view:
             self.inter.client.load_view(view)
         payload = payload.to_form(InteractionCallbackType.channel_message_with_source)
+        self.inter._responded = True
         await self.inter.client.http.send_interaction_mp_callback(
             self.inter.id, self.inter.token, payload
         )
-        self.inter._responded = True
         return InteractionResponse(self.inter)
 
     async def send_modal(self, modal: Union[Modal, Any]) -> InteractionResponse:
@@ -233,10 +233,10 @@ class ResponseAdapter:
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal,
         }
+        self.inter._responded = True
         await self.inter.client.http.send_interaction_callback(
             self.inter.id, self.inter.token, payload
         )
-        self.inter._responded = True
         return InteractionResponse(self.inter)
 
     async def autocomplete(self, choices: List[Choice]):
@@ -299,10 +299,10 @@ class ResponseAdapter:
         else:
             raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}")
 
+        self.inter._responded = True
         await self.inter.client.http.send_interaction_callback(
             self.inter.id, self.inter.token, payload
         )
-        self.inter._responded = True
         return InteractionResponse(self.inter)
 
     async def require_premium(self):
@@ -316,10 +316,10 @@ class ResponseAdapter:
             "data": {},
             "type": InteractionCallbackType.premium_required,
         }
+        self.inter._responded = True
         await self.inter.client.http.send_interaction_callback(
             self.inter.id, self.inter.token, payload
         )
-        self.inter._responded = True
         return InteractionResponse(self.inter)
 
     async def update_message(
@@ -380,10 +380,10 @@ class ResponseAdapter:
         if view and view is not MISSING:
             self.inter.client.load_view(view)
         payload = payload.to_form(InteractionCallbackType.update_component_message)
+        self.inter._responded = True
         await self.inter.client.http.send_interaction_mp_callback(
             self.inter.id, self.inter.token, payload
         )
-        self.inter._responded = True
         return InteractionResponse(self.inter)
 
     async def followup(
