@@ -13,10 +13,10 @@ class HTTPClient:
 
     DISCORD_API_VERSION: int = 10
 
-    def __init__(self, client: "Client", token: str, session: aiohttp.ClientSession):
+    def __init__(self, client: "Client", token: str):
         self.token = token
         self.client = client
-        self.session = session
+        self.session: Optional[aiohttp.ClientSession] = None
 
     async def request(
         self,
@@ -40,6 +40,8 @@ class HTTPClient:
         if form:
             for key, value in headers.items():
                 form.headers.add(key, value)
+        if not self.session:
+            self.session = aiohttp.ClientSession("https://discord.com")
         resp = await self.session.request(
             method,
             f"/api/v{self.DISCORD_API_VERSION}{path}",
