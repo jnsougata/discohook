@@ -51,7 +51,11 @@ class HTTPClient:
             json=json,
         )
         if resp.status >= 400:
-            raise HTTPException(resp, await resp.json())
+            if resp.headers.get("content-type") == "application/json":
+                text = await resp.json()
+            else:
+                text = await resp.text()
+            raise HTTPException(resp, text)
         return resp
 
     async def fetch_application(self):
