@@ -32,5 +32,5 @@ class HTTPException(Exception):
 
     def __init__(self, resp: aiohttp.ClientResponse, data: Any):
         self.resp = resp
-        message = f"[{resp.method}] {resp.url.path} {resp.status} with code({data['code']}): {data['message']}"
+        message = f"[{resp.status} {resp.method}] {resp.url.path}\n{data}"
         super().__init__(message)
