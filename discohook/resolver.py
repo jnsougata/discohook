@@ -67,7 +67,7 @@ def parse_generic_options(payload: List[Dict[str, Any]], interaction: Interactio
                 interaction.focused_option_name = name
         elif option_type == ApplicationCommandOptionType.user:
             user_data = interaction.data["resolved"]["users"][value]
-            if interaction.guild_id:
+            if interaction.guild_id and "members" in interaction.data["resolved"]:
                 member_data = interaction.data["resolved"]["members"][value]
                 member_data["user"] = user_data
                 member_data = unwrap_user(member_data, interaction.guild_id)
