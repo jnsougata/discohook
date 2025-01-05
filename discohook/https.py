@@ -441,3 +441,46 @@ class HTTPClient:
         return await self.request(
             "POST", f"/channels/{channel_id}/polls/{message_id}/expire", authorize=True
         )
+
+    async def fetch_application_emojis(self):
+        return await self.request(
+            "GET",
+            f"/applications/{self.client.application_id}/emojis",
+            authorize=True,
+        )
+
+    async def fetch_application_emoji(self, emoji_id: str):
+        return await self.request(
+            "GET",
+            f"/applications/{self.client.application_id}/emojis/{emoji_id}",
+            authorize=True,
+        )
+
+    async def create_application_emoji(
+        self, payload: Dict[str, Any]
+    ):
+        return await self.request(
+            "POST",
+            f"/applications/{self.client.application_id}/emojis",
+            json=payload,
+            authorize=True,
+        )
+
+    async def edit_application_emoji(
+        self, emoji_id: str, payload: Dict[str, Any]
+    ):
+        return await self.request(
+            "PATCH",
+            f"/applications/{self.client.application_id}/emojis/{emoji_id}",
+            json=payload,
+            authorize=True,
+        )
+
+    async def delete_application_emoji(
+        self, emoji_id: str
+    ):
+        return await self.request(
+            "DELETE",
+            f"/applications/{self.client.application_id}/emojis/{emoji_id}",
+            authorize=True,
+        )

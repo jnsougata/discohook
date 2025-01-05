@@ -488,3 +488,59 @@ class Client(Starlette):
         """
         resp = await self.http.fetch_application()
         return await resp.json()
+
+    async def fetch_application_emojis(self):
+        """
+        Fetch all emojis from the client.
+        """
+        resp = await self.http.fetch_application_emojis()
+        return await resp.json()
+
+    async def fetch_application_emoji(self, emoji_id: str):
+        """
+        Fetch an emoji from the client.
+
+        Parameters
+        ----------
+        emoji_id: str
+            The ID of the emoji to fetch.
+        """
+        resp = await self.http.fetch_application_emoji(emoji_id)
+        return await resp.json()
+
+    async def create_application_emoji(self, name: str, image_base64: str):
+        """
+        Create a new emoji in a guild.
+
+        Parameters
+        ----------
+        name: str
+            The name of the emoji.
+        image_base64: str
+            The base64 encoded image of the emoji. ( Size must be less than 256kb )
+        """
+        await self.http.create_application_emoji({"name": name, "image": image_base64})
+
+    async def edit_application_emoji(self, emoji_id: str, name: str):
+        """
+        Edit an existing emoji in a guild.
+
+        Parameters
+        ----------
+        emoji_id: str
+            The ID of the emoji.
+        name: str
+            The name of the emoji.
+        """
+        await self.http.edit_application_emoji(emoji_id, {"name": name})
+
+    async def delete_application_emoji(self, emoji_id: str):
+        """
+        Delete an existing emoji in a guild.
+
+        Parameters
+        ----------
+        emoji_id: str
+            The ID of the emoji.
+        """
+        await self.http.delete_application_emoji(emoji_id)
