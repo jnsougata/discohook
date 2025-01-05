@@ -12,6 +12,7 @@ class SingleUseSession(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, rre: RequestResponseEndpoint):
-        await request.app.http.session.close()
+        if request.app.http.session:
+            await request.app.http.session.close()
         request.app.http.session = aiohttp.ClientSession("https://discord.com")
         return await rre(request)
