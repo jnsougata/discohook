@@ -1,7 +1,7 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
-from .base import Component
+from .component import Component
 from .emoji import PartialEmoji
 from .enums import ChannelType, ComponentType, SelectDefaultValueType, SelectType
 

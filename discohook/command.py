@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any, Dict, List, Optional, Union
 
-from .base import Interactable
+from .component import Interactable
 from .enums import (
     ApplicationCommandOptionType,
     ApplicationCommandType,

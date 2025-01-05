@@ -1,7 +1,7 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
-from .base import Component
+from .component import Component
 from .enums import ComponentType, TextInputFieldLength
 
 if TYPE_CHECKING:

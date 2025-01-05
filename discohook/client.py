@@ -6,7 +6,7 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .base import Component
+from .component import Component
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
 from .dash import dashboard
