@@ -30,7 +30,15 @@ class UnknownInteractionType(Exception):
 class HTTPException(Exception):
     """Raised when an HTTP request operation fails."""
 
-    def __init__(self, resp: aiohttp.ClientResponse, data: Any):
+    def __init__(self, resp: aiohttp.ClientResponse, message: str):
         self.resp = resp
-        message = f"[{resp.status} {resp.method}] {resp.url.path}\n{data}"
         super().__init__(message)
+
+    @classmethod
+    async def create(cls, resp: aiohttp.ClientResponse):
+        if resp.headers.get("content-type") == "application/json":
+            data = await resp.json()
+        else:
+            data = await resp.text()
+        message = f"[{resp.status} {resp.method}] {resp.url.path}\n{data}"
+        return cls(resp, message)
