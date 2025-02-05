@@ -51,7 +51,7 @@ class HTTPClient:
             json=json,
         )
         if resp.status >= 400:
-            raise HTTPException(resp, await resp.json())
+            raise await HTTPException.create(resp)
         return resp
 
     async def fetch_application(self):
