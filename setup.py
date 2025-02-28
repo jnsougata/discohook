@@ -2,9 +2,8 @@ import re
 
 from setuptools import setup
 
-requirements = ["aiohttp", "pynacl", "starlette"]
-# with open('requirements.txt') as f:
-#     requirements = f.read().splitlines()  # type: ignore
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()  # type: ignore
 
 version = ''
 with open('discohook/__init__.py') as f:
@@ -28,6 +27,10 @@ if version.endswith(('a', 'b', 'rc')):
     except Exception:  # noqa
         pass
 
+readme = ''
+with open('README.md') as f:
+    readme = f.read() # type: ignore
+
 setup(
     name="discohook",
     version=version,
@@ -44,4 +47,6 @@ setup(
     packages=["discohook"],
     python_requires=">=3.6",
     install_requires=requirements,
+    long_description=readme,
+    long_description_content_type="text/markdown",
 )
