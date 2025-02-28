@@ -2,9 +2,9 @@ import re
 
 from setuptools import setup
 
-requirements = []
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()  # type: ignore
+requirements = ["aiohttp", "pynacl", "starlette"]
+# with open('requirements.txt') as f:
+#     requirements = f.read().splitlines()  # type: ignore
 
 version = ''
 with open('discohook/__init__.py') as f:
