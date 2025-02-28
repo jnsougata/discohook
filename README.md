@@ -5,9 +5,12 @@
 ### Installation
 
 ```bash
+pip install discohook
+```
+or
+```bash
 pip install git+https://github.com/jnsougata/discohook.git
 ```
-- ⚠️ `pip install discohook` won't install this library. Use the git method mentioned above.
 
 ### Links
 - [Documentation](https://discohook.readthedocs.io/en/latest/)
