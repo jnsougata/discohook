@@ -24,7 +24,7 @@ class PartialWebhook:
         id: str,
         token: str,
         *,
-        session: aiohttp.ClientSession = None,
+        session: Optional[aiohttp.ClientSession] = None,
         api_version: int = 10,
     ):
         self.id = id
@@ -112,7 +112,7 @@ class PartialWebhook:
         cls,
         url: str,
         *,
-        session: aiohttp.ClientSession = None,
+        session: Optional[aiohttp.ClientSession] = None,
         api_version: int = 10
     ) -> "PartialWebhook":
         return cls(*url.split("/")[-2:], session=session, api_version=api_version)
