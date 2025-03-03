@@ -96,13 +96,16 @@ class PartialWebhook:
         params = {"wait": int(wait)}
         if thread_id:
             params["thread_id"] = thread_id
+        is_external_session = self.session is not None
         session = self.session or aiohttp.ClientSession()
-        async with session:
-            return await session.post(
-                f"https://discord.com/api/v{self.api_version}/webhooks/{self.id}/{self.token}",
-                data=payload.to_form(**extras),
-                params=params
-            )
+        resp = await session.post(
+            f"https://discord.com/api/v{self.api_version}/webhooks/{self.id}/{self.token}",
+            data=payload.to_form(**extras),
+            params=params
+        )
+        if not is_external_session:
+            await session.close()
+        return await resp.json()
 
     @classmethod
     def from_url(
