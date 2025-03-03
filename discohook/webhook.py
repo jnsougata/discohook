@@ -19,10 +19,18 @@ if TYPE_CHECKING:
 # noinspection PyShadowingBuiltins
 class PartialWebhook:
 
-    def __init__(self, client: "Client", id: str, token: str):
+    def __init__(
+        self,
+        id: str,
+        token: str,
+        *,
+        session: aiohttp.ClientSession = None,
+        api_version: int = 10,
+    ):
         self.id = id
         self.token = token
-        self.client = client
+        self.session = session
+        self.api_version = api_version
 
     async def send(
         self,
@@ -35,7 +43,6 @@ class PartialWebhook:
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
         tts: bool = False,
-        view: Optional[View] = None,
         thread_name: Optional[str] = None,
         wait: bool = False,
         thread_id: Optional[str] = None,
@@ -60,8 +67,6 @@ class PartialWebhook:
             The files of the message.
         tts: :class:`bool`
             Whether the message should be sent with text-to-speech.
-        view: Optional[:class:`View`]
-            The view to be sent with the message.
         thread_name: Optional[:class:`str`]
             The name of the thread to create.
         wait: :class:`bool`
@@ -79,8 +84,7 @@ class PartialWebhook:
             embed=embed,
             embeds=embeds,
             file=file,
-            files=files,
-            view=view,
+            files=files
         )
         extras = {}
         if username:
@@ -89,22 +93,26 @@ class PartialWebhook:
             extras["avatar_url"] = avatar_url
         if thread_name:
             extras["thread_name"] = thread_name
-        if view:
-            self.client.load_view(view)
         params = {"wait": int(wait)}
         if thread_id:
             params["thread_id"] = thread_id
-        resp = await self.client.http.execute_webhook(
-            self.id, self.token, form=payload.to_form(**extras), params=params
-        )
-        if wait:
-            data = await resp.json()
-            return Message(self.client, data)
-        return resp
+        session = self.session or aiohttp.ClientSession()
+        async with session:
+            return await session.post(
+                f"https://discord.com/api/v{self.api_version}/webhooks/{self.id}/{self.token}",
+                data=payload.to_form(**extras),
+                params=params
+            )
 
     @classmethod
-    def from_url(cls, client: "Client", url: str) -> "PartialWebhook":
-        return cls(client, *url.split("/")[-2:])
+    def from_url(
+        cls,
+        url: str,
+        *,
+        session: aiohttp.ClientSession = None,
+        api_version: int = 10
+    ) -> "PartialWebhook":
+        return cls(*url.split("/")[-2:], session=session, api_version=api_version)
 
 
 class Webhook:
