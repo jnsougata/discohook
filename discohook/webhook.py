@@ -46,7 +46,7 @@ class PartialWebhook:
         thread_name: Optional[str] = None,
         wait: bool = False,
         thread_id: Optional[str] = None,
-    ):
+    ) -> aiohttp.ClientResponse:
         """
         Sends a message to the webhook.
         Parameters
@@ -105,7 +105,7 @@ class PartialWebhook:
         )
         if not is_external_session:
             await session.close()
-        return await resp.json()
+        return resp
 
     @classmethod
     def from_url(

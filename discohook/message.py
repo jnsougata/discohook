@@ -148,21 +148,21 @@ class Message:
     def attachments(self) -> Optional[List[Attachment]]:
         attachments = self.data.get("attachments")
         if not attachments:
-            return
+            return None
         return [Attachment(x) for x in attachments]
 
     @property
     def poll(self) -> Optional[Poll]:
         poll = self.data.get("poll")
         if not poll:
-            return
+            return None
         return Poll._from_message(self.client, self)  # noqa
 
     @property
     def embeds(self) -> Optional[List[Embed]]:
         embeds = self.data.get("embeds")
         if not embeds:
-            return
+            return None
         return [Embed.from_dict(x) for x in embeds]
 
     @property
@@ -209,7 +209,7 @@ class Message:
     def interaction(self) -> Optional[MessageInteraction]:
         data = self.data.get("interaction")
         if not data:
-            return
+            return None
         return MessageInteraction(self.client, data)
 
     @property

@@ -13,7 +13,7 @@ __title__ = "discohook"
 __license__ = "MIT"
 __copyright__ = "Copyright 2022-present Sougata Jana"
 __author__ = "Sougata Jana"
-__version__ = "0.0.8a1"
+__version__ = "0.1.dev0"
 
 from .adapter import FollowupResponse, InteractionResponse
 from .attachment import Attachment
