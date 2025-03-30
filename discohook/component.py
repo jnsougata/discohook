@@ -6,13 +6,14 @@ from .enums import ComponentType
 
 if TYPE_CHECKING:
     from .interaction import Interaction
+    from .errors import InteractionException
 
 
 class Interactable:
 
     def __init__(self):
         self.checks: List[Callable[["Interaction"], bool]] = []
-        self._error_handler: Optional[Callable[["Interaction", Exception], Any]] = None
+        self._error_handler: Optional[Callable[["InteractionException"], Any]] = None
 
     def check(self):
         """
@@ -32,7 +33,7 @@ class Interactable:
         A decorator that adds an error handler to a specific command or component.
         """
 
-        def decorator(coro: Callable[["Interaction", Exception], None]):
+        def decorator(coro: Callable[["InteractionException"], None]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("error handler must be a coroutine")
             self._error_handler = coro

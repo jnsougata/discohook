@@ -12,7 +12,7 @@ from .enums import (
     InteractionCallbackType,
     InteractionType,
 )
-from .errors import CheckFailure, UnknownInteractionType
+from .errors import CheckFailure, UnknownInteractionType, InteractionException
 from .interaction import Interaction
 from .resolver import (
     build_context_menu_param,
@@ -88,7 +88,7 @@ async def _handler(request: Request):
             except Exception as e:
                 if not cmd._error_handler:
                     raise e
-                await cmd._error_handler(interaction, e)
+                await cmd._error_handler(InteractionException(str(e), interaction))
 
         elif interaction.type == InteractionType.autocomplete:
             cmd: ApplicationCommand = request.app.commands.get(_build_key(interaction))
@@ -152,12 +152,12 @@ async def _handler(request: Request):
             except Exception as e:
                 if not component._error_handler:
                     raise e
-                await component._error_handler(interaction, e)
+                await component._error_handler(InteractionException(str(e), interaction))
         else:
             raise UnknownInteractionType(f"unknown interaction type {interaction.type}", interaction)
     except Exception as e:
         if request.app._interaction_error_handler:
-            await request.app._interaction_error_handler(interaction, e)
+            await request.app._interaction_error_handler(e)
             return Response(status_code=500)
         else:
             raise e from None
