@@ -157,7 +157,7 @@ async def _handler(request: Request):
             raise UnknownInteractionType(f"unknown interaction type {interaction.type}", interaction)
     except Exception as e:
         if request.app._interaction_error_handler:
-            await request.app._interaction_error_handler(e)
+            await request.app._interaction_error_handler(InteractionException(str(e), interaction))
             return Response(status_code=500)
         else:
             raise e from None
