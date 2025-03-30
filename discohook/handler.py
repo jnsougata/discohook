@@ -64,10 +64,11 @@ async def _handler(request: Request):
                     for result in results:
                         if not isinstance(result, bool):
                             raise CheckFailure(
-                                f"check returned {type(result)}, expected bool"
+                                f"check returned {type(result)}, expected bool",
+                                interaction
                             )
                     if not all(results):
-                        raise CheckFailure(f"command checks failed")
+                        raise CheckFailure(f"command checks failed", interaction)
 
                 if not (interaction.data["type"] == ApplicationCommandType.slash):
                     await cmd(interaction, build_context_menu_param(interaction))
@@ -132,10 +133,11 @@ async def _handler(request: Request):
                     for result in results:
                         if not isinstance(result, bool):
                             raise CheckFailure(
-                                f"check returned {type(result)}, expected bool"
+                                f"check returned {type(result)}, expected bool",
+                                interaction
                             )
                     if not all(results):
-                        raise CheckFailure("component checks failed")
+                        raise CheckFailure("component checks failed", interaction)
 
                 if interaction.type == InteractionType.component:
                     if interaction.data["component_type"] == ComponentType.button:
@@ -152,7 +154,7 @@ async def _handler(request: Request):
                     raise e
                 await component._error_handler(interaction, e)
         else:
-            raise UnknownInteractionType(f"unknown interaction type {interaction.type}")
+            raise UnknownInteractionType(f"unknown interaction type {interaction.type}", interaction)
     except Exception as e:
         if request.app._interaction_error_handler:
             await request.app._interaction_error_handler(interaction, e)

@@ -11,6 +11,7 @@ from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
 from .dash import dashboard
 from .embed import Embed
+from .errors import InteractionException
 from .file import File
 from .guild import Guild
 from .handler import _handler
@@ -132,7 +133,7 @@ class Client(Starlette):
         if default_help_command:
             self.add_commands(_help)
         self._interaction_error_handler: Optional[
-            Callable[[Interaction, Exception], Any]
+            Callable[[InteractionException], Any]
         ] = None
 
     def on_error(self):
@@ -243,7 +244,7 @@ class Client(Starlette):
         A decorator to register a global interaction error handler.
         """
 
-        def decorator(coro: Callable[[Interaction, Exception], Any]):
+        def decorator(coro: Callable[[InteractionException], Any]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Exception handler must be a coroutine.")
             self._interaction_error_handler = coro
@@ -434,7 +435,7 @@ class Client(Starlette):
         resp = await self.http.fetch_guild(guild_id)
         data = await resp.json()
         if not data.get("id"):
-            return
+            return None
         return Guild(self, data)
 
     async def fetch_user(self, user_id: str) -> Optional[User]:
@@ -448,7 +449,7 @@ class Client(Starlette):
         resp = await self.http.fetch_user(user_id)
         data = await resp.json()
         if not data.get("id"):
-            return
+            return None
         return User(self, data)
 
     async def fetch_channel(self, channel_id: str) -> Optional[Channel]:
@@ -462,7 +463,7 @@ class Client(Starlette):
         resp = await self.http.fetch_channel(channel_id)
         data = await resp.json()
         if not data.get("id"):
-            return
+            return None
         return Channel(self, data)
 
     async def fetch_commands(self):
