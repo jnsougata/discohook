@@ -373,7 +373,15 @@ class HTTPClient:
     async def get_current_user_guilds(): pass
     async def get_current_user_guild_member(): pass
     async def leave_guild(): pass
-    async def create_dm(): pass
+
+    async def create_dm(elf, payload: Dict[str, Any]):
+        return await self.request(
+            "POST", 
+            "/users/@me/channels", 
+            body=payload, 
+            authorize=True
+        )
+
     async def create_group_dm(): pass
     async def get_current_user_connections(): pass
     async def get_current_user_application_role_connection(): pass
@@ -422,11 +430,6 @@ class HTTPClient:
             "DELETE",
             f"/applications/{application_id}/commands/{command_id}",
             authorize=True,
-        )
-
-    async def create_dm_channel(self, payload: Dict[str, Any]):
-        return await self.request(
-            "POST", "/users/@me/channels", body=payload, authorize=True
         )
 
     async def fetch_channel(self, channel_id: str):

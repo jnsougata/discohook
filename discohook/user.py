@@ -162,5 +162,5 @@ class User:
             file=file,
             files=files,
         )
-        resp = await self.client.http.create_dm_channel({"recipient_id": self.id})
+        resp = await self.client.http.create_dm({"recipient_id": self.id})
         return await self.client.http.create_message((await resp.json())["id"], payload)
