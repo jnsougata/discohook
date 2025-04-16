@@ -374,7 +374,7 @@ class Client(Starlette):
         if self._sync_queue:
             responses.append(
                 (
-                    await self.http.sync_global_commands(
+                    await self.http.bulk_overwrite_global_application_commands(
                         str(self.application_id),
                         [cmd.to_dict() for cmd in self._sync_queue],
                     )

@@ -74,13 +74,25 @@ class HTTPClient:
 
     # Application Commands
     # https://discord.com/developers/docs/interactions/application-commands#application-commands
-    
+
     async def get_global_application_commands(): pass
     async def create_global_application_command(): pass
     async def get_global_application_command(): pass
     async def edit_global_application_command(): pass
     async def delete_global_application_command(): pass
-    async def bulk_overwrite_global_application_commands(): pass
+
+    async def bulk_overwrite_global_application_commands(
+        self, 
+        application_id: str, 
+        commands: List[Dict[str, Any]]
+    ):
+        return await self.request(
+            "PUT",
+            f"/applications/{application_id}/commands",
+            body=commands,
+            authorize=True,
+        )
+
     async def get_guild_application_commands(): pass
     async def create_guild_application_command(): pass
     async def get_guild_application_command(): pass
@@ -372,16 +384,6 @@ class HTTPClient:
     async def delete_webhook_message(): pass
 
     # todo
-
-    async def sync_global_commands(
-        self, application_id: str, commands: List[Dict[str, Any]]
-    ):
-        return await self.request(
-            "PUT",
-            f"/applications/{application_id}/commands",
-            body=commands,
-            authorize=True,
-        )
 
     async def sync_guild_commands(
         self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]
