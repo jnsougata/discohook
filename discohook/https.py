@@ -60,6 +60,298 @@ class HTTPClient:
             raise HTTPException(resp, await resp.read())
         return resp
 
+    # Interactions
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
+
+    async def create_interaction_response(): pass
+    async def get_original_interaction_response(): pass # get_webhook_message(), message_id as @original
+    async def edit_original_interaction_response(): pass # edit_webhook_message(), message_id as @original
+    async def delete_original_interaction_response(): pass # delete_webhook_message(), message_id as @original + no thread_id param
+    async def create_followup_message(): pass # execute_webhook()
+    async def get_followup_message(): pass # get_webhook_message()
+    async def edit_followup_message(): pass # edit_webhook_message()
+    async def delete_followup_message(): pass # delete_webhook_message()
+
+    # Application Role Connection Metadata
+    # https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata
+
+    async def get_application_role_connection_metadata_records(): pass
+    async def update_application_role_connection_metadata_records(): pass
+
+    # Application Resource
+    # https://discord.com/developers/docs/resources/application#application-resource
+
+    async def get_current_application(): pass
+    async def edit_current_application(): pass
+    async def get_application_activity_instance(): pass
+
+    # Audit Logs Resource
+    # https://discord.com/developers/docs/resources/audit-log#audit-logs-resource
+
+    async def get_audit_log(): pass
+
+    # Auto Moderation
+    # https://discord.com/developers/docs/resources/auto-moderation#auto-moderation
+
+    async def list_auto_moderation_rules_for_guild(): pass
+    async def get_auto_moderation_rule(): pass
+    async def create_auto_moderation_rule(): pass
+    async def modify_auto_moderation_rule(): pass
+    async def delete_auto_moderation_rule(): pass
+
+    # Channels Resource
+    # https://discord.com/developers/docs/resources/channel#channels-resource
+
+    async def get_channel(): pass
+    async def modify_channel(): pass
+    async def delete_or_close_channel(): pass # "closes" a dm channel
+    async def edit_channel_permissions(): pass
+    async def get_channel_invites(): pass
+    async def create_channel_invite(): pass
+    async def delete_channel_permission(): pass
+    async def follow_announcement_channel(): pass
+    async def trigger_typing_indicator(): pass
+    async def get_pinned_messages(): pass
+    async def pin_message(): pass
+    async def unpin_message(): pass
+    async def group_dm_add_recipient(): pass
+    async def group_dm_remove_recipient(): pass
+    async def start_thread_from_message(): pass
+    async def start_thread_without_message(): pass
+    async def start_thread_in_forum_or_media_channel(): pass
+    async def join_thread(): pass
+    async def add_thread_member(): pass
+    async def leave_thread(): pass
+    async def remove_thread_member(): pass
+    async def get_thread_member(): pass
+    async def list_thread_member(): pass
+    async def list_public_archived_threads(): pass
+    async def list_private_archived_threads(): pass
+    async def list_joined_private_threads(): pass
+    
+    # Emoji Resource
+    # https://discord.com/developers/docs/resources/emoji#emoji-resource
+
+    async def list_guild_emojis(): pass
+    async def get_guild_emoji(): pass
+    async def create_guild_emoji(): pass
+    async def modify_guild_emoji(): pass
+    async def delete_guild_emoji(): pass
+    async def list_application_emojis(): pass
+    async def get_application_emoji(): pass
+    async def create_application_emoji(): pass
+    async def modify_application_emoji(): pass
+    
+    # Entitlements Resource
+    # https://discord.com/developers/docs/resources/entitlement#entitlements-resource
+
+    async def list_entitlements(): pass
+    async def get_entitlement(): pass
+    async def consume_entitlement(): pass
+    async def create_test_entitlement(): pass
+    async def delete_test_entitlement(): pass
+
+    # Guild Scheduled Event
+    # https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event
+
+    async def list_scheduled_events_for_guild(): pass
+    async def create_guild_scheduled_event(): pass
+    async def get_guild_scheduled_event(): pass
+    async def modify_guild_scheduled_event(): pass
+    async def delete_guild_scheduled_event(): pass
+    async def get_guild_scheduled_event_users(): pass
+
+    # Guild Template Resource
+    # https://discord.com/developers/docs/resources/guild-template#guild-template-resource
+
+    async def get_guild_template(): pass
+    async def create_guild_from_guild_template(): pass
+    async def get_guild_templates(): pass
+    async def create_guild_template(): pass
+    async def sync_guild_template(): pass
+    async def modify_guild_template(): pass
+    async def delete_guild_template(): pass
+
+    # Guild Resource
+    # https://discord.com/developers/docs/resources/guild#guild-resource
+
+    async def create_guild(): pass
+    async def get_guild(): pass
+    async def get_guild_preview(): pass
+    async def modify_guild(): pass
+    async def delete_guild(): pass
+    async def get_guild_channels(): pass
+    async def create_guild_channel(): pass
+    async def modify_guild_channel_positions(): pass
+    async def list_active_guild_threads(): pass
+    async def get_guild_member(): pass
+    async def list_guild_members(): pass
+    async def search_guild_members(): pass
+    async def add_guild_member(): pass
+    async def modify_guild_member(): pass
+    async def modify_current_member(): pass
+    async def modify_current_user_nick(): pass
+    async def add_guild_member_role(): pass
+    async def remove_guild_member_role(): pass
+    async def remove_guild_member(): pass
+    async def get_guild_bans(): pass
+    async def get_guild_ban(): pass
+    async def create_guild_ban(): pass
+    async def remove_guild_ban(): pass
+    async def bulk_guild_ban(): pass
+    async def get_guild_roles(): pass
+    async def get_guild_role(): pass
+    async def create_guild_role(): pass
+    async def modify_guild_role_positions(): pass
+    async def modify_guild_role(): pass
+    async def modify_guild_mfa_level(): pass
+    async def delete_guild_role(): pass
+    async def get_guild_prune_count(): pass
+    async def begin_guild_prune(): pass
+    async def get_guild_voice_regions(): pass
+    async def get_guild_invites(): pass
+    async def get_guild_integrations(): pass
+    async def delete_guild_integration(): pass
+    async def get_guild_widget_settings(): pass
+    async def modify_guild_widget(): pass
+    async def get_guild_widget(): pass
+    async def get_guild_vanity_url(): pass
+    async def get_guild_widget_image(): pass
+    async def get_guild_welcome_screen(): pass
+    async def modify_guild_welcome_screen(): pass
+    async def get_guild_onboarding(): pass
+    async def modify_guild_onboarding(): pass
+    async def modify_guild_incident_actions(): pass
+
+    # Invite Resource
+    # https://discord.com/developers/docs/resources/invite#invite-resource
+
+    async def get_invite(): pass
+    async def delete_invite(): pass
+
+    # Lobby Resource
+    # https://discord.com/developers/docs/resources/lobby#lobby-resource
+
+    async def create_lobby(): pass
+    async def get_lobby(): pass
+    async def modify_lobby(): pass
+    async def delete_lobby(): pass
+    async def add_a_member_to_a_lobby(): pass
+    async def remove_a_member_from_a_lobby(): pass
+    async def leave_lobby(): pass
+    async def link_channel_to_lobby(): pass
+    async def unlink_channel_from_lobby(): pass
+
+    # Messages Resource
+    # https://discord.com/developers/docs/resources/channel#message-resource
+
+    async def get_channel_messages(): pass
+    async def get_channel_message(): pass
+    async def create_message(): pass
+    async def crosspost_message(): pass
+    async def create_reaction(): pass
+    async def delete_own_reaction(): pass
+    async def delete_user_reaction(): pass
+    async def get_reactions(): pass
+    async def delete_all_reactions(): pass
+    async def delete_all_reactions_for_emoji(): pass
+    async def edit_message(): pass
+    async def delete_message(): pass
+    async def bulk_delete_messages(): pass
+
+    # Poll Resource
+    # https://discord.com/developers/docs/resources/poll#poll-resource
+
+    async def get_answer_voters(): pass
+    async def end_poll(): pass
+
+    # SKU Resource
+    # https://discord.com/developers/docs/resources/sku#sku-resource
+
+    async def list_skus(): pass
+
+    # Soundboard Resource
+    # https://discord.com/developers/docs/resources/soundboard#soundboard-resource
+
+    async def send_soundboard_sound(): pass
+    async def list_default_soundboard_sounds(): pass
+    async def list_guild_soundboard_sounds(): pass
+    async def get_guild_soundboard_sound(): pass
+    async def create_guild_soundboard_sound(): pass
+    async def modify_guild_soundboard_sound(): pass
+    async def delete_guild_soundboard_sound(): pass
+
+    # Stage Instance Resource
+    # https://discord.com/developers/docs/resources/stage-instance#stage-instance-resource
+
+    async def create_stage_instance(): pass
+    async def get_stage_instance(): pass
+    async def modify_stage_instance(): pass
+    async def delete_stage_instance(): pass
+
+    # Sticker Resource
+    # https://discord.com/developers/docs/resources/sticker#sticker-resource
+
+    async def get_sticker(): pass
+    async def list_sticker_packs(): pass
+    async def get_sticker_pack(): pass
+    async def list_guild_stickers(): pass
+    async def get_guild_sticker(): pass
+    async def create_guild_sticker(): pass
+    async def modify_guild_sticker(): pass
+    async def delete_guild_sticker(): pass
+
+    # Subscription Resource
+    # https://discord.com/developers/docs/resources/subscription#subscription-resource
+
+    async def list_sku_subscriptions(): pass
+    async def get_sku_subscription(): pass
+
+    # Users Resource
+    # https://discord.com/developers/docs/resources/user#user-resource
+
+    async def get_current_user(): pass
+    async def get_user(): pass
+    async def modify_current_user(): pass
+    async def get_current_user_guilds(): pass
+    async def get_current_user_guild_member(): pass
+    async def leave_guild(): pass
+    async def create_dm(): pass
+    async def create_group_dm(): pass
+    async def get_current_user_connections(): pass
+    async def get_current_user_application_role_connection(): pass
+    async def update_current_user_application_role_connection(): pass
+
+    # Voice Resource
+    # https://discord.com/developers/docs/resources/voice#voice-resource
+
+    async def list_voice_regions(): pass
+    async def get_current_user_voice_state(): pass
+    async def get_user_voice_state(): pass
+    async def modify_current_user_voice_state(): pass
+    async def modify_user_voice_state(): pass
+
+    # Webhook Resource
+    # https://discord.com/developers/docs/resources/webhook#webhook-resource
+
+    async def create_webhook(): pass
+    async def get_channel_webhooks(): pass
+    async def get_guild_webhooks(): pass
+    async def get_webhook(): pass
+    async def get_webhook_with_token(): pass
+    async def modify_webhook(): pass
+    async def modify_webhook_with_token(): pass
+    async def delete_webhook(): pass
+    async def delete_webhook_with_token(): pass
+    async def execute_webhook(): pass
+    async def execute_slack_compatible_webhook(): pass
+    async def execute_github_compatible_webhook(): pass
+    async def get_webhook_message(): pass
+    async def edit_webhook_message(): pass
+    async def delete_webhook_message(): pass
+
+    # todo
+
     async def fetch_application(self):
         return await self.request("GET", "/applications/@me", authorize=True)
 
