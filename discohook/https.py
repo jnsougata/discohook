@@ -424,11 +424,6 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def send_message(self, channel_id: str, data: Any):
-        return await self.request(
-            "POST", f"/channels/{channel_id}/messages", body=data, authorize=True
-        )
-
     async def create_dm_channel(self, payload: Dict[str, Any]):
         return await self.request(
             "POST", "/users/@me/channels", body=payload, authorize=True
