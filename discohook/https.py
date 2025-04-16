@@ -361,7 +361,10 @@ class HTTPClient:
 
     async def get_current_user(): pass
     async def get_user(): pass
-    async def modify_current_user(): pass
+    
+    async def modify_current_user(self, payload: Dict[str, Any]):
+        return await self.request("PATCH", "/users/@me", body=payload, authorize=True)
+
     async def get_current_user_guilds(): pass
     async def get_current_user_guild_member(): pass
     async def leave_guild(): pass
@@ -400,9 +403,6 @@ class HTTPClient:
     async def delete_webhook_message(): pass
 
     # todo
-
-    async def edit_client(self, payload: Dict[str, Any]):
-        return await self.request("PATCH", "/users/@me", body=payload, authorize=True)
 
     async def delete_command(
         self, application_id: str, command_id: str, guild_id: Optional[str] = None

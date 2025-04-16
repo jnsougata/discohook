@@ -346,7 +346,7 @@ class Client(Starlette):
         payload = {"username": username}
         if avatar:
             payload["avatar"] = avatar
-        await self.http.edit_client(payload)
+        await self.http.modify_current_user(payload)
 
     async def _sync(self) -> Tuple[List[aiohttp.ClientResponse], List[Dict[str, Any]]]:
         """
