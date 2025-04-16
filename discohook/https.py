@@ -81,7 +81,9 @@ class HTTPClient:
     # Application Resource
     # https://discord.com/developers/docs/resources/application#application-resource
 
-    async def get_current_application(): pass
+    async def get_current_application(self):
+        return await self.request("GET", "/applications/@me", authorize=True)
+
     async def edit_current_application(): pass
     async def get_application_activity_instance(): pass
 
@@ -351,9 +353,6 @@ class HTTPClient:
     async def delete_webhook_message(): pass
 
     # todo
-
-    async def fetch_application(self):
-        return await self.request("GET", "/applications/@me", authorize=True)
 
     async def sync_global_commands(
         self, application_id: str, commands: List[Dict[str, Any]]

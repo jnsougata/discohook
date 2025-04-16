@@ -489,7 +489,7 @@ class Client(Starlette):
         -------
         Dict[str, Any]
         """
-        resp = await self.http.fetch_application()
+        resp = await self.http.get_current_application()
         return await resp.json()
 
     async def fetch_application_emojis(self):
