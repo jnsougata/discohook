@@ -89,7 +89,7 @@ class PartialWebhook:
             files=files,
             **extras,
         )
-        resp = await self.http.exec_webhook(self.id, self.token, payload, params)
+        resp = await self.http.execute_webhook(self.id, self.token, payload, params)
         return resp
 
     @classmethod

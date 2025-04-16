@@ -310,11 +310,11 @@ class HTTPClient:
         self,
         webhook_id: str,
         webhook_token: str,
-        form: aiohttp.MultipartWriter,
+        data: Any,
         params: Dict[str, Any],
     ):
         return await self.request(
-            "POST", f"/webhooks/{webhook_id}/{webhook_token}", body=form, params=params
+            "POST", f"/webhooks/{webhook_id}/{webhook_token}", body=data, params=params
         )
 
     async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any]):
@@ -472,14 +472,4 @@ class HTTPClient:
             "DELETE",
             f"/applications/{self.application_id}/emojis/{emoji_id}",
             authorize=True,
-        )
-
-    async def exec_webhook(
-        self, id: str, token: str, data: Any, params: Dict[str, Any]
-    ):
-        return await self.request(
-            "POST",
-            f"/webhooks/{id}/{token}",
-            body=data,
-            params=params,
         )
