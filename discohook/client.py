@@ -476,7 +476,7 @@ class Client(Starlette):
         -------
         List[Dict[str, Any]]
         """
-        resp = await self.http.fetch_global_application_commands(
+        resp = await self.http.get_global_application_commands(
             str(self.application_id)
         )
         return await resp.json()

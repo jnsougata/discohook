@@ -75,7 +75,13 @@ class HTTPClient:
     # Application Commands
     # https://discord.com/developers/docs/interactions/application-commands#application-commands
 
-    async def get_global_application_commands(): pass
+    async def get_global_application_commands(self, application_id: str):
+        return await self.request(
+            "GET", 
+            f"/applications/{application_id}/commands", 
+            authorize=True
+        )
+    
     async def create_global_application_command(): pass
     async def get_global_application_command(): pass
     async def edit_global_application_command(): pass
@@ -394,12 +400,6 @@ class HTTPClient:
     async def delete_webhook_message(): pass
 
     # todo
-
-
-    async def fetch_global_application_commands(self, application_id: str):
-        return await self.request(
-            "GET", f"/applications/{application_id}/commands", authorize=True
-        )
 
     async def edit_client(self, payload: Dict[str, Any]):
         return await self.request("PATCH", "/users/@me", body=payload, authorize=True)
