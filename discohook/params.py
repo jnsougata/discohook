@@ -141,11 +141,11 @@ def _prepare_editing_payload(
         payload["content"] = str(content)
     if tts is not MISSING:
         payload["tts"] = tts
-    if embeds:
+    if embeds is not MISSING:
         payload["embeds"] = [embed.to_dict() for embed in embeds]
     if view is not MISSING:
         payload["components"] = view.components if view else []
-    if files:
+    if files is not MISSING:
         payload["attachments"] = [
             {
                 "id": i,
@@ -163,7 +163,7 @@ def _prepare_editing_payload(
         if payload_type is None
         else {"type": payload_type.value, "data": payload}
     )
-    if files:
+    if files is not MISSING:
         form = aiohttp.MultipartWriter("form-data")
         form.append(
             json.dumps(payload_json),
