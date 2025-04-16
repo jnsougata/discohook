@@ -72,6 +72,25 @@ class HTTPClient:
     async def edit_followup_message(): pass # edit_webhook_message()
     async def delete_followup_message(): pass # delete_webhook_message()
 
+    # Application Commands
+    # https://discord.com/developers/docs/interactions/application-commands#application-commands
+    
+    async def get_global_application_commands(): pass
+    async def create_global_application_command(): pass
+    async def get_global_application_command(): pass
+    async def edit_global_application_command(): pass
+    async def delete_global_application_command(): pass
+    async def bulk_overwrite_global_application_commands(): pass
+    async def get_guild_application_commands(): pass
+    async def create_guild_application_command(): pass
+    async def get_guild_application_command(): pass
+    async def edit_guild_application_command(): pass
+    async def delete_guild_application_command(): pass
+    async def bulk_overwrite_guild_application_commands(): pass
+    async def get_guild_application_command_permissions(): pass
+    async def get_application_command_permissions(): pass
+    async def edit_application_command_permissions(): pass
+
     # Application Role Connection Metadata
     # https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata
 
