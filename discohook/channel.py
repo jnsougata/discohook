@@ -8,7 +8,7 @@ from .enums import ChannelType
 from .file import File
 from .message import Message
 from .models import AllowedMentions, MessageReference
-from .params import _SendingPayload
+from .params import _prepare_sending_payload
 from .poll import Poll
 from .view import View
 
@@ -94,7 +94,7 @@ class PartialChannel:
         if view:
             self.client.load_view(view)
 
-        payload = _SendingPayload(
+        payload = _prepare_sending_payload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -107,7 +107,7 @@ class PartialChannel:
             message_reference=message_reference,
         )
 
-        resp = await self.client.http.send_message(self.id, payload.to_form())
+        resp = await self.client.http.send_message(self.id, payload)
         data = await resp.json()
         return Message(self.client, data)
 

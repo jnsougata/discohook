@@ -8,7 +8,7 @@ from .message import Message
 from .modal import Modal
 from .models import AllowedMentions
 from .option import Choice
-from .params import MISSING, _EditingPayload, _prepare_sending_payload
+from .params import MISSING, _prepare_editing_payload, _prepare_sending_payload
 from .poll import Poll
 from .view import View
 
@@ -51,7 +51,7 @@ class InteractionResponse:
         ----------
         same as :meth:`Message.edit`
         """
-        payload = _EditingPayload(
+        payload = _prepare_editing_payload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -67,7 +67,7 @@ class InteractionResponse:
             self.inter.application_id,
             self.inter.token,
             "@original",
-            payload.to_form(),
+            payload,
         )
         data = await resp.json()
         return Message(self.inter.client, data)
@@ -111,7 +111,7 @@ class FollowupResponse:
         ----------
         same as :meth:`Message.edit`
         """
-        payload = _EditingPayload(
+        payload = _prepare_editing_payload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -127,7 +127,7 @@ class FollowupResponse:
             self.interaction.application_id,
             self.interaction.token,
             self.message.id,
-            payload.to_form(),
+            payload,
         )
         data = await resp.json()
         return Message(self.interaction.client, data)
@@ -200,7 +200,7 @@ class ResponseAdapter:
             suppress_embeds=suppress_embeds,
             allowed_mentions=allowed_mentions,
             poll=poll,
-            payload_type=InteractionCallbackType.channel_message_with_source
+            payload_type=InteractionCallbackType.channel_message_with_source,
         )
         if view:
             self.inter.client.load_view(view)
@@ -377,7 +377,7 @@ class ResponseAdapter:
                 f"Method not supported for {self.inter.type}", self.inter
             )
 
-        payload = _EditingPayload(
+        payload = _prepare_editing_payload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -386,12 +386,12 @@ class ResponseAdapter:
             file=file,
             files=files,
             suppress_embeds=suppress_embeds,
+            payload_type=InteractionCallbackType.update_component_message,
         )
         if view and view is not MISSING:
             self.inter.client.load_view(view)
-        payload = payload.to_form(InteractionCallbackType.update_component_message)
         self.inter._responded = True
-        await self.inter.client.http.send_interaction_mp_callback(
+        await self.inter.client.http.send_interaction_callback(
             self.inter.id, self.inter.token, payload
         )
         return InteractionResponse(self.inter)

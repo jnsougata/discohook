@@ -1,13 +1,10 @@
 import json
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import aiohttp
 
 from . import __url__, __version__
 from .errors import HTTPException
-
-if TYPE_CHECKING:
-    from .client import Client
 
 
 class HTTPClient:
@@ -16,10 +13,16 @@ class HTTPClient:
     DISCORD_API_VERSION: int = 10
     USER_AGENT: str = f"discohook ({__url__}, {__version__})"
 
-    def __init__(self, client: "Client", token: str):
+    def __init__(
+        self,
+        *,
+        token: Optional[str] = None,
+        application_id: Optional[str] = None,
+        session: Optional[aiohttp.ClientSession] = None,
+    ):
         self.token = token
-        self.client = client
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.application_id = application_id
+        self.session: Optional[aiohttp.ClientSession] = session
 
     async def request(
         self,
@@ -103,9 +106,9 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def send_message(self, channel_id: str, form: aiohttp.MultipartWriter):
+    async def send_message(self, channel_id: str, data: Any):
         return await self.request(
-            "POST", f"/channels/{channel_id}/messages", body=form, authorize=True
+            "POST", f"/channels/{channel_id}/messages", body=data, authorize=True
         )
 
     async def create_dm_channel(self, payload: Dict[str, Any]):
@@ -154,13 +157,11 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def edit_channel_message(
-        self, channel_id: str, message_id: str, form: aiohttp.MultipartWriter
-    ):
+    async def edit_channel_message(self, channel_id: str, message_id: str, data: Any):
         return await self.request(
             "PATCH",
             f"/channels/{channel_id}/messages/{message_id}",
-            body=form,
+            body=data,
             authorize=True,
         )
 
@@ -183,12 +184,12 @@ class HTTPClient:
         webhook_id: str,
         webhook_token: str,
         message_id: str,
-        form: aiohttp.MultipartWriter,
+        data: Any,
     ):
         return await self.request(
             "PATCH",
             f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}",
-            body=form,
+            body=data,
         )
 
     async def fetch_original_webhook_message(self, webhook_id: str, webhook_token: str):
@@ -439,21 +440,21 @@ class HTTPClient:
     async def fetch_application_emojis(self):
         return await self.request(
             "GET",
-            f"/applications/{self.client.application_id}/emojis",
+            f"/applications/{self.application_id}/emojis",
             authorize=True,
         )
 
     async def fetch_application_emoji(self, emoji_id: str):
         return await self.request(
             "GET",
-            f"/applications/{self.client.application_id}/emojis/{emoji_id}",
+            f"/applications/{self.application_id}/emojis/{emoji_id}",
             authorize=True,
         )
 
     async def create_application_emoji(self, payload: Dict[str, Any]):
         return await self.request(
             "POST",
-            f"/applications/{self.client.application_id}/emojis",
+            f"/applications/{self.application_id}/emojis",
             body=payload,
             authorize=True,
         )
@@ -461,7 +462,7 @@ class HTTPClient:
     async def edit_application_emoji(self, emoji_id: str, payload: Dict[str, Any]):
         return await self.request(
             "PATCH",
-            f"/applications/{self.client.application_id}/emojis/{emoji_id}",
+            f"/applications/{self.application_id}/emojis/{emoji_id}",
             body=payload,
             authorize=True,
         )
@@ -469,6 +470,16 @@ class HTTPClient:
     async def delete_application_emoji(self, emoji_id: str):
         return await self.request(
             "DELETE",
-            f"/applications/{self.client.application_id}/emojis/{emoji_id}",
+            f"/applications/{self.application_id}/emojis/{emoji_id}",
             authorize=True,
+        )
+
+    async def exec_webhook(
+        self, id: str, token: str, data: Any, params: Dict[str, Any]
+    ):
+        return await self.request(
+            "POST",
+            f"/webhooks/{id}/{token}",
+            body=data,
+            params=params,
         )

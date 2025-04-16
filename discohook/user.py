@@ -5,7 +5,7 @@ import aiohttp
 from .asset import Asset
 from .embed import Embed
 from .file import File
-from .params import _SendingPayload
+from .params import _prepare_sending_payload
 
 if TYPE_CHECKING:
     from .client import Client
@@ -154,7 +154,7 @@ class User:
         files: Optional[:class:`List`[:class:`File`]`]
             The files to be sent with the message.
         """
-        payload = _SendingPayload(
+        payload = _prepare_sending_payload(
             content=content,
             tts=tts,
             embed=embed,
@@ -163,6 +163,4 @@ class User:
             files=files,
         )
         resp = await self.client.http.create_dm_channel({"recipient_id": self.id})
-        data = await resp.json()
-        channel_id = data["id"]
-        return await self.client.http.send_message(channel_id, payload.to_form())
+        return await self.client.http.send_message((await resp.json())["id"], payload)

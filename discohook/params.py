@@ -86,11 +86,15 @@ def _prepare_sending_payload(
     if flags:
         payload["flags"] = flags
     payload.update(kwargs)
-    payload_json = payload if payload_type is None else {"type": payload_type.value, "data": payload}
+    payload_json = (
+        payload
+        if payload_type is None
+        else {"type": payload_type.value, "data": payload}
+    )
     if merged_files:
         form = aiohttp.MultipartWriter("form-data")
         form.append(
-            json.dumps(payload_json) ,
+            json.dumps(payload_json),
             headers={
                 "Content-Disposition": 'form-data; name="payload_json"',
                 "Content-Type": "application/json",
@@ -154,7 +158,11 @@ def _prepare_editing_payload(
     if suppress_embeds is not MISSING:
         payload["flags"] = 1 << 2
     payload.update(kwargs)
-    payload_json = payload if payload_type is None else {"type": payload_type.value, "data": payload}
+    payload_json = (
+        payload
+        if payload_type is None
+        else {"type": payload_type.value, "data": payload}
+    )
     if files:
         form = aiohttp.MultipartWriter("form-data")
         form.append(
@@ -175,6 +183,7 @@ def _prepare_editing_payload(
             )
         return form
     return payload_json
+
 
 class _SendingPayload:
     def __init__(

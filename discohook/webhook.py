@@ -7,8 +7,9 @@ from .channel import PartialChannel
 from .embed import Embed
 from .file import File
 from .guild import PartialGuild
+from .https import HTTPClient
 from .message import Message
-from .params import MISSING, _prepare_sending_payload, _prepare_editing_payload
+from .params import MISSING, _prepare_editing_payload, _prepare_sending_payload
 from .user import User
 from .view import View
 
@@ -19,18 +20,10 @@ if TYPE_CHECKING:
 # noinspection PyShadowingBuiltins
 class PartialWebhook:
 
-    def __init__(
-        self,
-        id: str,
-        token: str,
-        *,
-        session: Optional[aiohttp.ClientSession] = None,
-        api_version: int = 10,
-    ):
+    def __init__(self, id: str, token: str):
         self.id = id
         self.token = token
-        self.session = session
-        self.api_version = api_version
+        self.http = HTTPClient()
 
     async def send(
         self,
@@ -88,29 +81,20 @@ class PartialWebhook:
         if thread_id:
             params["thread_id"] = thread_id
         payload = _prepare_sending_payload(
-            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files,
-            **extras
+            content=content,
+            tts=tts,
+            embed=embed,
+            embeds=embeds,
+            file=file,
+            files=files,
+            **extras,
         )
-        is_external_session = self.session is not None
-        session = self.session or aiohttp.ClientSession()
-        resp = await session.post(
-            f"https://discord.com/api/v{self.api_version}/webhooks/{self.id}/{self.token}",
-            data=payload,
-            params=params,
-        )
-        if not is_external_session:
-            await session.close()
+        resp = await self.http.exec_webhook(self.id, self.token, payload, params)
         return resp
 
     @classmethod
-    def from_url(
-        cls,
-        url: str,
-        *,
-        session: Optional[aiohttp.ClientSession] = None,
-        api_version: int = 10,
-    ) -> "PartialWebhook":
-        return cls(*url.split("/")[-2:], session=session, api_version=api_version)
+    def from_url(cls, url: str) -> "PartialWebhook":
+        return cls(*url.split("/")[-2:])
 
 
 class Webhook:
@@ -360,7 +344,9 @@ class Webhook:
         )
         if view:
             self.client.load_view(view)
-        resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, payload)
+        resp = await self.client.http.edit_webhook_message(
+            self.id, self.token, message_id, payload
+        )
         data = await resp.json()
         return Message(self.client, data)
 

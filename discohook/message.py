@@ -7,7 +7,7 @@ from .embed import Embed
 from .emoji import PartialEmoji
 from .file import File
 from .models import AllowedMentions, MessageReference
-from .params import MISSING, _EditingPayload, _SendingPayload
+from .params import MISSING, _prepare_editing_payload, _prepare_sending_payload
 from .poll import Poll
 from .role import Role
 from .user import User
@@ -272,7 +272,7 @@ class Message:
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
         """
-        payload = _EditingPayload(
+        payload = _prepare_editing_payload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -285,7 +285,7 @@ class Message:
         if view and view is not MISSING:
             self.client.load_view(view)
         resp = await self.client.http.edit_channel_message(
-            self.channel_id, self.id, payload.to_form()
+            self.channel_id, self.id, payload
         )
         return Message(self.client, await resp.json())
 
@@ -349,7 +349,7 @@ class Message:
             if not allowed_mentions:
                 allowed_mentions = AllowedMentions(replied_user=True)
             allowed_mentions.replied_user = True
-        payload = _SendingPayload(
+        payload = _prepare_sending_payload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -365,7 +365,7 @@ class Message:
         )
         if view and view is not MISSING:
             self.client.load_view(view)
-        resp = await self.client.http.send_message(self.channel_id, payload.to_form())
+        resp = await self.client.http.send_message(self.channel_id, payload)
         return Message(self.client, await resp.json())
 
     async def add_reaction(self, emoji: Union[PartialEmoji, str]):

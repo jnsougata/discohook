@@ -48,7 +48,5 @@ class HTTPException(Exception):
         else:
             self.data = data.decode("utf-8")
             code = f""
-        message = (
-            f"[{response.method} {response.status}{code}] {response.url.path}\n{self.data}"
-        )
+        message = f"[{response.method} {response.status}{code}] {response.url.path}\n{self.data}"
         super().__init__(message)
