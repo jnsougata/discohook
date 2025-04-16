@@ -296,7 +296,12 @@ class HTTPClient:
 
     async def get_channel_messages(): pass
     async def get_channel_message(): pass
-    async def create_message(): pass
+
+    async def create_message(self, channel_id: str, data: Any):
+        return await self.request(
+            "POST", f"/channels/{channel_id}/messages", body=data, authorize=True
+        )
+
     async def crosspost_message(): pass
     async def create_reaction(): pass
     async def delete_own_reaction(): pass

@@ -365,7 +365,7 @@ class Message:
         )
         if view and view is not MISSING:
             self.client.load_view(view)
-        resp = await self.client.http.send_message(self.channel_id, payload)
+        resp = await self.client.http.create_message(self.channel_id, payload)
         return Message(self.client, await resp.json())
 
     async def add_reaction(self, emoji: Union[PartialEmoji, str]):

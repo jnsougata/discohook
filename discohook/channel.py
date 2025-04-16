@@ -107,7 +107,7 @@ class PartialChannel:
             message_reference=message_reference,
         )
 
-        resp = await self.client.http.send_message(self.id, payload)
+        resp = await self.client.http.create_message(self.id, payload)
         data = await resp.json()
         return Message(self.client, data)
 
