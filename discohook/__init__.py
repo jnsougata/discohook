@@ -14,6 +14,7 @@ __license__ = "MIT"
 __copyright__ = "Copyright 2022-present Sougata Jana"
 __author__ = "Sougata Jana"
 __version__ = "0.1.dev0"
+__url__ = "https://github.com/jnsougata/discohook"
 
 from .adapter import FollowupResponse, InteractionResponse
 from .attachment import Attachment
@@ -24,7 +25,7 @@ from .command import ApplicationCommand, SubCommand
 from .embed import Embed
 from .emoji import PartialEmoji
 from .enums import *
-from .errors import InteractionException, HTTPException
+from .errors import HTTPException, InteractionException
 from .file import File
 from .guild import Guild, PartialGuild
 from .interaction import Interaction
@@ -34,7 +35,7 @@ from .modal import Modal, TextInput
 from .models import AllowedMentions, MessageReference
 from .option import Choice, Option
 from .permission import Permission
-from .poll import Poll, PollAnswer, PollLayoutType, PollMedia, PollAnswerCount
+from .poll import Poll, PollAnswer, PollAnswerCount, PollLayoutType, PollMedia
 from .role import PartialRole, Role
 from .select import Select, SelectOption
 from .user import User

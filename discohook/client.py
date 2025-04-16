@@ -6,9 +6,9 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .component import Component
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
+from .component import Component
 from .dash import dashboard
 from .embed import Embed
 from .errors import InteractionException
@@ -373,9 +373,11 @@ class Client(Starlette):
             self._sync_queue = [cmd for cmd in self._sync_queue if not cmd.guild_id]
         if self._sync_queue:
             responses.append(
-                await self.http.sync_global_commands(
-                    str(self.application_id),
-                    [cmd.to_dict() for cmd in self._sync_queue],
+                (
+                    await self.http.sync_global_commands(
+                        str(self.application_id),
+                        [cmd.to_dict() for cmd in self._sync_queue],
+                    )
                 )
             )
         return responses, [cmd.to_dict() for cmd in self._sync_queue]

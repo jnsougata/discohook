@@ -8,7 +8,7 @@ from .embed import Embed
 from .file import File
 from .guild import PartialGuild
 from .message import Message
-from .params import MISSING, _EditingPayload, _SendingPayload
+from .params import MISSING, _prepare_sending_payload, _prepare_editing_payload
 from .user import User
 from .view import View
 
@@ -78,30 +78,25 @@ class PartialWebhook:
         -------
         aiohttp.ClientResponse
         """
-        payload = _SendingPayload(
-            content=content,
-            tts=tts,
-            embed=embed,
-            embeds=embeds,
-            file=file,
-            files=files
-        )
-        extras = {}
-        if username:
-            extras["username"] = username
-        if avatar_url:
-            extras["avatar_url"] = avatar_url
-        if thread_name:
-            extras["thread_name"] = thread_name
+
+        extras = {
+            "username": username,
+            "avatar_url": avatar_url,
+            "thread_name": thread_name,
+        }
         params = {"wait": int(wait)}
         if thread_id:
             params["thread_id"] = thread_id
+        payload = _prepare_sending_payload(
+            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files,
+            **extras
+        )
         is_external_session = self.session is not None
         session = self.session or aiohttp.ClientSession()
         resp = await session.post(
             f"https://discord.com/api/v{self.api_version}/webhooks/{self.id}/{self.token}",
-            data=payload.to_form(**extras),
-            params=params
+            data=payload,
+            params=params,
         )
         if not is_external_session:
             await session.close()
@@ -113,7 +108,7 @@ class PartialWebhook:
         url: str,
         *,
         session: Optional[aiohttp.ClientSession] = None,
-        api_version: int = 10
+        api_version: int = 10,
     ) -> "PartialWebhook":
         return cls(*url.split("/")[-2:], session=session, api_version=api_version)
 
@@ -300,7 +295,13 @@ class Webhook:
         -------
         None
         """
-        payload = _SendingPayload(
+        extras = {
+            "username": username,
+            "avatar_url": avatar_url,
+            "thread_name": thread_name,
+        }
+
+        payload = _prepare_sending_payload(
             content=content,
             tts=tts,
             embed=embed,
@@ -308,19 +309,11 @@ class Webhook:
             file=file,
             files=files,
             view=view,
+            **extras,
         )
-        extras = {}
-        if username:
-            extras["username"] = username
-        if avatar_url:
-            extras["avatar_url"] = avatar_url
-        if thread_name:
-            extras["thread_name"] = thread_name
         if view:
             self.client.load_view(view)
-        return await self.client.http.send_webhook_message(
-            self.id, self.token, payload.to_form(**extras)
-        )
+        return await self.client.http.send_webhook_message(self.id, self.token, payload)
 
     async def edit_message(
         self,
@@ -357,7 +350,7 @@ class Webhook:
         -------
         :class:`Message`
         """
-        payload = _EditingPayload(
+        payload = _prepare_editing_payload(
             content=content,
             embed=embed,
             embeds=embeds,
@@ -367,9 +360,7 @@ class Webhook:
         )
         if view:
             self.client.load_view(view)
-        resp = await self.client.http.edit_webhook_message(
-            self.id, self.token, message_id, payload.to_form()
-        )
+        resp = await self.client.http.edit_webhook_message(self.id, self.token, message_id, payload)
         data = await resp.json()
         return Message(self.client, data)
 

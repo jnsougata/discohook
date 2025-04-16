@@ -30,11 +30,14 @@ async def poke(i: discohook.Interaction):
     options=[
         discohook.Option.integer("min_num", "The minimum number", required=True),
         discohook.Option.integer("max_num", "The maximum number", required=True),
-    ]
+    ],
 )
 async def random_num(i: discohook.Interaction, min_num: int, max_num: int):
     if min_num > max_num:
-        return await i.response.send("The minimum number cannot be greater than the maximum number!", ephemeral=True)
+        return await i.response.send(
+            "The minimum number cannot be greater than the maximum number!",
+            ephemeral=True,
+        )
     num = random.randint(min_num, max_num)
     view = discohook.View()
     view.add_buttons(delete)

@@ -27,47 +27,44 @@ option_4: str
     description="Create a new poll",
     options=[
         discohook.Option.string(
-            name="enunciado",
-            description="The motive of the poll",
-            required=True
+            name="enunciado", description="The motive of the poll", required=True
         ),
         discohook.Option.string(
-            name="option_1",
-            description="The first option",
-            required=True
+            name="option_1", description="The first option", required=True
         ),
         discohook.Option.string(
-            name="option_2",
-            description="The second option",
-            required=False
+            name="option_2", description="The second option", required=False
         ),
         discohook.Option.string(
-            name="option_3",
-            description="The third option",
-            required=False
+            name="option_3", description="The third option", required=False
         ),
         discohook.Option.string(
-            name="option_4",
-            description="The fourth option",
-            required=False
-        )
-    ]
+            name="option_4", description="The fourth option", required=False
+        ),
+    ],
 )
 async def vote(interaction: discohook.Interaction, enunciado: str):
     # Get options and remove empty ones
-    options = list(filter(None, interaction.data['options'][1:]))
+    options = list(filter(None, interaction.data["options"][1:]))
 
     # Get all values into a list
-    options = [option['value'] for option in options]
+    options = [option["value"] for option in options]
 
     # Format options with emojis (a, b, c, d)
-    formatted = [f":regional_indicator_{chr(97+i)}: {item}" for i, item in enumerate(options)]
+    formatted = [
+        f":regional_indicator_{chr(97+i)}: {item}" for i, item in enumerate(options)
+    ]
 
     # Create embed
-    embed = discohook.Embed(title=f"{enunciado}", description="\n\n".join(formatted), color=0xb51ed4)
+    embed = discohook.Embed(
+        title=f"{enunciado}", description="\n\n".join(formatted), color=0xB51ED4
+    )
 
     # Add footer with author name and avatar
-    embed.set_footer("Poll created by " + interaction.author.name, icon_url=interaction.author.avatar.url)
+    embed.set_footer(
+        "Poll created by " + interaction.author.name,
+        icon_url=interaction.author.avatar.url,
+    )
 
     # Send result
     await interaction.response.send(embed=embed)
@@ -83,7 +80,9 @@ async def vote(interaction: discohook.Interaction, enunciado: str):
         # Create new reaction for the message
         await interaction.client.http.request(
             method="PUT",
-            path=f"/channels/{interaction.channel_id}/messages/{msg.id}/reactions/{emoji}/@me", authorize=True)
+            path=f"/channels/{interaction.channel_id}/messages/{msg.id}/reactions/{emoji}/@me",
+            authorize=True,
+        )
 
         # Wait a moment between each reaction to avoid rate limit
         await asyncio.sleep(0.2)

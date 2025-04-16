@@ -13,7 +13,7 @@ app = discohook.Client(
     application_id=APPLICATION_ID,
     public_key=PUBLIC_KEY,
     token=DISCORD_TOKEN,
-    password=APPLICATION_PASSWORD
+    password=APPLICATION_PASSWORD,
 )
 
 

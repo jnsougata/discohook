@@ -1,4 +1,5 @@
-from typing import Any, TYPE_CHECKING
+import json
+from typing import TYPE_CHECKING
 
 import aiohttp
 
@@ -13,6 +14,7 @@ class InteractionException(Exception):
         self.message = message
         self.interaction = interaction
         super().__init__(message)
+
 
 class InteractionTypeMismatch(InteractionException):
     """Raised when the interaction type is not the expected type."""
@@ -38,7 +40,15 @@ class UnknownInteractionType(InteractionException):
 class HTTPException(Exception):
     """Raised when an HTTP request operation fails."""
 
-    def __init__(self, resp: aiohttp.ClientResponse, data: Any):
-        self.resp = resp
-        message = f"[{resp.method}] {resp.url.path} {resp.status} with code({data['code']}): {data['message']}"
+    def __init__(self, response: aiohttp.ClientResponse, data: bytes):
+        self.response = response
+        if response.content_type == "application/json":
+            self.data = json.loads(data)
+            code = f" (code: {self.data.get('code')})"
+        else:
+            self.data = data.decode("utf-8")
+            code = f""
+        message = (
+            f"[{response.method} {response.status}{code}] {response.url.path}\n{self.data}"
+        )
         super().__init__(message)

@@ -395,7 +395,7 @@ def mentionable(
     """
 
     def decorator(
-        coro: Callable[["Interaction", List[Union["User", "PartialRole"]]], Any]
+        coro: Callable[["Interaction", List[Union["User", "PartialRole"]]], Any],
     ):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")

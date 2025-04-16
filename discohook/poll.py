@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from .emoji import PartialEmoji
 from .enums import PollLayoutType
@@ -243,8 +243,8 @@ class Poll:
         """
         answers_ids = [ans.id for ans in self.answers]
         tasks = []
-        for id in answers_ids:
-            tasks.append(self.__fetch_voters(id))
+        for ans in answers_ids:
+            tasks.append(self.__fetch_voters(ans))
         voters = await asyncio.gather(*tasks)
         return dict(voters)
 
