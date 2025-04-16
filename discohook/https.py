@@ -98,7 +98,17 @@ class HTTPClient:
     async def get_guild_application_command(): pass
     async def edit_guild_application_command(): pass
     async def delete_guild_application_command(): pass
-    async def bulk_overwrite_guild_application_commands(): pass
+
+    async def bulk_overwrite_guild_application_commands(
+        self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]
+    ):
+        return await self.request(
+            "PUT",
+            f"/applications/{application_id}/guilds/{guild_id}/commands",
+            body=commands,
+            authorize=True,
+        )
+
     async def get_guild_application_command_permissions(): pass
     async def get_application_command_permissions(): pass
     async def edit_application_command_permissions(): pass
@@ -385,15 +395,6 @@ class HTTPClient:
 
     # todo
 
-    async def sync_guild_commands(
-        self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]
-    ):
-        return await self.request(
-            "PUT",
-            f"/applications/{application_id}/guilds/{guild_id}/commands",
-            body=commands,
-            authorize=True,
-        )
 
     async def fetch_global_application_commands(self, application_id: str):
         return await self.request(

@@ -363,7 +363,7 @@ class Client(Starlette):
             tasks = []
             for guild_id, commands in guild_commands.items():
                 tasks.append(
-                    self.http.sync_guild_commands(
+                    self.http.bulk_overwrite_guild_application_commands(
                         str(self.application_id),
                         guild_id,
                         [cmd.to_dict() for cmd in commands],
