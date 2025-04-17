@@ -256,9 +256,9 @@ class PartialChannel:
         self,
         limit: int = 50,
         *,
+        around: Optional[str] = None,
         before: Optional[str] = None,
         after: Optional[str] = None,
-        around: Optional[str] = None,
     ) -> List[Message]:
         """
         Fetches messages from the channel.
@@ -267,12 +267,12 @@ class PartialChannel:
         ----------
         limit: Optional[:class:`int`]
             The maximum amount of messages to fetch.
+        around: Optional[:class:`str`]
+            The id of the message to fetch around.
         before: Optional[:class:`str`]
             The id of the message to fetch before.
         after: Optional[:class:`str`]
             The id of the message to fetch after.
-        around: Optional[:class:`str`]
-            The id of the message to fetch around.
 
         Returns
         -------
@@ -280,13 +280,13 @@ class PartialChannel:
             The fetched messages.
         """
         params = {"limit": limit}
-        if before:
-            params["before"] = before
-        if after:
-            params["after"] = after
-        if around:
-            params["around"] = around
-        resp = await self.client.http.fetch_channel_messages(self.id, **params)
+-       if before:
+-           params["before"] = before
+-       if after:
+-           params["after"] = after
+-       if around:
+-           params["around"] = around
+        resp = await self.client.http.get_channel_messages(self.id, **params)
         data = await resp.json()
         return [Message(self.client, msg) for msg in data]
 

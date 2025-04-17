@@ -625,7 +625,13 @@ class HTTPClient:
     # Messages Resource
     # https://discord.com/developers/docs/resources/channel#message-resource
 
-    async def get_channel_messages(self): pass
+    async def get_channel_messages(self, channel_id: str, **params):
+        return await self.request(
+            "GET", 
+            f"/channels/{channel_id}/messages", 
+            authorize=True,
+            **params
+        )
 
     async def get_channel_message(self, channel_id: str, message_id: str):
         return await self.request(
@@ -879,11 +885,6 @@ class HTTPClient:
         )
 
     # TODO
-
-    async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
-        return await self.request(
-            "GET", f"/channels/{channel_id}/messages", params=params, authorize=True
-        )
 
     async def fetch_original_webhook_message(self, webhook_id: str, webhook_token: str):
         return await self.request(
