@@ -82,8 +82,8 @@ class HTTPClient:
     async def delete_global_application_command(): pass
 
     async def bulk_overwrite_global_application_commands(
-        self, 
-        application_id: str, 
+        self,
+        application_id: str,
         commands: List[Dict[str, Any]]
     ):
         return await self.request(
@@ -100,9 +100,9 @@ class HTTPClient:
     async def delete_guild_application_command(): pass
 
     async def bulk_overwrite_guild_application_commands(
-        self, 
-        application_id: str, 
-        guild_id: str, 
+        self,
+        application_id: str,
+        guild_id: str,
         commands: List[Dict[str, Any]]
     ):
         return await self.request(
@@ -153,10 +153,15 @@ class HTTPClient:
 
     async def modify_channel(): pass
 
-    async def delete_or_close_channel(self, channel_id: str, reason: Optional[str] = None):
+    async def delete_or_close_channel(
+        self,
+        channel_id: str,
+        *,
+        reason: Optional[str] = None
+    ):
         return await self.request(
-            "DELETE", 
-            f"/channels/{channel_id}", 
+            "DELETE",
+            f"/channels/{channel_id}",
             authorize=True,
             reason=reason
         )
@@ -169,15 +174,27 @@ class HTTPClient:
     async def trigger_typing_indicator(): pass
     async def get_pinned_messages(): pass
 
-    async def pin_message(self, channel_id: str, message_id: str, reason: Optional[str] = None):
+    async def pin_message(
+        self,
+        channel_id: str,
+        message_id: str,
+        *,
+        reason: Optional[str] = None
+    ):
         await self.request(
-            "PUT", 
-            f"/channels/{channel_id}/messages/{message_id}/pin", 
+            "PUT",
+            f"/channels/{channel_id}/messages/{message_id}/pin",
             authorize=True,
             reason=reason
         )
 
-    async def unpin_message(self, channel_id: str, message_id: str, reason: Optional[str] = None):
+    async def unpin_message(
+        self,
+        channel_id: str,
+        message_id: str,
+        *,
+        reason: Optional[str] = None
+    ):
         await self.request(
             "DELETE",
             f"/channels/{channel_id}/messages/{message_id}/pin",
@@ -264,11 +281,11 @@ class HTTPClient:
     async def modify_current_user_nick(): pass
 
     async def add_guild_member_role(
-        self, 
-        guild_id: str, 
-        user_id: str, 
-        role_id: str, 
-        *, 
+        self,
+        guild_id: str,
+        user_id: str,
+        role_id: str,
+        *,
         reason: Optional[str] = None
     ):
         return await self.request(
@@ -278,7 +295,20 @@ class HTTPClient:
             reason=reason
         )
 
-    async def remove_guild_member_role(): pass
+    async def remove_guild_member_role(
+        self,
+        guild_id: str,
+        user_id: str,
+        role_id: str,
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "DELETE",
+            f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}",
+            authorize=True,
+        )
+
     async def remove_guild_member(): pass
     async def get_guild_bans(): pass
     async def get_guild_ban(): pass
@@ -335,16 +365,16 @@ class HTTPClient:
 
     async def get_channel_message(self, channel_id: str, message_id: str):
         return await self.request(
-            "GET", 
-            f"/channels/{channel_id}/messages/{message_id}", 
+            "GET",
+            f"/channels/{channel_id}/messages/{message_id}",
             authorize=True
         )
 
     async def create_message(self, channel_id: str, data: Any):
         return await self.request(
-            "POST", 
-            f"/channels/{channel_id}/messages", 
-            body=data, 
+            "POST",
+            f"/channels/{channel_id}/messages",
+            body=data,
             authorize=True
         )
 
@@ -364,18 +394,25 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def delete_message(self, channel_id: str, message_id: str, reason: Optional[str] = None):
+    async def delete_message(
+        self,
+        channel_id: str,
+        message_id: str,
+        *,
+        reason: Optional[str] = None
+    ):
         await self.request(
-            "DELETE", 
-            f"/channels/{channel_id}/messages/{message_id}", 
+            "DELETE",
+            f"/channels/{channel_id}/messages/{message_id}",
             authorize=True,
             reason=reason
         )
 
     async def bulk_delete_messages(
-        self, 
-        channel_id: str, 
-        payload: Dict[str, Any], 
+        self,
+        channel_id: str,
+        payload: Dict[str, Any],
+        *,
         reason: Optional[str] = None
     ):
         await self.request(
@@ -449,9 +486,9 @@ class HTTPClient:
 
     async def create_dm(elf, payload: Dict[str, Any]):
         return await self.request(
-            "POST", 
-            "/users/@me/channels", 
-            body=payload, 
+            "POST",
+            "/users/@me/channels",
+            body=payload,
             authorize=True
         )
 
@@ -491,14 +528,14 @@ class HTTPClient:
     # todo
 
     async def get_global_application_commands(
-        self, 
+        self,
         application_id: str,
         *,
         with_localizations: bool = False
     ):
         return await self.request(
-            "GET", 
-            f"/applications/{application_id}/commands", 
+            "GET",
+            f"/applications/{application_id}/commands",
             authorize=True,
             with_localizations=with_localizations
         )
@@ -549,13 +586,6 @@ class HTTPClient:
         )
         
     # end todo
-
-    async def remove_role(self, guild_id: str, user_id: str, role_id: str):
-        return await self.request(
-            "DELETE",
-            f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}",
-            authorize=True,
-        )
 
     async def fetch_user(self, user_id: str):
         return await self.request("GET", f"/users/{user_id}", authorize=True)

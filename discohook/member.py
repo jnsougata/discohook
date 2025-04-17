@@ -97,7 +97,7 @@ class Member(User):
         role_id : str
             The ID of the role.
         """
-        return await self.client.http.remove_role(self.guild_id, self.id, role_id)
+        return await self.client.http.remove_guild_member_role(self.guild_id, self.id, role_id)
 
     async def kick(self):
         """
