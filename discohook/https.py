@@ -413,7 +413,21 @@ class HTTPClient:
             reason=reason
         )
 
-    async def modify_guild_role_positions(): pass
+    async def modify_guild_role_positions(
+        self, 
+        guild_id: str, 
+        payload: Dict[str, Any],
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "PATCH", 
+            f"/guilds/{guild_id}/roles", 
+            body=payload, 
+            authorize=True,
+            reason=reason
+        )
+
     async def modify_guild_role(): pass
     async def modify_guild_mfa_level(): pass
     async def delete_guild_role(): pass
@@ -705,10 +719,6 @@ class HTTPClient:
     # end todo
 
 
-    async def edit_guild_role_position(self, guild_id: str, payload: Dict[str, Any]):
-        return await self.request(
-            "PATCH", f"/guilds/{guild_id}/roles", body=payload, authorize=True
-        )
 
     async def edit_guild_role(
         self, guild_id: str, role_id: str, payload: Dict[str, Any]

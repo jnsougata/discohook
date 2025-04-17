@@ -104,7 +104,7 @@ class PartialRole:
         :class:`Role`
         """
         payload = {"id": role_id, "position": position}
-        resp = await self.client.http.edit_guild_role_position(self.guild_id, payload)
+        resp = await self.client.http.modify_guild_role_positions(self.guild_id, payload)
         data = await resp.json()
         return [Role(self.client, role) for role in data]
 
