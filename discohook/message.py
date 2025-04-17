@@ -7,7 +7,7 @@ from .embed import Embed
 from .emoji import PartialEmoji
 from .file import File
 from .models import AllowedMentions, MessageReference
-from .params import MISSING, _prepare_editing_payload, _prepare_sending_payload
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .poll import Poll
 from .role import Role
 from .user import User
@@ -240,15 +240,15 @@ class Message:
 
     async def edit(
         self,
-        content: Optional[str] = MISSING,
+        content: Optional[str] = UNSPECIFIED,
         *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        suppress_embeds: Optional[bool] = MISSING,
+        embed: Optional[Embed] = UNSPECIFIED,
+        embeds: Optional[List[Embed]] = UNSPECIFIED,
+        view: Optional[View] = UNSPECIFIED,
+        tts: Optional[bool] = UNSPECIFIED,
+        file: Optional[File] = UNSPECIFIED,
+        files: Optional[List[File]] = UNSPECIFIED,
+        suppress_embeds: Optional[bool] = UNSPECIFIED,
     ):
         """
         Edits the message.
@@ -282,7 +282,7 @@ class Message:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view and view is not MISSING:
+        if view and view is not UNSPECIFIED:
             self.client.load_view(view)
         resp = await self.client.http.edit_channel_message(
             self.channel_id, self.id, payload
@@ -363,7 +363,7 @@ class Message:
             ),
             poll=poll,
         )
-        if view and view is not MISSING:
+        if view and view is not UNSPECIFIED:
             self.client.load_view(view)
         resp = await self.client.http.send_message(self.channel_id, payload)
         return Message(self.client, await resp.json())

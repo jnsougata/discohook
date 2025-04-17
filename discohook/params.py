@@ -13,7 +13,7 @@ from .view import View
 if TYPE_CHECKING:
     from .poll import Poll
 
-MISSING = Any
+UNSPECIFIED = Any
 
 
 def _prepare_sending_payload(
@@ -115,55 +115,74 @@ def _prepare_sending_payload(
 
 def _prepare_editing_payload(
     *,
-    content: Optional[str] = MISSING,
-    embed: Optional[Embed] = MISSING,
-    embeds: Optional[List[Embed]] = MISSING,
-    view: Optional[View] = MISSING,
-    tts: Optional[bool] = MISSING,
-    file: Optional[File] = MISSING,
-    files: Optional[List[File]] = MISSING,
-    suppress_embeds: Optional[bool] = MISSING,
+    content: Optional[str] = UNSPECIFIED,
+    embed: Optional[Embed] = UNSPECIFIED,
+    embeds: Optional[List[Embed]] = UNSPECIFIED,
+    view: Optional[View] = UNSPECIFIED,
+    tts: Optional[bool] = UNSPECIFIED,
+    file: Optional[File] = UNSPECIFIED,
+    files: Optional[List[File]] = UNSPECIFIED,
+    suppress_embeds: Optional[bool] = UNSPECIFIED,
     payload_type: Optional[Enum] = None,
     **kwargs: Any,
 ):
     payload: Dict[str, Any] = {}
-    if embed is None:
+
+    if content is not UNSPECIFIED and content is not None:
+        payload["content"] = str(content)
+    if content is None:
+        payload["content"] = None
+    if embed is None or embeds is None:
+        payload["embeds"] = None
+    elif embed is not UNSPECIFIED or embeds is not UNSPECIFIED:
         payload["embeds"] = []
-    if embeds is None:
-        payload["embeds"] = []
+        if embed is not UNSPECIFIED:
+            payload["embeds"].append(embed.to_dict())
+        if embeds is not UNSPECIFIED:
+            payload["embeds"].extend([e.to_dict() for e in embeds])
+    if tts is not UNSPECIFIED:
+        payload["tts"] = tts
+    if suppress_embeds is not UNSPECIFIED:
+        payload["flags"] = 1 << 2
+
     if view is None:
         payload["components"] = []
-    if file is None:
+    elif view is not UNSPECIFIED:
+        payload["components"] = view.components
+
+    if file is None or files is None:
         payload["attachments"] = []
-    if files is None:
+    elif files is not UNSPECIFIED and file is not UNSPECIFIED:
         payload["attachments"] = []
-    if content is not MISSING:
-        payload["content"] = str(content)
-    if tts is not MISSING:
-        payload["tts"] = tts
-    if embeds is not MISSING:
-        payload["embeds"] = [embed.to_dict() for embed in embeds]
-    if view is not MISSING:
-        payload["components"] = view.components if view else []
-    if files is not MISSING:
-        payload["attachments"] = [
-            {
-                "id": i,
-                "filename": file.name,
-                "ephemeral": file.spoiler,
-                "description": file.description,
-            }
-            for i, file in enumerate(files)
-        ]
-    if suppress_embeds is not MISSING:
-        payload["flags"] = 1 << 2
+        if file is not UNSPECIFIED:
+            payload["attachments"].append(
+                {
+                    "id": 0,
+                    "filename": file.name,
+                    "ephemeral": file.spoiler,
+                    "description": file.description,
+                }
+            )
+        if files is not UNSPECIFIED:
+            payload["attachments"].extend(
+                [
+                    {
+                        "id": i,
+                        "filename": f.name,
+                        "ephemeral": f.spoiler,
+                        "description": f.description,
+                    }
+                    for i, f in enumerate(files)
+                ]
+            )
+
     payload.update(kwargs)
     payload_json = (
         payload
         if payload_type is None
         else {"type": payload_type.value, "data": payload}
     )
-    if files is not MISSING:
+    if files is not UNSPECIFIED or file is not UNSPECIFIED:
         form = aiohttp.MultipartWriter("form-data")
         form.append(
             json.dumps(payload_json),
@@ -172,14 +191,24 @@ def _prepare_editing_payload(
                 "Content-Type": "application/json",
             },
         )
-        for i, f in enumerate(files):
-            mime, _ = mimetypes.guess_type(f.name)
+        if file is not UNSPECIFIED:
+            mime, _ = mimetypes.guess_type(file.name)
             form.append(
-                f.content,
+                file.content,
                 headers={
-                    "Content-Disposition": f'form-data; name="files[{i}]"; filename="{f.name}"',
+                    "Content-Disposition": f'form-data; name="files[0]"; filename="{file.name}"',
                     "Content-Type": mime or "application/octet-stream",
                 },
             )
+        if files is not UNSPECIFIED:
+            for i, f in enumerate(files):
+                mime, _ = mimetypes.guess_type(f.name)
+                form.append(
+                    f.content,
+                    headers={
+                        "Content-Disposition": f'form-data; name="files[{i}]"; filename="{f.name}"',
+                        "Content-Type": mime or "application/octet-stream",
+                    },
+                )
         return form
     return payload_json

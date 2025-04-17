@@ -8,7 +8,7 @@ from .message import Message
 from .modal import Modal
 from .models import AllowedMentions
 from .option import Choice
-from .params import MISSING, _prepare_editing_payload, _prepare_sending_payload
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .poll import Poll
 from .view import View
 
@@ -34,15 +34,15 @@ class InteractionResponse:
 
     async def edit(
         self,
-        content: Optional[str] = MISSING,
+        content: Optional[str] = UNSPECIFIED,
         *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        suppress_embeds: Optional[bool] = MISSING,
+        embed: Optional[Embed] = UNSPECIFIED,
+        embeds: Optional[List[Embed]] = UNSPECIFIED,
+        view: Optional[View] = UNSPECIFIED,
+        tts: Optional[bool] = UNSPECIFIED,
+        file: Optional[File] = UNSPECIFIED,
+        files: Optional[List[File]] = UNSPECIFIED,
+        suppress_embeds: Optional[bool] = UNSPECIFIED,
     ) -> Message:
         """
         Edits the response message.
@@ -61,7 +61,7 @@ class InteractionResponse:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view and view is not MISSING:
+        if view and view is not UNSPECIFIED:
             self.inter.client.load_view(view)
         resp = await self.inter.client.http.edit_webhook_message(
             self.inter.application_id,
@@ -94,15 +94,15 @@ class FollowupResponse:
 
     async def edit(
         self,
-        content: Optional[str] = MISSING,
+        content: Optional[str] = UNSPECIFIED,
         *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        suppress_embeds: Optional[bool] = MISSING,
+        embed: Optional[Embed] = UNSPECIFIED,
+        embeds: Optional[List[Embed]] = UNSPECIFIED,
+        view: Optional[View] = UNSPECIFIED,
+        tts: Optional[bool] = UNSPECIFIED,
+        file: Optional[File] = UNSPECIFIED,
+        files: Optional[List[File]] = UNSPECIFIED,
+        suppress_embeds: Optional[bool] = UNSPECIFIED,
     ) -> Message:
         """
         Edits the followup message.
@@ -121,7 +121,7 @@ class FollowupResponse:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view and view is not MISSING:
+        if view and view is not UNSPECIFIED:
             self.interaction.client.load_view(view)
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
@@ -332,15 +332,15 @@ class ResponseAdapter:
 
     async def update_message(
         self,
-        content: Optional[str] = MISSING,
+        content: Optional[str] = UNSPECIFIED,
         *,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        view: Optional[View] = MISSING,
-        tts: Optional[bool] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        suppress_embeds: Optional[bool] = MISSING,
+        embed: Optional[Embed] = UNSPECIFIED,
+        embeds: Optional[List[Embed]] = UNSPECIFIED,
+        view: Optional[View] = UNSPECIFIED,
+        tts: Optional[bool] = UNSPECIFIED,
+        file: Optional[File] = UNSPECIFIED,
+        files: Optional[List[File]] = UNSPECIFIED,
+        suppress_embeds: Optional[bool] = UNSPECIFIED,
     ) -> InteractionResponse:
         """
         Edits the message, the component was attached to.
@@ -388,7 +388,7 @@ class ResponseAdapter:
             suppress_embeds=suppress_embeds,
             payload_type=InteractionCallbackType.update_component_message,
         )
-        if view and view is not MISSING:
+        if view and view is not UNSPECIFIED:
             self.inter.client.load_view(view)
         self.inter._responded = True
         await self.inter.client.http.send_interaction_callback(

@@ -9,7 +9,7 @@ from .file import File
 from .guild import PartialGuild
 from .https import HTTPClient
 from .message import Message
-from .params import MISSING, _prepare_editing_payload, _prepare_sending_payload
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .user import User
 from .view import View
 
@@ -303,12 +303,12 @@ class Webhook:
         self,
         message_id: str,
         *,
-        content: Optional[str] = MISSING,
-        embed: Optional[Embed] = MISSING,
-        embeds: Optional[List[Embed]] = MISSING,
-        file: Optional[File] = MISSING,
-        files: Optional[List[File]] = MISSING,
-        view: Optional[View] = MISSING,
+        content: Optional[str] = UNSPECIFIED,
+        embed: Optional[Embed] = UNSPECIFIED,
+        embeds: Optional[List[Embed]] = UNSPECIFIED,
+        file: Optional[File] = UNSPECIFIED,
+        files: Optional[List[File]] = UNSPECIFIED,
+        view: Optional[View] = UNSPECIFIED,
     ) -> Message:
         """
         Edits a message from the webhook.
