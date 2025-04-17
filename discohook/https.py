@@ -179,7 +179,15 @@ class HTTPClient:
     async def follow_announcement_channel(): pass
     async def trigger_typing_indicator(): pass
     async def get_pinned_messages(): pass
-    async def pin_message(): pass
+
+    async def pin_message(self, channel_id: str, message_id: str, reason: Optional[str] = None):
+        await self.request(
+            "PUT", 
+            f"/channels/{channel_id}/messages/{message_id}/pin", 
+            authorize=True,
+            reason=reason
+        )
+
     async def unpin_message(): pass
     async def group_dm_add_recipient(): pass
     async def group_dm_remove_recipient(): pass
@@ -482,11 +490,6 @@ class HTTPClient:
     async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
         return await self.request(
             "GET", f"/channels/{channel_id}/messages", params=params, authorize=True
-        )
-
-    async def pin_channel_message(self, channel_id: str, message_id: str):
-        await self.request(
-            "PUT", f"/channels/{channel_id}/messages/{message_id}/pin", authorize=True
         )
 
     async def unpin_channel_message(self, channel_id: str, message_id: str):
