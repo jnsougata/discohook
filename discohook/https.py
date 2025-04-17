@@ -272,7 +272,14 @@ class HTTPClient:
     async def create_guild_channel(): pass
     async def modify_guild_channel_positions(): pass
     async def list_active_guild_threads(): pass
-    async def get_guild_member(): pass
+
+    async def get_guild_member(self, guild_id: str, user_id: str):
+        return await self.request(
+            "GET", 
+            f"/guilds/{guild_id}/members/{user_id}", 
+            authorize=True
+        )
+
     async def list_guild_members(): pass
     async def search_guild_members(): pass
     async def add_guild_member(): pass
@@ -615,8 +622,6 @@ class HTTPClient:
         return await self.request(
             "GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original"
         )
-        
-    # end todo
 
     async def send_interaction_callback(
         self, interaction_id: str, interaction_token: str, data: Any
@@ -632,10 +637,7 @@ class HTTPClient:
             "GET", f"/guilds/{guild_id}?with_counts=true", authorize=True
         )
 
-    async def fetch_guild_member(self, guild_id: str, user_id: str):
-        return await self.request(
-            "GET", f"/guilds/{guild_id}/members/{user_id}", authorize=True
-        )
+    # end todo
 
     async def fetch_guild_channels(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}/channels", authorize=True)

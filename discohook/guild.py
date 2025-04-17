@@ -34,7 +34,7 @@ class PartialGuild:
         -------
         Optional[:class:`Member`]
         """
-        resp = await self.client.http.fetch_guild_member(self.id, user_id)
+        resp = await self.client.http.get_guild_member(self.id, user_id)
         data = await resp.json()
         if not data.get("user"):
             return
