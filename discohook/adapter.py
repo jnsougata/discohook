@@ -208,11 +208,11 @@ class ResponseAdapter:
             self.inter.client.load_view(view)
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload
+            self.inter.id, self.inter.token, payload, with_response
         )
         return InteractionResponse(self.inter)
 
-    async def send_modal(self, modal: Union[Modal, Any]) -> InteractionResponse:
+    async def send_modal(self, modal: Union[Modal, Any], with_response: bool = False) -> InteractionResponse:
         """
         Sends a modal to the interaction
 
@@ -239,11 +239,11 @@ class ResponseAdapter:
         }
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload
+            self.inter.id, self.inter.token, payload, with_response
         )
         return InteractionResponse(self.inter)
 
-    async def autocomplete(self, choices: List[Choice]):
+    async def autocomplete(self, choices: List[Choice], with_response: bool = False):
         """
         Sends autocomplete choices to the interaction (max 25)
 
@@ -262,11 +262,11 @@ class ResponseAdapter:
             "data": {"choices": [i.to_dict() for i in choices]},
         }
         await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload
+            self.inter.id, self.inter.token, payload, with_response
         )
 
     async def defer(
-        self, ephemeral: bool = False, thinking: bool = False
+        self, ephemeral: bool = False, thinking: bool = False, with_response: bool = False
     ) -> InteractionResponse:
         """
         Defers the interaction
@@ -309,11 +309,11 @@ class ResponseAdapter:
 
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload
+            self.inter.id, self.inter.token, payload, with_response
         )
         return InteractionResponse(self.inter)
 
-    async def require_premium(self):
+    async def require_premium(self, with_response: bool = False):
         """
         Prompts the user that a premium purchase is required for this interaction
         This method is only available for applications with a premium SKU set up
@@ -328,7 +328,7 @@ class ResponseAdapter:
         }
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload
+            self.inter.id, self.inter.token, payload, with_response
         )
         return InteractionResponse(self.inter)
 
@@ -343,6 +343,7 @@ class ResponseAdapter:
         file: Optional[File] = UNSPECIFIED,
         files: Optional[List[File]] = UNSPECIFIED,
         suppress_embeds: Optional[bool] = UNSPECIFIED,
+        with_response: bool = False
     ) -> InteractionResponse:
         """
         Edits the message, the component was attached to.
@@ -394,7 +395,7 @@ class ResponseAdapter:
             self.inter.client.load_view(view)
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload
+            self.inter.id, self.inter.token, payload, with_response
         )
         return InteractionResponse(self.inter)
 
