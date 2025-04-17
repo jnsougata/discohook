@@ -346,7 +346,19 @@ class HTTPClient:
             reason=reason
         )
 
-    async def bulk_delete_messages(): pass
+    async def bulk_delete_messages(
+        self, 
+        channel_id: str, 
+        payload: Dict[str, Any], 
+        reason: Optional[str] = None
+    ):
+        await self.request(
+            "POST",
+            f"/channels/{channel_id}/messages/bulk-delete",
+            body=payload,
+            authorize=True,
+            reason=reason
+        )
 
     # Poll Resource
     # https://discord.com/developers/docs/resources/poll#poll-resource
@@ -470,14 +482,6 @@ class HTTPClient:
     async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
         return await self.request(
             "GET", f"/channels/{channel_id}/messages", params=params, authorize=True
-        )
-
-    async def delete_channel_messages(self, channel_id: str, payload: Dict[str, Any]):
-        await self.request(
-            "POST",
-            f"/channels/{channel_id}/messages/bulk-delete",
-            body=payload,
-            authorize=True,
         )
 
     async def pin_channel_message(self, channel_id: str, message_id: str):
