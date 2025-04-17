@@ -190,14 +190,14 @@ class Webhook:
         if data:
             return User(self.client, data)
 
-    async def delete(self):
+    async def delete(self, *, reason: Optional[str] = None):
         """
         Deletes the webhook.
         Returns
         -------
         None
         """
-        await self.client.http.delete_webhook(self.id)
+        await self.client.http.delete_webhook(self.id, reason=reason)
 
     async def edit(
         self,

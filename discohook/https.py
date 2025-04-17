@@ -692,7 +692,15 @@ class HTTPClient:
         )
 
     async def modify_webhook_with_token(): pass
-    async def delete_webhook(): pass
+
+    async def delete_webhook(self, webhook_id: str, *, reason: Optional[str] = None):
+        return await self.request(
+            "DELETE", 
+            f"/webhooks/{webhook_id}", 
+            authorize=True,
+            reason=reason
+        )
+
     async def delete_webhook_with_token(): pass
     async def execute_webhook(): pass
     async def execute_slack_compatible_webhook(): pass
@@ -786,15 +794,12 @@ class HTTPClient:
             "POST", f"/webhooks/{webhook_id}/{webhook_token}", body=data, params=params
         )
 
-    # end todo
-
     async def fetch_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
         if webhook_token:
             return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
         return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
 
-    async def delete_webhook(self, webhook_id: str):
-        return await self.request("DELETE", f"/webhooks/{webhook_id}", authorize=True)
+    # end todo
 
     async def create_message_reaction(
         self, channel_id: str, message_id: str, emoji: str
