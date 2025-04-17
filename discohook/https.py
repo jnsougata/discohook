@@ -77,7 +77,8 @@ class HTTPClient:
 
     async def get_global_application_commands(
         self, 
-        application_id: str, 
+        application_id: str,
+        *,
         with_localizations: bool = False
     ):
         return await self.request(
@@ -506,12 +507,6 @@ class HTTPClient:
             "GET", f"/channels/{channel_id}/messages", params=params, authorize=True
         )
 
-    async def send_webhook_message(
-        self, webhook_id: str, webhook_token: str, form: aiohttp.MultipartWriter
-    ):
-        return await self.request(
-            "POST", f"/webhooks/{webhook_id}/{webhook_token}", body=form
-        )
 
     async def delete_webhook_message(
         self, webhook_id: str, webhook_token: str, message_id: str
