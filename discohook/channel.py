@@ -321,7 +321,7 @@ class PartialChannel:
         )
         ids = [msg.id for msg in messages]
         if len(ids) < 2:
-            await self.client.http.delete_channel_message(self.id, ids[0])
+            await self.client.http.delete_message(self.id, ids[0])
             return messages
         await self.client.http.delete_channel_messages(self.id, {"messages": ids})
         return messages

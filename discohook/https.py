@@ -337,7 +337,15 @@ class HTTPClient:
     async def delete_all_reactions(): pass
     async def delete_all_reactions_for_emoji(): pass
     async def edit_message(): pass
-    async def delete_message(): pass
+
+    async def delete_message(self, channel_id: str, message_id: str, reason: Optional[str] = None):
+        await self.request(
+            "DELETE", 
+            f"/channels/{channel_id}/messages/{message_id}", 
+            authorize=True,
+            reason=reason
+        )
+
     async def bulk_delete_messages(): pass
 
     # Poll Resource
@@ -462,11 +470,6 @@ class HTTPClient:
     async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
         return await self.request(
             "GET", f"/channels/{channel_id}/messages", params=params, authorize=True
-        )
-
-    async def delete_channel_message(self, channel_id: str, message_id: str):
-        await self.request(
-            "DELETE", f"/channels/{channel_id}/messages/{message_id}", authorize=True
         )
 
     async def delete_channel_messages(self, channel_id: str, payload: Dict[str, Any]):
