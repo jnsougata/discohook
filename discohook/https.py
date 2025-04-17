@@ -325,7 +325,23 @@ class HTTPClient:
 
     async def get_guild_bans(): pass
     async def get_guild_ban(): pass
-    async def create_guild_ban(): pass
+
+    async def create_guild_ban(
+        self, 
+        guild_id: str, 
+        user_id: str, 
+        delete_message_seconds: int = 0,
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "PUT",
+            f"/guilds/{guild_id}/bans/{user_id}",
+            authorize=True,
+            body={"delete_message_seconds": delete_message_seconds},
+            reason=reason
+        )
+
     async def remove_guild_ban(): pass
     async def bulk_guild_ban(): pass
     async def get_guild_roles(): pass
@@ -601,16 +617,6 @@ class HTTPClient:
         )
         
     # end todo
-
-    async def ban_user(
-        self, guild_id: str, user_id: str, delete_message_seconds: int = 0
-    ):
-        return await self.request(
-            "PUT",
-            f"/guilds/{guild_id}/bans/{user_id}",
-            authorize=True,
-            body={"delete_message_seconds": delete_message_seconds},
-        )
 
     async def send_interaction_callback(
         self, interaction_id: str, interaction_token: str, data: Any

@@ -116,6 +116,6 @@ class Member(User):
         """
         if delete_message_seconds > 604800:
             raise ValueError("You can only delete messages for up to last 7 days.")
-        return await self.client.http.ban_user(
+        return await self.client.http.create_guild_ban(
             self.guild_id, self.id, delete_message_seconds
         )
