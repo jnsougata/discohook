@@ -744,7 +744,19 @@ class HTTPClient:
     # Poll Resource
     # https://discord.com/developers/docs/resources/poll#poll-resource
 
-    async def get_answer_voters(self): pass
+    async def get_answer_voters(
+        self,
+        channel_id: str,
+        message_id: str,
+        answer_id: int,
+        **params,
+    ):
+        return await self.request(
+            "GET",
+            f"/channels/{channel_id}/polls/{message_id}/answers/{answer_id}",
+            authorize=True,
+            **params
+        )
 
     async def end_poll(self, channel_id: str, message_id: str):
         return await self.request(
@@ -932,21 +944,4 @@ class HTTPClient:
     ):
         await self.request(
             "DELETE", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"
-        )
-
-    # TODO
-
-    async def fetch_answer_voters(
-        self,
-        channel_id: str,
-        message_id: str,
-        answer_id: int,
-        *,
-        params: Dict[str, Any] = None,
-    ):
-        return await self.request(
-            "GET",
-            f"/channels/{channel_id}/polls/{message_id}/answers/{answer_id}",
-            params=params,
-            authorize=True,
         )
