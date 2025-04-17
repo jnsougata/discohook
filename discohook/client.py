@@ -329,7 +329,7 @@ class Client(Starlette):
         User
             The client as a user.
         """
-        resp = await self.http.fetch_user(self.application_id)
+        resp = await self.http.get_user(self.application_id)
         return User(self, await resp.json())
 
     async def edit(self, username: str, *, avatar: Optional[str] = None):
@@ -346,7 +346,7 @@ class Client(Starlette):
         payload = {"username": username}
         if avatar:
             payload["avatar"] = avatar
-        await self.http.edit_client(payload)
+        await self.http.modify_current_user(payload)
 
     async def _sync(self) -> Tuple[List[aiohttp.ClientResponse], List[Dict[str, Any]]]:
         """
@@ -363,7 +363,7 @@ class Client(Starlette):
             tasks = []
             for guild_id, commands in guild_commands.items():
                 tasks.append(
-                    self.http.sync_guild_commands(
+                    self.http.bulk_overwrite_guild_application_commands(
                         str(self.application_id),
                         guild_id,
                         [cmd.to_dict() for cmd in commands],
@@ -374,7 +374,7 @@ class Client(Starlette):
         if self._sync_queue:
             responses.append(
                 (
-                    await self.http.sync_global_commands(
+                    await self.http.bulk_overwrite_global_application_commands(
                         str(self.application_id),
                         [cmd.to_dict() for cmd in self._sync_queue],
                     )
@@ -383,7 +383,12 @@ class Client(Starlette):
         return responses, [cmd.to_dict() for cmd in self._sync_queue]
 
     async def create_webhook(
-        self, channel_id: str, *, name: str, image_base64: Optional[str] = None
+        self, 
+        channel_id: str, 
+        *, 
+        name: str, 
+        image_base64: Optional[str] = None,
+        reason: Optional[str] = None
     ):
         """
         Create a webhook in a channel.
@@ -402,7 +407,7 @@ class Client(Starlette):
 
         """
         resp = await self.http.create_webhook(
-            channel_id, {"name": name, "avatar": image_base64}
+            channel_id, {"name": name, "avatar": image_base64}, reason=reason
         )
         data = await resp.json()
         return Webhook(self, data)
@@ -448,7 +453,7 @@ class Client(Starlette):
         -------
         User
         """
-        resp = await self.http.fetch_user(user_id)
+        resp = await self.http.get_user(user_id)
         data = await resp.json()
         if not data.get("id"):
             return None
@@ -462,7 +467,7 @@ class Client(Starlette):
         -------
         Channel
         """
-        resp = await self.http.fetch_channel(channel_id)
+        resp = await self.http.get_channel(channel_id)
         data = await resp.json()
         if not data.get("id"):
             return None
@@ -476,7 +481,7 @@ class Client(Starlette):
         -------
         List[Dict[str, Any]]
         """
-        resp = await self.http.fetch_global_application_commands(
+        resp = await self.http.get_global_application_commands(
             str(self.application_id)
         )
         return await resp.json()
@@ -489,14 +494,14 @@ class Client(Starlette):
         -------
         Dict[str, Any]
         """
-        resp = await self.http.fetch_application()
+        resp = await self.http.get_current_application()
         return await resp.json()
 
     async def fetch_application_emojis(self):
         """
         Fetch all emojis from the client.
         """
-        resp = await self.http.fetch_application_emojis()
+        resp = await self.http.list_application_emojis()
         return await resp.json()
 
     async def fetch_application_emoji(self, emoji_id: str):
@@ -508,7 +513,7 @@ class Client(Starlette):
         emoji_id: str
             The ID of the emoji to fetch.
         """
-        resp = await self.http.fetch_application_emoji(emoji_id)
+        resp = await self.http.get_application_emoji(emoji_id)
         return await resp.json()
 
     async def create_application_emoji(self, name: str, image_base64: str):
@@ -535,7 +540,7 @@ class Client(Starlette):
         name: str
             The name of the emoji.
         """
-        await self.http.edit_application_emoji(emoji_id, {"name": name})
+        await self.http.modify_application_emoji(emoji_id, name)
 
     async def delete_application_emoji(self, emoji_id: str):
         """

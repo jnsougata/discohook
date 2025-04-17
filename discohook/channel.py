@@ -107,7 +107,7 @@ class PartialChannel:
             message_reference=message_reference,
         )
 
-        resp = await self.client.http.send_message(self.id, payload)
+        resp = await self.client.http.create_message(self.id, payload)
         data = await resp.json()
         return Message(self.client, data)
 
@@ -134,6 +134,7 @@ class PartialChannel:
         default_thread_rate_limit_per_user: Optional[int] = None,
         default_sort_order: Optional[int] = None,
         default_forum_layout: Optional[int] = None,
+        reason: Optional[str] = None
     ) -> "Channel":
         """
         Edits all kinds of channels.
@@ -229,7 +230,7 @@ class PartialChannel:
             payload["default_sort_order"] = default_sort_order
         if default_forum_layout:
             payload["default_forum_layout"] = default_forum_layout
-        resp = await self.client.http.edit_channel(self.id, payload)
+        resp = await self.client.http.modify_channel(self.id, payload, reason=reason)
         data = await resp.json()
         return Channel(self.client, data)
 
@@ -247,7 +248,7 @@ class PartialChannel:
         :class:`Message`
             The fetched message.
         """
-        resp = await self.client.http.fetch_channel_message(self.id, message_id)
+        resp = await self.client.http.get_channel_message(self.id, message_id)
         data = await resp.json()
         return Message(self.client, data)
 
@@ -296,6 +297,7 @@ class PartialChannel:
         before: Optional[str] = None,
         after: Optional[str] = None,
         around: Optional[str] = None,
+        reason: Optional[str] = None
     ) -> List[Message]:
         """
         Deletes messages from the channel in bulk.
@@ -321,16 +323,16 @@ class PartialChannel:
         )
         ids = [msg.id for msg in messages]
         if len(ids) < 2:
-            await self.client.http.delete_channel_message(self.id, ids[0])
+            await self.client.http.delete_message(self.id, ids[0], reason=reason)
             return messages
-        await self.client.http.delete_channel_messages(self.id, {"messages": ids})
+        await self.client.http.bulk_delete_messages(self.id, {"messages": ids}, reason=reason)
         return messages
 
-    async def delete(self):
-        await self.client.http.delete_channel(self.id)
+    async def delete(self, *, reason: Optional[str] = None):
+        await self.client.http.delete_or_close_channel(self.id, reason=reason)
 
     async def crosspost(self, message_id: str):
-        resp = await self.client.http.crosspost_channel_message(self.id, message_id)
+        resp = await self.client.http.crosspost_message(self.id, message_id)
         data = await resp.json()
         return Message(self.client, data)
 

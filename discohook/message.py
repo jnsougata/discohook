@@ -232,11 +232,11 @@ class Message:
     def position(self) -> Optional[int]:
         return self.data.get("position")
 
-    async def delete(self):
+    async def delete(self, *, reason: Optional[str] = None):
         """
         Deletes the message.
         """
-        return await self.client.http.delete_channel_message(self.channel_id, self.id)
+        return await self.client.http.delete_message(self.channel_id, self.id, reason=reason)
 
     async def edit(
         self,
@@ -284,22 +284,22 @@ class Message:
         )
         if view and view is not UNSPECIFIED:
             self.client.load_view(view)
-        resp = await self.client.http.edit_channel_message(
+        resp = await self.client.http.edit_message(
             self.channel_id, self.id, payload
         )
         return Message(self.client, await resp.json())
 
-    async def pin(self):
+    async def pin(self, *, reason: Optional[str] = None):
         """
         Pins the message to the channel.
         """
-        return await self.client.http.pin_channel_message(self.channel_id, self.id)
+        return await self.client.http.pin_message(self.channel_id, self.id, reason=reason)
 
-    async def unpin(self):
+    async def unpin(self, *, reason: Optional[str] = None):
         """
         Unpins the message from the channel.
         """
-        return await self.client.http.unpin_channel_message(self.channel_id, self.id)
+        return await self.client.http.unpin_message(self.channel_id, self.id, reason=reason)
 
     async def reply(
         self,
@@ -365,7 +365,7 @@ class Message:
         )
         if view and view is not UNSPECIFIED:
             self.client.load_view(view)
-        resp = await self.client.http.send_message(self.channel_id, payload)
+        resp = await self.client.http.create_message(self.channel_id, payload)
         return Message(self.client, await resp.json())
 
     async def add_reaction(self, emoji: Union[PartialEmoji, str]):
@@ -382,7 +382,7 @@ class Message:
             encoded = f"{emoji.name}:{emoji.id}"
         else:
             encoded = "".join(f"%{byte:02x}" for byte in emoji.encode("utf-8"))
-        return await self.client.http.create_message_reaction(
+        return await self.client.http.create_reaction(
             self.channel_id, self.id, encoded
         )
 
@@ -429,7 +429,7 @@ class Message:
         """
         Crossposts the message.
         """
-        resp = await self.client.http.crosspost_channel_message(
+        resp = await self.client.http.crosspost_message(
             self.channel_id, self.id
         )
         data = await resp.json()
@@ -466,6 +466,6 @@ class Message:
             "auto_archive_duration": auto_archive_duration,
             "rate_limit_per_user": rate_limit_per_user,
         }
-        return await self.client.http.start_thread_with_message(
+        return await self.client.http.start_thread_from_message(
             self.channel_id, self.id, payload, reason
         )

@@ -34,7 +34,7 @@ class PartialGuild:
         -------
         Optional[:class:`Member`]
         """
-        resp = await self.client.http.fetch_guild_member(self.id, user_id)
+        resp = await self.client.http.get_guild_member(self.id, user_id)
         data = await resp.json()
         if not data.get("user"):
             return
@@ -48,7 +48,7 @@ class PartialGuild:
         -------
         List[Channel]
         """
-        resp = await self.client.http.fetch_guild_channels(self.id)
+        resp = await self.client.http.get_guild_channels(self.id)
         data = await resp.json()
         return [Channel(self.client, c) for c in data]
 
@@ -60,7 +60,7 @@ class PartialGuild:
         -------
         List[Role]
         """
-        resp = await self.client.http.fetch_guild_roles(self.id)
+        resp = await self.client.http.get_guild_roles(self.id)
         data = await resp.json()
         return [Role(self.client, r) for r in data]
 
@@ -84,6 +84,7 @@ class PartialGuild:
         default_reaction_emoji: Optional[PartialEmoji] = None,
         available_tags: Optional[List[Dict[str, Any]]] = None,
         default_sort_order: Optional[int] = None,
+        reason: Optional[str] = None
     ) -> Channel:
         """
         Creates a channel in the guild. Requires the MANAGE_CHANNELS permission.
@@ -158,7 +159,7 @@ class PartialGuild:
             payload["available_tags"] = available_tags
         if default_sort_order:
             payload["default_sort_order"] = default_sort_order
-        resp = await self.client.http.create_guild_channel(self.id, payload)
+        resp = await self.client.http.create_guild_channel(self.id, payload, reason=reason)
         data = await resp.json()
         return Channel(self.client, data)
 
@@ -192,7 +193,7 @@ class PartialGuild:
         }
         if parent_id:
             payload["parent_id"] = parent_id
-        await self.client.http.edit_guild_channel_position(self.id, payload)
+        await self.client.http.modify_guild_channel_positions(self.id, payload)
 
     async def create_role(
         self,
@@ -204,6 +205,7 @@ class PartialGuild:
         mentionable: Optional[bool] = False,
         icon_data_uri: Optional[str] = None,
         unicode_emoji: Optional[str] = None,
+        reason: Optional[str] = None
     ):
         payload = {"name": name}
         base_permissions = 0
@@ -221,12 +223,17 @@ class PartialGuild:
             payload["icon"] = icon_data_uri
         if unicode_emoji:
             payload["unicode_emoji"] = unicode_emoji
-        resp = await self.client.http.create_guild_role(self.id, payload)
+        resp = await self.client.http.create_guild_role(self.id, payload, reason=reason)
         data = await resp.json()
         return Role(self.client, data)
 
     async def create_emoji(
-        self, name: str, image: str, *, roles: Optional[List[str]] = None
+        self, 
+        name: str, 
+        image: str, 
+        *, 
+        roles: Optional[List[str]] = None,
+        reason: Optional[str] = None
     ):
         """
         Creates a new emoji for the guild.
@@ -247,7 +254,7 @@ class PartialGuild:
         payload = {"name": name, "image": image}
         if roles:
             payload["roles"] = roles
-        resp = await self.client.http.create_guild_emoji(self.id, payload)
+        resp = await self.client.http.create_guild_emoji(self.id, payload, reason=reason)
         return await resp.json()
 
 
