@@ -462,7 +462,7 @@ class Client(Starlette):
         -------
         Channel
         """
-        resp = await self.http.fetch_channel(channel_id)
+        resp = await self.http.get_channel(channel_id)
         data = await resp.json()
         if not data.get("id"):
             return None

@@ -159,7 +159,9 @@ class HTTPClient:
     # Channels Resource
     # https://discord.com/developers/docs/resources/channel#channels-resource
 
-    async def get_channel(): pass
+    async def get_channel(self, channel_id: str):
+        return await self.request("GET", f"/channels/{channel_id}", authorize=True)
+
     async def modify_channel(): pass
     async def delete_or_close_channel(): pass # "closes" a dm channel
     async def edit_channel_permissions(): pass
@@ -442,9 +444,6 @@ class HTTPClient:
             f"/applications/{application_id}/commands/{command_id}",
             authorize=True,
         )
-
-    async def fetch_channel(self, channel_id: str):
-        return await self.request("GET", f"/channels/{channel_id}", authorize=True)
 
     async def delete_channel(self, channel_id: str):
         return await self.request("DELETE", f"/channels/{channel_id}", authorize=True)
