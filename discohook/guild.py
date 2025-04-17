@@ -228,7 +228,12 @@ class PartialGuild:
         return Role(self.client, data)
 
     async def create_emoji(
-        self, name: str, image: str, *, roles: Optional[List[str]] = None
+        self, 
+        name: str, 
+        image: str, 
+        *, 
+        roles: Optional[List[str]] = None,
+        reason: Optional[str] = None
     ):
         """
         Creates a new emoji for the guild.
@@ -249,7 +254,7 @@ class PartialGuild:
         payload = {"name": name, "image": image}
         if roles:
             payload["roles"] = roles
-        resp = await self.client.http.create_guild_emoji(self.id, payload)
+        resp = await self.client.http.create_guild_emoji(self.id, payload, reason=reason)
         return await resp.json()
 
 

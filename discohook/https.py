@@ -235,7 +235,22 @@ class HTTPClient:
 
     async def list_guild_emojis(): pass
     async def get_guild_emoji(): pass
-    async def create_guild_emoji(): pass
+
+    async def create_guild_emoji(
+        self, 
+        guild_id: str, 
+        payload: Dict[str, Any],
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "POST", 
+            f"/guilds/{guild_id}/emojis", 
+            body=payload, 
+            authorize=True,
+            reason=reason
+        )
+
     async def modify_guild_emoji(): pass
     async def delete_guild_emoji(): pass
     async def list_application_emojis(): pass
@@ -732,11 +747,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def create_guild_emoji(self, guild_id: str, payload: Dict[str, Any]):
-        return await self.request(
-            "POST", f"/guilds/{guild_id}/emojis", body=payload, authorize=True
-        )
 
     async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
         return await self.request(
