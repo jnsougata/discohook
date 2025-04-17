@@ -329,7 +329,7 @@ class Client(Starlette):
         User
             The client as a user.
         """
-        resp = await self.http.fetch_user(self.application_id)
+        resp = await self.http.get_user(self.application_id)
         return User(self, await resp.json())
 
     async def edit(self, username: str, *, avatar: Optional[str] = None):
@@ -448,7 +448,7 @@ class Client(Starlette):
         -------
         User
         """
-        resp = await self.http.fetch_user(user_id)
+        resp = await self.http.get_user(user_id)
         data = await resp.json()
         if not data.get("id"):
             return None

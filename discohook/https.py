@@ -475,7 +475,9 @@ class HTTPClient:
     # https://discord.com/developers/docs/resources/user#user-resource
 
     async def get_current_user(): pass
-    async def get_user(): pass
+
+    async def get_user(self, user_id: str):
+        return await self.request("GET", f"/users/{user_id}", authorize=True)
     
     async def modify_current_user(self, payload: Dict[str, Any]):
         return await self.request("PATCH", "/users/@me", body=payload, authorize=True)
@@ -586,9 +588,6 @@ class HTTPClient:
         )
         
     # end todo
-
-    async def fetch_user(self, user_id: str):
-        return await self.request("GET", f"/users/{user_id}", authorize=True)
 
     async def kick_user(self, guild_id: str, user_id: str):
         return await self.request(
