@@ -85,7 +85,7 @@ class PartialRole:
             payload["unicode_emoji"] = unicode_emoji
         if icon_data_uri:
             payload["icon"] = icon_data_uri
-        resp = await self.client.http.edit_guild_role(self.guild_id, self.id, payload)
+        resp = await self.client.http.modify_guild_role(self.guild_id, self.id, payload)
         data = await resp.json()
         return Role(self.client, data)
 

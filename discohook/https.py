@@ -428,7 +428,22 @@ class HTTPClient:
             reason=reason
         )
 
-    async def modify_guild_role(): pass
+    async def modify_guild_role(
+        self, 
+        guild_id: str, 
+        role_id: str, 
+        payload: Dict[str, Any],
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "PATCH", 
+            f"/guilds/{guild_id}/roles/{role_id}", 
+            body=payload, 
+            authorize=True,
+            reason=reason
+        )
+
     async def modify_guild_mfa_level(): pass
     async def delete_guild_role(): pass
     async def get_guild_prune_count(): pass
@@ -717,15 +732,6 @@ class HTTPClient:
         )
 
     # end todo
-
-
-
-    async def edit_guild_role(
-        self, guild_id: str, role_id: str, payload: Dict[str, Any]
-    ):
-        return await self.request(
-            "PATCH", f"/guilds/{guild_id}/roles/{role_id}", body=payload, authorize=True
-        )
 
     async def create_guild_emoji(self, guild_id: str, payload: Dict[str, Any]):
         return await self.request(
