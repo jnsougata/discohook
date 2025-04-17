@@ -44,9 +44,7 @@ class HTTPException(Exception):
         self.response = response
         if response.content_type == "application/json":
             self.data = json.loads(data)
-            code = f" (code: {self.data.get('code')})"
         else:
             self.data = data.decode("utf-8")
-            code = f""
-        message = f"[{response.method} {response.status}{code}] {response.url.path}\n{self.data}"
+        message = f"[{response.method} {response.status}] {response.url.path}\n{self.data}"
         super().__init__(message)
