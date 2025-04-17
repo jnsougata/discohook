@@ -1,6 +1,6 @@
-![image](https://github.com/jnsougata/discohook/assets/53375272/3bf58705-24c8-47ba-98f8-dffca05c1f82)
-
 # discohook
+
+A discord interaction API wrapper for serverless applications.
 
 ### Installation
 
