@@ -205,6 +205,7 @@ class PartialGuild:
         mentionable: Optional[bool] = False,
         icon_data_uri: Optional[str] = None,
         unicode_emoji: Optional[str] = None,
+        reason: Optional[str] = None
     ):
         payload = {"name": name}
         base_permissions = 0
@@ -222,7 +223,7 @@ class PartialGuild:
             payload["icon"] = icon_data_uri
         if unicode_emoji:
             payload["unicode_emoji"] = unicode_emoji
-        resp = await self.client.http.create_guild_role(self.id, payload)
+        resp = await self.client.http.create_guild_role(self.id, payload, reason=reason)
         data = await resp.json()
         return Role(self.client, data)
 

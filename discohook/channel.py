@@ -134,6 +134,7 @@ class PartialChannel:
         default_thread_rate_limit_per_user: Optional[int] = None,
         default_sort_order: Optional[int] = None,
         default_forum_layout: Optional[int] = None,
+        reason: Optional[str] = None
     ) -> "Channel":
         """
         Edits all kinds of channels.
@@ -229,7 +230,7 @@ class PartialChannel:
             payload["default_sort_order"] = default_sort_order
         if default_forum_layout:
             payload["default_forum_layout"] = default_forum_layout
-        resp = await self.client.http.modify_channel(self.id, payload)
+        resp = await self.client.http.modify_channel(self.id, payload, reason=reason)
         data = await resp.json()
         return Channel(self.client, data)
 

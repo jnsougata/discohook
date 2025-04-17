@@ -152,16 +152,16 @@ class HTTPClient:
         return await self.request("GET", f"/channels/{channel_id}", authorize=True)
 
     async def modify_channel(
-        self, 
-        channel_id: str, 
+        self,
+        channel_id: str,
         payload: Dict[str, Any],
         *,
         reason: Optional[str] = None
     ):
         return await self.request(
-            "PATCH", 
-            f"/channels/{channel_id}", 
-            body=payload, 
+            "PATCH",
+            f"/channels/{channel_id}",
+            body=payload,
             authorize=True,
             reason=reason
         )
@@ -286,29 +286,29 @@ class HTTPClient:
         return await self.request("GET", f"/guilds/{guild_id}/channels", authorize=True)
 
     async def create_guild_channel(
-        self, 
-        guild_id: str, 
+        self,
+        guild_id: str,
         payload: Dict[str, Any],
         *,
         reason: Optional[str] = None
     ):
         return await self.request(
-            "POST", 
-            f"/guilds/{guild_id}/channels", 
-            body=payload, 
+            "POST",
+            f"/guilds/{guild_id}/channels",
+            body=payload,
             authorize=True,
             reason=reason
         )
 
     async def modify_guild_channel_positions(
-        self, 
-        guild_id: str, 
+        self,
+        guild_id: str,
         payload: Dict[str, Any]
     ):
         return await self.request(
-            "PATCH", 
-            f"/guilds/{guild_id}/channels", 
-            body=payload, 
+            "PATCH",
+            f"/guilds/{guild_id}/channels",
+            body=payload,
             authorize=True
         )
 
@@ -316,8 +316,8 @@ class HTTPClient:
 
     async def get_guild_member(self, guild_id: str, user_id: str):
         return await self.request(
-            "GET", 
-            f"/guilds/{guild_id}/members/{user_id}", 
+            "GET",
+            f"/guilds/{guild_id}/members/{user_id}",
             authorize=True
         )
 
@@ -358,15 +358,15 @@ class HTTPClient:
         )
 
     async def remove_guild_member(
-        self, 
-        guild_id: str, 
-        user_id: str, 
-        *, 
+        self,
+        guild_id: str,
+        user_id: str,
+        *,
         reason: Optional[str] = None
     ):
         return await self.request(
-            "DELETE", 
-            f"/guilds/{guild_id}/members/{user_id}", 
+            "DELETE",
+            f"/guilds/{guild_id}/members/{user_id}",
             authorize=True,
             reason=reason
         )
@@ -375,9 +375,9 @@ class HTTPClient:
     async def get_guild_ban(): pass
 
     async def create_guild_ban(
-        self, 
-        guild_id: str, 
-        user_id: str, 
+        self,
+        guild_id: str,
+        user_id: str,
         delete_message_seconds: int = 0,
         *,
         reason: Optional[str] = None
@@ -399,47 +399,47 @@ class HTTPClient:
     async def get_guild_role(): pass
 
     async def create_guild_role(
-        self, 
-        guild_id: str, 
+        self,
+        guild_id: str,
         payload: Dict[str, Any],
         *,
         reason: Optional[str] = None
     ):
         return await self.request(
-            "POST", 
-            f"/guilds/{guild_id}/roles", 
-            body=payload, 
+            "POST",
+            f"/guilds/{guild_id}/roles",
+            body=payload,
             authorize=True,
             reason=reason
         )
 
     async def modify_guild_role_positions(
-        self, 
-        guild_id: str, 
+        self,
+        guild_id: str,
         payload: Dict[str, Any],
         *,
         reason: Optional[str] = None
     ):
         return await self.request(
-            "PATCH", 
-            f"/guilds/{guild_id}/roles", 
-            body=payload, 
+            "PATCH",
+            f"/guilds/{guild_id}/roles",
+            body=payload,
             authorize=True,
             reason=reason
         )
 
     async def modify_guild_role(
-        self, 
-        guild_id: str, 
-        role_id: str, 
+        self,
+        guild_id: str,
+        role_id: str,
         payload: Dict[str, Any],
         *,
         reason: Optional[str] = None
     ):
         return await self.request(
-            "PATCH", 
-            f"/guilds/{guild_id}/roles/{role_id}", 
-            body=payload, 
+            "PATCH",
+            f"/guilds/{guild_id}/roles/{role_id}",
+            body=payload,
             authorize=True,
             reason=reason
         )
