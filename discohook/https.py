@@ -151,7 +151,20 @@ class HTTPClient:
     async def get_channel(self, channel_id: str):
         return await self.request("GET", f"/channels/{channel_id}", authorize=True)
 
-    async def modify_channel(): pass
+    async def modify_channel(
+        self, 
+        channel_id: str, 
+        payload: Dict[str, Any],
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "PATCH", 
+            f"/channels/{channel_id}", 
+            body=payload, 
+            authorize=True,
+            reason=reason
+        )
 
     async def delete_or_close_channel(
         self,
@@ -664,11 +677,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def edit_channel(self, channel_id: str, payload: Dict[str, Any]):
-        return await self.request(
-            "PATCH", f"/channels/{channel_id}", body=payload, authorize=True
-        )
 
     async def edit_guild_channel_position(self, guild_id: str, payload: Dict[str, Any]):
         return await self.request(

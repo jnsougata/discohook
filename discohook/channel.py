@@ -229,7 +229,7 @@ class PartialChannel:
             payload["default_sort_order"] = default_sort_order
         if default_forum_layout:
             payload["default_forum_layout"] = default_forum_layout
-        resp = await self.client.http.edit_channel(self.id, payload)
+        resp = await self.client.http.modify_channel(self.id, payload)
         data = await resp.json()
         return Channel(self.client, data)
 
