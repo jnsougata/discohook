@@ -193,7 +193,7 @@ class PartialGuild:
         }
         if parent_id:
             payload["parent_id"] = parent_id
-        await self.client.http.edit_guild_channel_position(self.id, payload)
+        await self.client.http.modify_guild_channel_positions(self.id, payload)
 
     async def create_role(
         self,

@@ -300,7 +300,18 @@ class HTTPClient:
             reason=reason
         )
 
-    async def modify_guild_channel_positions(): pass
+    async def modify_guild_channel_positions(
+        self, 
+        guild_id: str, 
+        payload: Dict[str, Any]
+    ):
+        return await self.request(
+            "PATCH", 
+            f"/guilds/{guild_id}/channels", 
+            body=payload, 
+            authorize=True
+        )
+
     async def list_active_guild_threads(): pass
 
     async def get_guild_member(self, guild_id: str, user_id: str):
@@ -677,11 +688,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def edit_guild_channel_position(self, guild_id: str, payload: Dict[str, Any]):
-        return await self.request(
-            "PATCH", f"/guilds/{guild_id}/channels", body=payload, authorize=True
-        )
 
     async def create_guild_role(self, guild_id: str, payload: Dict[str, Any]):
         return await self.request(
