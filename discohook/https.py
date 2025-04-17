@@ -268,7 +268,10 @@ class HTTPClient:
     async def get_guild_preview(): pass
     async def modify_guild(): pass
     async def delete_guild(): pass
-    async def get_guild_channels(): pass
+
+    async def get_guild_channels(self, guild_id: str):
+        return await self.request("GET", f"/guilds/{guild_id}/channels", authorize=True)
+
     async def create_guild_channel(): pass
     async def modify_guild_channel_positions(): pass
     async def list_active_guild_threads(): pass
@@ -638,9 +641,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def fetch_guild_channels(self, guild_id: str):
-        return await self.request("GET", f"/guilds/{guild_id}/channels", authorize=True)
 
     async def fetch_guild_roles(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}/roles", authorize=True)

@@ -48,7 +48,7 @@ class PartialGuild:
         -------
         List[Channel]
         """
-        resp = await self.client.http.fetch_guild_channels(self.id)
+        resp = await self.client.http.get_guild_channels(self.id)
         data = await resp.json()
         return [Channel(self.client, c) for c in data]
 
