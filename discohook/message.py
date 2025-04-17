@@ -466,6 +466,6 @@ class Message:
             "auto_archive_duration": auto_archive_duration,
             "rate_limit_per_user": rate_limit_per_user,
         }
-        return await self.client.http.start_thread_with_message(
+        return await self.client.http.start_thread_from_message(
             self.channel_id, self.id, payload, reason
         )

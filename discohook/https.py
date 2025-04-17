@@ -217,7 +217,22 @@ class HTTPClient:
 
     async def group_dm_add_recipient(): pass
     async def group_dm_remove_recipient(): pass
-    async def start_thread_from_message(): pass
+
+    async def start_thread_from_message(
+        self,
+        channel_id: str,
+        message_id: str,
+        payload: Dict[str, Any],
+        *,
+        reason: Optional[str] = None,
+    ):
+        return await self.request(
+            "POST",
+            f"/channels/{channel_id}/messages/{message_id}/threads",
+            body=payload,
+            authorize=True,
+            reason=reason
+        )
 
     async def start_thread_without_message(
         self, 
@@ -871,21 +886,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def start_thread_with_message(
-        self,
-        channel_id: str,
-        message_id: str,
-        payload: Dict[str, Any],
-        reason: Optional[str] = None,
-    ):
-        return await self.request(
-            "POST",
-            f"/channels/{channel_id}/messages/{message_id}/threads",
-            body=payload,
-            reason=reason,
-            authorize=True
-        )
 
     async def fetch_answer_voters(
         self,
