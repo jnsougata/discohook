@@ -303,7 +303,7 @@ class Interaction:
         """
         if not self._responded:
             return
-        resp = await self.client.http.fetch_original_webhook_message(
+        resp = await self.client.http.get_original_interaction_response(
             self.application_id, self.token
         )
         data = await resp.json()

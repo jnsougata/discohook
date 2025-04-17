@@ -280,12 +280,12 @@ class PartialChannel:
             The fetched messages.
         """
         params = {"limit": limit}
--       if before:
--           params["before"] = before
--       if after:
--           params["after"] = after
--       if around:
--           params["around"] = around
+        if before:
+            params["before"] = before
+        if after:
+            params["after"] = after
+        if around:
+            params["around"] = around
         resp = await self.client.http.get_channel_messages(self.id, **params)
         data = await resp.json()
         return [Message(self.client, msg) for msg in data]
