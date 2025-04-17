@@ -205,7 +205,7 @@ class ResponseAdapter:
         if view:
             self.inter.client.load_view(view)
         self.inter._responded = True
-        await self.inter.client.http.send_interaction_callback(
+        await self.inter.client.http.create_interaction_response(
             self.inter.id, self.inter.token, payload
         )
         return InteractionResponse(self.inter)
@@ -236,7 +236,7 @@ class ResponseAdapter:
             "type": InteractionCallbackType.modal,
         }
         self.inter._responded = True
-        await self.inter.client.http.send_interaction_callback(
+        await self.inter.client.http.create_interaction_response(
             self.inter.id, self.inter.token, payload
         )
         return InteractionResponse(self.inter)
@@ -259,7 +259,7 @@ class ResponseAdapter:
             "type": InteractionCallbackType.autocomplete,
             "data": {"choices": [i.to_dict() for i in choices]},
         }
-        await self.inter.client.http.send_interaction_callback(
+        await self.inter.client.http.create_interaction_response(
             self.inter.id, self.inter.token, payload
         )
 
@@ -306,7 +306,7 @@ class ResponseAdapter:
             )
 
         self.inter._responded = True
-        await self.inter.client.http.send_interaction_callback(
+        await self.inter.client.http.create_interaction_response(
             self.inter.id, self.inter.token, payload
         )
         return InteractionResponse(self.inter)
@@ -325,7 +325,7 @@ class ResponseAdapter:
             "type": InteractionCallbackType.premium_required,
         }
         self.inter._responded = True
-        await self.inter.client.http.send_interaction_callback(
+        await self.inter.client.http.create_interaction_response(
             self.inter.id, self.inter.token, payload
         )
         return InteractionResponse(self.inter)
@@ -391,7 +391,7 @@ class ResponseAdapter:
         if view and view is not UNSPECIFIED:
             self.inter.client.load_view(view)
         self.inter._responded = True
-        await self.inter.client.http.send_interaction_callback(
+        await self.inter.client.http.create_interaction_response(
             self.inter.id, self.inter.token, payload
         )
         return InteractionResponse(self.inter)

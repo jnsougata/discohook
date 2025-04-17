@@ -63,7 +63,17 @@ class HTTPClient:
     # Interactions
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 
-    async def create_interaction_response(self): pass
+    async def create_interaction_response(
+        self,
+        interaction_id: str,
+        interaction_token: str,
+        data: Any,
+    ):
+        return await self.request(
+            "POST",
+            f"/interactions/{interaction_id}/{interaction_token}/callback",
+            body=data,
+        )
     async def get_original_interaction_response(self): pass # get_webhook_message(self), message_id as @original
     async def edit_original_interaction_response(self): pass # edit_webhook_message(self), message_id as @original
     async def delete_original_interaction_response(self): pass # delete_webhook_message(self), message_id as @original + no thread_id param
@@ -876,15 +886,6 @@ class HTTPClient:
     async def fetch_original_webhook_message(self, webhook_id: str, webhook_token: str):
         return await self.request(
             "GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original"
-        )
-
-    async def send_interaction_callback(
-        self, interaction_id: str, interaction_token: str, data: Any
-    ):
-        return await self.request(
-            "POST",
-            f"/interactions/{interaction_id}/{interaction_token}/callback",
-            body=data,
         )
 
     async def fetch_guild(self, guild_id: str):
