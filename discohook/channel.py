@@ -247,7 +247,7 @@ class PartialChannel:
         :class:`Message`
             The fetched message.
         """
-        resp = await self.client.http.fetch_channel_message(self.id, message_id)
+        resp = await self.client.http.get_channel_message(self.id, message_id)
         data = await resp.json()
         return Message(self.client, data)
 

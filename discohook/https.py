@@ -313,7 +313,13 @@ class HTTPClient:
     # https://discord.com/developers/docs/resources/channel#message-resource
 
     async def get_channel_messages(): pass
-    async def get_channel_message(): pass
+
+    async def get_channel_message(self, channel_id: str, message_id: str):
+        return await self.request(
+            "GET", 
+            f"/channels/{channel_id}/messages/{message_id}", 
+            authorize=True
+        )
 
     async def create_message(self, channel_id: str, data: Any):
         return await self.request(
@@ -451,11 +457,6 @@ class HTTPClient:
             "DELETE",
             f"/applications/{application_id}/commands/{command_id}",
             authorize=True,
-        )
-
-    async def fetch_channel_message(self, channel_id: str, message_id: str):
-        return await self.request(
-            "GET", f"/channels/{channel_id}/messages/{message_id}", authorize=True
         )
 
     async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
