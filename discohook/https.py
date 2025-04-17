@@ -76,7 +76,10 @@ class HTTPClient:
             body=data,
             with_response=str(with_response),
         )
-    async def get_original_interaction_response(self): pass # get_webhook_message(self), message_id as @original
+
+    async def get_original_interaction_response(self, webhook_id: str, webhook_token: str):
+        return await self.get_webhook_message(webhook_id, webhook_token, "@original")
+
     async def edit_original_interaction_response(self): pass # edit_webhook_message(self), message_id as @original
     async def delete_original_interaction_response(self): pass # delete_webhook_message(self), message_id as @original + no thread_id param
     async def create_followup_message(self): pass # execute_webhook(self)
@@ -363,7 +366,13 @@ class HTTPClient:
     # Entitlements Resource
     # https://discord.com/developers/docs/resources/entitlement#entitlements-resource
 
-    async def list_entitlements(self): pass
+    async def list_entitlements(self, application_id: str, **params):
+        return await self.request(
+            "GET",
+            f"/applications/{application_id}/entitlements",
+            authorize=True,
+            **params
+        )
 
     async def get_entitlement(self, application_id: str, entitlement_id: str):
         return await self.request(
@@ -416,7 +425,12 @@ class HTTPClient:
     # https://discord.com/developers/docs/resources/guild#guild-resource
 
     async def create_guild(self): pass
-    async def get_guild(self): pass
+
+    async def get_guild(self, guild_id: str, with_counts: Optional[str] = False):
+        return await self.request(
+            "GET", f"/guilds/{guild_id}", authorize=True, with_counts=with_counts
+        )
+    
     async def get_guild_preview(self): pass
     async def modify_guild(self): pass
     async def delete_guild(self): pass
@@ -625,7 +639,13 @@ class HTTPClient:
     # Messages Resource
     # https://discord.com/developers/docs/resources/channel#message-resource
 
-    async def get_channel_messages(self): pass
+    async def get_channel_messages(self, channel_id: str, **params):
+        return await self.request(
+            "GET", 
+            f"/channels/{channel_id}/messages", 
+            authorize=True,
+            **params
+        )
 
     async def get_channel_message(self, channel_id: str, message_id: str):
         return await self.request(
@@ -658,11 +678,31 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def delete_own_reaction(self): pass
-    async def delete_user_reaction(self): pass
+    async def delete_own_reaction(self, message_id: str, emoji: str):
+        return await self.delete_user_reaction(message_id, emoji, '@me')
+
+    async def delete_user_reaction(self, message_id: str, emoji: str, user_id: str):
+        return await self.request(
+            "DELETE",
+            f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/{user_id}",
+            authorize=True
+        )
+
     async def get_reactions(self): pass
-    async def delete_all_reactions(self): pass
-    async def delete_all_reactions_for_emoji(self): pass
+
+    async def delete_all_reactions(self, message_id: str):
+        return await self.request(
+            "DELETE", 
+            f"/channels/{message_id}/messages/{message_id}/reactions", 
+            authorize=True
+        )
+
+    async def delete_all_reactions_for_emoji(self, message_id: str, emoji: str):
+        return await self.request(
+            "DELETE", 
+            f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}", 
+            authorize=True
+        )
 
     async def edit_message(self, channel_id: str, message_id: str, data: Any):
         return await self.request(
@@ -704,7 +744,19 @@ class HTTPClient:
     # Poll Resource
     # https://discord.com/developers/docs/resources/poll#poll-resource
 
-    async def get_answer_voters(self): pass
+    async def get_answer_voters(
+        self,
+        channel_id: str,
+        message_id: str,
+        answer_id: int,
+        **params,
+    ):
+        return await self.request(
+            "GET",
+            f"/channels/{channel_id}/polls/{message_id}/answers/{answer_id}",
+            authorize=True,
+            **params
+        )
 
     async def end_poll(self, channel_id: str, message_id: str):
         return await self.request(
@@ -813,8 +865,12 @@ class HTTPClient:
 
     async def get_channel_webhooks(self): pass
     async def get_guild_webhooks(self): pass
-    async def get_webhook(self): pass
-    async def get_webhook_with_token(self): pass
+
+    async def get_webhook(self, webhook_id: str):
+        return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
+
+    async def get_webhook_with_token(webhook_id: str, webhook_token: str):
+        return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
 
     async def modify_webhook(
         self, 
@@ -856,7 +912,19 @@ class HTTPClient:
 
     async def execute_slack_compatible_webhook(self): pass
     async def execute_github_compatible_webhook(self): pass
-    async def get_webhook_message(self): pass
+
+    async def get_webhook_message(
+        self,
+        webhook_id: str,
+        webhook_token: str,
+        message_id: str,
+        **params
+    ):
+        return await self.request(
+            "GET", 
+            f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}", 
+            **params
+        )
 
     async def edit_webhook_message(
             self,
@@ -876,64 +944,4 @@ class HTTPClient:
     ):
         await self.request(
             "DELETE", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"
-        )
-
-    # TODO
-
-    async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
-        return await self.request(
-            "GET", f"/channels/{channel_id}/messages", params=params, authorize=True
-        )
-
-    async def fetch_original_webhook_message(self, webhook_id: str, webhook_token: str):
-        return await self.request(
-            "GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original"
-        )
-
-    async def fetch_guild(self, guild_id: str):
-        return await self.request(
-            "GET", f"/guilds/{guild_id}?with_counts=true", authorize=True
-        )
-
-    async def fetch_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
-        if webhook_token:
-            return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
-        return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
-
-    async def delete_message_reaction(self, message_id: str, emoji: str, user_id: str):
-        return await self.request(
-            "DELETE",
-            f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/{user_id}",
-            authorize=True,
-        )
-
-    async def delete_all_message_reactions(
-        self, message_id: str, emoji: Optional[str] = None
-    ):
-        path = f"/channels/{message_id}/messages/{message_id}/reactions"
-        if emoji:
-            path += f"/{emoji}"
-        return await self.request("DELETE", path, authorize=True)
-
-    async def fetch_entitlements(self, application_id: str, params: Dict[str, Any]):
-        return await self.request(
-            "GET",
-            f"/applications/{application_id}/entitlements",
-            params=params,
-            authorize=True,
-        )
-
-    async def fetch_answer_voters(
-        self,
-        channel_id: str,
-        message_id: str,
-        answer_id: int,
-        *,
-        params: Dict[str, Any] = None,
-    ):
-        return await self.request(
-            "GET",
-            f"/channels/{channel_id}/polls/{message_id}/answers/{answer_id}",
-            params=params,
-            authorize=True,
         )
