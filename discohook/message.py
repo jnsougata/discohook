@@ -429,7 +429,7 @@ class Message:
         """
         Crossposts the message.
         """
-        resp = await self.client.http.crosspost_channel_message(
+        resp = await self.client.http.crosspost_message(
             self.channel_id, self.id
         )
         data = await resp.json()

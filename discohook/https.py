@@ -434,7 +434,13 @@ class HTTPClient:
             authorize=True
         )
 
-    async def crosspost_message(): pass
+    async def crosspost_message(self, channel_id: str, message_id: str):
+        return await self.request(
+            "POST",
+            f"/channels/{channel_id}/messages/{message_id}/crosspost",
+            authorize=True,
+        )
+
     async def create_reaction(): pass
     async def delete_own_reaction(): pass
     async def delete_user_reaction(): pass
@@ -658,13 +664,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def crosspost_channel_message(self, channel_id: str, message_id: str):
-        return await self.request(
-            "POST",
-            f"/channels/{channel_id}/messages/{message_id}/crosspost",
-            authorize=True,
-        )
 
     async def edit_channel(self, channel_id: str, payload: Dict[str, Any]):
         return await self.request(
