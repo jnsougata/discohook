@@ -501,7 +501,7 @@ class Client(Starlette):
         """
         Fetch all emojis from the client.
         """
-        resp = await self.http.fetch_application_emojis()
+        resp = await self.http.list_application_emojis()
         return await resp.json()
 
     async def fetch_application_emoji(self, emoji_id: str):
@@ -513,7 +513,7 @@ class Client(Starlette):
         emoji_id: str
             The ID of the emoji to fetch.
         """
-        resp = await self.http.fetch_application_emoji(emoji_id)
+        resp = await self.http.get_application_emoji(emoji_id)
         return await resp.json()
 
     async def create_application_emoji(self, name: str, image_base64: str):
@@ -540,7 +540,7 @@ class Client(Starlette):
         name: str
             The name of the emoji.
         """
-        await self.http.edit_application_emoji(emoji_id, {"name": name})
+        await self.http.modify_application_emoji(emoji_id, name)
 
     async def delete_application_emoji(self, emoji_id: str):
         """

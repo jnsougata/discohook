@@ -283,10 +283,43 @@ class HTTPClient:
 
     async def modify_guild_emoji(): pass
     async def delete_guild_emoji(): pass
-    async def list_application_emojis(): pass
-    async def get_application_emoji(): pass
-    async def create_application_emoji(): pass
-    async def modify_application_emoji(): pass
+
+    async def list_application_emojis(self):
+        return await self.request(
+            "GET",
+            f"/applications/{self.application_id}/emojis",
+            authorize=True,
+        )
+
+    async def get_application_emoji(self, emoji_id: str):
+        return await self.request(
+            "GET",
+            f"/applications/{self.application_id}/emojis/{emoji_id}",
+            authorize=True,
+        )
+
+    async def create_application_emoji(self, payload: Dict[str, Any]):
+        return await self.request(
+            "POST",
+            f"/applications/{self.application_id}/emojis",
+            body=payload,
+            authorize=True,
+        )
+
+    async def modify_application_emoji(self, emoji_id: str, name: str):
+        return await self.request(
+            "PATCH",
+            f"/applications/{self.application_id}/emojis/{emoji_id}",
+            body={"name": name},
+            authorize=True,
+        )
+    
+    async def delete_application_emoji(self, emoji_id: str):
+        return await self.request(
+            "DELETE",
+            f"/applications/{self.application_id}/emojis/{emoji_id}",
+            authorize=True,
+        )
     
     # Entitlements Resource
     # https://discord.com/developers/docs/resources/entitlement#entitlements-resource
@@ -901,44 +934,5 @@ class HTTPClient:
             "GET",
             f"/channels/{channel_id}/polls/{message_id}/answers/{answer_id}",
             params=params,
-            authorize=True,
-        )
-
-    # end todo
-
-    async def fetch_application_emojis(self):
-        return await self.request(
-            "GET",
-            f"/applications/{self.application_id}/emojis",
-            authorize=True,
-        )
-
-    async def fetch_application_emoji(self, emoji_id: str):
-        return await self.request(
-            "GET",
-            f"/applications/{self.application_id}/emojis/{emoji_id}",
-            authorize=True,
-        )
-
-    async def create_application_emoji(self, payload: Dict[str, Any]):
-        return await self.request(
-            "POST",
-            f"/applications/{self.application_id}/emojis",
-            body=payload,
-            authorize=True,
-        )
-
-    async def edit_application_emoji(self, emoji_id: str, payload: Dict[str, Any]):
-        return await self.request(
-            "PATCH",
-            f"/applications/{self.application_id}/emojis/{emoji_id}",
-            body=payload,
-            authorize=True,
-        )
-
-    async def delete_application_emoji(self, emoji_id: str):
-        return await self.request(
-            "DELETE",
-            f"/applications/{self.application_id}/emojis/{emoji_id}",
             authorize=True,
         )
