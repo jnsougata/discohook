@@ -404,9 +404,13 @@ class Message:
             encoded = f"{emoji.name}:{emoji.id}"
         else:
             encoded = "".join(f"%{byte:02x}" for byte in emoji.encode("utf-8"))
-        return await self.client.http.delete_message_reaction(
-            self.channel_id, self.id, encoded, user_id or "@me"
-        )
+
+        if user_id:
+            return await self.client.http.delete_user_reaction(
+                self.channel_id, self.id, encoded, user_id
+            )
+        return await self.client.http.delete_own_reaction(self.channel_id, self.id, encoded)
+        
 
     async def remove_reactions(self, emoji: Optional[Union[PartialEmoji, str]] = None):
         """

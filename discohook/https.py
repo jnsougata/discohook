@@ -678,8 +678,16 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def delete_own_reaction(self): pass
-    async def delete_user_reaction(self): pass
+    async def delete_own_reaction(self, message_id: str, emoji: str):
+        return await self.delete_user_reaction(message_id, emoji, '@me')
+
+    async def delete_user_reaction(self, message_id: str, emoji: str, user_id: str):
+        return await self.request(
+            "DELETE",
+            f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/{user_id}",
+            authorize=True
+        )
+
     async def get_reactions(self): pass
     async def delete_all_reactions(self): pass
     async def delete_all_reactions_for_emoji(self): pass
@@ -833,7 +841,7 @@ class HTTPClient:
 
     async def get_channel_webhooks(self): pass
     async def get_guild_webhooks(self): pass
-    
+
     async def get_webhook(self, webhook_id: str):
         return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
 
@@ -915,13 +923,6 @@ class HTTPClient:
         )
 
     # TODO
-
-    async def delete_message_reaction(self, message_id: str, emoji: str, user_id: str):
-        return await self.request(
-            "DELETE",
-            f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}/{user_id}",
-            authorize=True,
-        )
 
     async def delete_all_message_reactions(
         self, message_id: str, emoji: Optional[str] = None
