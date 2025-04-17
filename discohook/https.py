@@ -163,7 +163,15 @@ class HTTPClient:
         return await self.request("GET", f"/channels/{channel_id}", authorize=True)
 
     async def modify_channel(): pass
-    async def delete_or_close_channel(): pass # "closes" a dm channel
+
+    async def delete_or_close_channel(self, channel_id: str, reason: Optional[str] = None):
+        return await self.request(
+            "DELETE", 
+            f"/channels/{channel_id}", 
+            authorize=True,
+            reason=reason
+        )
+
     async def edit_channel_permissions(): pass
     async def get_channel_invites(): pass
     async def create_channel_invite(): pass
@@ -445,9 +453,6 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def delete_channel(self, channel_id: str):
-        return await self.request("DELETE", f"/channels/{channel_id}", authorize=True)
-
     async def fetch_channel_message(self, channel_id: str, message_id: str):
         return await self.request(
             "GET", f"/channels/{channel_id}/messages/{message_id}", authorize=True
@@ -529,8 +534,8 @@ class HTTPClient:
         return await self.request(
             "PUT",
             f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}",
-            reason=reason,
             authorize=True,
+            reason=reason
         )
 
     async def remove_role(self, guild_id: str, user_id: str, role_id: str):
@@ -724,8 +729,8 @@ class HTTPClient:
             "POST",
             f"/channels/{channel_id}/threads",
             body=payload,
-            authorize=True,
             reason=reason,
+            authorize=True
         )
 
     async def start_thread_with_message(
@@ -739,8 +744,8 @@ class HTTPClient:
             "POST",
             f"/channels/{channel_id}/messages/{message_id}/threads",
             body=payload,
-            authorize=True,
             reason=reason,
+            authorize=True
         )
 
     async def fetch_answer_voters(

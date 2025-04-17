@@ -327,7 +327,7 @@ class PartialChannel:
         return messages
 
     async def delete(self):
-        await self.client.http.delete_channel(self.id)
+        await self.client.http.delete_or_close_channel(self.id)
 
     async def crosspost(self, message_id: str):
         resp = await self.client.http.crosspost_channel_message(self.id, message_id)
