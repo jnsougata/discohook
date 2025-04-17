@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 UNSPECIFIED = Any
 
+
 def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
     mime, _ = mimetypes.guess_type(file.name)
     form.append(
@@ -106,8 +107,8 @@ def _prepare_sending_payload(
             payload_json,
             headers={
                 "Content-Disposition": 'form-data; name="payload_json"',
-                "Content-Type": "application/json"
-            }
+                "Content-Type": "application/json",
+            },
         )
         for i, file in enumerate(merged_files):
             _append_file(form, i, file)
@@ -187,7 +188,7 @@ def _prepare_editing_payload(
             headers={
                 "Content-Disposition": 'form-data; name="payload_json"',
                 "Content-Type": "application/json",
-            }
+            },
         )
         merged_files = []
         if file is not UNSPECIFIED:
