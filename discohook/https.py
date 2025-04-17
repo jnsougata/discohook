@@ -833,8 +833,12 @@ class HTTPClient:
 
     async def get_channel_webhooks(self): pass
     async def get_guild_webhooks(self): pass
-    async def get_webhook(self): pass
-    async def get_webhook_with_token(self): pass
+    
+    async def get_webhook(self, webhook_id: str):
+        return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
+
+    async def get_webhook_with_token(webhook_id: str, webhook_token: str):
+        return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
 
     async def modify_webhook(
         self, 
@@ -911,11 +915,6 @@ class HTTPClient:
         )
 
     # TODO
-
-    async def fetch_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
-        if webhook_token:
-            return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
-        return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
 
     async def delete_message_reaction(self, message_id: str, emoji: str, user_id: str):
         return await self.request(

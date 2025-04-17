@@ -427,7 +427,10 @@ class Client(Starlette):
         -------
         Webhook
         """
-        resp = await self.http.fetch_webhook(webhook_id, webhook_token=webhook_token)
+        if webhook_token:
+            resp = await self.http.get_webhook_with_token(webhook_id, webhook_token)
+        else:
+            resp = await self.http.get_webhook(webhook_id)
         data = await resp.json()
         return Webhook(self, data)
 
