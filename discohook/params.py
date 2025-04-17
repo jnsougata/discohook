@@ -1,6 +1,5 @@
-import json
 import mimetypes
-from enum import Enum, IntEnum
+from enum import Enum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
