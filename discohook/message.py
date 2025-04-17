@@ -299,7 +299,7 @@ class Message:
         """
         Unpins the message from the channel.
         """
-        return await self.client.http.unpin_channel_message(self.channel_id, self.id)
+        return await self.client.http.unpin_message(self.channel_id, self.id)
 
     async def reply(
         self,
