@@ -11,7 +11,7 @@ class HTTPClient:
     """Represents an HTTP client for Discord's API."""
 
     DISCORD_API_VERSION: int = 10
-    USER_AGENT: str = f"discohook ({__url__}, {__version__})"
+    USER_AGENT: str = f"DiscordBot ({__url__}, {__version__})"
 
     def __init__(
         self,
@@ -68,13 +68,13 @@ class HTTPClient:
         interaction_id: str,
         interaction_token: str,
         data: Any,
-        with_response: bool = True,
+        with_response: bool = False,
     ):
         return await self.request(
             "POST",
             f"/interactions/{interaction_id}/{interaction_token}/callback",
             body=data,
-            with_response=with_response
+            with_response=str(with_response),
         )
     async def get_original_interaction_response(self): pass # get_webhook_message(self), message_id as @original
     async def edit_original_interaction_response(self): pass # edit_webhook_message(self), message_id as @original
