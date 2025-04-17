@@ -30,9 +30,9 @@ class HTTPClient:
         path: str,
         *,
         body: Union[aiohttp.MultipartWriter, Any] = None,
-        params: Optional[Dict[str, Any]] = None,
         authorize: bool = False,
         reason: Optional[str] = None,
+        **params: Dict[str, Any]
     ):
         headers = {"User-Agent": self.USER_AGENT}
         if authorize:
@@ -75,11 +75,16 @@ class HTTPClient:
     # Application Commands
     # https://discord.com/developers/docs/interactions/application-commands#application-commands
 
-    async def get_global_application_commands(self, application_id: str):
+    async def get_global_application_commands(
+        self, 
+        application_id: str, 
+        with_localizations: bool = False
+    ):
         return await self.request(
             "GET", 
             f"/applications/{application_id}/commands", 
-            authorize=True
+            authorize=True,
+            with_localizations=with_localizations
         )
     
     async def create_global_application_command(): pass
@@ -106,7 +111,10 @@ class HTTPClient:
     async def delete_guild_application_command(): pass
 
     async def bulk_overwrite_guild_application_commands(
-        self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]
+        self, 
+        application_id: str, 
+        guild_id: str, 
+        commands: List[Dict[str, Any]]
     ):
         return await self.request(
             "PUT",
@@ -299,7 +307,10 @@ class HTTPClient:
 
     async def create_message(self, channel_id: str, data: Any):
         return await self.request(
-            "POST", f"/channels/{channel_id}/messages", body=data, authorize=True
+            "POST", 
+            f"/channels/{channel_id}/messages", 
+            body=data, 
+            authorize=True
         )
 
     async def crosspost_message(): pass
