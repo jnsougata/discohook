@@ -689,8 +689,20 @@ class HTTPClient:
         )
 
     async def get_reactions(self): pass
-    async def delete_all_reactions(self): pass
-    async def delete_all_reactions_for_emoji(self): pass
+
+    async def delete_all_reactions(self, message_id: str):
+        return await self.request(
+            "DELETE", 
+            f"/channels/{message_id}/messages/{message_id}/reactions", 
+            authorize=True
+        )
+
+    async def delete_all_reactions_for_emoji(self, message_id: str, emoji: str):
+        return await self.request(
+            "DELETE", 
+            f"/channels/{message_id}/messages/{message_id}/reactions/{emoji}", 
+            authorize=True
+        )
 
     async def edit_message(self, channel_id: str, message_id: str, data: Any):
         return await self.request(
@@ -923,14 +935,6 @@ class HTTPClient:
         )
 
     # TODO
-
-    async def delete_all_message_reactions(
-        self, message_id: str, emoji: Optional[str] = None
-    ):
-        path = f"/channels/{message_id}/messages/{message_id}/reactions"
-        if emoji:
-            path += f"/{emoji}"
-        return await self.request("DELETE", path, authorize=True)
 
     async def fetch_answer_voters(
         self,

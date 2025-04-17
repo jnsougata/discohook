@@ -425,7 +425,11 @@ class Message:
             encoded = f"{emoji.name}:{emoji.id}"
         else:
             encoded = "".join(f"%{byte:02x}" for byte in emoji.encode("utf-8"))
-        return await self.client.http.delete_all_message_reactions(
+        if emoji:
+            return await self.client.http.delete_all_reactions_for_emoji(
+                self.id, self.channel_id, encoded, emoji
+            )
+        return await self.client.http.delete_all_reactions(
             self.id, self.channel_id, encoded
         )
 
