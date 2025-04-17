@@ -262,10 +262,32 @@ class HTTPClient:
     # https://discord.com/developers/docs/resources/entitlement#entitlements-resource
 
     async def list_entitlements(): pass
-    async def get_entitlement(): pass
-    async def consume_entitlement(): pass
-    async def create_test_entitlement(): pass
-    async def delete_test_entitlement(): pass
+
+    async def get_entitlement(self, application_id: str, entitlement_id: str):
+        return await self.request(
+            "GET",
+            f"/applications/{application_id}/entitlements/{entitlement_id}",
+            authorize=True,
+        )
+
+    async def consume_entitlement(): pass    
+    
+    async def create_test_entitlement(
+        self, application_id: str, payload: Dict[str, Any]
+    ):
+        return await self.request(
+            "POST",
+            f"/applications/{application_id}/entitlements",
+            body=payload,
+            authorize=True,
+        )
+
+    async def delete_test_entitlement(self, application_id: str, entitlement_id: str):
+        return await self.request(
+            "DELETE",
+            f"/applications/{application_id}/entitlements/{entitlement_id}",
+            authorize=True,
+        )
 
     # Guild Scheduled Event
     # https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event
@@ -585,7 +607,10 @@ class HTTPClient:
     # SKU Resource
     # https://discord.com/developers/docs/resources/sku#sku-resource
 
-    async def list_skus(): pass
+    async def list_skus(self, application_id: str):
+        return await self.request(
+            "GET", f"/applications/{application_id}/skus", authorize=True
+        )
 
     # Soundboard Resource
     # https://discord.com/developers/docs/resources/soundboard#soundboard-resource
@@ -807,8 +832,6 @@ class HTTPClient:
             return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
         return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
 
-    # end todo
-    
     async def delete_message_reaction(self, message_id: str, emoji: str, user_id: str):
         return await self.request(
             "DELETE",
@@ -824,30 +847,6 @@ class HTTPClient:
             path += f"/{emoji}"
         return await self.request("DELETE", path, authorize=True)
 
-    async def create_test_entitlement(
-        self, application_id: str, payload: Dict[str, Any]
-    ):
-        return await self.request(
-            "POST",
-            f"/applications/{application_id}/entitlements",
-            body=payload,
-            authorize=True,
-        )
-
-    async def delete_test_entitlement(self, application_id: str, entitlement_id: str):
-        return await self.request(
-            "DELETE",
-            f"/applications/{application_id}/entitlements/{entitlement_id}",
-            authorize=True,
-        )
-
-    async def fetch_entitlement(self, application_id: str, entitlement_id: str):
-        return await self.request(
-            "GET",
-            f"/applications/{application_id}/entitlements/{entitlement_id}",
-            authorize=True,
-        )
-
     async def fetch_entitlements(self, application_id: str, params: Dict[str, Any]):
         return await self.request(
             "GET",
@@ -856,10 +855,7 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def fetch_skus(self, application_id: str):
-        return await self.request(
-            "GET", f"/applications/{application_id}/skus", authorize=True
-        )
+    # end todo
 
     async def start_thread_without_message(
         self, channel_id: str, payload: Dict[str, Any], reason: Optional[str] = None
