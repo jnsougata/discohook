@@ -75,19 +75,7 @@ class HTTPClient:
     # Application Commands
     # https://discord.com/developers/docs/interactions/application-commands#application-commands
 
-    async def get_global_application_commands(
-        self, 
-        application_id: str,
-        *,
-        with_localizations: bool = False
-    ):
-        return await self.request(
-            "GET", 
-            f"/applications/{application_id}/commands", 
-            authorize=True,
-            with_localizations=with_localizations
-        )
-    
+    async def get_global_application_commands(): pass
     async def create_global_application_command(): pass
     async def get_global_application_command(): pass
     async def edit_global_application_command(): pass
@@ -486,6 +474,19 @@ class HTTPClient:
     async def delete_webhook_message(): pass
 
     # todo
+
+    async def get_global_application_commands(
+        self, 
+        application_id: str,
+        *,
+        with_localizations: bool = False
+    ):
+        return await self.request(
+            "GET", 
+            f"/applications/{application_id}/commands", 
+            authorize=True,
+            with_localizations=with_localizations
+        )
 
     async def delete_command(
         self, application_id: str, command_id: str, guild_id: Optional[str] = None
