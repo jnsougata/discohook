@@ -191,9 +191,9 @@ def _prepare_editing_payload(
             },
         )
         merged_files = []
-        if file is not UNSPECIFIED:
-            merged_files.extend(files)
-        if files is not UNSPECIFIED:
+        if file is not UNSPECIFIED and file is not None:
+            merged_files.append(file)
+        if files is not UNSPECIFIED and files is not None:
             merged_files.extend(files)
         for i, f in enumerate(merged_files):
             _append_file(form, i, f)
