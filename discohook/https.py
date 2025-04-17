@@ -863,7 +863,9 @@ class HTTPClient:
             reason=reason
         )
 
-    async def get_channel_webhooks(self): pass
+    async def get_channel_webhooks(self, channel_id: str):
+        return await self.request("GET", f"/channels/{channel_id}/webhooks", authorize=True)
+
     async def get_guild_webhooks(self): pass
 
     async def get_webhook(self, webhook_id: str):
