@@ -296,6 +296,7 @@ class PartialChannel:
         before: Optional[str] = None,
         after: Optional[str] = None,
         around: Optional[str] = None,
+        reason: Optional[str] = None
     ) -> List[Message]:
         """
         Deletes messages from the channel in bulk.
@@ -321,13 +322,13 @@ class PartialChannel:
         )
         ids = [msg.id for msg in messages]
         if len(ids) < 2:
-            await self.client.http.delete_message(self.id, ids[0])
+            await self.client.http.delete_message(self.id, ids[0], reason=reason)
             return messages
-        await self.client.http.bulk_delete_messages(self.id, {"messages": ids})
+        await self.client.http.bulk_delete_messages(self.id, {"messages": ids}, reason=reason)
         return messages
 
-    async def delete(self):
-        await self.client.http.delete_or_close_channel(self.id)
+    async def delete(self, *, reason: Optional[str] = None):
+        await self.client.http.delete_or_close_channel(self.id, reason=reason)
 
     async def crosspost(self, message_id: str):
         resp = await self.client.http.crosspost_channel_message(self.id, message_id)

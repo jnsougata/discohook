@@ -272,7 +272,21 @@ class HTTPClient:
     async def get_guild_channels(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}/channels", authorize=True)
 
-    async def create_guild_channel(): pass
+    async def create_guild_channel(
+        self, 
+        guild_id: str, 
+        payload: Dict[str, Any],
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "POST", 
+            f"/guilds/{guild_id}/channels", 
+            body=payload, 
+            authorize=True,
+            reason=reason
+        )
+
     async def modify_guild_channel_positions(): pass
     async def list_active_guild_threads(): pass
 
@@ -644,11 +658,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def create_guild_channel(self, guild_id: str, payload: Dict[str, Any]):
-        return await self.request(
-            "POST", f"/guilds/{guild_id}/channels", body=payload, authorize=True
-        )
 
     async def crosspost_channel_message(self, channel_id: str, message_id: str):
         return await self.request(

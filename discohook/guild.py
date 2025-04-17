@@ -84,6 +84,7 @@ class PartialGuild:
         default_reaction_emoji: Optional[PartialEmoji] = None,
         available_tags: Optional[List[Dict[str, Any]]] = None,
         default_sort_order: Optional[int] = None,
+        reason: Optional[str] = None
     ) -> Channel:
         """
         Creates a channel in the guild. Requires the MANAGE_CHANNELS permission.
@@ -158,7 +159,7 @@ class PartialGuild:
             payload["available_tags"] = available_tags
         if default_sort_order:
             payload["default_sort_order"] = default_sort_order
-        resp = await self.client.http.create_guild_channel(self.id, payload)
+        resp = await self.client.http.create_guild_channel(self.id, payload, reason=reason)
         data = await resp.json()
         return Channel(self.client, data)
 

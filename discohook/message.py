@@ -232,11 +232,11 @@ class Message:
     def position(self) -> Optional[int]:
         return self.data.get("position")
 
-    async def delete(self):
+    async def delete(self, *, reason: Optional[str] = None):
         """
         Deletes the message.
         """
-        return await self.client.http.delete_message(self.channel_id, self.id)
+        return await self.client.http.delete_message(self.channel_id, self.id, reason=reason)
 
     async def edit(
         self,
@@ -289,17 +289,17 @@ class Message:
         )
         return Message(self.client, await resp.json())
 
-    async def pin(self):
+    async def pin(self, *, reason: Optional[str] = None):
         """
         Pins the message to the channel.
         """
-        return await self.client.http.pin_message(self.channel_id, self.id)
+        return await self.client.http.pin_message(self.channel_id, self.id, reason=reason)
 
-    async def unpin(self):
+    async def unpin(self, *, reason: Optional[str] = None):
         """
         Unpins the message from the channel.
         """
-        return await self.client.http.unpin_message(self.channel_id, self.id)
+        return await self.client.http.unpin_message(self.channel_id, self.id, reason=reason)
 
     async def reply(
         self,
