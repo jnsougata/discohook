@@ -675,7 +675,22 @@ class HTTPClient:
     async def get_guild_webhooks(): pass
     async def get_webhook(): pass
     async def get_webhook_with_token(): pass
-    async def modify_webhook(): pass
+
+    async def modify_webhook(
+        self, 
+        webhook_id: str, 
+        payload: Dict[str, Any],
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "PATCH", 
+            f"/webhooks/{webhook_id}", 
+            body=payload, 
+            authorize=True,
+            reason=reason
+        )
+
     async def modify_webhook_with_token(): pass
     async def delete_webhook(): pass
     async def delete_webhook_with_token(): pass
@@ -760,8 +775,6 @@ class HTTPClient:
             "GET", f"/guilds/{guild_id}?with_counts=true", authorize=True
         )
 
-    # end todo
-
     async def execute_webhook(
         self,
         webhook_id: str,
@@ -773,10 +786,7 @@ class HTTPClient:
             "POST", f"/webhooks/{webhook_id}/{webhook_token}", body=data, params=params
         )
 
-    async def edit_webhook(self, webhook_id: str, payload: Dict[str, Any]):
-        return await self.request(
-            "PATCH", f"/webhooks/{webhook_id}", body=payload, authorize=True
-        )
+    # end todo
 
     async def fetch_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
         if webhook_token:

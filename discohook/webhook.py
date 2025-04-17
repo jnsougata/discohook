@@ -204,6 +204,7 @@ class Webhook:
         name: Optional[str] = None,
         image_base64: Optional[str] = None,
         channel_id: Optional[str] = None,
+        reason: Optional[str] = None
     ) -> "Webhook":
         """
         Edits the webhook.
@@ -232,7 +233,7 @@ class Webhook:
             payload["avatar"] = image_base64
         if channel_id:
             payload["channel_id"] = channel_id
-        resp = await self.client.http.edit_webhook(self.id, payload)
+        resp = await self.client.http.modify_webhook(self.id, payload, reason=reason)
         data = await resp.json()
         return Webhook(self.client, data)
 
