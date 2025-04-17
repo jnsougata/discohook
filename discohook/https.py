@@ -366,7 +366,13 @@ class HTTPClient:
     # Entitlements Resource
     # https://discord.com/developers/docs/resources/entitlement#entitlements-resource
 
-    async def list_entitlements(self): pass
+    async def list_entitlements(self, application_id: str, **params):
+        return await self.request(
+            "GET",
+            f"/applications/{application_id}/entitlements",
+            authorize=True,
+            **params
+        )
 
     async def get_entitlement(self, application_id: str, entitlement_id: str):
         return await self.request(
@@ -925,14 +931,6 @@ class HTTPClient:
         if emoji:
             path += f"/{emoji}"
         return await self.request("DELETE", path, authorize=True)
-
-    async def fetch_entitlements(self, application_id: str, params: Dict[str, Any]):
-        return await self.request(
-            "GET",
-            f"/applications/{application_id}/entitlements",
-            params=params,
-            authorize=True,
-        )
 
     async def fetch_answer_voters(
         self,
