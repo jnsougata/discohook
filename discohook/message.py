@@ -382,7 +382,7 @@ class Message:
             encoded = f"{emoji.name}:{emoji.id}"
         else:
             encoded = "".join(f"%{byte:02x}" for byte in emoji.encode("utf-8"))
-        return await self.client.http.create_message_reaction(
+        return await self.client.http.create_reaction(
             self.channel_id, self.id, encoded
         )
 

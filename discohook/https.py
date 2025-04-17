@@ -524,7 +524,15 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def create_reaction(): pass
+    async def create_reaction(
+        self, channel_id: str, message_id: str, emoji: str
+    ):
+        return await self.request(
+            "PUT",
+            f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me",
+            authorize=True,
+        )
+
     async def delete_own_reaction(): pass
     async def delete_user_reaction(): pass
     async def get_reactions(): pass
@@ -800,16 +808,7 @@ class HTTPClient:
         return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
 
     # end todo
-
-    async def create_message_reaction(
-        self, channel_id: str, message_id: str, emoji: str
-    ):
-        return await self.request(
-            "PUT",
-            f"/channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me",
-            authorize=True,
-        )
-
+    
     async def delete_message_reaction(self, message_id: str, emoji: str, user_id: str):
         return await self.request(
             "DELETE",
