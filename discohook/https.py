@@ -632,7 +632,11 @@ class HTTPClient:
     # https://discord.com/developers/docs/resources/poll#poll-resource
 
     async def get_answer_voters(): pass
-    async def end_poll(): pass
+
+    async def end_poll(self, channel_id: str, message_id: str):
+        return await self.request(
+            "POST", f"/channels/{channel_id}/polls/{message_id}/expire", authorize=True
+        )
 
     # SKU Resource
     # https://discord.com/developers/docs/resources/sku#sku-resource
@@ -885,8 +889,6 @@ class HTTPClient:
             authorize=True,
         )
 
-    # end todo
-
     async def fetch_answer_voters(
         self,
         channel_id: str,
@@ -902,10 +904,7 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def end_poll(self, channel_id: str, message_id: str):
-        return await self.request(
-            "POST", f"/channels/{channel_id}/polls/{message_id}/expire", authorize=True
-        )
+    # end todo
 
     async def fetch_application_emojis(self):
         return await self.request(
