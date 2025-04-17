@@ -351,7 +351,14 @@ class HTTPClient:
     async def get_reactions(): pass
     async def delete_all_reactions(): pass
     async def delete_all_reactions_for_emoji(): pass
-    async def edit_message(): pass
+
+    async def edit_message(elf, channel_id: str, message_id: str, data: Any):
+        return await self.request(
+            "PATCH",
+            f"/channels/{channel_id}/messages/{message_id}",
+            body=data,
+            authorize=True,
+        )
 
     async def delete_message(self, channel_id: str, message_id: str, reason: Optional[str] = None):
         await self.request(
@@ -497,14 +504,6 @@ class HTTPClient:
     async def fetch_channel_messages(self, channel_id: str, params: Dict[str, Any]):
         return await self.request(
             "GET", f"/channels/{channel_id}/messages", params=params, authorize=True
-        )
-
-    async def edit_channel_message(self, channel_id: str, message_id: str, data: Any):
-        return await self.request(
-            "PATCH",
-            f"/channels/{channel_id}/messages/{message_id}",
-            body=data,
-            authorize=True,
         )
 
     async def send_webhook_message(

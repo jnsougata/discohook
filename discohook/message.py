@@ -284,7 +284,7 @@ class Message:
         )
         if view and view is not MISSING:
             self.client.load_view(view)
-        resp = await self.client.http.edit_channel_message(
+        resp = await self.client.http.edit_message(
             self.channel_id, self.id, payload
         )
         return Message(self.client, await resp.json())
