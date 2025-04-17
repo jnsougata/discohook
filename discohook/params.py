@@ -15,6 +15,16 @@ if TYPE_CHECKING:
 
 UNSPECIFIED = Any
 
+def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
+    mime, _ = mimetypes.guess_type(file.name)
+    form.append(
+        file.content,
+        headers={
+            "Content-Disposition": f'form-data; name="files[{index}]"; filename="{file.name}"',
+            "Content-Type": mime or "application/octet-stream",
+        },
+    )
+
 
 def _prepare_sending_payload(
     *,
@@ -93,22 +103,15 @@ def _prepare_sending_payload(
     )
     if merged_files:
         form = aiohttp.MultipartWriter("form-data")
-        form.append(
-            json.dumps(payload_json),
+        form.append_json(
+            payload_json,
             headers={
                 "Content-Disposition": 'form-data; name="payload_json"',
-                "Content-Type": "application/json",
-            },
+                "Content-Type": "application/json"
+            }
         )
-        for i, f in enumerate(merged_files):
-            mime, _ = mimetypes.guess_type(f.name)
-            form.append(
-                f.content,
-                headers={
-                    "Content-Disposition": f'form-data; name="files[{i}]"; filename="{f.name}"',
-                    "Content-Type": mime or "application/octet-stream",
-                },
-            )
+        for i, file in enumerate(merged_files):
+            _append_file(form, i, file)
         return form
     return payload_json
 
@@ -127,7 +130,6 @@ def _prepare_editing_payload(
     **kwargs: Any,
 ):
     payload: Dict[str, Any] = {}
-
     if content is not UNSPECIFIED and content is not None:
         payload["content"] = str(content)
     if content is None:
@@ -144,12 +146,10 @@ def _prepare_editing_payload(
         payload["tts"] = tts
     if suppress_embeds is not UNSPECIFIED:
         payload["flags"] = 1 << 2
-
     if view is None:
         payload["components"] = []
     elif view is not UNSPECIFIED:
         payload["components"] = view.components
-
     if file is None or files is None:
         payload["attachments"] = []
     elif files is not UNSPECIFIED and file is not UNSPECIFIED:
@@ -175,7 +175,6 @@ def _prepare_editing_payload(
                     for i, f in enumerate(files)
                 ]
             )
-
     payload.update(kwargs)
     payload_json = (
         payload
@@ -184,31 +183,19 @@ def _prepare_editing_payload(
     )
     if files is not UNSPECIFIED or file is not UNSPECIFIED:
         form = aiohttp.MultipartWriter("form-data")
-        form.append(
-            json.dumps(payload_json),
+        form.append_json(
+            payload_json,
             headers={
                 "Content-Disposition": 'form-data; name="payload_json"',
                 "Content-Type": "application/json",
-            },
+            }
         )
+        merged_files = []
         if file is not UNSPECIFIED:
-            mime, _ = mimetypes.guess_type(file.name)
-            form.append(
-                file.content,
-                headers={
-                    "Content-Disposition": f'form-data; name="files[0]"; filename="{file.name}"',
-                    "Content-Type": mime or "application/octet-stream",
-                },
-            )
+            merged_files.extend(files)
         if files is not UNSPECIFIED:
-            for i, f in enumerate(files):
-                mime, _ = mimetypes.guess_type(f.name)
-                form.append(
-                    f.content,
-                    headers={
-                        "Content-Disposition": f'form-data; name="files[{i}]"; filename="{f.name}"',
-                        "Content-Type": mime or "application/octet-stream",
-                    },
-                )
+            merged_files.extend(files)
+        for i, f in enumerate(merged_files):
+            _append_file(form, i, f)
         return form
     return payload_json
