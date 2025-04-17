@@ -286,7 +286,7 @@ class PartialChannel:
             params["after"] = after
         if around:
             params["around"] = around
-        resp = await self.client.http.fetch_channel_messages(self.id, params=params)
+        resp = await self.client.http.fetch_channel_messages(self.id, **params)
         data = await resp.json()
         return [Message(self.client, msg) for msg in data]
 
