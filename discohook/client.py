@@ -383,7 +383,12 @@ class Client(Starlette):
         return responses, [cmd.to_dict() for cmd in self._sync_queue]
 
     async def create_webhook(
-        self, channel_id: str, *, name: str, image_base64: Optional[str] = None
+        self, 
+        channel_id: str, 
+        *, 
+        name: str, 
+        image_base64: Optional[str] = None,
+        reason: Optional[str] = None
     ):
         """
         Create a webhook in a channel.
@@ -402,7 +407,7 @@ class Client(Starlette):
 
         """
         resp = await self.http.create_webhook(
-            channel_id, {"name": name, "avatar": image_base64}
+            channel_id, {"name": name, "avatar": image_base64}, reason=reason
         )
         data = await resp.json()
         return Webhook(self, data)

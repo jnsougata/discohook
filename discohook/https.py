@@ -656,7 +656,21 @@ class HTTPClient:
     # Webhook Resource
     # https://discord.com/developers/docs/resources/webhook#webhook-resource
 
-    async def create_webhook(): pass
+    async def create_webhook(
+        self, 
+        channel_id: str, 
+        payload: Dict[str, Any],
+        *,
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "POST", 
+            f"/channels/{channel_id}/webhooks", 
+            body=payload, 
+            authorize=True,
+            reason=reason
+        )
+
     async def get_channel_webhooks(): pass
     async def get_guild_webhooks(): pass
     async def get_webhook(): pass
@@ -747,11 +761,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def create_webhook(self, channel_id: str, payload: Dict[str, Any]):
-        return await self.request(
-            "POST", f"/channels/{channel_id}/webhooks", body=payload, authorize=True
-        )
 
     async def execute_webhook(
         self,
