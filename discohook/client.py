@@ -431,7 +431,7 @@ class Client(Starlette):
         data = await resp.json()
         return Webhook(self, data)
 
-    async def fetch_guild(self, guild_id: str) -> Optional[Guild]:
+    async def fetch_guild(self, guild_id: str, *, with_counts: Optional[str] = False) -> Optional[Guild]:
         """
         Fetches the guild of given id.
 
@@ -439,7 +439,7 @@ class Client(Starlette):
         -------
         Guild
         """
-        resp = await self.http.fetch_guild(guild_id)
+        resp = await self.http.get_guild(guild_id, with_counts)
         data = await resp.json()
         if not data.get("id"):
             return None

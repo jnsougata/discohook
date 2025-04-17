@@ -419,7 +419,12 @@ class HTTPClient:
     # https://discord.com/developers/docs/resources/guild#guild-resource
 
     async def create_guild(self): pass
-    async def get_guild(self): pass
+
+    async def get_guild(self, guild_id: str, with_counts: Optional[str] = False):
+        return await self.request(
+            "GET", f"/guilds/{guild_id}", authorize=True, with_counts=with_counts
+        )
+    
     async def get_guild_preview(self): pass
     async def modify_guild(self): pass
     async def delete_guild(self): pass
@@ -900,11 +905,6 @@ class HTTPClient:
         )
 
     # TODO
-
-    async def fetch_guild(self, guild_id: str):
-        return await self.request(
-            "GET", f"/guilds/{guild_id}?with_counts=true", authorize=True
-        )
 
     async def fetch_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
         if webhook_token:
