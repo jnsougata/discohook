@@ -68,11 +68,13 @@ class HTTPClient:
         interaction_id: str,
         interaction_token: str,
         data: Any,
+        with_response: bool = True,
     ):
         return await self.request(
             "POST",
             f"/interactions/{interaction_id}/{interaction_token}/callback",
             body=data,
+            with_response=with_response
         )
     async def get_original_interaction_response(self): pass # get_webhook_message(self), message_id as @original
     async def edit_original_interaction_response(self): pass # edit_webhook_message(self), message_id as @original

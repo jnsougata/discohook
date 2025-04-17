@@ -155,6 +155,7 @@ class ResponseAdapter:
         ephemeral: Optional[bool] = False,
         suppress_embeds: Optional[bool] = False,
         poll: Optional[Poll] = None,
+        with_response: bool = False,
     ) -> InteractionResponse:
         """
         Sends a response to the interaction
@@ -183,7 +184,8 @@ class ResponseAdapter:
             Whether the embeds should be suppressed or not
         poll: Optional[Poll]
             The poll to send with the message
-
+        with_response: Optional[bool]
+            Whether to include an interaction callback object as the response.
         Returns
         -------
         InteractionResponse
