@@ -309,7 +309,20 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def remove_guild_member(): pass
+    async def remove_guild_member(
+        self, 
+        guild_id: str, 
+        user_id: str, 
+        *, 
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "DELETE", 
+            f"/guilds/{guild_id}/members/{user_id}", 
+            authorize=True,
+            reason=reason
+        )
+
     async def get_guild_bans(): pass
     async def get_guild_ban(): pass
     async def create_guild_ban(): pass
@@ -588,11 +601,6 @@ class HTTPClient:
         )
         
     # end todo
-
-    async def kick_user(self, guild_id: str, user_id: str):
-        return await self.request(
-            "DELETE", f"/guilds/{guild_id}/members/{user_id}", authorize=True
-        )
 
     async def ban_user(
         self, guild_id: str, user_id: str, delete_message_seconds: int = 0
