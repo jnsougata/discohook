@@ -262,7 +262,22 @@ class HTTPClient:
     async def modify_guild_member(): pass
     async def modify_current_member(): pass
     async def modify_current_user_nick(): pass
-    async def add_guild_member_role(): pass
+
+    async def add_guild_member_role(
+        self, 
+        guild_id: str, 
+        user_id: str, 
+        role_id: str, 
+        *, 
+        reason: Optional[str] = None
+    ):
+        return await self.request(
+            "PUT",
+            f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}",
+            authorize=True,
+            reason=reason
+        )
+
     async def remove_guild_member_role(): pass
     async def remove_guild_member(): pass
     async def get_guild_bans(): pass
@@ -508,7 +523,6 @@ class HTTPClient:
             "GET", f"/channels/{channel_id}/messages", params=params, authorize=True
         )
 
-
     async def delete_webhook_message(
         self, webhook_id: str, webhook_token: str, message_id: str
     ):
@@ -533,16 +547,8 @@ class HTTPClient:
         return await self.request(
             "GET", f"/webhooks/{webhook_id}/{webhook_token}/messages/@original"
         )
-
-    async def add_role(
-        self, guild_id: str, user_id: str, role_id: str, *, reason: Optional[str] = None
-    ):
-        return await self.request(
-            "PUT",
-            f"/guilds/{guild_id}/members/{user_id}/roles/{role_id}",
-            authorize=True,
-            reason=reason
-        )
+        
+    # end todo
 
     async def remove_role(self, guild_id: str, user_id: str, role_id: str):
         return await self.request(

@@ -84,7 +84,7 @@ class Member(User):
         reason: Optional[str]
             The reason for adding the role to be logged.
         """
-        return await self.client.http.add_role(
+        return await self.client.http.add_guild_member_role(
             self.guild_id, self.id, role_id, reason=reason
         )
 
