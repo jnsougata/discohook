@@ -354,7 +354,10 @@ class HTTPClient:
 
     async def remove_guild_ban(): pass
     async def bulk_guild_ban(): pass
-    async def get_guild_roles(): pass
+
+    async def get_guild_roles(self, guild_id: str):
+        return await self.request("GET", f"/guilds/{guild_id}/roles", authorize=True)
+
     async def get_guild_role(): pass
     async def create_guild_role(): pass
     async def modify_guild_role_positions(): pass
@@ -641,9 +644,6 @@ class HTTPClient:
         )
 
     # end todo
-
-    async def fetch_guild_roles(self, guild_id: str):
-        return await self.request("GET", f"/guilds/{guild_id}/roles", authorize=True)
 
     async def create_guild_channel(self, guild_id: str, payload: Dict[str, Any]):
         return await self.request(

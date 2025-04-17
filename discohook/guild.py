@@ -60,7 +60,7 @@ class PartialGuild:
         -------
         List[Role]
         """
-        resp = await self.client.http.fetch_guild_roles(self.id)
+        resp = await self.client.http.get_guild_roles(self.id)
         data = await resp.json()
         return [Role(self.client, r) for r in data]
 
