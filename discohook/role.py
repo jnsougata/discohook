@@ -113,7 +113,7 @@ class PartialRole:
         payload = {"id": role_id, "position": position}
         resp = await self.client.http.modify_guild_role_positions(
             self.guild_id, 
-            payload
+            payload,
             reason=reason
         )
         data = await resp.json()

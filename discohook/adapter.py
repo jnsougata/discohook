@@ -454,7 +454,7 @@ class ResponseAdapter:
         )
         if view:
             self.inter.client.load_view(view)
-        resp = await self.inter.client.http.send_webhook_message(
+        resp = await self.inter.client.http.execute_webhook(
             self.inter.application_id, self.inter.token, payload
         )
         data = await resp.json()
