@@ -1,5 +1,18 @@
-import time
+from dataclasses import dataclass
 from typing import Optional, Protocol, runtime_checkable
+
+
+@dataclass
+class Bucket:
+    """
+    A dataclass that represents a rate limit bucket.
+    """
+
+    limit: int
+    remaining: int
+    reset: float
+    reset_after: float
+    bucket: str
 
 
 @runtime_checkable
@@ -8,7 +21,7 @@ class RatelimitMux(Protocol):
     A protocol that defines the methods and properties of a rate limit bucket.
     """
 
-    def insert(
+    async def insert(
         self,
         path: str,
         *,
@@ -19,8 +32,20 @@ class RatelimitMux(Protocol):
         bucket: str,
     ) -> str: ...
 
-    def reset(self, path: str) -> None: ...
+    async def reset(self, path: str) -> None:
+        """
+        Reset the rate limit bucket for the given path.
+        """
+        ...
 
-    def get(self, path: str) -> Optional[dict]: ...
+    async def get(self, path: str) -> Optional[Bucket]:
+        """
+        Get the rate limit bucket for the given path.
+        """
+        ...
 
-    def is_rate_limited(self, path: str) -> bool: ...
+    async def is_rate_limited(self, path: str) -> bool:
+        """
+        Check if the rate limit bucket for the given path is rate limited.
+        """
+        ...
