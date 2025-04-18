@@ -1,5 +1,7 @@
 # discohook
 
+A discord interaction API wrapper for serverless applications.
+
 ### Installation
 
 ```bash
