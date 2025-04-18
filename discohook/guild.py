@@ -84,7 +84,7 @@ class PartialGuild:
         default_reaction_emoji: Optional[PartialEmoji] = None,
         available_tags: Optional[List[Dict[str, Any]]] = None,
         default_sort_order: Optional[int] = None,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
     ) -> Channel:
         """
         Creates a channel in the guild. Requires the MANAGE_CHANNELS permission.
@@ -159,7 +159,9 @@ class PartialGuild:
             payload["available_tags"] = available_tags
         if default_sort_order:
             payload["default_sort_order"] = default_sort_order
-        resp = await self.client.http.create_guild_channel(self.id, payload, reason=reason)
+        resp = await self.client.http.create_guild_channel(
+            self.id, payload, reason=reason
+        )
         data = await resp.json()
         return Channel(self.client, data)
 
@@ -205,7 +207,7 @@ class PartialGuild:
         mentionable: Optional[bool] = False,
         icon_data_uri: Optional[str] = None,
         unicode_emoji: Optional[str] = None,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
     ):
         payload = {"name": name}
         base_permissions = 0
@@ -228,12 +230,12 @@ class PartialGuild:
         return Role(self.client, data)
 
     async def create_emoji(
-        self, 
-        name: str, 
-        image: str, 
-        *, 
+        self,
+        name: str,
+        image: str,
+        *,
         roles: Optional[List[str]] = None,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
     ):
         """
         Creates a new emoji for the guild.
@@ -254,7 +256,9 @@ class PartialGuild:
         payload = {"name": name, "image": image}
         if roles:
             payload["roles"] = roles
-        resp = await self.client.http.create_guild_emoji(self.id, payload, reason=reason)
+        resp = await self.client.http.create_guild_emoji(
+            self.id, payload, reason=reason
+        )
         return await resp.json()
 
 

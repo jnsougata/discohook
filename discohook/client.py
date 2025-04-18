@@ -20,6 +20,7 @@ from .https import HTTPClient
 from .interaction import Interaction
 from .message import Message
 from .poll import Poll
+from .ratelimit import RatelimitMux
 from .user import User
 from .utils import compare_password
 from .view import View
@@ -96,6 +97,8 @@ class Client(Starlette):
         The password to use for the dashboard.
     default_help_command: bool
         Whether to use the default help command or not. Defaults to False.
+    ratelimit_mux: RatelimitMux | None
+        Whether to use a custom ratelimit mux or not. Defaults to None.
     **kwargs
         Keyword arguments to pass to the FastAPI instance.
     """
@@ -109,6 +112,7 @@ class Client(Starlette):
         route: str = "/interactions",
         password: Optional[str] = None,
         default_help_command: bool = False,
+        ratelimit_mux: Optional[RatelimitMux] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -116,7 +120,9 @@ class Client(Starlette):
         self.public_key = public_key
         self.application_id = application_id
         self.password = password
-        self.http = HTTPClient(token=token, application_id=application_id)
+        self.http = HTTPClient(
+            token=token, application_id=application_id, rate_limiter=ratelimit_mux
+        )
         self.active_components: Dict[str, Component] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.commands: Dict[str, ApplicationCommand] = {}
@@ -383,12 +389,12 @@ class Client(Starlette):
         return responses, [cmd.to_dict() for cmd in self._sync_queue]
 
     async def create_webhook(
-        self, 
-        channel_id: str, 
-        *, 
-        name: str, 
+        self,
+        channel_id: str,
+        *,
+        name: str,
         image_base64: Optional[str] = None,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
     ):
         """
         Create a webhook in a channel.
@@ -481,9 +487,7 @@ class Client(Starlette):
         -------
         List[Dict[str, Any]]
         """
-        resp = await self.http.get_global_application_commands(
-            str(self.application_id)
-        )
+        resp = await self.http.get_global_application_commands(str(self.application_id))
         return await resp.json()
 
     async def fetch_info(self) -> Dict[str, Any]:

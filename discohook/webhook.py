@@ -9,7 +9,8 @@ from .file import File
 from .guild import PartialGuild
 from .https import HTTPClient
 from .message import Message
-from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
+from .params import (UNSPECIFIED, _prepare_editing_payload,
+                     _prepare_sending_payload)
 from .user import User
 from .view import View
 
@@ -204,7 +205,7 @@ class Webhook:
         name: Optional[str] = None,
         image_base64: Optional[str] = None,
         channel_id: Optional[str] = None,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
     ) -> "Webhook":
         """
         Edits the webhook.

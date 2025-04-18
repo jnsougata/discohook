@@ -38,7 +38,7 @@ class PartialRole:
         description: Optional[str] = None,
         unicode_emoji: Optional[str] = None,
         icon_data_uri: Optional[str] = None,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
     ) -> "Role":
         """
         Edits the role.
@@ -86,16 +86,14 @@ class PartialRole:
             payload["unicode_emoji"] = unicode_emoji
         if icon_data_uri:
             payload["icon"] = icon_data_uri
-        resp = await self.client.http.modify_guild_role(self.guild_id, self.id, payload, reason=reason)
+        resp = await self.client.http.modify_guild_role(
+            self.guild_id, self.id, payload, reason=reason
+        )
         data = await resp.json()
         return Role(self.client, data)
 
     async def edit_position(
-        self, 
-        role_id: str, 
-        *, 
-        position: int,
-        reason: Optional[str] = None 
+        self, role_id: str, *, position: int, reason: Optional[str] = None
     ) -> List["Role"]:
         """
         Changes the position of the role.
@@ -112,9 +110,7 @@ class PartialRole:
         """
         payload = {"id": role_id, "position": position}
         resp = await self.client.http.modify_guild_role_positions(
-            self.guild_id, 
-            payload,
-            reason=reason
+            self.guild_id, payload, reason=reason
         )
         data = await resp.json()
         return [Role(self.client, role) for role in data]

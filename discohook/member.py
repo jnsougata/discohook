@@ -105,9 +105,13 @@ class Member(User):
         """
         Kick the member.
         """
-        return await self.client.http.remove_guild_member(self.guild_id, self.id, reason=reason)
+        return await self.client.http.remove_guild_member(
+            self.guild_id, self.id, reason=reason
+        )
 
-    async def ban(self, *, delete_message_seconds: int = 0, reason: Optional[str] = None):
+    async def ban(
+        self, *, delete_message_seconds: int = 0, reason: Optional[str] = None
+    ):
         """
         Ban the member.
 
