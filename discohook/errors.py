@@ -62,3 +62,4 @@ class RateLimitExceeded(Exception):
             f"Rate limit exceeded for {path}. Retry after {bucket.reset_after} seconds."
         )
         super().__init__(message)
+        self.bucket = bucket

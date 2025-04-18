@@ -1,5 +1,6 @@
 import json
-from typing import Any, Dict, List, Optional, Union
+import warnings
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 import aiohttp
 
@@ -28,18 +29,18 @@ class HTTPClient:
         self.rate_limiter: Optional[RatelimitMux] = rate_limiter
 
     async def request(
-        self,
-        method: str,
-        path: str,
-        *,
-        body: Union[aiohttp.MultipartWriter, Any] = None,
-        authorize: bool = False,
-        reason: Optional[str] = None,
-        **params: Any,
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Union[aiohttp.MultipartWriter, Any] = None,
+            authorize: bool = False,
+            reason: Optional[str] = None,
+            **params: Any,
     ):
         ratelimit_bucket_key = f"{method}{path}"
         if self.rate_limiter and await self.rate_limiter.is_rate_limited(
-            ratelimit_bucket_key
+                ratelimit_bucket_key
         ):
             raise RateLimitExceeded(
                 ratelimit_bucket_key,
@@ -86,6 +87,86 @@ class HTTPClient:
             raise HTTPException(resp, await resp.read())
         return resp
 
+    def _route_fmt(
+        self,
+        method: str,
+        template: str,
+        minor: Tuple[str],
+        major: Dict[str, Any],
+    ):
+        path = f"/api/v{self.DISCORD_API_VERSION}"
+        path = path + template.format(*minor, **major)
+        key = template
+        for k, v in major.items():
+            key = key.replace(f"{{{k}}}", str(v))
+        return method, path, key
+
+    async def request_exp(
+        self,
+        method: str,
+        template: str,
+        minor: Tuple[str] = tuple(),
+        major: Dict[str, Any] = None,
+        body: Union[aiohttp.MultipartWriter, Any] = None,
+        authorize: bool = False,
+        reason: Optional[str] = None,
+        **params: Any,
+    ):
+        warnings.warn(
+            f"\nExperimental ratelimiting used for: {method} {template}\n"
+            f"Params: \n"
+            f"  |- Minor: {list(minor)}\n"
+            f"  |- Major: {major}",
+        )
+        method, path, ratelimit_bucket_key = self._route_fmt(method, template, minor, major or {})
+        if self.rate_limiter and await self.rate_limiter.is_rate_limited(
+            ratelimit_bucket_key
+        ):
+            raise RateLimitExceeded(
+                ratelimit_bucket_key,
+                await self.rate_limiter.get(ratelimit_bucket_key),
+            )
+
+        headers = {"User-Agent": self.USER_AGENT}
+        if authorize:
+            headers["Authorization"] = f"Bot {self.token}"
+        if reason:
+            headers["X-Audit-Log-Reason"] = reason
+        if body:
+            if isinstance(body, aiohttp.MultipartWriter):
+                for key, value in headers.items():
+                    body.headers.add(key, value)
+                headers = body.headers
+            else:
+                headers["Content-Type"] = "application/json"
+                body = json.dumps(body)
+        if not self.session:
+            self.session = aiohttp.ClientSession("https://discord.com")
+        resp = await self.session.request(
+            method,
+            path,
+            params=params,
+            headers=headers,
+            data=body,
+        )
+        limit = int(resp.headers.get("X-RateLimit-Limit", 0))
+        remaining = int(resp.headers.get("X-RateLimit-Remaining", 0))
+        reset = float(resp.headers.get("X-RateLimit-Reset", 0))
+        reset_after = float(resp.headers.get("X-RateLimit-Reset-After", 0))
+        bucket = resp.headers.get("X-RateLimit-Bucket")
+        if self.rate_limiter:
+            await self.rate_limiter.insert(
+                ratelimit_bucket_key,
+                limit=limit,
+                remaining=remaining,
+                reset=reset,
+                reset_after=reset_after,
+                bucket=bucket,
+            )
+        if resp.status >= 400:
+            raise HTTPException(resp, await resp.read())
+        return resp
+
     # Interactions
     # https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 
@@ -96,9 +177,11 @@ class HTTPClient:
         data: Any,
         with_response: bool = False,
     ):
-        return await self.request(
+        return await self.request_exp(
             "POST",
-            f"/interactions/{interaction_id}/{interaction_token}/callback",
+            "/interactions/{interaction_id}/{0}/callback",
+            minor=(interaction_token,),
+            major={"interaction_id": interaction_id},
             body=data,
             with_response=str(with_response),
         )
@@ -130,9 +213,10 @@ class HTTPClient:
     async def get_global_application_commands(
         self, application_id: str, *, with_localizations: bool = False
     ):
-        return await self.request(
+        return await self.request_exp(
             "GET",
-            f"/applications/{application_id}/commands",
+            "/applications/{application_id}/commands",
+            major={"application_id": application_id},
             authorize=True,
             with_localizations=with_localizations,
         )
@@ -153,23 +237,28 @@ class HTTPClient:
         self, application_id: str, command_id: str, guild_id: Optional[str] = None
     ):
         if guild_id:
-            return await self.request(
+            return await self.request_exp(
                 "DELETE",
-                f"/applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
+                "/applications/{application_id}/guilds/{guild_id}/commands/{0}",
+                minor=(command_id,),
+                major={"application_id": application_id, "guild_id": guild_id},
                 authorize=True,
             )
-        return await self.request(
+        return await self.request_exp(
             "DELETE",
-            f"/applications/{application_id}/commands/{command_id}",
+            "/applications/{application_id}/commands/{0}",
+            minor=(command_id,),
+            major={"application_id": application_id},
             authorize=True,
         )
 
     async def bulk_overwrite_global_application_commands(
         self, application_id: str, commands: List[Dict[str, Any]]
     ):
-        return await self.request(
+        return await self.request_exp(
             "PUT",
-            f"/applications/{application_id}/commands",
+            "/applications/{application_id}/commands",
+            major={"application_id": application_id},
             body=commands,
             authorize=True,
         )
@@ -192,9 +281,10 @@ class HTTPClient:
     async def bulk_overwrite_guild_application_commands(
         self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]
     ):
-        return await self.request(
+        return await self.request_exp(
             "PUT",
-            f"/applications/{application_id}/guilds/{guild_id}/commands",
+            "/applications/{application_id}/guilds/{guild_id}/commands",
+            major={"application_id": application_id, "guild_id": guild_id},
             body=commands,
             authorize=True,
         )
@@ -257,14 +347,20 @@ class HTTPClient:
     # https://discord.com/developers/docs/resources/channel#channels-resource
 
     async def get_channel(self, channel_id: str):
-        return await self.request("GET", f"/channels/{channel_id}", authorize=True)
+        return await self.request_exp(
+            "GET",
+            "/channels/{0}",
+            minor=(channel_id,),
+            authorize=True
+        )
 
     async def modify_channel(
         self, channel_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None
     ):
-        return await self.request(
+        return await self.request_exp(
             "PATCH",
-            f"/channels/{channel_id}",
+            "/channels/{0}",
+            minor=(channel_id,),
             body=payload,
             authorize=True,
             reason=reason,
