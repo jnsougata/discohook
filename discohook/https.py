@@ -118,12 +118,12 @@ class HTTPClient:
         self,
         method: str,
         template: str,
-        minor: Tuple[str] = tuple(),
-        major: Dict[str, Any] = None,
+        *minor: str,
         body: Union[aiohttp.MultipartWriter, Any] = None,
         authorize: bool = False,
         reason: Optional[str] = None,
-        **params: Any,
+        params: Optional[Dict[str, Any]] = None,
+        **major: str,
     ):
         warnings.warn(
             f"\nExperimental ratelimiting used for: {method} {template}\n"
@@ -131,7 +131,7 @@ class HTTPClient:
             f"  |- Minor: {list(minor)}\n"
             f"  |- Major: {major}",
         )
-        method, path, ratelimit_bucket_key = self._route_fmt(method, template, minor, major or {})
+        method, path, ratelimit_bucket_key = self._route_fmt(method, template, minor, major or {})  # type: ignore
         if self.rate_limiter and await self.rate_limiter.is_rate_limited(
             ratelimit_bucket_key
         ):
@@ -185,10 +185,10 @@ class HTTPClient:
         return await self.request_exp(
             "POST",
             "/interactions/{interaction_id}/{0}/callback",
-            minor=(interaction_token,),
-            major={"interaction_id": interaction_id},
+            interaction_token,
+            interaction_id=interaction_id,
             body=data,
-            with_response=str(with_response),
+            with_response=str(with_response).lower(),
         )
 
     async def get_original_interaction_response(self):
@@ -221,9 +221,9 @@ class HTTPClient:
         return await self.request_exp(
             "GET",
             "/applications/{application_id}/commands",
-            major={"application_id": application_id},
             authorize=True,
-            with_localizations=with_localizations,
+            params={"with_localizations": str(with_localizations).lower()},
+            application_id=application_id,
         )
 
     async def create_global_application_command(self):
@@ -245,15 +245,16 @@ class HTTPClient:
             return await self.request_exp(
                 "DELETE",
                 "/applications/{application_id}/guilds/{guild_id}/commands/{0}",
-                minor=(command_id,),
-                major={"application_id": application_id, "guild_id": guild_id},
+                command_id,
                 authorize=True,
+                application_id=application_id,
+                guild_id=guild_id,
             )
         return await self.request_exp(
             "DELETE",
             "/applications/{application_id}/commands/{0}",
-            minor=(command_id,),
-            major={"application_id": application_id},
+            command_id,
+            application_id=application_id,
             authorize=True,
         )
 
@@ -263,7 +264,7 @@ class HTTPClient:
         return await self.request_exp(
             "PUT",
             "/applications/{application_id}/commands",
-            major={"application_id": application_id},
+            application_id=application_id,
             body=commands,
             authorize=True,
         )
@@ -289,7 +290,8 @@ class HTTPClient:
         return await self.request_exp(
             "PUT",
             "/applications/{application_id}/guilds/{guild_id}/commands",
-            major={"application_id": application_id, "guild_id": guild_id},
+            application_id=application_id,
+            guild_id=guild_id,
             body=commands,
             authorize=True,
         )
@@ -355,7 +357,7 @@ class HTTPClient:
         return await self.request_exp(
             "GET",
             "/channels/{0}",
-            minor=(channel_id,),
+            channel_id,
             authorize=True
         )
 
@@ -365,7 +367,7 @@ class HTTPClient:
         return await self.request_exp(
             "PATCH",
             "/channels/{0}",
-            minor=(channel_id,),
+            channel_id,
             body=payload,
             authorize=True,
             reason=reason,
