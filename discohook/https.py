@@ -37,12 +37,13 @@ class HTTPClient:
         reason: Optional[str] = None,
         **params: Any,
     ):
+        ratelimit_bucket_key = f"{method}{path}"
         if self.rate_limiter and await self.rate_limiter.is_rate_limited(
-            f"{method} {path}"
+            ratelimit_bucket_key
         ):
             raise RateLimitExceeded(
-                f"{method} {path}",
-                await self.rate_limiter.get(f"{method} {path}"),
+                ratelimit_bucket_key,
+                await self.rate_limiter.get(ratelimit_bucket_key),
             )
 
         headers = {"User-Agent": self.USER_AGENT}
@@ -74,7 +75,7 @@ class HTTPClient:
         bucket = resp.headers.get("X-RateLimit-Bucket")
         if self.rate_limiter:
             await self.rate_limiter.insert(
-                f"{method} {path}",
+                ratelimit_bucket_key,
                 limit=limit,
                 remaining=remaining,
                 reset=reset,

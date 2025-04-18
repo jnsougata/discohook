@@ -7,8 +7,7 @@ from .embed import Embed
 from .emoji import PartialEmoji
 from .file import File
 from .models import AllowedMentions, MessageReference
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .poll import Poll
 from .role import Role
 from .user import User

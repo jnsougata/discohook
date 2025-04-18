@@ -25,7 +25,7 @@ from .command import ApplicationCommand, SubCommand
 from .embed import Embed
 from .emoji import PartialEmoji
 from .enums import *
-from .errors import HTTPException, InteractionException
+from .errors import *
 from .file import File
 from .guild import Guild, PartialGuild
 from .interaction import Interaction
