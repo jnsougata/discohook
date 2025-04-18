@@ -378,7 +378,7 @@ class PartialChannel:
         )
         data = await resp.json()
         return Channel(self.client, data)
-    
+
     async def fetch_webhooks(self):
         return await self.client.http.fetch_channel_webhooks(self.id)
 

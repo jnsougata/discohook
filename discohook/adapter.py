@@ -8,7 +8,8 @@ from .message import Message
 from .modal import Modal
 from .models import AllowedMentions
 from .option import Choice
-from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
+from .params import (UNSPECIFIED, _prepare_editing_payload,
+                     _prepare_sending_payload)
 from .poll import Poll
 from .view import View
 
@@ -212,7 +213,9 @@ class ResponseAdapter:
         )
         return InteractionResponse(self.inter)
 
-    async def send_modal(self, modal: Union[Modal, Any], with_response: bool = False) -> InteractionResponse:
+    async def send_modal(
+        self, modal: Union[Modal, Any], with_response: bool = False
+    ) -> InteractionResponse:
         """
         Sends a modal to the interaction
 
@@ -266,7 +269,10 @@ class ResponseAdapter:
         )
 
     async def defer(
-        self, ephemeral: bool = False, thinking: bool = False, with_response: bool = False
+        self,
+        ephemeral: bool = False,
+        thinking: bool = False,
+        with_response: bool = False,
     ) -> InteractionResponse:
         """
         Defers the interaction
@@ -343,7 +349,7 @@ class ResponseAdapter:
         file: Optional[File] = UNSPECIFIED,
         files: Optional[List[File]] = UNSPECIFIED,
         suppress_embeds: Optional[bool] = UNSPECIFIED,
-        with_response: bool = False
+        with_response: bool = False,
     ) -> InteractionResponse:
         """
         Edits the message, the component was attached to.

@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 
 import aiohttp
 
+from .ratelimit import Bucket
+
 if TYPE_CHECKING:
     from .interaction import Interaction
 
@@ -46,5 +48,17 @@ class HTTPException(Exception):
             self.data = json.loads(data)
         else:
             self.data = data.decode("utf-8")
-        message = f"[{response.method} {response.status}] {response.url.path}\n{self.data}"
+        message = (
+            f"[{response.method} {response.status}] {response.url.path}\n{self.data}"
+        )
+        super().__init__(message)
+
+
+class RateLimitExceeded(Exception):
+    """Raised when a rate limit is exceeded."""
+
+    def __init__(self, path: str, bucket: Bucket):
+        message = (
+            f"Rate limit exceeded for {path}. Retry after {bucket.reset_after} seconds."
+        )
         super().__init__(message)

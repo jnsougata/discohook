@@ -7,7 +7,8 @@ from .embed import Embed
 from .emoji import PartialEmoji
 from .file import File
 from .models import AllowedMentions, MessageReference
-from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
+from .params import (UNSPECIFIED, _prepare_editing_payload,
+                     _prepare_sending_payload)
 from .poll import Poll
 from .role import Role
 from .user import User
@@ -411,8 +412,9 @@ class Message:
             return await self.client.http.delete_user_reaction(
                 self.channel_id, self.id, encoded, user_id
             )
-        return await self.client.http.delete_own_reaction(self.channel_id, self.id, encoded)
-        
+        return await self.client.http.delete_own_reaction(
+            self.channel_id, self.id, encoded
+        )
 
     async def remove_reactions(self, emoji: Optional[Union[PartialEmoji, str]] = None):
         """

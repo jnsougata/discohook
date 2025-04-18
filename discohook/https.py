@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 import aiohttp
 
 from . import __url__, __version__
-from .errors import HTTPException
+from .errors import HTTPException, RateLimitExceeded
 from .ratelimit import RatelimitMux
 
 
@@ -37,8 +37,13 @@ class HTTPClient:
         reason: Optional[str] = None,
         **params: Any,
     ):
-        if self.rate_limiter and await self.rate_limiter.is_rate_limited(f"{method} {path}"):
-            raise Exception("Rate limited")
+        if self.rate_limiter and await self.rate_limiter.is_rate_limited(
+            f"{method} {path}"
+        ):
+            raise RateLimitExceeded(
+                f"{method} {path}",
+                await self.rate_limiter.get(f"{method} {path}"),
+            )
 
         headers = {"User-Agent": self.USER_AGENT}
         if authorize:
