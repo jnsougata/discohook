@@ -367,3 +367,23 @@ class Webhook:
         return await self.client.http.delete_webhook_message(
             self.id, self.token, message_id
         )
+
+    async def fetch_message(self, message_id: str, *, thread_id: Optional[str] = None):
+        """
+        Fetches a message sent by the webhook.
+
+        Parameters
+        ----------
+        message_id: :class:`str`
+            The id of the message to edit.
+        thread_id: Optional[:class:`str`]
+            The thread id the message is in.
+
+        Returns
+        -------
+        :class:`Message`
+        """
+        params = {}
+        if thread_id:
+            params["thread_id"] = thread_id
+        resp = await self.client.http.get_webhook_message(self.id, self.token, message_id, **params)

@@ -228,8 +228,8 @@ class Poll:
         ), "Only polls fetched from a message can fetch voters."
         if after:
             params["after"] = after
-        resp = await self._client.http.fetch_answer_voters(
-            self._channel_id, self._message_id, answer_id, params=params
+        resp = await self._client.http.get_answer_voters(
+            self._channel_id, self._message_id, answer_id, **params
         )
         voters = await resp.json()
         return answer_id, [User(self._client, data) for data in voters]
