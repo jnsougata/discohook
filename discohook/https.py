@@ -28,6 +28,27 @@ class HTTPClient:
         self.session: Optional[aiohttp.ClientSession] = session
         self.rate_limiter: Optional[RatelimitMux] = rate_limiter
 
+    def _handle_payload_processing(
+        self,
+        body: Union[aiohttp.MultipartWriter, Any] = None,
+        authorize: bool = False,
+        reason: Optional[str] = None,
+    ):
+        headers = {"User-Agent": self.USER_AGENT}
+        if authorize:
+            headers["Authorization"] = f"Bot {self.token}"
+        if reason:
+            headers["X-Audit-Log-Reason"] = reason
+        if body:
+            if isinstance(body, aiohttp.MultipartWriter):
+                for key, value in headers.items():
+                    body.headers.add(key, value)
+                return body.headers, body
+            else:
+                headers["Content-Type"] = "application/json"
+                body = json.dumps(body)
+        return headers, body
+
     async def request(
             self,
             method: str,
@@ -47,19 +68,11 @@ class HTTPClient:
                 await self.rate_limiter.get(ratelimit_bucket_key),
             )
 
-        headers = {"User-Agent": self.USER_AGENT}
-        if authorize:
-            headers["Authorization"] = f"Bot {self.token}"
-        if reason:
-            headers["X-Audit-Log-Reason"] = reason
-        if body:
-            if isinstance(body, aiohttp.MultipartWriter):
-                for key, value in headers.items():
-                    body.headers.add(key, value)
-                headers = body.headers
-            else:
-                headers["Content-Type"] = "application/json"
-                body = json.dumps(body)
+        headers, body = self._handle_payload_processing(
+            body=body,
+            authorize=authorize,
+            reason=reason,
+        )
         if not self.session:
             self.session = aiohttp.ClientSession("https://discord.com")
         resp = await self.session.request(
@@ -127,19 +140,11 @@ class HTTPClient:
                 await self.rate_limiter.get(ratelimit_bucket_key),
             )
 
-        headers = {"User-Agent": self.USER_AGENT}
-        if authorize:
-            headers["Authorization"] = f"Bot {self.token}"
-        if reason:
-            headers["X-Audit-Log-Reason"] = reason
-        if body:
-            if isinstance(body, aiohttp.MultipartWriter):
-                for key, value in headers.items():
-                    body.headers.add(key, value)
-                headers = body.headers
-            else:
-                headers["Content-Type"] = "application/json"
-                body = json.dumps(body)
+        headers, body = self._handle_payload_processing(
+            body=body,
+            authorize=authorize,
+            reason=reason,
+        )
         if not self.session:
             self.session = aiohttp.ClientSession("https://discord.com")
         resp = await self.session.request(
