@@ -188,7 +188,7 @@ class HTTPClient:
             interaction_token,
             interaction_id=interaction_id,
             body=data,
-            with_response=str(with_response).lower(),
+            params={"with_response": "true" if with_response else "false"},
         )
 
     async def get_original_interaction_response(self):
@@ -222,7 +222,7 @@ class HTTPClient:
             "GET",
             "/applications/{application_id}/commands",
             authorize=True,
-            params={"with_localizations": str(with_localizations).lower()},
+            params={"with_localizations": "true" if with_localizations else "false"},
             application_id=application_id,
         )
 
