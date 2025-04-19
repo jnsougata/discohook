@@ -103,6 +103,8 @@ class PartialRole:
             The id of the role to move.
         position: :class:`int`
             The new position of the role.
+        reason: Optional[:class:`str`]
+            The reason for changing the position to be logged.
 
         Returns
         -------

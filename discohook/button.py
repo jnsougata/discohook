@@ -107,7 +107,7 @@ def new(
             emoji=emoji,
             custom_id=custom_id,
         )
-        self.callback = coro
+        self.callback = coro  # type: ignore
         return self
 
     return decorator

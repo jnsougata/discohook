@@ -222,6 +222,8 @@ class ResponseAdapter:
         ----------
         modal: Modal
             The modal to send
+        with_response: bool
+            Whether to include an interaction callback object as the response.
 
         Returns
         -------
@@ -253,6 +255,8 @@ class ResponseAdapter:
         ----------
         choices: List[Choice]
             The choices to send
+        with_response: bool
+            Whether to include an interaction callback object as the response.
         """
         if self.inter.type != InteractionType.autocomplete:
             raise InteractionTypeMismatch(
@@ -285,6 +289,8 @@ class ResponseAdapter:
             Whether to send a new "is thinking..." message to be edited later
             (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) or do nothing to edit the original message later
             (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
+        with_response: bool
+            Whether to include an interaction callback object as the response.
         """
         payload = {}
         if (
@@ -372,6 +378,8 @@ class ResponseAdapter:
             A list of files to send with the message.
         suppress_embeds: Optional[bool]
             Whether the embeds should be suppressed.
+        with_response: bool
+            Whether to include an interaction callback object as the response.
 
         Returns
         -------

@@ -96,6 +96,8 @@ class Member(User):
         ----------
         role_id : str
             The ID of the role.
+        reason: Optional[str]
+            The reason for removing the role to be logged.
         """
         return await self.client.http.remove_guild_member_role(
             self.guild_id, self.id, role_id, reason=reason
@@ -119,6 +121,9 @@ class Member(User):
         ----------
         delete_message_seconds: int
             The number of days to delete messages for.
+            This must be between 0 and 604800 (7 days).
+        reason: Optional[str]
+            The reason for banning the member to be logged.
         """
         if delete_message_seconds > 604800:
             raise ValueError("You can only delete messages for up to last 7 days.")

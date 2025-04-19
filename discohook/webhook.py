@@ -77,7 +77,7 @@ class PartialWebhook:
             "avatar_url": avatar_url,
             "thread_name": thread_name,
         }
-        params = {"wait": int(wait)}
+        params = {"wait": "true" if wait else "false"}
         if thread_id:
             params["thread_id"] = thread_id
         payload = _prepare_sending_payload(
@@ -89,7 +89,7 @@ class PartialWebhook:
             files=files,
             **extras,
         )
-        resp = await self.http.execute_webhook(self.id, self.token, payload, params)
+        resp = await self.http.execute_webhook(self.id, self.token, payload, **params)
         return resp
 
     @classmethod
@@ -217,6 +217,9 @@ class Webhook:
             The new avatar of the webhook.
         channel_id: Optional[:class:`str`]
             The new channel id of the webhook.
+        reason: Optional[:class:`str`]
+            The reason for editing the webhook to be logged.
+
         Returns
         -------
         :class:`Webhook`
@@ -386,6 +389,6 @@ class Webhook:
         params = {}
         if thread_id:
             params["thread_id"] = thread_id
-        resp = await self.client.http.get_webhook_message(
+        return await self.client.http.get_webhook_message(
             self.id, self.token, message_id, **params
         )
