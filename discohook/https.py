@@ -226,17 +226,10 @@ class HTTPClient:
             application_id=application_id,
         )
 
-    async def create_global_application_command(self):
-        pass
-
-    async def get_global_application_command(self):
-        pass
-
-    async def edit_global_application_command(self):
-        pass
-
-    async def delete_global_application_command(self):
-        pass
+    async def create_global_application_command(self): pass
+    async def get_global_application_command(self): pass
+    async def edit_global_application_command(self): pass
+    async def delete_global_application_command(self): pass
 
     async def delete_application_command(
         self, application_id: str, command_id: str, guild_id: Optional[str] = None
@@ -631,8 +624,10 @@ class HTTPClient:
     async def create_guild(self):
         pass
 
-    async def get_guild(self):
-        pass
+    async def get_guild(self, guild_id: str, **params: str):
+        return await self.request(
+            "GET", f"/guilds/{guild_id}", authorize=True, params=params
+        )
 
     async def get_guild_preview(self):
         pass
@@ -1129,11 +1124,10 @@ class HTTPClient:
     async def get_guild_webhooks(self):
         pass
 
-    async def get_webhook(self):
-        pass
-
-    async def get_webhook_with_token(self):
-        pass
+    async def get_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
+        if webhook_token:
+            return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
+        return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
 
     async def modify_webhook(
         self, webhook_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None

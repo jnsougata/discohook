@@ -1,3 +1,4 @@
 aiohttp
 pynacl
 starlette
+python-dotenv

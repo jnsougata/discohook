@@ -142,6 +142,67 @@ class Client(Starlette):
             Callable[[InteractionException], Any]
         ] = None
 
+    @classmethod
+    def fromenv(
+        cls,
+        path: str = ".env",
+        *,
+        default_help_command: bool = False,
+        ratelimit_mux: Optional[RatelimitMux] = None,
+        **kwargs,
+    ) -> "Client":
+        """
+        Creates a client from environment variables.
+        The environment variables must be set in the following format:
+            - APPLICATION_ID: The application ID of the bot.
+            - PUBLIC_KEY: The public key of the bot.
+            - BOT_TOKEN: The token of the bot.
+            - APPLICATION_PASSWORD: The password to use for the dashboard (OPTIONAL).
+                The password is used to authenticate the dashboard and the sync route.
+                The password is not required if you are not using the dashboard or the sync route.
+
+        Parameters
+        ----------
+        path: str
+            Path to the .env file. Defaults to ".env".
+        default_help_command: bool
+            Whether to use the default help command or not. Defaults to False.
+        ratelimit_mux: RatelimitMux | None
+            Whether to use a custom ratelimit mux or not. Defaults to None.
+        **kwargs
+            Keyword arguments to pass to the Starlette instance.
+
+        Returns
+        -------
+        Client
+            The client instance.
+        """
+        import os
+        from dotenv import load_dotenv
+
+        load_dotenv(path)
+
+        application_id = os.getenv("APPLICATION_ID")
+        public_key = os.getenv("PUBLIC_KEY")
+        token = os.getenv("BOT_TOKEN")
+        password = os.getenv("APPLICATION_PASSWORD")
+
+        if not application_id or not public_key or not token:
+            raise ValueError(
+                "APPLICATION_ID, PUBLIC_KEY and BOT_TOKEN must be set in the environment."
+            )
+
+        return cls(
+            application_id=application_id,
+            public_key=public_key,
+            token=token,
+            password=password,
+            default_help_command=default_help_command,
+            ratelimit_mux=ratelimit_mux,
+            **kwargs,
+        )
+
+
     def on_error(self):
         """
         A decorator to add an error handler for any server errors.
@@ -223,7 +284,7 @@ class Client(Starlette):
         guild_id: str | None
             The id of the guild to delete the command from. Defaults to None.
         """
-        return await self.http.delete_command(
+        return await self.http.delete_application_command(
             str(self.application_id), command_id, guild_id
         )
 
@@ -407,6 +468,9 @@ class Client(Starlette):
             The name of the webhook.
         image_base64:
             The base64 encoded image of the webhook.
+        reason:
+            The reason for creating the webhook. This will be shown in the audit log.
+            This is optional and can be None.
         Returns
         -------
         Webhook
@@ -433,12 +497,8 @@ class Client(Starlette):
         -------
         Webhook
         """
-        if webhook_token:
-            resp = await self.http.get_webhook_with_token(webhook_id, webhook_token)
-        else:
-            resp = await self.http.get_webhook(webhook_id)
-        data = await resp.json()
-        return Webhook(self, data)
+        resp = await self.http.get_webhook(webhook_id, webhook_token)
+        return Webhook(self, await resp.json())
 
     async def fetch_guild(
         self, guild_id: str, *, with_counts: Optional[str] = False
@@ -450,7 +510,7 @@ class Client(Starlette):
         -------
         Guild
         """
-        resp = await self.http.get_guild(guild_id, with_counts)
+        resp = await self.http.get_guild(guild_id, with_counts="true" if with_counts else "false")
         data = await resp.json()
         if not data.get("id"):
             return None
