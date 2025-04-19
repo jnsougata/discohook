@@ -1,6 +1,6 @@
 import json
 import warnings
-from typing import Any, Dict, List, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import aiohttp
 
@@ -50,18 +50,18 @@ class HTTPClient:
         return headers, body
 
     async def request(
-            self,
-            method: str,
-            path: str,
-            *,
-            body: Union[aiohttp.MultipartWriter, Any] = None,
-            authorize: bool = False,
-            reason: Optional[str] = None,
-            **params: Any,
+        self,
+        method: str,
+        path: str,
+        *,
+        body: Union[aiohttp.MultipartWriter, Any] = None,
+        authorize: bool = False,
+        reason: Optional[str] = None,
+        **params: Any,
     ):
         ratelimit_bucket_key = f"{method}{path}"
         if self.rate_limiter and await self.rate_limiter.is_rate_limited(
-                ratelimit_bucket_key
+            ratelimit_bucket_key
         ):
             raise RateLimitExceeded(
                 ratelimit_bucket_key,
@@ -226,10 +226,17 @@ class HTTPClient:
             application_id=application_id,
         )
 
-    async def create_global_application_command(self): pass
-    async def get_global_application_command(self): pass
-    async def edit_global_application_command(self): pass
-    async def delete_global_application_command(self): pass
+    async def create_global_application_command(self):
+        pass
+
+    async def get_global_application_command(self):
+        pass
+
+    async def edit_global_application_command(self):
+        pass
+
+    async def delete_global_application_command(self):
+        pass
 
     async def delete_application_command(
         self, application_id: str, command_id: str, guild_id: Optional[str] = None
@@ -348,10 +355,7 @@ class HTTPClient:
 
     async def get_channel(self, channel_id: str):
         return await self.request_exp(
-            "GET",
-            "/channels/{0}",
-            channel_id,
-            authorize=True
+            "GET", "/channels/{0}", channel_id, authorize=True
         )
 
     async def modify_channel(

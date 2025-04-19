@@ -178,6 +178,7 @@ class Client(Starlette):
             The client instance.
         """
         import os
+
         from dotenv import load_dotenv
 
         load_dotenv(path)
@@ -201,7 +202,6 @@ class Client(Starlette):
             ratelimit_mux=ratelimit_mux,
             **kwargs,
         )
-
 
     def on_error(self):
         """
@@ -510,7 +510,9 @@ class Client(Starlette):
         -------
         Guild
         """
-        resp = await self.http.get_guild(guild_id, with_counts="true" if with_counts else "false")
+        resp = await self.http.get_guild(
+            guild_id, with_counts="true" if with_counts else "false"
+        )
         data = await resp.json()
         if not data.get("id"):
             return None
