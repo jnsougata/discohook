@@ -251,7 +251,7 @@ class Interaction:
     @property
     def guild(self) -> Optional[PartialGuild]:
         if not self.guild_id:
-            return
+            return None
         return PartialGuild(self.client, self.guild_id)
 
     @property
@@ -265,7 +265,7 @@ class Interaction:
         """
         payload = self.payload.get("message")
         if not payload:
-            return
+            return None
         return Message(self.client, payload)
 
     @property
@@ -302,7 +302,7 @@ class Interaction:
             The original response message
         """
         if not self._responded:
-            return
+            return None
         resp = await self.client.http.get_original_interaction_response(
             self.application_id, self.token
         )

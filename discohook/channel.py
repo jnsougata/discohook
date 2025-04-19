@@ -181,6 +181,8 @@ class PartialChannel:
             The new default sort order of the channel. Applies to text and forum channels.
         default_forum_layout: Optional[:class:`int`]
             The new default forum layout of the channel. Applies to text and forum channels.
+        reason: Optional[:class:`str`]
+            The reason for the edit. This will be shown in the audit log.
 
         Returns
         -------
@@ -312,6 +314,8 @@ class PartialChannel:
             The id of the message to delete after.
         around: Optional[:class:`str`]
             The id of the message to delete around.
+        reason: Optional[:class:`str`]
+            The reason for the deletion. This will be shown in the audit log.
 
         Returns
         -------
