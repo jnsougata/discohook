@@ -6,12 +6,20 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from .command import ApplicationCommand, ApplicationCommandOptionType
-from .enums import (ApplicationCommandType, ComponentType,
-                    InteractionCallbackType, InteractionType)
+from .enums import (
+    ApplicationCommandType,
+    ComponentType,
+    InteractionCallbackType,
+    InteractionType,
+)
 from .errors import CheckFailure, InteractionException, UnknownInteractionType
 from .interaction import Interaction
-from .resolver import (build_context_menu_param, build_modal_params,
-                       build_select_menu_values, build_slash_command_params)
+from .resolver import (
+    build_context_menu_param,
+    build_modal_params,
+    build_select_menu_values,
+    build_slash_command_params,
+)
 
 
 def _build_key(interaction: Interaction) -> str:

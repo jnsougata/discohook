@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
+from .components import ActionRow, Container, MediaGallery, Section, Separator
 from .embed import Embed
 from .enums import InteractionCallbackType, InteractionType
 from .errors import InteractionTypeMismatch
@@ -8,8 +9,7 @@ from .message import Message
 from .modal import Modal
 from .models import AllowedMentions
 from .option import Choice
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .poll import Poll
 from .view import View
 
@@ -142,10 +142,29 @@ class ResponseAdapter:
     def __init__(self, interaction: "Interaction") -> None:
         self.inter = interaction
 
+    async def _send(
+        self,
+        *components: Union[Container, Section, ActionRow, MediaGallery, Separator],
+        with_response: bool = False,
+    ):
+        flags = 1 << 15
+        payload = {
+            "type": InteractionCallbackType.channel_message_with_source,
+            "data": {
+                "flags": flags,
+                "components": [component.to_dict() for component in components],
+            },
+        }
+        await self.inter.client.http.create_interaction_response(
+            self.inter.id, self.inter.token, payload, with_response=with_response
+        )
+        self.inter._responded = True
+        return InteractionResponse(self.inter)
+
     async def send(
         self,
         content: Optional[str] = None,
-        *,
+        *components: Union[Container, Section, ActionRow, MediaGallery, Separator],
         embed: Optional[Embed] = None,
         embeds: Optional[List[Embed]] = None,
         view: Optional[View] = None,
@@ -191,6 +210,8 @@ class ResponseAdapter:
         -------
         InteractionResponse
         """
+        if len(components) > 0:
+            return await self._send(*components, with_response=with_response)
         payload = _prepare_sending_payload(
             content=content,
             embed=embed,

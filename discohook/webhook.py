@@ -9,8 +9,7 @@ from .file import File
 from .guild import PartialGuild
 from .https import HTTPClient
 from .message import Message
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .user import User
 from .view import View
 

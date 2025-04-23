@@ -3,8 +3,7 @@ from typing import Any, Callable, Dict, List, Tuple
 
 from .attachment import Attachment
 from .channel import Channel
-from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
-                    ComponentType)
+from .enums import ApplicationCommandOptionType, ApplicationCommandType, ComponentType
 from .interaction import Interaction
 from .member import Member
 from .message import Message
@@ -143,27 +142,27 @@ def build_modal_params(func: Callable, interaction: Interaction):
 
 
 def build_select_menu_values(interaction: Interaction) -> List[Any]:
-    if interaction.data["component_type"] == ComponentType.select_text:
+    if interaction.data["component_type"] == ComponentType.string_select:
         return interaction.data["values"]
-    if interaction.data["component_type"] == ComponentType.select_channel:
+    if interaction.data["component_type"] == ComponentType.channel_select:
         resolved = interaction.data["resolved"]["channels"]
         return [
             Channel(interaction.client, resolved.pop(channel_id))
             for channel_id in interaction.data["values"]
         ]
-    if interaction.data["component_type"] == ComponentType.select_user:
+    if interaction.data["component_type"] == ComponentType.user_select:
         resolved = interaction.data["resolved"]["users"]
         return [
             User(interaction.client, resolved.pop(user_id))
             for user_id in interaction.data["values"]
         ]
-    if interaction.data["component_type"] == ComponentType.select_role:
+    if interaction.data["component_type"] == ComponentType.role_select:
         resolved = interaction.data["resolved"]["roles"]
         roles = [resolved.pop(role_id) for role_id in interaction.data["values"]]
         for role in roles:
             role["guild_id"] = interaction.guild_id
         return [Role(interaction.client, role) for role in roles]
-    if interaction.data["component_type"] == ComponentType.select_mentionable:
+    if interaction.data["component_type"] == ComponentType.mentionable_select:
         raw_values = interaction.data["values"]
         resolved_roles = interaction.data["resolved"].get("roles", {})
         resolved_users = interaction.data["resolved"].get("users", {})

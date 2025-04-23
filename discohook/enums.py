@@ -186,12 +186,19 @@ class ComponentType(int, Enum):
 
     action_row = 1
     button = 2
-    select_text = 3
+    string_select = 3
     text_input = 4
-    select_user = 5
-    select_role = 6
-    select_mentionable = 7
-    select_channel = 8
+    user_select = 5
+    role_select = 6
+    mentionable_select = 7
+    channel_select = 8
+    section = 9
+    text_display = 10
+    thumbnail = 11
+    media_gallery = 12
+    file = 13
+    separator = 14
+    container = 17
 
 
 class SelectType(int, Enum):

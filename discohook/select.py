@@ -1,10 +1,9 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
-from .component import Component
+from .common import Component
 from .emoji import PartialEmoji
-from .enums import (ChannelType, ComponentType, SelectDefaultValueType,
-                    SelectType)
+from .enums import ChannelType, ComponentType, SelectDefaultValueType, SelectType
 
 if TYPE_CHECKING:
     from .channel import PartialChannel
@@ -151,15 +150,15 @@ class Select(Component):
             The dictionary representation of the button.
         """
         payload = {"type": self.type, "custom_id": self.custom_id}
-        if self.type == ComponentType.select_text:
+        if self.type == ComponentType.string_select:
             if not self.options:
                 raise ValueError("options must be provided for text select menus")
             payload["options"] = [option.to_dict() for option in self.options]
-        elif self.type != ComponentType.select_text and self.default_values:
+        elif self.type != ComponentType.string_select and self.default_values:
             payload["default_values"] = [
                 value.to_dict() for value in self.default_values
             ]
-        if self.type == ComponentType.select_channel and self.channel_types:
+        if self.type == ComponentType.channel_select and self.channel_types:
             payload["channel_types"] = [x.value for x in self.channel_types]
         if self.placeholder:
             payload["placeholder"] = self.placeholder

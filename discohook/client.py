@@ -8,7 +8,7 @@ from starlette.responses import JSONResponse
 
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
-from .component import Component
+from .common import Component
 from .dash import dashboard
 from .embed import Embed
 from .errors import InteractionException

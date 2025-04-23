@@ -1,10 +1,10 @@
 import mimetypes
-from enum import Enum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 
 from .embed import Embed
+from .enums import InteractionCallbackType
 from .file import File
 from .models import AllowedMentions, MessageReference
 from .view import View
@@ -42,7 +42,7 @@ def _prepare_sending_payload(
     suppress_embeds: Optional[bool] = False,
     supress_notifications: Optional[bool] = False,
     poll: Optional["Poll"] = None,
-    payload_type: Optional[Enum] = None,
+    payload_type: Optional[InteractionCallbackType] = None,
     **kwargs: Any,
 ) -> Union[Dict[str, Any], aiohttp.MultipartWriter]:
     merged_files = []
