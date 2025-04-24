@@ -7,11 +7,12 @@ from .embed import Embed
 from .emoji import PartialEmoji
 from .file import File
 from .models import AllowedMentions, MessageReference
-from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
+from .params import (UNSPECIFIED, _prepare_editing_payload,
+                     _prepare_sending_payload)
 from .poll import Poll
 from .role import Role
 from .user import User
-from .view import View
+from .view import LegacyView
 
 if TYPE_CHECKING:
     from .client import Client
@@ -246,7 +247,7 @@ class Message:
         *,
         embed: Optional[Embed] = UNSPECIFIED,
         embeds: Optional[List[Embed]] = UNSPECIFIED,
-        view: Optional[View] = UNSPECIFIED,
+        view: Optional[LegacyView] = UNSPECIFIED,
         tts: Optional[bool] = UNSPECIFIED,
         file: Optional[File] = UNSPECIFIED,
         files: Optional[List[File]] = UNSPECIFIED,
@@ -263,7 +264,7 @@ class Message:
             The new embed of the message.
         embeds: Optional[List[Embed]]
             The new embeds of the message.
-        view: Optional[View]
+        view: Optional[LegacyView]
             The new view of the message.
         tts: Optional[bool]
             Whether the message should be sent with text-to-speech.
@@ -311,7 +312,7 @@ class Message:
         *,
         embed: Optional[Embed] = None,
         embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
+        view: Optional[LegacyView] = None,
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
@@ -330,7 +331,7 @@ class Message:
             The embed of the message.
         embeds: Optional[List[Embed]]
             The embeds of the message.
-        view: Optional[View]
+        view: Optional[LegacyView]
             The view of the message.
         tts: Optional[bool]
             Whether the message should be sent with text-to-speech.

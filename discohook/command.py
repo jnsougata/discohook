@@ -2,12 +2,8 @@ import asyncio
 from typing import Any, Dict, List, Optional, Union
 
 from .common import Interactable
-from .enums import (
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-    ApplicationIntegrationType,
-    InteractionContextType,
-)
+from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
+                    ApplicationIntegrationType, InteractionContextType)
 from .option import Option
 from .permission import Permission
 from .utils import Handler, find_description

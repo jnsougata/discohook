@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from .button import Button
 from .enums import ComponentType
+from .file import File
 from .select import Select
 
 __all__ = [
@@ -20,7 +21,7 @@ __all__ = [
 # noinspection PyShadowingBuiltins
 class ActionRow:
 
-    def __init__(self, *components: Union[Button, Select], id: Optional[str] = None):
+    def __init__(self, *components: Union[Button, Select], id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.action_row
         self.components = components
@@ -42,19 +43,46 @@ class ActionRow:
 class FileAttachment:
     def __init__(
         self,
-        url: str,
+        *,
+        name: Optional[str] = None,
+        content: Optional[bytes] = None,
+        url: Optional[str] = None,
         description: Optional[str] = None,
         spoiler: bool = False,
-        id: Optional[str] = None,
+        id: Optional[int] = None,
     ):
+        self.name = name
         self.type = ComponentType.file
+        self.content = content
         self.url = url
         self.description = description
         self.spoiler = spoiler
         self.id = id
 
+    @classmethod
+    def from_file(cls, file: File, *, id: Optional[int] = None):
+        return cls(
+            name=file.name,
+            content=file.content,
+            description=file.description,
+            spoiler=file.spoiler,
+            id=id,
+            url=f"attachment://{file.name}",
+        )
+
+    @classmethod
+    def from_url(
+        cls,
+        url: str,
+        *,
+        description: Optional[str] = None,
+        spoiler: bool = False,
+        id: Optional[int] = None,
+    ):
+        return cls(url=url, description=description, spoiler=spoiler, id=id)
+
     def to_dict(self) -> Dict[str, Any]:
-        data = {"type": self.type, "media": {"url": self.url}, "spoiler": self.spoiler}
+        data = {"type": self.type, "file": {"url": self.url}, "spoiler": self.spoiler}
         if self.id:
             data["id"] = self.id
         if self.description:
@@ -81,7 +109,7 @@ class Media:
 # noinspection PyShadowingBuiltins
 class MediaGallery:
 
-    def __init__(self, items: List[Media], id: Optional[str] = None):
+    def __init__(self, items: List[Media], id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.media_gallery
         self.items = items
@@ -103,7 +131,7 @@ class MediaGallery:
 # noinspection PyShadowingBuiltins
 class TextDisplay:
 
-    def __init__(self, markdown: str, id: Optional[str] = None):
+    def __init__(self, markdown: str, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.text_display
         self.content = markdown
@@ -122,7 +150,7 @@ class Thumbnail:
         media: str,
         description: Optional[str] = None,
         spoiler: bool = False,
-        id: Optional[str] = None,
+        id: Optional[int] = None,
     ):
         self.id = id
         self.type = ComponentType.thumbnail
@@ -149,7 +177,7 @@ class Section:
         self,
         *components: TextDisplay,
         accessory: Union[Button, Thumbnail],
-        id: Optional[str] = None,
+        id: Optional[int] = None,
     ):
         self.type = ComponentType.section
         self.components = components
@@ -170,7 +198,7 @@ class Section:
 # noinspection PyShadowingBuiltins
 class Separator:
 
-    def __init__(self, id: Optional[str] = None, spacing: int = 1):
+    def __init__(self, id: Optional[int] = None, spacing: int = 1):
         self.id = id
         self.type = ComponentType.separator
         self.divider = True
@@ -191,7 +219,7 @@ class Container:
         self,
         *components: Union[ActionRow, TextDisplay, Section, MediaGallery, Separator],
         accent_color: Optional[int] = None,
-        id: Optional[str] = None,
+        id: Optional[int] = None,
     ):
         self.id = id
         self.type = ComponentType.container

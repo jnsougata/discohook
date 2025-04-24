@@ -10,7 +10,7 @@ from .message import Message
 from .models import AllowedMentions, MessageReference
 from .params import _prepare_sending_payload
 from .poll import Poll
-from .view import View
+from .view import LegacyView
 
 if TYPE_CHECKING:
     from .client import Client
@@ -57,7 +57,7 @@ class PartialChannel:
         *,
         embed: Optional[Embed] = None,
         embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
+        view: Optional[LegacyView] = None,
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
@@ -76,7 +76,7 @@ class PartialChannel:
             The embed to send with the message.
         embeds: Optional[List[:class:`Embed`]]
             A list of embeds to send with the message.
-        view: Optional[:class:`View`]
+        view: Optional[:class:`LegacyView`]
             The view to send with the message.
         tts: Optional[:class:`bool`]
             Whether the message should be sent with text-to-speech.

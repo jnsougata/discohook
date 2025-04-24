@@ -9,9 +9,10 @@ from .file import File
 from .guild import PartialGuild
 from .https import HTTPClient
 from .message import Message
-from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
+from .params import (UNSPECIFIED, _prepare_editing_payload,
+                     _prepare_sending_payload)
 from .user import User
-from .view import View
+from .view import LegacyView
 
 if TYPE_CHECKING:
     from .client import Client
@@ -251,7 +252,7 @@ class Webhook:
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
         tts: bool = False,
-        view: Optional[View] = None,
+        view: Optional[LegacyView] = None,
         thread_name: Optional[str] = None,
     ):
         """
@@ -274,7 +275,7 @@ class Webhook:
             The files of the message.
         tts: :class:`bool`
             Whether the message should be sent with text-to-speech.
-        view: Optional[:class:`View`]
+        view: Optional[:class:`LegacyView`]
             The view to be sent with the message.
         thread_name: Optional[:class:`str`]
             The name of the thread to create.
@@ -312,7 +313,7 @@ class Webhook:
         embeds: Optional[List[Embed]] = UNSPECIFIED,
         file: Optional[File] = UNSPECIFIED,
         files: Optional[List[File]] = UNSPECIFIED,
-        view: Optional[View] = UNSPECIFIED,
+        view: Optional[LegacyView] = UNSPECIFIED,
     ) -> Message:
         """
         Edits a message from the webhook.
@@ -331,7 +332,7 @@ class Webhook:
             The new file to be sent with the message.
         files: Optional[List[:class:`File`]]
             The new files to be sent with the message.
-        view: Optional[:class:`View`]
+        view: Optional[:class:`LegacyView`]
             The new view to be sent with the message.
 
         Returns

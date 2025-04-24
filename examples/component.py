@@ -19,7 +19,7 @@ async def user_select(i: discohook.Interaction, users: list[discohook.User]):
 @discohook.command.slash()
 async def poke(i: discohook.Interaction):
     """Poke a user."""
-    view = discohook.View()
+    view = discohook.LegacyView()
     view.add_select(user_select)
     await i.response.send(view=view)
 
@@ -39,6 +39,6 @@ async def random_num(i: discohook.Interaction, min_num: int, max_num: int):
             ephemeral=True,
         )
     num = random.randint(min_num, max_num)
-    view = discohook.View()
+    view = discohook.LegacyView()
     view.add_buttons(delete)
     await i.response.send(f"Your random number is {num}", view=view)

@@ -23,7 +23,7 @@ from .poll import Poll
 from .ratelimit import RatelimitMux
 from .user import User
 from .utils import compare_password
-from .view import View
+from .view import LegacyView
 from .webhook import Webhook
 
 
@@ -214,14 +214,14 @@ class Client(Starlette):
 
         return decorator
 
-    def load_view(self, view: View):
+    def load_view(self, view: LegacyView):
         """
         Loads multiple components into the client.
         Do not use this method unless you know what you are doing.
 
         Parameters
         ----------
-        view: View
+        view: LegacyView
             The view to load components from.
         """
         for component in view.children:
@@ -341,7 +341,7 @@ class Client(Starlette):
         embeds: Optional[List[Embed]] = None,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
-        view: Optional[View] = None,
+        view: Optional[LegacyView] = None,
         poll: Optional[Poll] = None,
     ) -> Message:
         """
@@ -363,7 +363,7 @@ class Client(Starlette):
             A file to be sent with the message
         files: Optional[List[File]]
             A list of files to be sent with message.
-        view: Optional[View]
+        view: Optional[LegacyView]
             The view to send with the message.
         poll: Optional[Poll]
             The poll to send with the message.

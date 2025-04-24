@@ -9,9 +9,10 @@ from .message import Message
 from .modal import Modal
 from .models import AllowedMentions
 from .option import Choice
-from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
+from .params import (UNSPECIFIED, _prepare_editing_payload,
+                     _prepare_sending_payload)
 from .poll import Poll
-from .view import View
+from .view import LegacyView, View
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -39,7 +40,7 @@ class InteractionResponse:
         *,
         embed: Optional[Embed] = UNSPECIFIED,
         embeds: Optional[List[Embed]] = UNSPECIFIED,
-        view: Optional[View] = UNSPECIFIED,
+        view: Optional[LegacyView] = UNSPECIFIED,
         tts: Optional[bool] = UNSPECIFIED,
         file: Optional[File] = UNSPECIFIED,
         files: Optional[List[File]] = UNSPECIFIED,
@@ -99,7 +100,7 @@ class FollowupResponse:
         *,
         embed: Optional[Embed] = UNSPECIFIED,
         embeds: Optional[List[Embed]] = UNSPECIFIED,
-        view: Optional[View] = UNSPECIFIED,
+        view: Optional[LegacyView] = UNSPECIFIED,
         tts: Optional[bool] = UNSPECIFIED,
         file: Optional[File] = UNSPECIFIED,
         files: Optional[List[File]] = UNSPECIFIED,
@@ -142,21 +143,15 @@ class ResponseAdapter:
     def __init__(self, interaction: "Interaction") -> None:
         self.inter = interaction
 
-    async def _send(
-        self,
-        *components: Union[Container, Section, ActionRow, MediaGallery, Separator],
-        with_response: bool = False,
-    ):
-        flags = 1 << 15
-        payload = {
-            "type": InteractionCallbackType.channel_message_with_source,
-            "data": {
-                "flags": flags,
-                "components": [component.to_dict() for component in components],
-            },
-        }
+    async def post(self, view: View, with_response: bool = False):
         await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload, with_response=with_response
+            self.inter.id,
+            self.inter.token,
+            _prepare_sending_payload(
+                component=view,
+                payload_type=InteractionCallbackType.channel_message_with_source,
+            ),
+            with_response=with_response,
         )
         self.inter._responded = True
         return InteractionResponse(self.inter)
@@ -164,10 +159,10 @@ class ResponseAdapter:
     async def send(
         self,
         content: Optional[str] = None,
-        *components: Union[Container, Section, ActionRow, MediaGallery, Separator],
+        *,
         embed: Optional[Embed] = None,
         embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
+        view: Optional[LegacyView] = None,
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
@@ -188,7 +183,7 @@ class ResponseAdapter:
             The embed to send with the message
         embeds: Optional[List[Embed]]
             The list of embeds to send with the message (max 10)
-        view: Optional[View]
+        view: Optional[LegacyView]
             The view to send with the message
         tts: Optional[bool]
             Whether the message should be sent as tts or not
@@ -210,8 +205,6 @@ class ResponseAdapter:
         -------
         InteractionResponse
         """
-        if len(components) > 0:
-            return await self._send(*components, with_response=with_response)
         payload = _prepare_sending_payload(
             content=content,
             embed=embed,
@@ -371,7 +364,7 @@ class ResponseAdapter:
         *,
         embed: Optional[Embed] = UNSPECIFIED,
         embeds: Optional[List[Embed]] = UNSPECIFIED,
-        view: Optional[View] = UNSPECIFIED,
+        view: Optional[LegacyView] = UNSPECIFIED,
         tts: Optional[bool] = UNSPECIFIED,
         file: Optional[File] = UNSPECIFIED,
         files: Optional[List[File]] = UNSPECIFIED,
@@ -390,7 +383,7 @@ class ResponseAdapter:
             The new embed of the message.
         embeds: Optional[List[Embed]]
             The new embeds of the message.
-        view: Optional[View]
+        view: Optional[LegacyView]
             The new view of the message.
         tts: Optional[bool]
             Whether the message should be sent with text-to-speech.
@@ -440,7 +433,7 @@ class ResponseAdapter:
         *,
         embed: Optional[Embed] = None,
         embeds: Optional[List[Embed]] = None,
-        view: Optional[View] = None,
+        view: Optional[LegacyView] = None,
         tts: Optional[bool] = False,
         file: Optional[File] = None,
         files: Optional[List[File]] = None,
@@ -460,7 +453,7 @@ class ResponseAdapter:
             The embed to send with the message
         embeds: Optional[List[Embed]]
             The list of embeds to send with the message (max 10)
-        view: Optional[View]
+        view: Optional[LegacyView]
             The view to send with the message
         tts: Optional[bool]
             Whether the message should be sent as tts or not

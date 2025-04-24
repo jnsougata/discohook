@@ -38,7 +38,7 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
 )
 async def color(i: discohook.Interaction):
     """Generate a random color."""
-    view = discohook.View()
+    view = discohook.LegacyView()
     view.add_buttons(regenerate_button)
     await i.response.send(embed=make_random_color_card(i), view=view)
 
@@ -79,7 +79,7 @@ async def exec_and_respond(i: discohook.Interaction, content: str):
 
     await i.response.defer()
 
-    view = discohook.View()
+    view = discohook.LegacyView()
     view.add_buttons(delete_button)
 
     pattern = re.compile("```(?:python|py)?\n([\s\S]*?)\n```")  # noqa

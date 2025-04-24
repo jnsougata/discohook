@@ -1,13 +1,15 @@
+import json
 import mimetypes
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 
+from .components import FileAttachment
 from .embed import Embed
 from .enums import InteractionCallbackType
 from .file import File
 from .models import AllowedMentions, MessageReference
-from .view import View
+from .view import LegacyView, View
 
 if TYPE_CHECKING:
     from .poll import Poll
@@ -15,7 +17,9 @@ if TYPE_CHECKING:
 UNSPECIFIED = Any
 
 
-def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
+def _append_file(
+    form: aiohttp.MultipartWriter, index: int, file: Union[File, FileAttachment]
+) -> None:
     mime, _ = mimetypes.guess_type(file.name)
     form.append(
         file.content,
@@ -28,10 +32,11 @@ def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
 
 def _prepare_sending_payload(
     *,
+    component: Optional[View] = None,
     content: Optional[str] = None,
     embed: Optional[Embed] = None,
     embeds: Optional[List[Embed]] = None,
-    view: Optional[View] = None,
+    view: Optional[LegacyView] = None,
     tts: Optional[bool] = False,
     file: Optional[File] = None,
     files: Optional[List[File]] = None,
@@ -45,6 +50,35 @@ def _prepare_sending_payload(
     payload_type: Optional[InteractionCallbackType] = None,
     **kwargs: Any,
 ) -> Union[Dict[str, Any], aiohttp.MultipartWriter]:
+
+    # Patch to support components v2
+    if component:
+        payload = {}
+        flags = 1 << 15
+        if payload_type:
+            payload["type"] = payload_type.value
+            payload["data"] = {
+                "flags": flags,
+                "components": [child.to_dict() for child in component.children],
+            }
+        else:
+            payload["flags"] = flags
+            payload["components"] = [child.to_dict() for child in component.children]
+
+        if len(component.attachments):
+            form = aiohttp.MultipartWriter("form-data")
+            form.append_json(
+                payload,
+                headers={
+                    "Content-Disposition": 'form-data; name="payload_json"',
+                    "Content-Type": "application/json",
+                },
+            )
+            for i, f in enumerate(component.attachments):
+                _append_file(form, i, f)
+            return form
+        return payload
+
     merged_files = []
     if file:
         merged_files.append(file)
@@ -121,12 +155,12 @@ def _prepare_editing_payload(
     content: Optional[str] = UNSPECIFIED,
     embed: Optional[Embed] = UNSPECIFIED,
     embeds: Optional[List[Embed]] = UNSPECIFIED,
-    view: Optional[View] = UNSPECIFIED,
+    view: Optional[LegacyView] = UNSPECIFIED,
     tts: Optional[bool] = UNSPECIFIED,
     file: Optional[File] = UNSPECIFIED,
     files: Optional[List[File]] = UNSPECIFIED,
     suppress_embeds: Optional[bool] = UNSPECIFIED,
-    payload_type: Optional[Enum] = None,
+    payload_type: Optional[InteractionCallbackType] = None,
     **kwargs: Any,
 ):
     payload: Dict[str, Any] = {}
