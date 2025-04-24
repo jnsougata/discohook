@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from .button import Button
 from .enums import ComponentType
@@ -7,7 +7,7 @@ from .select import Select
 
 __all__ = [
     "ActionRow",
-    "FileAttachment",
+    "File",
     "Media",
     "MediaGallery",
     "TextDisplay",
@@ -39,57 +39,6 @@ class ActionRow:
         return data
 
 
-# noinspection PyShadowingBuiltins
-class FileAttachment:
-    def __init__(
-        self,
-        *,
-        name: Optional[str] = None,
-        content: Optional[bytes] = None,
-        url: Optional[str] = None,
-        description: Optional[str] = None,
-        spoiler: bool = False,
-        id: Optional[int] = None,
-    ):
-        self.name = name
-        self.type = ComponentType.file
-        self.content = content
-        self.url = url
-        self.description = description
-        self.spoiler = spoiler
-        self.id = id
-
-    @classmethod
-    def from_file(cls, file: File, *, id: Optional[int] = None):
-        return cls(
-            name=file.name,
-            content=file.content,
-            description=file.description,
-            spoiler=file.spoiler,
-            id=id,
-            url=f"attachment://{file.name}",
-        )
-
-    @classmethod
-    def from_url(
-        cls,
-        url: str,
-        *,
-        description: Optional[str] = None,
-        spoiler: bool = False,
-        id: Optional[int] = None,
-    ):
-        return cls(url=url, description=description, spoiler=spoiler, id=id)
-
-    def to_dict(self) -> Dict[str, Any]:
-        data = {"type": self.type, "file": {"url": self.url}, "spoiler": self.spoiler}
-        if self.id:
-            data["id"] = self.id
-        if self.description:
-            data["description"] = self.description
-        return data
-
-
 class Media:
 
     def __init__(
@@ -109,19 +58,16 @@ class Media:
 # noinspection PyShadowingBuiltins
 class MediaGallery:
 
-    def __init__(self, items: List[Media], id: Optional[int] = None):
+    def __init__(self, *media: Media, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.media_gallery
-        self.items = items
-        assert 1 <= len(items) <= 10, "MediaGallery must have between 1 and 10 items."
+        self.items = media
+        assert 1 <= len(media) <= 10, "MediaGallery must have between 1 and 10 items."
 
     def to_dict(self) -> Dict[str, Any]:
         data = {
             "type": self.type,
-            "items": [
-                item.to_dict() if isinstance(item, Button) else item
-                for item in self.items
-            ],
+            "items": [media.to_dict() for media in self.items],
         }
         if self.id:
             data["id"] = self.id
@@ -131,7 +77,7 @@ class MediaGallery:
 # noinspection PyShadowingBuiltins
 class TextDisplay:
 
-    def __init__(self, markdown: str, id: Optional[int] = None):
+    def __init__(self, markdown: str, *, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.text_display
         self.content = markdown
@@ -148,6 +94,7 @@ class Thumbnail:
     def __init__(
         self,
         media: str,
+        *,
         description: Optional[str] = None,
         spoiler: bool = False,
         id: Optional[int] = None,
@@ -198,7 +145,7 @@ class Section:
 # noinspection PyShadowingBuiltins
 class Separator:
 
-    def __init__(self, id: Optional[int] = None, spacing: int = 1):
+    def __init__(self, *, id: Optional[int] = None, spacing: int = 1):
         self.id = id
         self.type = ComponentType.separator
         self.divider = True
@@ -217,7 +164,7 @@ class Container:
 
     def __init__(
         self,
-        *components: Union[ActionRow, TextDisplay, Section, MediaGallery, Separator],
+        *components: Union[ActionRow, TextDisplay, Section, MediaGallery, Separator, File],
         accent_color: Optional[int] = None,
         id: Optional[int] = None,
     ):

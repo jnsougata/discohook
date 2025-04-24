@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 
-from .components import FileAttachment
 from .embed import Embed
 from .enums import InteractionCallbackType
 from .file import File
@@ -18,7 +17,7 @@ UNSPECIFIED = Any
 
 
 def _append_file(
-    form: aiohttp.MultipartWriter, index: int, file: Union[File, FileAttachment]
+    form: aiohttp.MultipartWriter, index: int, file: File
 ) -> None:
     mime, _ = mimetypes.guess_type(file.name)
     form.append(

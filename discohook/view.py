@@ -1,10 +1,8 @@
 from typing import Any, Dict, List, Optional, Union
 
-import aiohttp
-
 from .button import Button
 from .components import *
-from .enums import ComponentType, InteractionCallbackType
+from .enums import ComponentType
 from .file import File
 from .select import Select
 
@@ -17,52 +15,43 @@ class View:
 
     def __init__(self):
         self.children: List[
-            Union[ActionRow, Section, Container, Separator, FileAttachment]
+            Union[ActionRow, Section, Container, Separator, File, MediaGallery]
         ] = []
-        self.attachments: List[FileAttachment] = []
+        self.attachments: List[File] = []
 
-    def file(
-        self,
-        file: Optional[File] = None,
-        url: Optional[str] = None,
-        description: Optional[str] = None,
-        spoiler: bool = False,
-        id: Optional[int] = None,
-    ):
+    def add_gallery(self, *media: Media, id: Optional[int] = None):
+        """
+        Appends a MediaGallery to the view.
+
+        Parameters
+        ----------
+        media: :class:`Media`
+            The media to be added to the gallery.
+        id: Optional[:class:`int`]
+        """
+        self.children.append(MediaGallery(*media, id=id))
+
+    def add_file(self, *file: File):
         """
         Appends a FileAttachment to the view.
 
         Parameters
         ----------
-        file: Optional[:class:`File`]
+        *file: :class:`File`
             The file to be attached. This is used to identify the file when it is submitted.
-        url: Optional[:class:`str`]
-            The url of the file.
-        description: Optional[:class:`str`]
-            The description of the file.
-        spoiler: bool
-            Whether the file is a spoiler.
-        id: Optional[:class:`int`]
-            The id of the file. This is used to identify the file when it is submitted.
         """
-        assert file or url, "Either file or url must be provided."
-        assert not (file and url), "Either file or url must be provided, not both."
-        if file:
-            attachment = FileAttachment.from_file(file, id=id)
-            self.attachments.append(attachment)
-        else:
-            attachment = FileAttachment.from_url(
-                url, description=description, spoiler=spoiler, id=id
-            )
-        self.children.append(attachment)
+        for f in file:
+            if f.content:
+                self.attachments.append(f)
+        self.children.extend(file)
 
-    def separator(self, id: Optional[int] = None, spacing: int = 1):
+    def add_separator(self, id: Optional[int] = None, spacing: int = 1):
         """
         Appends a Separator to the view.
         """
         self.children.append(Separator(id=id, spacing=spacing))
 
-    def row(self, *components: Union[Button, Select], id: Optional[int] = None):
+    def add_row(self, *components: Union[Button, Select], id: Optional[int] = None):
         """
         Appends an ActionRow to the view.
 
@@ -75,7 +64,7 @@ class View:
         """
         self.children.append(ActionRow(*components, id=id))
 
-    def section(
+    def add_section(
         self,
         *components: TextDisplay,
         accessory: Optional[Union[Button, Thumbnail]] = None,
@@ -95,9 +84,9 @@ class View:
         """
         self.children.append(Section(*components, accessory=accessory, id=id))
 
-    def container(
+    def add_container(
         self,
-        *components: Union[ActionRow, TextDisplay, Section, MediaGallery, Separator],
+        *components: Union[ActionRow, TextDisplay, Section, MediaGallery, Separator, File],
         accent_color: Optional[int] = None,
         id: Optional[int] = None
     ):
