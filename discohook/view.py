@@ -30,6 +30,7 @@ class View:
         id: Optional[:class:`int`]
         """
         self.children.append(MediaGallery(*media, id=id))
+        return self
 
     def add_file(self, *file: File):
         """
@@ -44,12 +45,14 @@ class View:
             if f.content:
                 self.attachments.append(f)
         self.children.extend(file)
+        return self
 
     def add_separator(self, id: Optional[int] = None, spacing: int = 1):
         """
         Appends a Separator to the view.
         """
         self.children.append(Separator(id=id, spacing=spacing))
+        return self
 
     def add_row(self, *components: Union[Button, Select], id: Optional[int] = None):
         """
@@ -63,6 +66,7 @@ class View:
             The id of the row. This is used to identify the row when it is submitted.
         """
         self.children.append(ActionRow(*components, id=id))
+        return self
 
     def add_section(
         self,
