@@ -21,7 +21,7 @@ __all__ = [
 # noinspection PyShadowingBuiltins
 class ActionRow:
 
-    def __init__(self, *components: Union[Button, Select], id: Optional[int] = None):
+    def __init__(self, *components: Union[Button, Select, Any], id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.action_row
         self.components = components
@@ -172,6 +172,7 @@ class Container:
         self.type = ComponentType.container
         self.components = components
         self.accent_color = accent_color
+        self.attachments = [c for c in components if isinstance(c, File) if c.content]
         assert (
             1 <= len(components) <= 10
         ), "Container must have between 1 and 10 components."

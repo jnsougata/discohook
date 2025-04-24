@@ -54,9 +54,9 @@ class File:
         """
         with open(path, "rb") as f:
             content = f.read()
-        name = path.split("/")[-1]
-        url = f"attachment://{name}"
-        return cls(name, content=content, spoiler=spoiler, description=description, url=url, id=id)
+            name = path.split("/")[-1]
+            url = f"attachment://{name}"
+            return cls(name, content=content, spoiler=spoiler, description=description, url=url, id=id)
 
     @classmethod
     def from_url(

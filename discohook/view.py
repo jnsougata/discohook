@@ -102,7 +102,10 @@ class View:
         id: Optional[:class:`str`]
             The id of the container. This is used to identify the container when it is submitted.
         """
-        self.children.append(Container(*components, accent_color=accent_color, id=id))
+        container = Container(*components, accent_color=accent_color, id=id)
+        self.attachments.extend(container.attachments)
+        self.children.append(container)
+        return self
 
 
 class LegacyView:
