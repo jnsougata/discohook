@@ -9,30 +9,21 @@ if TYPE_CHECKING:
     from .interaction import Interaction
 
 
-class InteractionException(Exception):
-    """Base exception for Discohook."""
-
-    def __init__(self, message: str, interaction: "Interaction"):
-        self.message = message
-        self.interaction = interaction
-        super().__init__(message)
-
-
-class InteractionTypeMismatch(InteractionException):
+class InteractionTypeMismatch(Exception):
     """Raised when the interaction type is not the expected type."""
 
     def __init__(self, message: str, interaction: "Interaction"):
         super().__init__(message, interaction)
 
 
-class CheckFailure(InteractionException):
+class CheckFailure(Exception):
     """Raised when a check fails."""
 
     def __init__(self, message: str, interaction: "Interaction"):
         super().__init__(message, interaction)
 
 
-class UnknownInteractionType(InteractionException):
+class UnknownInteractionType(Exception):
     """Raised when the interaction type is unknown."""
 
     def __init__(self, message: str, interaction: "Interaction"):

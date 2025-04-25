@@ -1,3 +1,4 @@
+import traceback
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from .adapter import ResponseAdapter
@@ -58,6 +59,31 @@ class Interaction:
         self.client: "Client" = client
         self._parsed_options = None
         self.focused_option_name: Optional[str] = None
+        self._error = None
+
+    @property
+    def error(self) -> Optional[Exception]:
+        """
+        The error that occurred during the interaction
+
+        Returns
+        -------
+        Exception | None
+        """
+        return self._error
+
+    @property
+    def tb(self) -> Optional[str]:
+        """
+        The traceback of the error that occurred during the interaction
+
+        Returns
+        -------
+        str | None
+        """
+        if not self._error:
+            return None
+        return "".join(traceback.format_exception(type(self.error), self.error, self.error.__traceback__))
 
     @property
     def data(self) -> Dict[str, Any]:

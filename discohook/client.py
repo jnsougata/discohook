@@ -11,7 +11,6 @@ from .command import ApplicationCommand
 from .common import Component
 from .dash import dashboard
 from .embed import Embed
-from .errors import InteractionException
 from .file import File
 from .guild import Guild
 from .handler import _handler
@@ -139,7 +138,7 @@ class Client(Starlette):
         if default_help_command:
             self.add_commands(_help)
         self._interaction_error_handler: Optional[
-            Callable[[InteractionException], Any]
+            Callable[[Interaction], Any]
         ] = None
 
     @classmethod
@@ -311,7 +310,7 @@ class Client(Starlette):
         A decorator to register a global interaction error handler.
         """
 
-        def decorator(coro: Callable[[InteractionException], Any]):
+        def decorator(coro: Callable[[Interaction], Any]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Exception handler must be a coroutine.")
             self._interaction_error_handler = coro

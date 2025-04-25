@@ -8,7 +8,7 @@ from starlette.responses import JSONResponse, Response
 from .command import ApplicationCommand, ApplicationCommandOptionType
 from .enums import (ApplicationCommandType, ComponentType,
                     InteractionCallbackType, InteractionType)
-from .errors import CheckFailure, InteractionException, UnknownInteractionType
+from .errors import CheckFailure, UnknownInteractionType
 from .interaction import Interaction
 from .resolver import (build_context_menu_param, build_modal_params,
                        build_select_menu_values, build_slash_command_params)
@@ -80,7 +80,8 @@ async def _handler(request: Request):
             except Exception as e:
                 if not cmd._error_handler:
                     raise e
-                await cmd._error_handler(InteractionException(str(e), interaction))
+                interaction._error = e
+                await cmd._error_handler(interaction)
 
         elif interaction.type == InteractionType.autocomplete:
             cmd: ApplicationCommand = request.app.commands.get(_build_key(interaction))
@@ -144,20 +145,17 @@ async def _handler(request: Request):
             except Exception as e:
                 if not component._error_handler:
                     raise e
-                await component._error_handler(
-                    InteractionException(str(e), interaction)
-                )
+                interaction._error = e
+                await component._error_handler(interaction)
         else:
             raise UnknownInteractionType(
                 f"unknown interaction type {interaction.type}", interaction
             )
     except Exception as e:
-        if request.app._interaction_error_handler:
-            await request.app._interaction_error_handler(
-                InteractionException(str(e), interaction)
-            )
-            return Response(status_code=500)
-        else:
-            raise e from None
+        if not request.app._interaction_error_handler:
+            raise e
+        interaction._error = e
+        await request.app._interaction_error_handler(interaction)
+        return Response(status_code=500)
     else:
         return Response(status_code=200)
