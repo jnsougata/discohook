@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from .components import ActionRow, Container, MediaGallery, Section, Separator
 from .embed import Embed
 from .enums import InteractionCallbackType, InteractionType
 from .errors import InteractionTypeMismatch
@@ -154,8 +153,6 @@ class ResponseAdapter:
             with_response=with_response,
         )
         self.inter._responded = True
-        for k, v in view.interactables.items():
-            self.inter.client.active_handlers[k] = v
         return InteractionResponse(self.inter)
 
     async def send(
@@ -221,8 +218,6 @@ class ResponseAdapter:
             poll=poll,
             payload_type=InteractionCallbackType.channel_message_with_source,
         )
-        if view:
-            self.inter.client.load_view(view)
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(
             self.inter.id, self.inter.token, payload, with_response
@@ -421,8 +416,6 @@ class ResponseAdapter:
             suppress_embeds=suppress_embeds,
             payload_type=InteractionCallbackType.update_component_message,
         )
-        if view and view is not UNSPECIFIED:
-            self.inter.client.load_view(view)
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(
             self.inter.id, self.inter.token, payload, with_response
@@ -485,8 +478,6 @@ class ResponseAdapter:
             allowed_mentions=allowed_mentions,
             poll=poll,
         )
-        if view:
-            self.inter.client.load_view(view)
         resp = await self.inter.client.http.execute_webhook(
             self.inter.application_id, self.inter.token, payload
         )

@@ -368,8 +368,6 @@ class Message:
             ),
             poll=poll,
         )
-        if view and view is not UNSPECIFIED:
-            self.client.load_view(view)
         resp = await self.client.http.create_message(self.channel_id, payload)
         return Message(self.client, await resp.json())
 

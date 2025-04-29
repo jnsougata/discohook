@@ -91,8 +91,6 @@ class PartialChannel:
         message_reference: Optional[:class:`MessageReference`]
             The message reference for the message.
         """
-        if view:
-            self.client.load_view(view)
 
         payload = _prepare_sending_payload(
             content=content,
