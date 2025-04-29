@@ -17,7 +17,7 @@ app = discohook.Client(
     default_help_command=True,  # This will enable your bot to use  default help command (/help).
 )
 
-app.add_commands(random_num)  # import a command from another file
+app.commands(random_num)  # import a command from another file
 
 
 # adding a error handler

@@ -22,4 +22,4 @@ app = discohook.Client(
 app.on_interaction_error()(send_error)
 app.preload("regenerate")(regenerate_button)
 app.preload("delete")(delete_button)
-app.add_commands(color, purge, avatar, _exec, translate, poll, fetch_votes)
+app.commands(color, purge, avatar, _exec, translate, poll, fetch_votes)

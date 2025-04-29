@@ -1,15 +1,15 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Union
 
-from .common import Component
 from .emoji import PartialEmoji
 from .enums import ButtonStyle, ComponentType
+from .handler import _Handler
 
 if TYPE_CHECKING:
     from .interaction import Interaction
 
 
-class Button(Component):
+class Button:
     """
     Represents a discord button type component.
 
@@ -35,9 +35,9 @@ class Button(Component):
         style: ButtonStyle = ButtonStyle.blurple,
         disabled: bool = False,
         emoji: Optional[Union[str, PartialEmoji]] = None,
-        custom_id: Optional[str] = None,
+        handler: Optional[_Handler] = None,
     ):
-        super().__init__(ComponentType.button, custom_id)
+        self.handler = handler
         self.url = url
         self.label = label
         self.style = style
@@ -57,7 +57,7 @@ class Button(Component):
         """
         assert self.label or self.emoji, "label or emoji must be provided"
         payload = {
-            "type": self.type,
+            "type": ComponentType.button,
             "style": self.style,
             "disabled": self.disabled,
         }
@@ -66,7 +66,7 @@ class Button(Component):
         if self.emoji:
             payload["emoji"] = self.emoji.to_dict()
         if self.style != ButtonStyle.link:
-            payload["custom_id"] = self.custom_id
+            payload["custom_id"] = self.handler.id
         if self.url and self.style == ButtonStyle.link:
             payload["url"] = self.url
         return payload
@@ -78,7 +78,7 @@ def new(
     style: ButtonStyle = ButtonStyle.blurple,
     disabled: bool = False,
     emoji: Optional[Union[str, PartialEmoji]] = None,
-    custom_id: Optional[str] = None,
+    custom_id: str,
 ):
     """
     A decorator that creates a button and registers a callback.
@@ -93,22 +93,23 @@ def new(
         Whether the button is disabled or not.
     emoji: :class:`str` | :class:`PartialEmoji` | None
         The emoji to be displayed on the button.
-    custom_id: Optional[:class:`str`]
+    custom_id: :class:`str`
         The custom id of the button.
     """
 
     def decorator(coro: Callable[["Interaction"], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
-        self = Button(
+        return Button(
             label=label,
             style=style,
             disabled=disabled,
             emoji=emoji,
-            custom_id=custom_id,
+            handler= _Handler(
+                custom_id,
+                coro # type: ignore
+            )
         )
-        self.callback = coro  # type: ignore
-        return self
 
     return decorator
 

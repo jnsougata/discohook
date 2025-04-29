@@ -1,8 +1,8 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
-from .common import Component
 from .enums import ComponentType, TextInputFieldLength
+from .handler import _Handler
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -73,7 +73,7 @@ class TextInput:
         }
 
 
-class Modal(Component):
+class Modal:
     """
     A modal for discord.
 
@@ -81,12 +81,17 @@ class Modal(Component):
     ----------
     title: :class:`str`
         The title of the modal.
-    custom_id: :class:`str`
-        The unique id of the modal.
+    handler: _Handler
+        The handler to control the modal submission.
     """
 
-    def __init__(self, title: str, *, custom_id: Optional[str] = None):
-        super().__init__(custom_id=custom_id)
+    def __init__(
+        self,
+        title: str,
+        *,
+        handler: _Handler,
+    ):
+        self.handler = handler
         self.title = title
         # self.components: List[Component] = []
         self.rows: List[Dict[str, Any]] = []
@@ -149,7 +154,7 @@ class Modal(Component):
         """
         Convert the modal to a dict to be sent to discord. For internal use only.
         """
-        data = {"title": self.title, "custom_id": self.custom_id, "components": []}
+        data = {"title": self.title, "custom_id": self.handler.id, "components": []}
         if self.rows:
             data["components"].extend(self.rows)
         return data
@@ -157,9 +162,8 @@ class Modal(Component):
 
 def new(
     title: str,
-    *,
-    fields: List[TextInput],
-    custom_id: Optional[str] = None,
+    *field: TextInput,
+    custom_id: str,
 ):
     """
     A decorator that creates a modal and registers a callback.
@@ -168,9 +172,9 @@ def new(
     ----------
     title: str
         The title of the modal.
-    fields: List[TextInput]
+    *field: Tuple[TextInput]
         The fields to be added to the modal.
-    custom_id: Optional[str]
+    custom_id: str
         The custom id of the modal. If not provided, it will be generated automatically.
 
     Returns
@@ -186,10 +190,9 @@ def new(
     def decorator(coro: Callable[["Interaction", Any], Any]):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")
-        self = Modal(title, custom_id=custom_id)
-        for field in fields:
-            self.rows.append(field.to_dict())
-        self.callback = coro
+        self = Modal(title, handler=_Handler(custom_id, coro))
+        for f in field:
+            self.rows.append(f.to_dict())
         return self
 
     return decorator

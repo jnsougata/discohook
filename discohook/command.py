@@ -1,12 +1,15 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING, Callable, Coroutine
 
-from .common import Interactable
 from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
                     ApplicationIntegrationType, InteractionContextType)
 from .option import Option
 from .permission import Permission
-from .utils import Handler, find_description
+from .utils import find_description
+from .handler import _Handler
+
+if TYPE_CHECKING:
+    from .interaction import Interaction
 
 
 class SubCommand:
@@ -21,7 +24,7 @@ class SubCommand:
         The description of the subcommand.
     options: List[Option] | None
         The options of the subcommand.
-    callback: `AsyncCallable` | None
+    handler: `AsyncCallable` | None
         The callback of the subcommand.
     """
 
@@ -31,13 +34,13 @@ class SubCommand:
         description: str,
         options: Optional[List[Option]] = None,
         *,
-        callback: Optional[Handler] = None,
+        handler: _Handler,
     ):
         self.name = name
         self.options = options
-        self.callback = callback
+        self.callback = handler
         self.description = description
-        self.autocompletion_handler: Optional[Handler] = None
+        self.autocompletion_handler: Optional[_Handler] = None
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -47,7 +50,7 @@ class SubCommand:
             )
         return self.callback(*args, **kwargs)
 
-    def on_autocomplete(self, coro: Handler):
+    def on_autocomplete(self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         """
         A decorator to register a callback for the subcommand's autocomplete options.
         """
@@ -70,7 +73,7 @@ class SubCommandGroup:
 
 
 # noinspection PyShadowingBuiltins
-class ApplicationCommand(Interactable):
+class ApplicationCommand:
     """
     A class representing a discord application command.
 
@@ -106,14 +109,10 @@ class ApplicationCommand(Interactable):
         permissions: Optional[List[Permission]] = None,
         type: ApplicationCommandType = ApplicationCommandType.slash,
         guild_id: Optional[str] = None,
-        callback: Handler,
+        handler: Optional[_Handler] = None,
     ):
-        super().__init__()
         self.name = name
-        if not guild_id:
-            self.key = f"{name}:{type.value}"
-        else:
-            self.key = f"{name}:{guild_id}:{type.value}"
+        self.handler = handler
         self.description = description
         self.options: List[Union[Option, SubCommand]] = options
         self.nsfw = nsfw
@@ -127,17 +126,11 @@ class ApplicationCommand(Interactable):
         )
         self.permissions = permissions
         self.guild_id = guild_id
-        self.callback: Handler = callback
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
-        self.autocompletion_handler: Optional[Handler] = None
+        self.autocompletion_handler: Optional[_Handler] = None
 
-    def __call__(self, *args, **kwargs):
-        if not self.callback:
-            raise RuntimeWarning(f"command `{self.key}` has no callback")
-        return self.callback(*args, **kwargs)
-
-    def on_autocomplete(self, coro: Handler):
+    def on_autocomplete(self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         """
         A decorator to register a callback for the command's autocomplete options.
         """
@@ -174,8 +167,8 @@ class ApplicationCommand(Interactable):
             If the callback is not a coroutine.
         """
 
-        def decorator(coro: Handler):
-            subcommand = SubCommand(name, description, options, callback=coro)
+        def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
+            subcommand = SubCommand(name, description, options, handler=_Handler(self.name, coro))
             if self.options:
                 self.options.append(subcommand)
             else:
@@ -231,7 +224,11 @@ def slash(
     A decorator to register a slash command with its callback.
     """
 
-    def decorator(coro: Handler):
+    def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
+        if not guild_id:
+            key = f"{name}:{ApplicationCommandType.slash.value}"
+        else:
+            key = f"{name}:{guild_id}:{ApplicationCommandType.slash.value}"
         return ApplicationCommand(
             name or coro.__name__,
             description=find_description(name, description, coro),
@@ -241,7 +238,7 @@ def slash(
             guild_id=guild_id,
             integration_types=integration_types,
             contexts=contexts,
-            callback=coro,
+            handler=_Handler(key, coro),
         )
 
     return decorator
@@ -259,8 +256,11 @@ def user(
     """
     A decorator to register a user command with its callback.
     """
-
-    def decorator(coro: Handler):
+    if not guild_id:
+        key = f"{name}:{ApplicationCommandType.slash.value}"
+    else:
+        key = f"{name}:{guild_id}:{ApplicationCommandType.slash.value}"
+    def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         return ApplicationCommand(
             name or coro.__name__,
             nsfw=nsfw,
@@ -269,7 +269,7 @@ def user(
             type=ApplicationCommandType.user,
             integration_types=integration_types,
             contexts=contexts,
-            callback=coro,
+            handler=_Handler(key, coro),
         )
 
     return decorator
@@ -287,8 +287,11 @@ def message(
     """
     A decorator to register a message command with its callback.
     """
-
-    def decorator(coro: Handler):
+    if not guild_id:
+        key = f"{name}:{ApplicationCommandType.slash.value}"
+    else:
+        key = f"{name}:{guild_id}:{ApplicationCommandType.slash.value}"
+    def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         return ApplicationCommand(
             name or coro.__name__,
             nsfw=nsfw,
@@ -297,7 +300,7 @@ def message(
             type=ApplicationCommandType.message,
             integration_types=integration_types,
             contexts=contexts,
-            callback=coro,
+            handler=_Handler(key, coro),
         )
 
     return decorator

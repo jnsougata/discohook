@@ -10,7 +10,7 @@ async def _help(i: Interaction):
     embed = Embed()
     embed.set_author(name=i.author.name, icon_url=i.author.avatar.url)
     embed.description = "Here are the commands you can use\n"
-    commands = i.client.commands.values()
+    commands = i.client.active_commands.values()
     commands = sorted(
         sorted(commands, key=lambda x: x.name), key=lambda x: x.type.value
     )

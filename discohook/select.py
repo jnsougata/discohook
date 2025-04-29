@@ -1,10 +1,10 @@
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
-from .common import Component
 from .emoji import PartialEmoji
 from .enums import (ChannelType, ComponentType, SelectDefaultValueType,
                     SelectType)
+from .handler import _Handler
 
 if TYPE_CHECKING:
     from .channel import PartialChannel
@@ -102,7 +102,7 @@ class SelectOption:
 
 
 # noinspection PyShadowingBuiltins
-class Select(Component):
+class Select:
     """
     Represents a discord select menu component.
 
@@ -128,9 +128,10 @@ class Select(Component):
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
-        custom_id: Optional[str] = None,
+        handler: _Handler
     ):
-        super().__init__(ComponentType(type.value), custom_id)
+        self.handler = handler
+        self.type = type
         self.placeholder: Optional[str] = placeholder
         self.min_values: Optional[int] = min_values
         self.max_values: Optional[int] = max_values
@@ -150,7 +151,7 @@ class Select(Component):
         :class:`dict`
             The dictionary representation of the button.
         """
-        payload = {"type": self.type, "custom_id": self.custom_id}
+        payload = {"type": ComponentType(self.type.value), "custom_id": self.handler.id}
         if self.type == ComponentType.string_select:
             if not self.options:
                 raise ValueError("options must be provided for text select menus")
@@ -180,7 +181,7 @@ def channel(
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
     default_values: Optional[List[SelectDefaultValue]] = None,
-    custom_id: Optional[str] = None,
+    custom_id: Optional[str],
 ):
     """
     A decorator that creates a channel select menu and registers a callback.
@@ -208,35 +209,32 @@ def channel(
             raise TypeError("Callback must be a coroutine.")
         self = Select(
             type=SelectType.channel,
-            custom_id=custom_id,
             placeholder=placeholder,
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
+            handler=_Handler(custom_id, coro)
         )
         self.channel_types = types
         self.default_values = default_values
-        self.callback = coro
         return self
-
     return decorator
 
 
 def text(
-    options: List[SelectOption],
-    *,
+    *option: SelectOption,
     placeholder: Optional[str] = None,
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
-    custom_id: Optional[str] = None,
+    custom_id: Optional[str],
 ):
     """
     A decorator that creates a text select menu and registers a callback.
 
     Parameters
     ----------
-    options: List[:class:`SelectOption`]
+    option: Tuple[:class:`SelectOption`]
         The options to be displayed on the select menu.
     placeholder: Optional[:class:`str`]
         The placeholder to be displayed on the select menu.
@@ -255,14 +253,13 @@ def text(
             raise TypeError("Callback must be a coroutine.")
         self = Select(
             type=SelectType.text,
-            custom_id=custom_id,
             placeholder=placeholder,
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
+            handler=_Handler(custom_id, coro)
         )
-        self.options = options
-        self.callback = coro
+        self.options = list(option)
         return self
 
     return decorator
@@ -275,7 +272,7 @@ def role(
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
     default_values: Optional[List[SelectDefaultValue]] = None,
-    custom_id: Optional[str] = None,
+    custom_id: Optional[str],
 ):
     """
     A decorator that creates a select menu and registers a callback.
@@ -312,10 +309,9 @@ def role(
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
-            custom_id=custom_id,
+            handler=_Handler(custom_id, coro)
         )
         self.default_values = default_values
-        self.callback = coro
         return self
 
     return decorator
@@ -328,7 +324,7 @@ def user(
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
     default_values: Optional[List[SelectDefaultValue]] = None,
-    custom_id: Optional[str] = None,
+    custom_id: Optional[str],
 ):
     """
     A decorator that creates a user select menu and registers a callback.
@@ -358,10 +354,9 @@ def user(
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
-            custom_id=custom_id,
+            handler=_Handler(custom_id, coro)
         )
         self.default_values = default_values
-        self.callback = coro
         return self
 
     return decorator
@@ -374,7 +369,7 @@ def mentionable(
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
     default_values: Optional[List[SelectDefaultValue]] = None,
-    custom_id: Optional[str] = None,
+    custom_id: Optional[str],
 ):
     """
     A decorator that creates a mentionable select menu and registers a callback.
@@ -406,10 +401,9 @@ def mentionable(
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
-            custom_id=custom_id,
+            handler=_Handler(custom_id, coro)
         )
         self.default_values = default_values
-        self.callback = coro
         return self
 
     return decorator

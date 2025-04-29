@@ -13,7 +13,7 @@ from .dash import dashboard
 from .embed import Embed
 from .file import File
 from .guild import Guild
-from .handler import _handler
+from .engine import _engine
 from .help import _help
 from .https import HTTPClient
 from .interaction import Interaction
@@ -24,6 +24,7 @@ from .user import User
 from .utils import compare_password
 from .view import LegacyView
 from .webhook import Webhook
+from .handler import _Handler
 
 
 async def delete_cmd(request: Request):
@@ -122,10 +123,10 @@ class Client(Starlette):
         self.http = HTTPClient(
             token=token, application_id=application_id, rate_limiter=ratelimit_mux
         )
-        self.active_components: Dict[str, Component] = {}
+        self.active_handlers: Dict[str, _Handler] = {}
         self._sync_queue: List[ApplicationCommand] = []
-        self.commands: Dict[str, ApplicationCommand] = {}
-        self.add_route(route, _handler, methods=["POST"], include_in_schema=False)
+        self.active_commands: Dict[str, ApplicationCommand] = {}
+        self.add_route(route, _engine, methods=["POST"], include_in_schema=False)
         self.add_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
         self.add_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
         self.add_route(
@@ -136,7 +137,7 @@ class Client(Starlette):
         )
         self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
-            self.add_commands(_help)
+            self.commands(_help)
         self._interaction_error_handler: Optional[
             Callable[[Interaction], Any]
         ] = None
@@ -224,41 +225,30 @@ class Client(Starlette):
             The view to load components from.
         """
         for component in view.children:
-            self.active_components[component.custom_id] = component
+            self.active_handlers[component.handler.id] = component.handler
 
-    def preload(self, custom_id: str):
+    def handlers(self, *handler: Union[_Handler, Any]):
         """
-        This decorator is used to load a component into the client.
-        This method will help you to use persistent components with static custom ids.
+        Loads multiple components into the client.
+        Do not use this method unless you know what you are doing.
 
         Parameters
         ----------
-        custom_id: str
-            The unique custom id of the component.
-
-        Raises
-        ------
-        ValueError
-            If the custom id is not a not empty string or is not provided.
+        *handler
+            The handler to load to the app.
         """
-        def decorator(component: Component):
-            if not custom_id or not isinstance(custom_id, str):
-                raise ValueError("Invalid custom id provided.")
-            component.custom_id = custom_id
-            self.active_components[custom_id] = component
-            return component
-
-        return decorator
+        for item in handler:
+            self.active_handlers[item.id] = item
 
     def load(self, cmd: ApplicationCommand) -> ApplicationCommand:
         """
         A decorator to load a command into the client.
         """
-        self.commands[cmd.key] = cmd
+        self.active_commands[cmd.handler.id] = cmd
         self._sync_queue.append(cmd)
         return cmd
 
-    def add_commands(self, *commands: Union[ApplicationCommand, Any]):
+    def commands(self, *commands: Union[ApplicationCommand, Any]):
         """
         Add commands to the client.
 
@@ -268,7 +258,7 @@ class Client(Starlette):
             The commands to add to the client.
         """
         for command in commands:
-            self.commands[command.key] = command
+            self.active_commands[command.handler.id] = command
         self._sync_queue.extend(commands)
 
     async def delete_command(self, command_id: str, *, guild_id: Optional[str] = None):

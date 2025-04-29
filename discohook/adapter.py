@@ -155,7 +155,7 @@ class ResponseAdapter:
         )
         self.inter._responded = True
         for k, v in view.interactables.items():
-            self.inter.client.active_components[k] = v
+            self.inter.client.active_handlers[k] = v
         return InteractionResponse(self.inter)
 
     async def send(
@@ -253,7 +253,7 @@ class ResponseAdapter:
             raise InteractionTypeMismatch(
                 f"Method not supported for {self.inter.type}", self.inter
             )
-        self.inter.client.active_components[modal.custom_id] = modal
+        self.inter.client.active_handlers[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal,
