@@ -154,6 +154,8 @@ class ResponseAdapter:
             with_response=with_response,
         )
         self.inter._responded = True
+        for k, v in view.interactables.items():
+            self.inter.client.active_components[k] = v
         return InteractionResponse(self.inter)
 
     async def send(

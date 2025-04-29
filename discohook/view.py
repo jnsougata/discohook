@@ -1,4 +1,7 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .common import Component
 
 from .button import Button
 from .components import *
@@ -18,6 +21,7 @@ class View:
             Union[ActionRow, Section, Container, Separator, File, MediaGallery]
         ] = []
         self.attachments: List[File] = []
+        self.interactables: Dict[str, "Component"] = {}
 
     def add_gallery(self, *media: Media, id: Optional[int] = None):
         """
@@ -65,6 +69,8 @@ class View:
         id: Optional[:class:`str`]
             The id of the row. This is used to identify the row when it is submitted.
         """
+        for component in components:
+            self.interactables[component.custom_id] = component
         self.children.append(ActionRow(*components, id=id))
         return self
 
@@ -86,6 +92,8 @@ class View:
         id: Optional[:class:`str`]
             The id of the section. This is used to identify the section when it is submitted.
         """
+        if isinstance(components, Button):
+            self.interactables[components.custom_id] = components
         self.children.append(Section(*components, accessory=accessory, id=id))
 
     def add_container(
@@ -106,6 +114,9 @@ class View:
         id: Optional[:class:`str`]
             The id of the container. This is used to identify the container when it is submitted.
         """
+        for component in components:
+            if isinstance(component, Button) or isinstance(component, Select):
+                self.interactables[component.custom_id] = component
         container = Container(*components, accent_color=accent_color, id=id)
         self.attachments.extend(container.attachments)
         self.children.append(container)

@@ -241,7 +241,6 @@ class Client(Starlette):
         ValueError
             If the custom id is not a not empty string or is not provided.
         """
-
         def decorator(component: Component):
             if not custom_id or not isinstance(custom_id, str):
                 raise ValueError("Invalid custom id provided.")
