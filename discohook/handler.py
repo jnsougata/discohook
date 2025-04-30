@@ -61,7 +61,7 @@ class _Handler:
 
 
 # noinspection PyShadowingBuiltins
-def handler(id: str):
+def handler(id: str) -> Callable[[Callable[["Interaction", Any], Any]], _Handler]:
     """
     A decorator that creates a handler.
 

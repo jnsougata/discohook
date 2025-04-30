@@ -139,6 +139,210 @@ class Select:
         self.channel_types: Optional[List[ChannelType]] = None
         self.default_values: Optional[List[SelectDefaultValue]] = None
 
+    @classmethod
+    def text(
+        cls,
+        *option: SelectOption,
+        placeholder: Optional[str] = None,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        handler: _Handler,
+    ):
+        """
+        Creates a text select menu and registers a callback.
+
+        Parameters
+        ----------
+        *option: Tuple[:class:`SelectOption`]
+            The options to be displayed on the select menu.
+        placeholder: Optional[:class:`str`]
+            The placeholder to be displayed on the select menu.
+        min_values: Optional[:class:`int`]
+            The minimum number of options that can be selected.
+        max_values: Optional[:class:`int`]
+            The maximum number of options that can be selected.
+        disabled: Optional[:class:`bool`]
+            Whether the select menu is disabled or not.
+        handler: :class:`_Handler`
+            The handler for the select menu.
+        """
+        self = cls(
+            type=SelectType.text,
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            disabled=disabled,
+            handler=handler,
+        )
+        self.options = list(option)
+        return self
+
+    @classmethod
+    def channel(
+        cls,
+        types: Optional[List[ChannelType]] = None,
+        *,
+        placeholder: Optional[str] = None,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        default_values: Optional[List[SelectDefaultValue]] = None,
+        handler: _Handler,
+    ):
+        """
+        Creates a channel select menu and registers a callback.
+
+        Parameters
+        ----------
+        types: Optional[List[:class:`ChannelType`]]
+            The channel types to be displayed on the select menu.
+        placeholder: Optional[:class:`str`]
+            The placeholder to be displayed on the select menu.
+        min_values: Optional[:class:`int`]
+            The minimum number of options that can be selected.
+        max_values: Optional[:class:`int`]
+            The maximum number of options that can be selected.
+        disabled: Optional[:class:`bool`]
+            Whether the select menu is disabled or not.
+        default_values: Optional[List[:class:`SelectDefaultValue`]]
+            The default values of the select menu.
+        handler: :class:`_Handler`
+            The handler for the select menu.
+        """
+        self = cls(
+            type=SelectType.channel,
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            disabled=disabled,
+            handler=handler,
+        )
+        self.channel_types = types
+        self.default_values = default_values
+        return
+
+    @classmethod
+    def role(
+        cls,
+        placeholder: Optional[str] = None,
+        *,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        default_values: Optional[List[SelectDefaultValue]] = None,
+        handler: _Handler,
+    ):
+        """
+        Creates a role select menu and registers a callback.
+
+        Parameters
+        ----------
+        placeholder: Optional[:class:`str`]
+            The placeholder to be displayed on the select menu.
+        min_values: Optional[:class:`int`]
+            The minimum number of options that can be selected.
+        max_values: Optional[:class:`int`]
+            The maximum number of options that can be selected.
+        disabled: Optional[:class:`bool`]
+            Whether the select menu is disabled or not.
+        default_values: Optional[List[:class:`SelectDefaultValue`]]
+            The default values of the select menu.
+        handler: :class:`_Handler`
+            The handler for the select menu.
+        """
+        self = cls(
+            type=SelectType.role,
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            disabled=disabled,
+            handler=handler,
+        )
+        self.default_values = default_values
+        return self
+
+    @classmethod
+    def user(
+        cls,
+        placeholder: Optional[str] = None,
+        *,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        default_values: Optional[List[SelectDefaultValue]] = None,
+        handler: _Handler,
+    ):
+        """
+        Creates a user select menu and registers a callback.
+
+        Parameters
+        ----------
+        placeholder: Optional[:class:`str`]
+            The placeholder to be displayed on the select menu.
+        min_values: Optional[:class:`int`]
+            The minimum number of options that can be selected.
+        max_values: Optional[:class:`int`]
+            The maximum number of options that can be selected.
+        disabled: Optional[:class:`bool`]
+            Whether the select menu is disabled or not.
+        default_values: Optional[List[:class:`SelectDefaultValue`]]
+            The default values of the select menu.
+        handler: :class:`_Handler`
+            The handler for the select menu.
+        """
+        self = cls(
+            type=SelectType.user,
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            disabled=disabled,
+            handler=handler,
+        )
+        self.default_values = default_values
+        return self
+
+    @classmethod
+    def mentionable(
+        cls,
+        placeholder: Optional[str] = None,
+        *,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        disabled: Optional[bool] = False,
+        default_values: Optional[List[SelectDefaultValue]] = None,
+        handler: _Handler,
+    ):
+        """
+        Creates a mentionable select menu and registers a callback.
+
+        Parameters
+        ----------
+         placeholder: Optional[:class:`str`]
+            The placeholder to be displayed on the select menu.
+        min_values: Optional[:class:`int`]
+            The minimum number of options that can be selected.
+        max_values: Optional[:class:`int`]
+            The maximum number of options that can be selected.
+        disabled: Optional[:class:`bool`]
+            Whether the select menu is disabled or not.
+        default_values: Optional[List[:class:`SelectDefaultValue`]]
+            The default values of the select menu.
+        handler: :class:`_Handler`
+            The handler for the select menu.
+        """
+        self = cls(
+            type=SelectType.mentionable,
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            disabled=disabled,
+            handler=handler,
+        )
+        self.default_values = default_values
+        return self
+
+
     def to_dict(self) -> Dict[str, Any]:
         """
         Returns a dictionary representation of the button.
