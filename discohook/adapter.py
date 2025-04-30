@@ -8,8 +8,7 @@ from .message import Message
 from .modal import Modal
 from .models import AllowedMentions
 from .option import Choice
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .poll import Poll
 from .view import LegacyView, View
 
@@ -62,8 +61,6 @@ class InteractionResponse:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view and view is not UNSPECIFIED:
-            self.inter.client.load_view(view)
         resp = await self.inter.client.http.edit_webhook_message(
             self.inter.application_id,
             self.inter.token,
@@ -122,8 +119,6 @@ class FollowupResponse:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view and view is not UNSPECIFIED:
-            self.interaction.client.load_view(view)
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
             self.interaction.token,

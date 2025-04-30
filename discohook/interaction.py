@@ -83,7 +83,11 @@ class Interaction:
         """
         if not self._error:
             return None
-        return "".join(traceback.format_exception(type(self.error), self.error, self.error.__traceback__))
+        return "".join(
+            traceback.format_exception(
+                type(self.error), self.error, self.error.__traceback__
+            )
+        )
 
     @property
     def data(self) -> Dict[str, Any]:

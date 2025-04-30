@@ -2,8 +2,7 @@ import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 from .emoji import PartialEmoji
-from .enums import (ChannelType, ComponentType, SelectDefaultValueType,
-                    SelectType)
+from .enums import ChannelType, ComponentType, SelectDefaultValueType, SelectType
 from .handler import _Handler
 
 if TYPE_CHECKING:
@@ -128,7 +127,7 @@ class Select:
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
-        handler: _Handler
+        handler: _Handler,
     ):
         self.handler = handler
         self.type = type
@@ -213,11 +212,12 @@ def channel(
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
-            handler=_Handler(custom_id, coro)
+            handler=_Handler(custom_id, coro),
         )
         self.channel_types = types
         self.default_values = default_values
         return self
+
     return decorator
 
 
@@ -257,7 +257,7 @@ def text(
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
-            handler=_Handler(custom_id, coro)
+            handler=_Handler(custom_id, coro),
         )
         self.options = list(option)
         return self
@@ -309,7 +309,7 @@ def role(
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
-            handler=_Handler(custom_id, coro)
+            handler=_Handler(custom_id, coro),
         )
         self.default_values = default_values
         return self
@@ -354,7 +354,7 @@ def user(
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
-            handler=_Handler(custom_id, coro)
+            handler=_Handler(custom_id, coro),
         )
         self.default_values = default_values
         return self
@@ -401,7 +401,7 @@ def mentionable(
             min_values=min_values,
             max_values=max_values,
             disabled=disabled,
-            handler=_Handler(custom_id, coro)
+            handler=_Handler(custom_id, coro),
         )
         self.default_values = default_values
         return self

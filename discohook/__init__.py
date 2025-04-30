@@ -29,6 +29,7 @@ from .enums import *
 from .errors import *
 from .file import File
 from .guild import Guild, PartialGuild
+from .handler import handler
 from .interaction import Interaction
 from .member import Member
 from .message import Message
@@ -43,4 +44,3 @@ from .select import Select, SelectOption
 from .user import User
 from .view import LegacyView, View
 from .webhook import PartialWebhook, Webhook
-from .handler import handler

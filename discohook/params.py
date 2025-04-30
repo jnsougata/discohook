@@ -16,9 +16,7 @@ if TYPE_CHECKING:
 UNSPECIFIED = Any
 
 
-def _append_file(
-    form: aiohttp.MultipartWriter, index: int, file: File
-) -> None:
+def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
     mime, _ = mimetypes.guess_type(file.name)
     form.append(
         file.content,

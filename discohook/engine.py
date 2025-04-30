@@ -6,12 +6,20 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from .command import ApplicationCommand, ApplicationCommandOptionType
-from .enums import (ApplicationCommandType, ComponentType,
-                    InteractionCallbackType, InteractionType)
+from .enums import (
+    ApplicationCommandType,
+    ComponentType,
+    InteractionCallbackType,
+    InteractionType,
+)
 from .errors import CheckFailure, UnknownInteractionType
 from .interaction import Interaction
-from .resolver import (build_context_menu_param, build_modal_params,
-                       build_select_menu_values, build_slash_command_params)
+from .resolver import (
+    build_context_menu_param,
+    build_modal_params,
+    build_select_menu_values,
+    build_slash_command_params,
+)
 
 
 def _build_key(interaction: Interaction) -> str:
@@ -43,7 +51,9 @@ async def _engine(request: Request):
             return JSONResponse({"type": InteractionCallbackType.pong}, status_code=200)
 
         elif interaction.type == InteractionType.app_command:
-            command: ApplicationCommand = request.app.active_commands.get(_build_key(interaction))
+            command: ApplicationCommand = request.app.active_commands.get(
+                _build_key(interaction)
+            )
             if not command:
                 raise NotImplementedError(
                     f"command `{interaction.data['name']}` ({interaction.data['id']}) not found"
@@ -63,19 +73,25 @@ async def _engine(request: Request):
                         raise CheckFailure(f"command checks failed", interaction)
 
                 if not (interaction.data["type"] == ApplicationCommandType.slash):
-                    await command.handler(interaction, build_context_menu_param(interaction))
+                    await command.handler(
+                        interaction, build_context_menu_param(interaction)
+                    )
 
                 elif interaction.data.get("options") and (
                     interaction.data["options"][0]["type"]
                     == ApplicationCommandOptionType.subcommand
                 ):
-                    subcommand = command.subcommands[interaction.data["options"][0]["name"]]
+                    subcommand = command.subcommands[
+                        interaction.data["options"][0]["name"]
+                    ]
                     args, kwargs = build_slash_command_params(
                         subcommand.callback, interaction
                     )
                     await subcommand(interaction, *args, **kwargs)
                 else:
-                    args, kwargs = build_slash_command_params(command.handler, interaction)
+                    args, kwargs = build_slash_command_params(
+                        command.handler, interaction
+                    )
                     await command.handler(interaction, *args, **kwargs)
             except Exception as e:
                 if not command.handler._error_handler:
@@ -84,7 +100,9 @@ async def _engine(request: Request):
                 await command.handler._error_handler(interaction)
 
         elif interaction.type == InteractionType.autocomplete:
-            command: ApplicationCommand = request.app.active_commands.get(_build_key(interaction))
+            command: ApplicationCommand = request.app.active_commands.get(
+                _build_key(interaction)
+            )
             if not command:
                 raise Exception(
                     f"command `{interaction.data['name']}` ({interaction.data['id']}) not found"

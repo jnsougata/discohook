@@ -1,12 +1,16 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING, Callable, Coroutine
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Dict, List, Optional, Union
 
-from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
-                    ApplicationIntegrationType, InteractionContextType)
+from .enums import (
+    ApplicationCommandOptionType,
+    ApplicationCommandType,
+    ApplicationIntegrationType,
+    InteractionContextType,
+)
+from .handler import _Handler
 from .option import Option
 from .permission import Permission
 from .utils import find_description
-from .handler import _Handler
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -50,7 +54,9 @@ class SubCommand:
             )
         return self.callback(*args, **kwargs)
 
-    def on_autocomplete(self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
+    def on_autocomplete(
+        self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
+    ):
         """
         A decorator to register a callback for the subcommand's autocomplete options.
         """
@@ -130,7 +136,9 @@ class ApplicationCommand:
         self.subcommands: Dict[str, SubCommand] = {}
         self.autocompletion_handler: Optional[_Handler] = None
 
-    def on_autocomplete(self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
+    def on_autocomplete(
+        self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
+    ):
         """
         A decorator to register a callback for the command's autocomplete options.
         """
@@ -168,7 +176,9 @@ class ApplicationCommand:
         """
 
         def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
-            subcommand = SubCommand(name, description, options, handler=_Handler(self.name, coro))
+            subcommand = SubCommand(
+                name, description, options, handler=_Handler(self.name, coro)
+            )
             if self.options:
                 self.options.append(subcommand)
             else:
@@ -260,6 +270,7 @@ def user(
         key = f"{name}:{ApplicationCommandType.slash.value}"
     else:
         key = f"{name}:{guild_id}:{ApplicationCommandType.slash.value}"
+
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         return ApplicationCommand(
             name or coro.__name__,
@@ -291,6 +302,7 @@ def message(
         key = f"{name}:{ApplicationCommandType.slash.value}"
     else:
         key = f"{name}:{guild_id}:{ApplicationCommandType.slash.value}"
+
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         return ApplicationCommand(
             name or coro.__name__,

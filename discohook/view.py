@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 if TYPE_CHECKING:
     from .common import Component
@@ -98,7 +98,9 @@ class View:
 
     def add_container(
         self,
-        *components: Union[ActionRow, TextDisplay, Section, MediaGallery, Separator, File],
+        *components: Union[
+            ActionRow, TextDisplay, Section, MediaGallery, Separator, File
+        ],
         accent_color: Optional[int] = None,
         id: Optional[int] = None
     ):

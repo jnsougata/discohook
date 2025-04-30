@@ -59,7 +59,6 @@ class Interactable:
 
 # noinspection PyShadowingBuiltins
 class Component(Interactable):
-
     """
     Represents a discord component.
 

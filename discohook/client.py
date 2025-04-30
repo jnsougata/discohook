@@ -8,12 +8,12 @@ from starlette.responses import JSONResponse
 
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
-from .common import Component
 from .dash import dashboard
 from .embed import Embed
+from .engine import _engine
 from .file import File
 from .guild import Guild
-from .engine import _engine
+from .handler import _Handler
 from .help import _help
 from .https import HTTPClient
 from .interaction import Interaction
@@ -24,7 +24,6 @@ from .user import User
 from .utils import compare_password
 from .view import LegacyView
 from .webhook import Webhook
-from .handler import _Handler
 
 
 async def delete_cmd(request: Request):
@@ -138,9 +137,7 @@ class Client(Starlette):
         self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
             self.commands(_help)
-        self._interaction_error_handler: Optional[
-            Callable[[Interaction], Any]
-        ] = None
+        self._interaction_error_handler: Optional[Callable[[Interaction], Any]] = None
 
     @classmethod
     def fromenv(
@@ -229,8 +226,7 @@ class Client(Starlette):
 
     def handlers(self, *handler: Union[_Handler, Any]):
         """
-        Loads multiple components into the client.
-        Do not use this method unless you know what you are doing.
+        Loads multiple component handlers into the client.
 
         Parameters
         ----------

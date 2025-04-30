@@ -21,7 +21,9 @@ __all__ = [
 # noinspection PyShadowingBuiltins
 class ActionRow:
 
-    def __init__(self, *components: Union[Button, Select, Any], id: Optional[int] = None):
+    def __init__(
+        self, *components: Union[Button, Select, Any], id: Optional[int] = None
+    ):
         self.id = id
         self.type = ComponentType.action_row
         self.components = components
@@ -164,7 +166,9 @@ class Container:
 
     def __init__(
         self,
-        *components: Union[ActionRow, TextDisplay, Section, MediaGallery, Separator, File],
+        *components: Union[
+            ActionRow, TextDisplay, Section, MediaGallery, Separator, File
+        ],
         accent_color: Optional[int] = None,
         id: Optional[int] = None,
     ):

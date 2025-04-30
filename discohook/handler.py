@@ -11,11 +11,7 @@ class _Handler:
     A class to handle interactions from a component or command.
     """
 
-    def __init__(
-        self,
-        id: str,
-        callback: Callable[["Interaction", Any], Any]
-    ):
+    def __init__(self, id: str, callback: Callable[["Interaction", Any], Any]):
         """
         Initialize the handler.
 
@@ -64,7 +60,6 @@ class _Handler:
         return self.callback(*args, **kwargs)
 
 
-
 # noinspection PyShadowingBuiltins
 def handler(id: str):
     """
@@ -75,6 +70,7 @@ def handler(id: str):
     id : str
         The ID of the component or command.
     """
+
     def decorator(callback: Callable[["Interaction", Any], Any]):
         return _Handler(id, callback)
 

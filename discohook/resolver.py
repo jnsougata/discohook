@@ -3,8 +3,7 @@ from typing import Any, Callable, Dict, List, Tuple
 
 from .attachment import Attachment
 from .channel import Channel
-from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
-                    ComponentType)
+from .enums import ApplicationCommandOptionType, ApplicationCommandType, ComponentType
 from .interaction import Interaction
 from .member import Member
 from .message import Message

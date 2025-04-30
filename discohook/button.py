@@ -105,10 +105,7 @@ def new(
             style=style,
             disabled=disabled,
             emoji=emoji,
-            handler= _Handler(
-                custom_id,
-                coro # type: ignore
-            )
+            handler=_Handler(custom_id, coro),  # type: ignore
         )
 
     return decorator

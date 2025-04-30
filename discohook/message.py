@@ -7,8 +7,7 @@ from .embed import Embed
 from .emoji import PartialEmoji
 from .file import File
 from .models import AllowedMentions, MessageReference
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .poll import Poll
 from .role import Role
 from .user import User
@@ -285,8 +284,6 @@ class Message:
             files=files,
             suppress_embeds=suppress_embeds,
         )
-        if view and view is not UNSPECIFIED:
-            self.client.load_view(view)
         resp = await self.client.http.edit_message(self.channel_id, self.id, payload)
         return Message(self.client, await resp.json())
 

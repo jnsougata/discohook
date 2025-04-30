@@ -1,4 +1,5 @@
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 from .enums import ComponentType
 
 
@@ -37,7 +38,14 @@ class File:
         self.id = id
 
     @classmethod
-    def from_path(cls, path: str, *, spoiler: bool = False, description: Optional[str] = None, id: Optional[int] = None):
+    def from_path(
+        cls,
+        path: str,
+        *,
+        spoiler: bool = False,
+        description: Optional[str] = None,
+        id: Optional[int] = None,
+    ):
         """
         Creates a File object from a file path.
 
@@ -56,19 +64,25 @@ class File:
             content = f.read()
             name = path.split("/")[-1]
             url = f"attachment://{name}"
-            return cls(name, content=content, spoiler=spoiler, description=description, url=url, id=id)
+            return cls(
+                name,
+                content=content,
+                spoiler=spoiler,
+                description=description,
+                url=url,
+                id=id,
+            )
 
     @classmethod
     def from_url(
-            cls,
-            url: str,
-            *,
-            description: Optional[str] = None,
-            spoiler: bool = False,
-            id: Optional[int] = None,
+        cls,
+        url: str,
+        *,
+        description: Optional[str] = None,
+        spoiler: bool = False,
+        id: Optional[int] = None,
     ):
         return cls(url=url, description=description, spoiler=spoiler, id=id)
-
 
     def to_dict(self) -> Dict[str, Any]:
         data = {"type": self.type, "file": {"url": self.url}, "spoiler": self.spoiler}

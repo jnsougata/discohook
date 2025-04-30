@@ -9,8 +9,7 @@ from .file import File
 from .guild import PartialGuild
 from .https import HTTPClient
 from .message import Message
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
+from .params import UNSPECIFIED, _prepare_editing_payload, _prepare_sending_payload
 from .user import User
 from .view import LegacyView
 
@@ -300,8 +299,6 @@ class Webhook:
             view=view,
             **extras,
         )
-        if view:
-            self.client.load_view(view)
         return await self.client.http.send_webhook_message(self.id, self.token, payload)
 
     async def edit_message(
@@ -347,8 +344,6 @@ class Webhook:
             files=files,
             view=view,
         )
-        if view:
-            self.client.load_view(view)
         resp = await self.client.http.edit_webhook_message(
             self.id, self.token, message_id, payload
         )
