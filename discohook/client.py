@@ -236,13 +236,13 @@ class Client(Starlette):
         self.active_handlers[handler.id] = handler
         return handler
 
-    def load(self, cmd: ApplicationCommand) -> ApplicationCommand:
+    def load(self, command: ApplicationCommand) -> ApplicationCommand:
         """
         A decorator to load a command into the client.
         """
-        self.active_commands[cmd.handler.id] = cmd
-        self._sync_queue.append(cmd)
-        return cmd
+        self.active_commands[command.handler.id] = command
+        self._sync_queue.append(command)
+        return command
 
     def commands(self, *commands: Union[ApplicationCommand, Any]):
         """
