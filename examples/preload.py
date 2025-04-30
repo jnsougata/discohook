@@ -33,8 +33,7 @@ def make_random_color_card(i: discohook.Interaction) -> discohook.Embed:
 # the button will be loaded when the bot cold starts with a predefined id.
 # changing the button's id will cause the older buttons with the same id to stop working.
 # changing the button's style, label, color will not affect the functionality of older buttons with the same id.
-@app.preload("regenerate")
-@discohook.button.new("Regenerate")
+@discohook.button.new("Regenerate", custom_id="regenerate")
 async def regenerate_button(i: discohook.Interaction):
     await i.response.defer()  # you should always defer the response if you are not planning to respond in 4s.
     await i.message.edit(embed=make_random_color_card(i))

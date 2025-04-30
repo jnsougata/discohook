@@ -224,17 +224,17 @@ class Client(Starlette):
         for component in view.children:
             self.active_handlers[component.handler.id] = component.handler
 
-    def handlers(self, *handler: Union[_Handler, Any]):
+    def register(self, handler: Union[_Handler]):
         """
-        Loads multiple component handlers into the client.
+        Register a handler to the client.
 
         Parameters
         ----------
-        *handler
+        handler
             The handler to load to the app.
         """
-        for item in handler:
-            self.active_handlers[item.id] = item
+        self.active_handlers[handler.id] = handler
+        return handler
 
     def load(self, cmd: ApplicationCommand) -> ApplicationCommand:
         """

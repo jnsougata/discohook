@@ -3,7 +3,7 @@ import random
 import discohook
 
 
-@discohook.button.new("Delete", style=discohook.ButtonStyle.red)
+@discohook.button.new("Delete", style=discohook.ButtonStyle.red, custom_id="delete-button")
 async def delete(i: discohook.Interaction):
     if i.from_originator:
         await i.message.delete()
@@ -11,7 +11,7 @@ async def delete(i: discohook.Interaction):
         await i.response.send("You can't delete this message!", ephemeral=True)
 
 
-@discohook.select.user("Select a user to poke", max_values=1)
+@discohook.select.user("Select a user to poke", max_values=1, custom_id="select-user")
 async def user_select(i: discohook.Interaction, users: list[discohook.User]):
     await i.response.update_message(f"You selected {users[0].mention}")
 
