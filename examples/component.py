@@ -3,7 +3,9 @@ import random
 import discohook
 
 
-@discohook.button.new("Delete", style=discohook.ButtonStyle.red, custom_id="delete-button")
+@discohook.button.new(
+    "Delete", style=discohook.ButtonStyle.red, custom_id="delete-button"
+)
 async def delete(i: discohook.Interaction):
     if i.from_originator:
         await i.message.delete()

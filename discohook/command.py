@@ -1,12 +1,9 @@
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, Dict, List, Optional, Union
+from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Dict, List,
+                    Optional, Union)
 
-from .enums import (
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-    ApplicationIntegrationType,
-    InteractionContextType,
-)
+from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
+                    ApplicationIntegrationType, InteractionContextType)
 from .handler import _Handler
 from .option import Option
 from .permission import Permission

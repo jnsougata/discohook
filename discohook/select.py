@@ -2,7 +2,8 @@ import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 from .emoji import PartialEmoji
-from .enums import ChannelType, ComponentType, SelectDefaultValueType, SelectType
+from .enums import (ChannelType, ComponentType, SelectDefaultValueType,
+                    SelectType)
 from .handler import _Handler
 
 if TYPE_CHECKING:
@@ -341,7 +342,6 @@ class Select:
         )
         self.default_values = default_values
         return self
-
 
     def to_dict(self) -> Dict[str, Any]:
         """
