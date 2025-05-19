@@ -7,7 +7,7 @@ from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
 from .handler import _Handler
 from .option import Option
 from .permission import Permission
-from .utils import find_description
+from .utils import resolve_description
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -67,7 +67,7 @@ class SubCommand:
             "description": self.description,
         }
         if self.options:
-            payload["options"] = [option.to_dict() for option in self.options]
+            payload["options"] = [option.to_dict() for option in self.options]  # type: ignore
         return payload
 
 
@@ -112,11 +112,17 @@ class ApplicationCommand:
         permissions: Optional[List[Permission]] = None,
         type: ApplicationCommandType = ApplicationCommandType.slash,
         guild_id: Optional[str] = None,
-        handler: Optional[_Handler] = None,
+        handler_func: Callable[["Interaction", Any], Any],
     ):
-        self.name = name
-        self.handler = handler
-        self.description = description
+        self.name = name or handler_func.__name__
+        key = f"{name}:{type.value}"
+        if guild_id:
+            key += f":{guild_id}"
+        self.handler = _Handler(key, handler_func)
+        if type == ApplicationCommandType.slash:
+            self.description = resolve_description(name, description, handler_func)
+        else:
+            self.description = None
         self.options: List[Union[Option, SubCommand]] = options
         self.nsfw = nsfw
         self.application_id = None
@@ -232,20 +238,16 @@ def slash(
     """
 
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
-        if not guild_id:
-            key = f"{name}:{ApplicationCommandType.slash.value}"
-        else:
-            key = f"{name}:{guild_id}:{ApplicationCommandType.slash.value}"
         return ApplicationCommand(
             name or coro.__name__,
-            description=find_description(name, description, coro),
+            description=description,
             options=options,
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,
             integration_types=integration_types,
             contexts=contexts,
-            handler=_Handler(key, coro),
+            handler_func=coro,
         )
 
     return decorator
@@ -263,21 +265,17 @@ def user(
     """
     A decorator to register a user command with its callback.
     """
-    if not guild_id:
-        key = f"{name}:{ApplicationCommandType.slash.value}"
-    else:
-        key = f"{name}:{guild_id}:{ApplicationCommandType.slash.value}"
 
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         return ApplicationCommand(
-            name or coro.__name__,
+            name=name,
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,
             type=ApplicationCommandType.user,
             integration_types=integration_types,
             contexts=contexts,
-            handler=_Handler(key, coro),
+            handler_func=coro,
         )
 
     return decorator
@@ -295,21 +293,17 @@ def message(
     """
     A decorator to register a message command with its callback.
     """
-    if not guild_id:
-        key = f"{name}:{ApplicationCommandType.slash.value}"
-    else:
-        key = f"{name}:{guild_id}:{ApplicationCommandType.slash.value}"
 
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         return ApplicationCommand(
-            name or coro.__name__,
+            name=name,
             nsfw=nsfw,
             permissions=permissions,
             guild_id=guild_id,
             type=ApplicationCommandType.message,
             integration_types=integration_types,
             contexts=contexts,
-            handler=_Handler(key, coro),
+            handler_func=coro,
         )
 
     return decorator

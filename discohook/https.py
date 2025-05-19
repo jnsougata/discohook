@@ -1,5 +1,4 @@
 import json
-import warnings
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import aiohttp
@@ -125,12 +124,6 @@ class HTTPClient:
         params: Optional[Dict[str, Any]] = None,
         **major: str,
     ):
-        warnings.warn(
-            f"\nExperimental ratelimiting used for: {method} {template}\n"
-            f"Params: \n"
-            f"  |- Minor: {list(minor)}\n"
-            f"  |- Major: {major}",
-        )
         method, path, ratelimit_bucket_key = self._route_fmt(method, template, minor, major or {})  # type: ignore
         if self.rate_limiter and await self.rate_limiter.is_rate_limited(
             ratelimit_bucket_key

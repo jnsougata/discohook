@@ -25,7 +25,7 @@ def snowflake_time(snowflake_id: str) -> float:
     return ((int(snowflake_id) >> 22) + discord_epoch) / 1000
 
 
-def find_description(name: str, description: Any, callback: Handler) -> str:
+def resolve_description(name: str, description: Any, callback: Handler) -> str:
     if description and isinstance(description, str):
         return description
     if callback.__doc__:

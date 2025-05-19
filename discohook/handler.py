@@ -37,7 +37,7 @@ class _Handler:
         def decorator(coro: Callable[["Interaction"], bool]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
-            self.checks.append(coro)
+            self.checks.append(coro)  # noqa
             return coro
 
         return decorator

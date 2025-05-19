@@ -16,9 +16,10 @@ from .resolver import (build_context_menu_param, build_modal_params,
 
 def _build_key(interaction: Interaction) -> str:
     specific_source_guild = interaction.data.get("guild_id")
+    key = f"{interaction.data['name']}:{interaction.data['type']}"
     if specific_source_guild:
-        return f"{interaction.data['name']}:{specific_source_guild}:{interaction.data['type']}"
-    return f"{interaction.data['name']}:{interaction.data['type']}"
+        key += f":{specific_source_guild}"
+    return key
 
 
 # noinspection PyProtectedMember
