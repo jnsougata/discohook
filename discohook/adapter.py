@@ -1,17 +1,14 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
-from .embed import Embed
+from .components import *
 from .enums import InteractionCallbackType, InteractionType
 from .errors import InteractionTypeMismatch
 from .file import File
 from .message import Message
 from .modal import Modal
-from .models import AllowedMentions
 from .option import Choice
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
-from .poll import Poll
-from .view import LegacyView, View
+from .params import _prepare_sending_payload
+from .view import View
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -25,6 +22,25 @@ class InteractionResponse:
     def __init__(self, interaction: "Interaction") -> None:
         self.inter = interaction
 
+    async def edit(
+        self,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
+    ):
+        """
+        Patches the response message.
+        """
+        resp = await self.inter.client.http.edit_webhook_message(
+            self.inter.application_id,
+            self.inter.token,
+            "@original",
+            _prepare_sending_payload(component=View.from_children(*components)),
+        )
+        data = await resp.json()
+        self.inter._responded = True
+        return Message(self.inter.client, data)
+
     async def delete(self):
         """
         Deletes the response message.
@@ -32,52 +48,6 @@ class InteractionResponse:
         await self.inter.client.http.delete_webhook_message(
             self.inter.application_id, self.inter.token, "@original"
         )
-
-    async def patch(self, view: View):
-        """
-        Patches the response message.
-        """
-        await self.inter.client.http.edit_webhook_message(
-            self.inter.application_id, self.inter.token, "@original",
-            _prepare_sending_payload(component=view))
-
-    async def edit(
-        self,
-        content: Optional[str] = UNSPECIFIED,
-        *,
-        embed: Optional[Embed] = UNSPECIFIED,
-        embeds: Optional[List[Embed]] = UNSPECIFIED,
-        view: Optional[LegacyView] = UNSPECIFIED,
-        tts: Optional[bool] = UNSPECIFIED,
-        file: Optional[File] = UNSPECIFIED,
-        files: Optional[List[File]] = UNSPECIFIED,
-        suppress_embeds: Optional[bool] = UNSPECIFIED,
-    ) -> Message:
-        """
-        Edits the response message.
-
-        Parameters
-        ----------
-        same as :meth:`Message.edit`
-        """
-        payload = _prepare_editing_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
-        )
-        resp = await self.inter.client.http.edit_webhook_message(
-            self.inter.application_id,
-            self.inter.token,
-            "@original",
-            payload,
-        )
-        data = await resp.json()
-        return Message(self.inter.client, data)
 
 
 class FollowupResponse:
@@ -101,41 +71,21 @@ class FollowupResponse:
 
     async def edit(
         self,
-        content: Optional[str] = UNSPECIFIED,
-        *,
-        embed: Optional[Embed] = UNSPECIFIED,
-        embeds: Optional[List[Embed]] = UNSPECIFIED,
-        view: Optional[LegacyView] = UNSPECIFIED,
-        tts: Optional[bool] = UNSPECIFIED,
-        file: Optional[File] = UNSPECIFIED,
-        files: Optional[List[File]] = UNSPECIFIED,
-        suppress_embeds: Optional[bool] = UNSPECIFIED,
-    ) -> Message:
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
+    ):
         """
-        Edits the followup message.
-
-        Parameters
-        ----------
-        same as :meth:`Message.edit`
+        Edits the followup response message.
         """
-        payload = _prepare_editing_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
-        )
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
             self.interaction.token,
             self.message.id,
-            payload,
+            _prepare_sending_payload(component=View.from_children(*components)),
         )
         data = await resp.json()
-        return Message(self.interaction.client, data)
+        self.message = Message(self.interaction.client, data)
 
 
 class ResponseAdapter:
@@ -146,86 +96,25 @@ class ResponseAdapter:
     def __init__(self, interaction: "Interaction") -> None:
         self.inter = interaction
 
-    async def post(self, view: View, with_response: bool = False):
+    async def send(
+        self,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
+        with_response: bool = False,
+        ephemeral: bool = False,
+    ):
         await self.inter.client.http.create_interaction_response(
             self.inter.id,
             self.inter.token,
             _prepare_sending_payload(
-                component=view,
+                component=View.from_children(*components),
+                ephemeral=ephemeral,
                 payload_type=InteractionCallbackType.channel_message_with_source,
             ),
             with_response=with_response,
         )
         self.inter._responded = True
-        return InteractionResponse(self.inter)
-
-    async def send(
-        self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[LegacyView] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        allowed_mentions: Optional[AllowedMentions] = None,
-        ephemeral: Optional[bool] = False,
-        suppress_embeds: Optional[bool] = False,
-        poll: Optional[Poll] = None,
-        with_response: bool = False,
-    ) -> InteractionResponse:
-        """
-        Sends a response to the interaction
-
-        Parameters
-        ----------
-        content: str | None
-            The content of the message to send
-        embed: Embed | None
-            The embed to send with the message
-        embeds: List[Embed] | None
-            The list of embeds to send with the message (max 10)
-        view: LegacyView | None
-            The view to send with the message
-        tts: bool
-            Whether the message should be sent as tts or not, defaults to False
-        file: File | None
-            The file to send with the message
-        files: List[File] | None
-            The list of files to send with the message
-        allowed_mentions: AllowedMentions | None
-            The allowed_mentions object to send with the message
-        ephemeral: bool
-            Whether the message should be ephemeral or not, defaults to False
-        suppress_embeds: bool
-            Whether the embeds should be suppressed or not, defaults to False
-        poll: Poll | None
-            The poll to send with the message
-        with_response: bool
-            Whether to include an interaction callback object as the response, defaults to False
-        Returns
-        -------
-        InteractionResponse
-        """
-        payload = _prepare_sending_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            suppress_embeds=suppress_embeds,
-            allowed_mentions=allowed_mentions,
-            poll=poll,
-            payload_type=InteractionCallbackType.channel_message_with_source,
-        )
-        self.inter._responded = True
-        await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload, with_response
-        )
         return InteractionResponse(self.inter)
 
     async def send_modal(
@@ -358,47 +247,29 @@ class ResponseAdapter:
         )
         return InteractionResponse(self.inter)
 
-    async def update_message(
+    async def edit_origin(
         self,
-        content: Optional[str] = UNSPECIFIED,
-        *,
-        embed: Optional[Embed] = UNSPECIFIED,
-        embeds: Optional[List[Embed]] = UNSPECIFIED,
-        view: Optional[LegacyView] = UNSPECIFIED,
-        tts: Optional[bool] = UNSPECIFIED,
-        file: Optional[File] = UNSPECIFIED,
-        files: Optional[List[File]] = UNSPECIFIED,
-        suppress_embeds: Optional[bool] = UNSPECIFIED,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
         with_response: bool = False,
     ) -> InteractionResponse:
         """
-        Edits the message, the component was attached to.
-        This method is only available for component interactions.
+        Edits the original message of the interaction.
+        Only available for buttons, select menus, and modal submission interactions.
 
         Parameters
         ----------
-        content: Optional[str]
-            The new content of the message.
-        embed: Optional[Embed]
-            The new embed of the message.
-        embeds: Optional[List[Embed]]
-            The new embeds of the message.
-        view: Optional[LegacyView]
-            The new view of the message.
-        tts: Optional[bool]
-            Whether the message should be sent with text-to-speech.
-        file: Optional[File]
-            A file to send with the message.
-        files: Optional[List[File]]
-            A list of files to send with the message.
-        suppress_embeds: Optional[bool]
-            Whether the embeds should be suppressed.
+        *components:
+            The components to include in the response message.
         with_response: bool
-            Whether to include an interaction callback object as the response.
+            Whether to return the original message as a response object.
 
         Returns
         -------
         InteractionResponse
+            The response object containing the edited message.
+
         """
         if not (
             self.inter.type == InteractionType.component
@@ -408,15 +279,8 @@ class ResponseAdapter:
                 f"Method not supported for {self.inter.type}", self.inter
             )
 
-        payload = _prepare_editing_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
+        payload = _prepare_sending_payload(
+            component=View.from_children(*components),
             payload_type=InteractionCallbackType.update_component_message,
         )
         self.inter._responded = True
@@ -427,60 +291,23 @@ class ResponseAdapter:
 
     async def followup(
         self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[LegacyView] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        allowed_mentions: Optional[AllowedMentions] = None,
-        ephemeral: Optional[bool] = False,
-        suppress_embeds: Optional[bool] = False,
-        poll: Optional[Poll] = None,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
     ) -> FollowupResponse:
         """
-        Sends a follow-up message to a deferred interaction
+        Sends a followup message to the interaction.
 
         Parameters
         ----------
-        content: str | None
-            The content of the message to send
-        embed: Embed | None
-            The embed to send with the message
-        embeds: List[Embed] | None
-            The list of embeds to send with the message (max 10)
-        view: LegacyView | None
-            The view to send with the message
-        tts: bool
-            Whether the message should be sent as tts or not, defaults to False
-        file: File | None
-            The file to send with the message
-        files: List[File] | None
-            The list of files to send with the message
-        allowed_mentions: AllowedMentions | None
-            The allowed_mentions object to send with the message
-        ephemeral: bool
-            Whether the message should be ephemeral or not, defaults to False
-        suppress_embeds: bool
-            Whether the message should suppress embeds or not, defaults to False
-        poll: Poll | None
-            The poll to send with the message
+        components:
+            The components to include in the followup message.
+
+        Returns
+        -------
+
         """
-        payload = _prepare_sending_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            ephemeral=ephemeral,
-            suppress_embeds=suppress_embeds,
-            allowed_mentions=allowed_mentions,
-            poll=poll,
-        )
+        payload = _prepare_sending_payload(component=View.from_children(*components))
         resp = await self.inter.client.http.execute_webhook(
             self.inter.application_id, self.inter.token, payload
         )

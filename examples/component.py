@@ -15,7 +15,7 @@ async def delete(i: discohook.Interaction):
 
 @discohook.select.user("Select a user to poke", max_values=1, custom_id="select-user")
 async def user_select(i: discohook.Interaction, users: list[discohook.User]):
-    await i.response.update_message(f"You selected {users[0].mention}")
+    await i.response.edit_origin(f"You selected {users[0].mention}")
 
 
 @discohook.command.slash()

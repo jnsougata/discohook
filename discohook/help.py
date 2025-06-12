@@ -1,28 +1,35 @@
 from .command import slash
-from .embed import Embed
+from .components import Container, Separator, TextDisplay
 from .enums import ApplicationCommandType
 from .interaction import Interaction
 
 
 @slash("help")
-async def _help(i: Interaction):
+async def _help(interaction: Interaction):
     """Shows help message."""
-    embed = Embed()
-    embed.set_author(name=i.author.name, icon_url=i.author.avatar.url)
-    embed.description = "Here are the commands you can use\n"
-    commands = i.client.active_commands.values()
+    commands = interaction.client.active_commands.values()
     commands = sorted(
         sorted(commands, key=lambda x: x.name), key=lambda x: x.type.value
     )
+    widgets = []
     for cmd in commands:
-        if cmd.guild_id and cmd.guild_id != i.guild_id:
+        if cmd.guild_id and cmd.guild_id != interaction.guild_id:
             continue
         if cmd.type == ApplicationCommandType.slash:
-            embed.description += f"\n**` /{cmd.name} `** {cmd.description}\n"
+            widgets.append(TextDisplay(f"- **`/{cmd.name}`** - {cmd.description}"))
+            widgets.append(Separator(spacing=1))
         else:
             category = "user" if cmd.type == ApplicationCommandType.user else "message"
-            embed.description += (
-                f"\n**` {cmd.name} `** {category.capitalize()} Command\n"
+            widgets.append(
+                TextDisplay(f"- **`{cmd.name}`** - {category.capitalize()} Command")
             )
-
-    await i.response.send(embed=embed)
+            widgets.append(Separator(spacing=1))
+        if len(widgets) > 0 and isinstance(widgets[-1], Separator):
+            widgets.pop()
+    await interaction.response.send(
+        Container(
+            TextDisplay("**You may use the following commands**"),
+            Separator(spacing=2),
+            *widgets,
+        )
+    )

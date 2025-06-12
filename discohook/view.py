@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 if TYPE_CHECKING:
     from .common import Component
@@ -18,10 +18,47 @@ class View:
 
     def __init__(self):
         self.children: List[
-            Union[ActionRow, Section, Container, Separator, File, MediaGallery]
+            Union[
+                TextDisplay,
+                ActionRow,
+                Section,
+                Container,
+                Separator,
+                File,
+                MediaGallery,
+            ]
         ] = []
         self.attachments: List[File] = []
         self.interactables: Dict[str, "Component"] = {}
+
+    @classmethod
+    def from_children(
+        cls,
+        *children: Union[
+            TextDisplay, ActionRow, Section, Container, Separator, File, MediaGallery
+        ]
+    ):
+        self = cls()
+        for child in children:
+            if isinstance(child, ActionRow):
+                self.add_row(*child.components, id=child.id)
+            elif isinstance(child, Section):
+                self.add_section(
+                    *child.components, accessory=child.accessory, id=child.id
+                )
+            elif isinstance(child, Container):
+                self.add_container(
+                    *child.components, accent_color=child.accent_color, id=child.id
+                )
+            elif isinstance(child, Separator):
+                self.add_separator(id=child.id, spacing=child.spacing)
+            elif isinstance(child, File):
+                self.add_file(child)
+            elif isinstance(child, MediaGallery):
+                self.add_gallery(*child.items, id=child.id)
+            else:
+                self.children.append(child)
+        return self
 
     def add_gallery(self, *media: Media, id: Optional[int] = None):
         """
@@ -70,7 +107,7 @@ class View:
             The id of the row. This is used to identify the row when it is submitted.
         """
         for component in components:
-            self.interactables[component.handler.id] = component # noqa
+            self.interactables[component.handler.id] = component  # noqa
         self.children.append(ActionRow(*components, id=id))
         return self
 
@@ -119,7 +156,7 @@ class View:
         """
         for component in components:
             if isinstance(component, Button) or isinstance(component, Select):
-                self.interactables[component.handler.id] = component # noqa
+                self.interactables[component.handler.id] = component  # noqa
         container = Container(*components, accent_color=accent_color, id=id)
         self.attachments.extend(container.attachments)
         self.children.append(container)

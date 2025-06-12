@@ -5,7 +5,7 @@ import discohook
 
 @discohook.button.new("Regenerate")
 async def regenerate_button(i: discohook.Interaction):
-    await i.response.update_message(embed=make_random_color_card(i))
+    await i.response.edit_origin(embed=make_random_color_card(i))
 
 
 @discohook.button.new("Delete", style=discohook.ButtonStyle.red)

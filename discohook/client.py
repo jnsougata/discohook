@@ -250,7 +250,7 @@ class Client(Starlette):
 
         Parameters
         ----------
-        *commands: ApplicationCommand
+        *commands:
             The commands to add to the client.
         """
         for command in commands:
@@ -311,7 +311,7 @@ class Client(Starlette):
         def decorator(coro: Callable[[Interaction, str], str]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Custom id parser must be a coroutine.")
-            self._custom_id_parser = coro # noqa
+            self._custom_id_parser = coro  # noqa
 
         return decorator
 
