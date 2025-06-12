@@ -4,7 +4,7 @@ from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Dict, List,
 
 from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
                     ApplicationIntegrationType, InteractionContextType)
-from .handler import _Handler
+from .handler import Handler
 from .option import Option
 from .permission import Permission
 from .utils import resolve_description
@@ -35,13 +35,13 @@ class SubCommand:
         description: str,
         options: Optional[List[Option]] = None,
         *,
-        handler: _Handler,
+        handler: Handler,
     ):
         self.name = name
         self.options = options
         self.callback = handler
         self.description = description
-        self.autocompletion_handler: Optional[_Handler] = None
+        self.autocompletion_handler: Optional[Handler] = None
 
     def __call__(self, *args, **kwargs):
         if not self.callback:
@@ -118,7 +118,7 @@ class ApplicationCommand:
         key = f"{name}:{type.value}"
         if guild_id:
             key += f":{guild_id}"
-        self.handler = _Handler(key, handler_func)
+        self.handler = Handler(key, handler_func)
         if type == ApplicationCommandType.slash:
             self.description = resolve_description(name, description, handler_func)
         else:
@@ -137,7 +137,7 @@ class ApplicationCommand:
         self.guild_id = guild_id
         self.data: Dict[str, Any] = {}
         self.subcommands: Dict[str, SubCommand] = {}
-        self.autocompletion_handler: Optional[_Handler] = None
+        self.autocompletion_handler: Optional[Handler] = None
 
     def on_autocomplete(
         self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
@@ -180,7 +180,7 @@ class ApplicationCommand:
 
         def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
             subcommand = SubCommand(
-                name, description, options, handler=_Handler(self.name, coro)
+                name, description, options, handler=Handler(self.name, coro)
             )
             if self.options:
                 self.options.append(subcommand)

@@ -33,6 +33,14 @@ class InteractionResponse:
             self.inter.application_id, self.inter.token, "@original"
         )
 
+    async def patch(self, view: View):
+        """
+        Patches the response message.
+        """
+        await self.inter.client.http.edit_webhook_message(
+            self.inter.application_id, self.inter.token, "@original",
+            _prepare_sending_payload(component=view))
+
     async def edit(
         self,
         content: Optional[str] = UNSPECIFIED,
@@ -172,30 +180,30 @@ class ResponseAdapter:
 
         Parameters
         ----------
-        content: Optional[str]
+        content: str | None
             The content of the message to send
-        embed: Optional[Embed]
+        embed: Embed | None
             The embed to send with the message
-        embeds: Optional[List[Embed]]
+        embeds: List[Embed] | None
             The list of embeds to send with the message (max 10)
-        view: Optional[LegacyView]
+        view: LegacyView | None
             The view to send with the message
-        tts: Optional[bool]
-            Whether the message should be sent as tts or not
-        file: Optional[File]
+        tts: bool
+            Whether the message should be sent as tts or not, defaults to False
+        file: File | None
             The file to send with the message
-        files: Optional[List[File]]
+        files: List[File] | None
             The list of files to send with the message
-        allowed_mentions: Optional[AllowedMentions]
+        allowed_mentions: AllowedMentions | None
             The allowed_mentions object to send with the message
-        ephemeral: Optional[bool]
-            Whether the message should be ephemeral or not
-        suppress_embeds: Optional[bool]
-            Whether the embeds should be suppressed or not
-        poll: Optional[Poll]
+        ephemeral: bool
+            Whether the message should be ephemeral or not, defaults to False
+        suppress_embeds: bool
+            Whether the embeds should be suppressed or not, defaults to False
+        poll: Poll | None
             The poll to send with the message
-        with_response: Optional[bool]
-            Whether to include an interaction callback object as the response.
+        with_response: bool
+            Whether to include an interaction callback object as the response, defaults to False
         Returns
         -------
         InteractionResponse
@@ -244,7 +252,6 @@ class ResponseAdapter:
             raise InteractionTypeMismatch(
                 f"Method not supported for {self.inter.type}", self.inter
             )
-        self.inter.client.active_handlers[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal,
@@ -438,27 +445,27 @@ class ResponseAdapter:
 
         Parameters
         ----------
-        content: Optional[str]
+        content: str | None
             The content of the message to send
-        embed: Optional[Embed]
+        embed: Embed | None
             The embed to send with the message
-        embeds: Optional[List[Embed]]
+        embeds: List[Embed] | None
             The list of embeds to send with the message (max 10)
-        view: Optional[LegacyView]
+        view: LegacyView | None
             The view to send with the message
-        tts: Optional[bool]
-            Whether the message should be sent as tts or not
-        file: Optional[File]
+        tts: bool
+            Whether the message should be sent as tts or not, defaults to False
+        file: File | None
             The file to send with the message
-        files: Optional[List[File]]
+        files: List[File] | None
             The list of files to send with the message
-        allowed_mentions: Optional[AllowedMentions]
+        allowed_mentions: AllowedMentions | None
             The allowed_mentions object to send with the message
-        ephemeral: Optional[bool]
-            Whether the message should be ephemeral or not
-        suppress_embeds: Optional[bool]
-            Whether the message should suppress embeds or not
-        poll: Optional[Poll]
+        ephemeral: bool
+            Whether the message should be ephemeral or not, defaults to False
+        suppress_embeds: bool
+            Whether the message should suppress embeds or not, defaults to False
+        poll: Poll | None
             The poll to send with the message
         """
         payload = _prepare_sending_payload(

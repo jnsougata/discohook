@@ -145,13 +145,13 @@ async def _engine(request: Request):
 
                 if interaction.type == InteractionType.component:
                     if interaction.data["component_type"] == ComponentType.button:
-                        await handler(interaction)
+                        await handler(interaction, custom_id)
                     else:
                         await handler(
                             interaction, build_select_menu_values(interaction)
                         )
                 elif interaction.type == InteractionType.modal_submit:
-                    args, kwargs = build_modal_params(handler.handler, interaction)
+                    args, kwargs = build_modal_params(handler.callback, interaction)
                     await handler(interaction, *args, **kwargs)
             except Exception as e:
                 if not handler._error_handler:

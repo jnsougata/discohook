@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, Tuple
 
 if TYPE_CHECKING:
     from .common import Component
@@ -70,7 +70,7 @@ class View:
             The id of the row. This is used to identify the row when it is submitted.
         """
         for component in components:
-            self.interactables[component.custom_id] = component
+            self.interactables[component.handler.id] = component # noqa
         self.children.append(ActionRow(*components, id=id))
         return self
 
@@ -85,15 +85,16 @@ class View:
 
         Parameters
         ----------
-        components: :class:`Button` or :class:`Select`
+        *components: Tuple[TextDisplay]
             The components to be added to the section.
         accessory: Optional[Union[:class:`Button`, :class:`Thumbnail`]]
             The accessory to be added to the section. This can be a button or a thumbnail.
         id: Optional[:class:`str`]
             The id of the section. This is used to identify the section when it is submitted.
         """
-        if isinstance(components, Button):
-            self.interactables[components.custom_id] = components
+        for component in components:
+            if isinstance(component, Button):
+                self.interactables[component.handler.id] = component
         self.children.append(Section(*components, accessory=accessory, id=id))
 
     def add_container(
@@ -109,16 +110,16 @@ class View:
 
         Parameters
         ----------
-        components: :class:`Button` or :class:`Select`
+        components: Tuple[ActionRow | TextDisplay | Section | MediaGallery | Separator | File]
             The components to be added to the container.
         accent_color: Optional[:class:`int`]
             The accent color of the container. This is used to identify the container when it is submitted.
-        id: Optional[:class:`str`]
+        id: str | None
             The id of the container. This is used to identify the container when it is submitted.
         """
         for component in components:
             if isinstance(component, Button) or isinstance(component, Select):
-                self.interactables[component.custom_id] = component
+                self.interactables[component.handler.id] = component # noqa
         container = Container(*components, accent_color=accent_color, id=id)
         self.attachments.extend(container.attachments)
         self.children.append(container)

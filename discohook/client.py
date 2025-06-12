@@ -13,7 +13,7 @@ from .embed import Embed
 from .engine import _engine
 from .file import File
 from .guild import Guild
-from .handler import _Handler
+from .handler import Handler
 from .help import _help
 from .https import HTTPClient
 from .interaction import Interaction
@@ -122,7 +122,7 @@ class Client(Starlette):
         self.http = HTTPClient(
             token=token, application_id=application_id, rate_limiter=ratelimit_mux
         )
-        self.active_handlers: Dict[str, _Handler] = {}
+        self.active_handlers: Dict[str, Handler] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.active_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, _engine, methods=["POST"], include_in_schema=False)
@@ -224,7 +224,7 @@ class Client(Starlette):
         for component in view.children:
             self.active_handlers[component.handler.id] = component.handler
 
-    def register(self, handler: Union[_Handler]):
+    def register(self, handler: Handler):
         """
         Register a handler to the client.
 
@@ -311,7 +311,7 @@ class Client(Starlette):
         def decorator(coro: Callable[[Interaction, str], str]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("Custom id parser must be a coroutine.")
-            self._custom_id_parser = coro
+            self._custom_id_parser = coro # noqa
 
         return decorator
 
@@ -335,7 +335,7 @@ class Client(Starlette):
         ----------
         channel_id: str
             The ID of the channel to send the message to.
-        content: Optional[str]
+        content: str | None
             The content of the message.
         tts: bool
             Whether the message should be sent using text-to-speech. Defaults to False.

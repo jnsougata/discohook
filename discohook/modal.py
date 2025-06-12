@@ -2,7 +2,7 @@ import asyncio
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
 from .enums import ComponentType, TextInputFieldLength
-from .handler import _Handler
+from .handler import Handler
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -81,7 +81,7 @@ class Modal:
     ----------
     title: :class:`str`
         The title of the modal.
-    handler: _Handler
+    handler: Handler
         The handler to control the modal submission.
     """
 
@@ -89,7 +89,7 @@ class Modal:
         self,
         title: str,
         *,
-        handler: _Handler,
+        handler: Handler,
     ):
         self.handler = handler
         self.title = title
@@ -149,6 +149,7 @@ class Modal:
                 ],
             }
         )
+        return self
 
     def to_dict(self):
         """
@@ -158,41 +159,3 @@ class Modal:
         if self.rows:
             data["components"].extend(self.rows)
         return data
-
-
-def new(
-    title: str,
-    *field: TextInput,
-    custom_id: str,
-):
-    """
-    A decorator that creates a modal and registers a callback.
-
-    Parameters
-    ----------
-    title: str
-        The title of the modal.
-    *field: Tuple[TextInput]
-        The fields to be added to the modal.
-    custom_id: str
-        The custom id of the modal. If not provided, it will be generated automatically.
-
-    Returns
-    -------
-    :class:`Modal`
-
-    Raises
-    ------
-    TypeError
-        If the callback is not a coroutine.
-    """
-
-    def decorator(coro: Callable[["Interaction", Any], Any]):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        self = Modal(title, handler=_Handler(custom_id, coro))
-        for f in field:
-            self.rows.append(f.to_dict())
-        return self
-
-    return decorator

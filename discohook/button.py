@@ -1,12 +1,8 @@
-import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from .emoji import PartialEmoji
 from .enums import ButtonStyle, ComponentType
-from .handler import _Handler
-
-if TYPE_CHECKING:
-    from .interaction import Interaction
+from .handler import Handler
 
 
 class Button:
@@ -35,7 +31,7 @@ class Button:
         style: ButtonStyle = ButtonStyle.blurple,
         disabled: bool = False,
         emoji: Optional[Union[str, PartialEmoji]] = None,
-        handler: Optional[_Handler] = None,
+        handler: Optional[Handler] = None,
     ):
         self.handler = handler
         self.url = url
@@ -70,60 +66,3 @@ class Button:
         if self.url and self.style == ButtonStyle.link:
             payload["url"] = self.url
         return payload
-
-
-def new(
-    label: Optional[str] = None,
-    *,
-    style: ButtonStyle = ButtonStyle.blurple,
-    disabled: bool = False,
-    emoji: Optional[Union[str, PartialEmoji]] = None,
-    custom_id: str,
-):
-    """
-    A decorator that creates a button and registers a callback.
-
-    Parameters
-    ----------
-    label: str | None
-        The text to be displayed on the button.
-    style: :class:`ButtonStyle`
-        The style of the button.
-    disabled: :class:`bool`
-        Whether the button is disabled or not.
-    emoji: :class:`str` | :class:`PartialEmoji` | None
-        The emoji to be displayed on the button.
-    custom_id: :class:`str`
-        The custom id of the button.
-    """
-
-    def decorator(coro: Callable[["Interaction"], Any]):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        return Button(
-            label=label,
-            style=style,
-            disabled=disabled,
-            emoji=emoji,
-            handler=_Handler(custom_id, coro),  # type: ignore
-        )
-
-    return decorator
-
-
-def link(
-    label: Optional[str], *, url: str, emoji: Optional[Union[str, PartialEmoji]] = None
-):
-    """
-    A decorator that creates a link button.
-
-    Parameters
-    ----------
-    label: str | None
-        The text to be displayed on the button.
-    url: str
-        The url to be opened when the button is clicked.
-    emoji: :class:`str` | :class:`PartialEmoji` | None
-        The emoji to be displayed on the button.
-    """
-    return Button(label=label, url=url, style=ButtonStyle.link, emoji=emoji)

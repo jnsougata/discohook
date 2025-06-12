@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 from .emoji import PartialEmoji
 from .enums import (ChannelType, ComponentType, SelectDefaultValueType,
                     SelectType)
-from .handler import _Handler
+from .handler import Handler
 
 if TYPE_CHECKING:
     from .channel import PartialChannel
@@ -128,7 +128,7 @@ class Select:
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
-        handler: _Handler,
+        handler: Handler,
     ):
         self.handler = handler
         self.type = type
@@ -148,7 +148,7 @@ class Select:
         min_values: Optional[int] = None,
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
-        handler: _Handler,
+        handler: Handler,
     ):
         """
         Creates a text select menu and registers a callback.
@@ -165,7 +165,7 @@ class Select:
             The maximum number of options that can be selected.
         disabled: Optional[:class:`bool`]
             Whether the select menu is disabled or not.
-        handler: :class:`_Handler`
+        handler: :class:`Handler`
             The handler for the select menu.
         """
         self = cls(
@@ -189,7 +189,7 @@ class Select:
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
         default_values: Optional[List[SelectDefaultValue]] = None,
-        handler: _Handler,
+        handler: Handler,
     ):
         """
         Creates a channel select menu and registers a callback.
@@ -208,7 +208,7 @@ class Select:
             Whether the select menu is disabled or not.
         default_values: Optional[List[:class:`SelectDefaultValue`]]
             The default values of the select menu.
-        handler: :class:`_Handler`
+        handler: :class:`Handler`
             The handler for the select menu.
         """
         self = cls(
@@ -232,7 +232,7 @@ class Select:
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
         default_values: Optional[List[SelectDefaultValue]] = None,
-        handler: _Handler,
+        handler: Handler,
     ):
         """
         Creates a role select menu and registers a callback.
@@ -249,7 +249,7 @@ class Select:
             Whether the select menu is disabled or not.
         default_values: Optional[List[:class:`SelectDefaultValue`]]
             The default values of the select menu.
-        handler: :class:`_Handler`
+        handler: :class:`Handler`
             The handler for the select menu.
         """
         self = cls(
@@ -272,7 +272,7 @@ class Select:
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
         default_values: Optional[List[SelectDefaultValue]] = None,
-        handler: _Handler,
+        handler: Handler,
     ):
         """
         Creates a user select menu and registers a callback.
@@ -289,7 +289,7 @@ class Select:
             Whether the select menu is disabled or not.
         default_values: Optional[List[:class:`SelectDefaultValue`]]
             The default values of the select menu.
-        handler: :class:`_Handler`
+        handler: :class:`Handler`
             The handler for the select menu.
         """
         self = cls(
@@ -312,7 +312,7 @@ class Select:
         max_values: Optional[int] = None,
         disabled: Optional[bool] = False,
         default_values: Optional[List[SelectDefaultValue]] = None,
-        handler: _Handler,
+        handler: Handler,
     ):
         """
         Creates a mentionable select menu and registers a callback.
@@ -329,7 +329,7 @@ class Select:
             Whether the select menu is disabled or not.
         default_values: Optional[List[:class:`SelectDefaultValue`]]
             The default values of the select menu.
-        handler: :class:`_Handler`
+        handler: :class:`Handler`
             The handler for the select menu.
         """
         self = cls(
@@ -374,240 +374,3 @@ class Select:
         if self.disabled:
             payload["disabled"] = self.disabled
         return payload
-
-
-def channel(
-    types: Optional[List[ChannelType]] = None,
-    *,
-    placeholder: Optional[str] = None,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    disabled: Optional[bool] = False,
-    default_values: Optional[List[SelectDefaultValue]] = None,
-    custom_id: Optional[str],
-):
-    """
-    A decorator that creates a channel select menu and registers a callback.
-
-    Parameters
-    ----------
-    types: Optional[List[:class:`ChannelType`]]
-        The channel types to be displayed on the select menu.
-    placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    disabled: Optional[:class:`bool`]
-        Whether the select menu is disabled or not.
-    default_values: Optional[List[:class:`SelectDefaultValue`]]
-        The default values of the select menu.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-    """
-
-    def decorator(coro: Callable[["Interaction", List["PartialChannel"]], Any]):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        self = Select(
-            type=SelectType.channel,
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            disabled=disabled,
-            handler=_Handler(custom_id, coro),
-        )
-        self.channel_types = types
-        self.default_values = default_values
-        return self
-
-    return decorator
-
-
-def text(
-    *option: SelectOption,
-    placeholder: Optional[str] = None,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    disabled: Optional[bool] = False,
-    custom_id: Optional[str],
-):
-    """
-    A decorator that creates a text select menu and registers a callback.
-
-    Parameters
-    ----------
-    option: Tuple[:class:`SelectOption`]
-        The options to be displayed on the select menu.
-    placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    disabled: Optional[:class:`bool`]
-        Whether the select menu is disabled or not.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-    """
-
-    def decorator(coro: Callable[["Interaction", List[str]], Any]):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        self = Select(
-            type=SelectType.text,
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            disabled=disabled,
-            handler=_Handler(custom_id, coro),
-        )
-        self.options = list(option)
-        return self
-
-    return decorator
-
-
-def role(
-    placeholder: Optional[str] = None,
-    *,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    disabled: Optional[bool] = False,
-    default_values: Optional[List[SelectDefaultValue]] = None,
-    custom_id: Optional[str],
-):
-    """
-    A decorator that creates a select menu and registers a callback.
-
-    For text select menus, use :meth:`text` and for channel select menus, use :meth:`channel`.
-
-    Parameters
-    ----------
-    placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    disabled: Optional[:class:`bool`]
-        Whether the select menu is disabled or not.
-    default_values: Optional[List[:class:`SelectDefaultValue`]]
-        The default values of the select menu.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-
-    Raises
-    ------
-    TypeError
-        If the callback is not a coroutine.
-    """
-
-    def decorator(coro: Callable[["Interaction", List["PartialRole"]], Any]):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        self = Select(
-            type=SelectType.role,
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            disabled=disabled,
-            handler=_Handler(custom_id, coro),
-        )
-        self.default_values = default_values
-        return self
-
-    return decorator
-
-
-def user(
-    placeholder: Optional[str] = None,
-    *,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    disabled: Optional[bool] = False,
-    default_values: Optional[List[SelectDefaultValue]] = None,
-    custom_id: Optional[str],
-):
-    """
-    A decorator that creates a user select menu and registers a callback.
-
-    Parameters
-    ----------
-    placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    disabled: Optional[:class:`bool`]
-        Whether the select menu is disabled or not.
-    default_values: Optional[List[:class:`SelectDefaultValue`]]
-        The default values of the select menu.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-    """
-
-    def decorator(coro: Callable[["Interaction", List["User"]], Any]):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        self = Select(
-            type=SelectType.user,
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            disabled=disabled,
-            handler=_Handler(custom_id, coro),
-        )
-        self.default_values = default_values
-        return self
-
-    return decorator
-
-
-def mentionable(
-    placeholder: Optional[str] = None,
-    *,
-    min_values: Optional[int] = None,
-    max_values: Optional[int] = None,
-    disabled: Optional[bool] = False,
-    default_values: Optional[List[SelectDefaultValue]] = None,
-    custom_id: Optional[str],
-):
-    """
-    A decorator that creates a mentionable select menu and registers a callback.
-
-    Parameters
-    ----------
-     placeholder: Optional[:class:`str`]
-        The placeholder to be displayed on the select menu.
-    min_values: Optional[:class:`int`]
-        The minimum number of options that can be selected.
-    max_values: Optional[:class:`int`]
-        The maximum number of options that can be selected.
-    disabled: Optional[:class:`bool`]
-        Whether the select menu is disabled or not.
-    default_values: Optional[List[:class:`SelectDefaultValue`]]
-        The default values of the select menu.
-    custom_id: Optional[:class:`str`]
-        The custom id of the select menu.
-    """
-
-    def decorator(
-        coro: Callable[["Interaction", List[Union["User", "PartialRole"]]], Any],
-    ):
-        if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("Callback must be a coroutine.")
-        self = Select(
-            type=SelectType.mentionable,
-            placeholder=placeholder,
-            min_values=min_values,
-            max_values=max_values,
-            disabled=disabled,
-            handler=_Handler(custom_id, coro),
-        )
-        self.default_values = default_values
-        return self
-
-    return decorator

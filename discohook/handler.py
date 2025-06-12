@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 
 # noinspection PyShadowingBuiltins
-class _Handler:
+class Handler:
     """
     A class to handle interactions from a component or command.
     """
@@ -61,7 +61,7 @@ class _Handler:
 
 
 # noinspection PyShadowingBuiltins
-def handler(id: str) -> Callable[[Callable[["Interaction", Any], Any]], _Handler]:
+def handler(id: str) -> Callable[[Callable[["Interaction", Any], Any]], Handler]:
     """
     A decorator that creates a handler.
 
@@ -72,6 +72,6 @@ def handler(id: str) -> Callable[[Callable[["Interaction", Any], Any]], _Handler
     """
 
     def decorator(callback: Callable[["Interaction", Any], Any]):
-        return _Handler(id, callback)
+        return Handler(id, callback)
 
     return decorator
