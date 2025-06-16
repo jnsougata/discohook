@@ -107,7 +107,8 @@ class View:
             The id of the row. This is used to identify the row when it is submitted.
         """
         for component in components:
-            self.interactables[component.handler.id] = component  # noqa
+            if component.handler:
+                self.interactables[component.handler.id] = component  # noqa
         self.children.append(ActionRow(*components, id=id))
         return self
 

@@ -28,7 +28,7 @@ async def _help(interaction: Interaction):
             widgets.pop()
     await interaction.response.send(
         Container(
-            TextDisplay("**You may use the following commands**"),
+            TextDisplay("**Commands you can use**"),
             Separator(spacing=2),
             *widgets,
         )

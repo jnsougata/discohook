@@ -318,7 +318,7 @@ class Client(Starlette):
         channel_id: str,
         *components: Union[
             TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
+        ]
     ) -> Message:
         """
         Send a message to a channel using the ID of the channel.
