@@ -3,16 +3,15 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 import aiohttp
 
 from .attachment import Attachment
+from .components import Container, Separator, Section, TextDisplay, MediaGallery, File, ActionRow
 from .embed import Embed
 from .emoji import PartialEmoji
-from .file import File
 from .models import AllowedMentions, MessageReference
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
+from .params import _prepare_payload
 from .poll import Poll
 from .role import Role
 from .user import User
-from .view import LegacyView
+from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
@@ -243,48 +242,19 @@ class Message:
 
     async def edit(
         self,
-        content: Optional[str] = UNSPECIFIED,
-        *,
-        embed: Optional[Embed] = UNSPECIFIED,
-        embeds: Optional[List[Embed]] = UNSPECIFIED,
-        view: Optional[LegacyView] = UNSPECIFIED,
-        tts: Optional[bool] = UNSPECIFIED,
-        file: Optional[File] = UNSPECIFIED,
-        files: Optional[List[File]] = UNSPECIFIED,
-        suppress_embeds: Optional[bool] = UNSPECIFIED,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ]
     ):
         """
         Edits the message.
 
         Parameters
         ----------
-        content: Optional[str]
-            The new content of the message.
-        embed: Optional[Embed]
-            The new embed of the message.
-        embeds: Optional[List[Embed]]
-            The new embeds of the message.
-        view: Optional[LegacyView]
-            The new view of the message.
-        tts: Optional[bool]
-            Whether the message should be sent with text-to-speech.
-        file: Optional[File]
-            A file to send with the message.
-        files: Optional[List[File]]
-            A list of files to send with the message.
-        suppress_embeds: Optional[bool]
-            Whether the embeds should be suppressed.
+        components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container]
+            The components to edit the message with. This can be a mix of different component types.
         """
-        payload = _prepare_editing_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            suppress_embeds=suppress_embeds,
-        )
+        payload = _prepare_payload(View.from_children(*components))
         resp = await self.client.http.edit_message(self.channel_id, self.id, payload)
         return Message(self.client, await resp.json())
 
@@ -306,43 +276,23 @@ class Message:
 
     async def reply(
         self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[LegacyView] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
         allowed_mentions: Optional[AllowedMentions] = None,
         mention_author: Optional[bool] = None,
-        poll: Optional[Poll] = None,
     ):
         """
         Replies to the message.
 
         Parameters
         ----------
-        content: Optional[str]
-            The content of the message.
-        embed: Optional[Embed]
-            The embed of the message.
-        embeds: Optional[List[Embed]]
-            The embeds of the message.
-        view: Optional[LegacyView]
-            The view of the message.
-        tts: Optional[bool]
-            Whether the message should be sent with text-to-speech.
-        file: Optional[File]
-            A file to send with the message.
-        files: Optional[List[File]]
-            A list of files to send with the message.
+        components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container]
+            The components to include in the reply. This can be a mix of different component types.
         allowed_mentions: Optional[AllowedMentions]
             The allowed mentions for the message.
         mention_author: Optional[bool]
             Whether the author should be mentioned.
-        poll: Optional[Poll]
-            The poll to send with the message.
 
         Returns
         -------
@@ -352,19 +302,12 @@ class Message:
             if not allowed_mentions:
                 allowed_mentions = AllowedMentions(replied_user=True)
             allowed_mentions.replied_user = True
-        payload = _prepare_sending_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
+        payload = _prepare_payload(
+            components=View.from_children(*components),
             allowed_mentions=allowed_mentions,
             message_reference=MessageReference(
                 message_id=self.id, channel_id=self.channel_id
-            ),
-            poll=poll,
+            )
         )
         resp = await self.client.http.create_message(self.channel_id, payload)
         return Message(self.client, await resp.json())

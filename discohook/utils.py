@@ -1,9 +1,10 @@
 import hashlib
 import json
 import secrets
-from typing import Any, Callable, Coroutine, Union
+from typing import Any, Callable, Coroutine, Union, TYPE_CHECKING
 
-Handler = Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
+if TYPE_CHECKING:
+    from .interaction import Interaction
 
 
 def compare_password(local: str, remote: str) -> bool:
@@ -25,7 +26,7 @@ def snowflake_time(snowflake_id: str) -> float:
     return ((int(snowflake_id) >> 22) + discord_epoch) / 1000
 
 
-def resolve_description(name: str, description: Any, callback: Handler) -> str:
+def resolve_description(name: str, description: Any, callback: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]) -> str:
     if description and isinstance(description, str):
         return description
     if callback.__doc__:

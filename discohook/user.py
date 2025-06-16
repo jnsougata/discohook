@@ -5,7 +5,7 @@ import aiohttp
 from .asset import Asset
 from .embed import Embed
 from .file import File
-from .params import _prepare_sending_payload
+from .params import _prepare_payload
 
 if TYPE_CHECKING:
     from .client import Client
@@ -154,7 +154,7 @@ class User:
         files: Optional[:class:`List`[:class:`File`]`]
             The files to be sent with the message.
         """
-        payload = _prepare_sending_payload(
+        payload = _prepare_payload(
             content=content,
             tts=tts,
             embed=embed,

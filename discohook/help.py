@@ -16,12 +16,12 @@ async def _help(interaction: Interaction):
         if cmd.guild_id and cmd.guild_id != interaction.guild_id:
             continue
         if cmd.type == ApplicationCommandType.slash:
-            widgets.append(TextDisplay(f"- **`/{cmd.name}`** - {cmd.description}"))
+            widgets.append(TextDisplay(f"- **`/{cmd.name}`**  {cmd.description}"))
             widgets.append(Separator(spacing=1))
         else:
             category = "user" if cmd.type == ApplicationCommandType.user else "message"
             widgets.append(
-                TextDisplay(f"- **`{cmd.name}`** - {category.capitalize()} Command")
+                TextDisplay(f"- **`{cmd.name}`**  {category.capitalize()} Command")
             )
             widgets.append(Separator(spacing=1))
         if len(widgets) > 0 and isinstance(widgets[-1], Separator):

@@ -8,17 +8,15 @@ from starlette.responses import JSONResponse
 
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
+from .components import TextDisplay, MediaGallery, File, ActionRow, Section, Separator, Container
 from .dash import dashboard
-from .embed import Embed
 from .engine import _engine
-from .file import File
 from .guild import Guild
 from .handler import Handler
 from .help import _help
 from .https import HTTPClient
 from .interaction import Interaction
 from .message import Message
-from .poll import Poll
 from .ratelimit import RatelimitMux
 from .user import User
 from .utils import compare_password
@@ -140,7 +138,7 @@ class Client(Starlette):
         self._interaction_error_handler: Optional[Callable[[Interaction], Any]] = None
 
     @classmethod
-    def fromenv(
+    def from_env(
         cls,
         path: str = ".env",
         *,
@@ -318,39 +316,15 @@ class Client(Starlette):
     async def send(
         self,
         channel_id: str,
-        content: Optional[str] = None,
-        *,
-        tts: bool = False,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        view: Optional[LegacyView] = None,
-        poll: Optional[Poll] = None,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
     ) -> Message:
         """
         Send a message to a channel using the ID of the channel.
 
         Parameters
         ----------
-        channel_id: str
-            The ID of the channel to send the message to.
-        content: str | None
-            The content of the message.
-        tts: bool
-            Whether the message should be sent using text-to-speech. Defaults to False.
-        embed: Optional[Embed]
-            The embed to send with the message.
-        embeds: Optional[List[Embed]]
-            A list of embeds to send with the message. Maximum of 10.
-        file: Optional[File]
-            A file to be sent with the message
-        files: Optional[List[File]]
-            A list of files to be sent with message.
-        view: Optional[LegacyView]
-            The view to send with the message.
-        poll: Optional[Poll]
-            The poll to send with the message.
 
         Returns
         -------
@@ -360,16 +334,7 @@ class Client(Starlette):
         if not channel_id.isdigit():
             raise TypeError("Channel ID must be a snowflake.")
         channel = PartialChannel(self, channel_id)
-        return await channel.send(
-            content=content,
-            tts=tts,
-            embed=embed,
-            embeds=embeds,
-            file=file,
-            files=files,
-            view=view,
-            poll=poll,
-        )
+        return await channel.send(*components)
 
     async def me(self) -> User:
         """
@@ -464,7 +429,7 @@ class Client(Starlette):
             channel_id, {"name": name, "avatar": image_base64}, reason=reason
         )
         data = await resp.json()
-        return Webhook(self, data)
+        return Webhook(data, self)
 
     async def fetch_webhook(
         self, webhook_id: str, *, webhook_token: Optional[str] = None
@@ -482,7 +447,7 @@ class Client(Starlette):
         Webhook
         """
         resp = await self.http.get_webhook(webhook_id, webhook_token)
-        return Webhook(self, await resp.json())
+        return Webhook(await resp.json(), self)
 
     async def fetch_guild(
         self, guild_id: str, *, with_counts: Optional[str] = False

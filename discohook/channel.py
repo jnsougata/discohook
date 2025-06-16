@@ -1,16 +1,13 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 
-from .embed import Embed
 from .emoji import PartialEmoji
 from .enums import ChannelType
-from .file import File
 from .message import Message
-from .models import AllowedMentions, MessageReference
-from .params import _prepare_sending_payload
-from .poll import Poll
-from .view import LegacyView
+from .params import _prepare_payload
+from .components import TextDisplay, Section, MediaGallery, File, ActionRow, Separator, Container
+from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
@@ -53,58 +50,20 @@ class PartialChannel:
 
     async def send(
         self,
-        content: Optional[str] = None,
-        *,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        view: Optional[LegacyView] = None,
-        tts: Optional[bool] = False,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        poll: Optional[Poll] = None,
-        allowed_mentions: Optional[AllowedMentions] = None,
-        message_reference: Optional[MessageReference] = None,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ]
     ):
         """
         Sends a message to the channel.
 
         Parameters
         ----------
-        content: Optional[:class:`str`]
-            The content of the message.
-        embed: Optional[:class:`Embed`]
-            The embed to send with the message.
-        embeds: Optional[List[:class:`Embed`]]
-            A list of embeds to send with the message.
-        view: Optional[:class:`LegacyView`]
-            The view to send with the message.
-        tts: Optional[:class:`bool`]
-            Whether the message should be sent with text-to-speech.
-        file: Optional[File]
-            A file to send with the message.
-        files: Optional[List[File]]
-            A list of files to send with the message.
-        poll: Optional[:class:`Poll`]
-            The poll to send with the message.
-        allowed_mentions: Optional[:class:`AllowedMentions`]
-            The allowed mentions for the message.
-        message_reference: Optional[:class:`MessageReference`]
-            The message reference for the message.
+        components:
+            The components to send in the message.
         """
 
-        payload = _prepare_sending_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            view=view,
-            tts=tts,
-            file=file,
-            files=files,
-            poll=poll,
-            allowed_mentions=allowed_mentions,
-            message_reference=message_reference,
-        )
-
+        payload = _prepare_payload(View.from_children(*components))
         resp = await self.client.http.create_message(self.id, payload)
         data = await resp.json()
         return Message(self.client, data)

@@ -7,7 +7,7 @@ from .file import File
 from .message import Message
 from .modal import Modal
 from .option import Choice
-from .params import _prepare_sending_payload
+from .params import _prepare_payload
 from .view import View
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ class InteractionResponse:
         self,
         *components: Union[
             TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
+        ]
     ):
         """
         Patches the response message.
@@ -35,7 +35,7 @@ class InteractionResponse:
             self.inter.application_id,
             self.inter.token,
             "@original",
-            _prepare_sending_payload(component=View.from_children(*components)),
+            _prepare_payload(View.from_children(*components)),
         )
         data = await resp.json()
         self.inter._responded = True
@@ -82,7 +82,7 @@ class FollowupResponse:
             self.interaction.application_id,
             self.interaction.token,
             self.message.id,
-            _prepare_sending_payload(component=View.from_children(*components)),
+            _prepare_payload(View.from_children(*components))
         )
         data = await resp.json()
         self.message = Message(self.interaction.client, data)
@@ -107,8 +107,8 @@ class ResponseAdapter:
         await self.inter.client.http.create_interaction_response(
             self.inter.id,
             self.inter.token,
-            _prepare_sending_payload(
-                component=View.from_children(*components),
+            _prepare_payload(
+                View.from_children(*components),
                 ephemeral=ephemeral,
                 payload_type=InteractionCallbackType.channel_message_with_source,
             ),
@@ -279,9 +279,9 @@ class ResponseAdapter:
                 f"Method not supported for {self.inter.type}", self.inter
             )
 
-        payload = _prepare_sending_payload(
-            component=View.from_children(*components),
-            payload_type=InteractionCallbackType.update_component_message,
+        payload = _prepare_payload(
+            View.from_children(*components),
+            payload_type=InteractionCallbackType.update_component_message
         )
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(
@@ -307,7 +307,7 @@ class ResponseAdapter:
         -------
 
         """
-        payload = _prepare_sending_payload(component=View.from_children(*components))
+        payload = _prepare_payload(View.from_children(*components))
         resp = await self.inter.client.http.execute_webhook(
             self.inter.application_id, self.inter.token, payload
         )

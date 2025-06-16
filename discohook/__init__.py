@@ -43,4 +43,4 @@ from .role import PartialRole, Role
 from .select import Select, SelectOption
 from .user import User
 from .view import LegacyView, View
-from .webhook import PartialWebhook, Webhook
+from .webhook import Webhook

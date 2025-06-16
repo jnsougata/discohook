@@ -1,136 +1,57 @@
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional, Union, Dict, Any
 
 import aiohttp
 
 from .asset import Asset
 from .channel import PartialChannel
-from .embed import Embed
-from .file import File
+from .components import TextDisplay, MediaGallery, File, ActionRow, Section, Separator, Container
 from .guild import PartialGuild
 from .https import HTTPClient
 from .message import Message
-from .params import (UNSPECIFIED, _prepare_editing_payload,
-                     _prepare_sending_payload)
+from .params import _prepare_payload
 from .user import User
-from .view import LegacyView
+from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
 
 
 # noinspection PyShadowingBuiltins
-class PartialWebhook:
+class Webhook:
 
-    def __init__(self, id: str, token: str):
-        self.id = id
-        self.token = token
+    def __init__(
+        self,
+        data: Union[Dict[str, Any], str],
+        client: Optional["Client"] = None,
+    ):
+        self.data = data
+        self.client = client
         self.http = HTTPClient()
 
-    async def send(
-        self,
-        content: Optional[str] = None,
-        *,
-        username: Optional[str] = None,
-        avatar_url: Optional[str] = None,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        tts: bool = False,
-        thread_name: Optional[str] = None,
-        wait: bool = False,
-        thread_id: Optional[str] = None,
-    ) -> aiohttp.ClientResponse:
+    @classmethod
+    def from_url(cls, url: str, *, client: Optional["Client"] = None) -> "Webhook":
+        id, token = url.split("/")[-2:]
+        data = {"id": id, "token": token, "type": 1}
+        return cls(data, client=client)
+
+    @classmethod
+    async def fetch(cls, id: str, *, token: Optional[str] = None, client: Optional["Client"] = None):
         """
-        Sends a message to the webhook.
-        Parameters
-        ----------
-        content: Optional[:class:`str`]
-            The content of the message.
-        username:
-            The username of the webhook.
-        avatar_url:
-            The avatar url of the webhook. (Overrides the webhook's avatar)
-        embed: Optional[:class:`Embed`]
-            The embed of the message.
-        embeds: Optional[List[:class:`Embed`]]
-            The embeds of the message.
-        file: Optional[:class:`File`]
-            The file of the message.
-        files:
-            The files of the message.
-        tts: :class:`bool`
-            Whether the message should be sent with text-to-speech.
-        thread_name: Optional[:class:`str`]
-            The name of the thread to create.
-        wait: :class:`bool`
-            Waits for server confirmation of the message.
-        thread_id: Optional[:class:`str`]
-            Whether to send to a specified thread within the webhook's channel.
+        Fetches the webhook from Discord.
 
         Returns
         -------
-        aiohttp.ClientResponse
+        :class:`Webhook`
+            The fetched webhook.
         """
-
-        extras = {
-            "username": username,
-            "avatar_url": avatar_url,
-            "thread_name": thread_name,
-        }
-        params = {"wait": "true" if wait else "false"}
-        if thread_id:
-            params["thread_id"] = thread_id
-        payload = _prepare_sending_payload(
-            content=content,
-            tts=tts,
-            embed=embed,
-            embeds=embeds,
-            file=file,
-            files=files,
-            **extras,
-        )
-        resp = await self.http.execute_webhook(self.id, self.token, payload, **params)
-        return resp
-
-    @classmethod
-    def from_url(cls, url: str) -> "PartialWebhook":
-        return cls(*url.split("/")[-2:])
-
-
-class Webhook:
-    """
-    Represents a Discord Application Owned Webhook.
-
-    Properties
-    ----------
-    id: :class:`str`
-        The id of the webhook.
-    type: :class:`int`
-        The type of the webhook.
-    guild_id: Optional[:class:`str`]
-        The id of the guild the webhook is in.
-    channel_id: Optional[:class:`str`]
-        The id of the channel the webhook is in.
-    name: Optional[:class:`str`]
-        The name of the webhook.
-    avatar: Optional[:class:`Asset`]
-        The avatar of the webhook.
-    token: Optional[:class:`str`]
-        The token of the webhook.
-    application_id: Optional[:class:`str`]
-        The id of the application the webhook belongs to.
-    source_guild: Optional[:class:`PartialGuild`]
-        The source guild of the webhook.
-    source_channel: Optional[:class:`PartialChannel`]
-        The source channel of the webhook.
-    url: :class:`str`
-        The url of the webhook.
-    """
-
-    def __init__(self, client: "Client", data: dict):
-        self.data = data
-        self.client = client
+        if not client and token:
+            resp = HTTPClient().get_webhook(id, token)
+        elif client and not token:
+            resp = await client.http.get_webhook(id)
+        else:
+            raise ValueError("Either client or token must be provided to fetch a webhook.")
+        data = await resp.json()
+        return cls(client=client, data=data)
 
     @property
     def id(self) -> str:
@@ -160,36 +81,40 @@ class Webhook:
         return None
 
     @property
-    def token(self) -> Optional[str]:
-        return self.data.get("token")
+    def token(self) -> str:
+        return self.data.get("token", "")
 
     @property
     def application_id(self) -> Optional[str]:
         return self.data.get("application_id")
 
     @property
-    def source_guild(self) -> Optional[PartialGuild]:
+    def source_guild(self) -> Optional[Union[PartialGuild, Dict[str, Any]]]:
         data = self.data.get("source_guild")
-        if data:
+        if data and self.client:
             return PartialGuild(self.client, data["id"])
-        return None
+        else:
+            return data
 
     @property
-    def source_channel(self) -> Optional[PartialChannel]:
+    def source_channel(self) -> Optional[Union[PartialChannel, Dict[str, Any]]]:
         data = self.data.get("source_channel")
-        if data:
+        if data and self.client:
             return PartialChannel(self.client, data["id"])
-        return None
+        else:
+            return data
 
     @property
     def url(self) -> Optional[str]:
         return self.data.get("url")
 
     @property
-    def user(self) -> Optional[User]:
+    def user(self) -> Optional[Union[User, Dict[str, Any]]]:
         data = self.data.get("user")
-        if data:
+        if data and self.client:
             return User(self.client, data)
+        else:
+            return data
 
     async def delete(self, *, reason: Optional[str] = None):
         """
@@ -200,13 +125,13 @@ class Webhook:
         """
         await self.client.http.delete_webhook(self.id, reason=reason)
 
-    async def edit(
+    async def modify(
         self,
         name: Optional[str] = None,
         image_base64: Optional[str] = None,
         channel_id: Optional[str] = None,
-        reason: Optional[str] = None,
-    ) -> "Webhook":
+        reason: Optional[str] = None
+    ):
         """
         Edits the webhook.
 
@@ -237,136 +162,56 @@ class Webhook:
             payload["avatar"] = image_base64
         if channel_id:
             payload["channel_id"] = channel_id
-        resp = await self.client.http.modify_webhook(self.id, payload, reason=reason)
-        data = await resp.json()
-        return Webhook(self.client, data)
+        resp = await self.client.http.modify_webhook(self.id, payload, token=self.token, reason=reason)
+        self.data = await resp.json()
+        return self
 
     async def send(
         self,
-        content: Optional[str] = None,
-        *,
+        *components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container],
         username: Optional[str] = None,
         avatar_url: Optional[str] = None,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        tts: bool = False,
-        view: Optional[LegacyView] = None,
         thread_name: Optional[str] = None,
-    ):
+        wait: bool = False,
+        thread_id: Optional[str] = None,
+    ) -> aiohttp.ClientResponse:
         """
         Sends a message to the webhook.
+
         Parameters
         ----------
-        content: Optional[:class:`str`]
-            The content of the message.
+        *components:
+            Components to be sent with the message.
         username:
             The username of the webhook.
         avatar_url:
             The avatar url of the webhook. (Overrides the webhook's avatar)
-        embed: Optional[:class:`Embed`]
-            The embed of the message.
-        embeds: Optional[List[:class:`Embed`]]
-            The embeds of the message.
-        file: Optional[:class:`File`]
-            The file of the message.
-        files:
-            The files of the message.
-        tts: :class:`bool`
-            Whether the message should be sent with text-to-speech.
-        view: Optional[:class:`LegacyView`]
-            The view to be sent with the message.
         thread_name: Optional[:class:`str`]
             The name of the thread to create.
-
-        Returns
-        -------
-        None
-        """
-        extras = {
-            "username": username,
-            "avatar_url": avatar_url,
-            "thread_name": thread_name,
-        }
-
-        payload = _prepare_sending_payload(
-            content=content,
-            tts=tts,
-            embed=embed,
-            embeds=embeds,
-            file=file,
-            files=files,
-            view=view,
-            **extras,
-        )
-        return await self.client.http.send_webhook_message(self.id, self.token, payload)
-
-    async def edit_message(
-        self,
-        message_id: str,
-        *,
-        content: Optional[str] = UNSPECIFIED,
-        embed: Optional[Embed] = UNSPECIFIED,
-        embeds: Optional[List[Embed]] = UNSPECIFIED,
-        file: Optional[File] = UNSPECIFIED,
-        files: Optional[List[File]] = UNSPECIFIED,
-        view: Optional[LegacyView] = UNSPECIFIED,
-    ) -> Message:
-        """
-        Edits a message from the webhook.
-
-        Parameters
-        ----------
-        message_id: :class:`str`
-            The id of the message to edit.
-        content: Optional[:class:`str`]
-            The new content of the message.
-        embed: Optional[:class:`Embed`]
-            The new embed to be sent with the message.
-        embeds: Optional[List[:class:`Embed`]]
-            The new embeds to be sent with the message.
-        file: Optional[:class:`File`]
-            The new file to be sent with the message.
-        files: Optional[List[:class:`File`]]
-            The new files to be sent with the message.
-        view: Optional[:class:`LegacyView`]
-            The new view to be sent with the message.
-
-        Returns
-        -------
-        :class:`Message`
-        """
-        payload = _prepare_editing_payload(
-            content=content,
-            embed=embed,
-            embeds=embeds,
-            file=file,
-            files=files,
-            view=view,
-        )
-        resp = await self.client.http.edit_webhook_message(
-            self.id, self.token, message_id, payload
-        )
-        data = await resp.json()
-        return Message(self.client, data)
-
-    async def delete_message(self, message_id: str) -> aiohttp.ClientResponse:
-        """
-        Deletes a message from the webhook.
-
-        Parameters
-        ----------
-        message_id: :class:`str`
-            The id of the message to delete.
+        wait: :class:`bool`
+            Waits for server confirmation of the message.
+        thread_id: Optional[:class:`str`]
+            Whether to send to a specified thread within the webhook's channel.
 
         Returns
         -------
         aiohttp.ClientResponse
         """
-        return await self.client.http.delete_webhook_message(
-            self.id, self.token, message_id
-        )
+
+        extras = {
+            "username": username,
+            "avatar_url": avatar_url,
+            "thread_name": thread_name,
+        }
+        params = {
+            "wait": "true" if wait else "false",
+            "with_components": "true"
+        }
+        if thread_id:
+            params["thread_id"] = thread_id
+        payload = _prepare_payload(View.from_children(*components), **extras)
+        resp = await self.http.execute_webhook(self.id, self.token, payload, **params)
+        return resp
 
     async def fetch_message(self, message_id: str, *, thread_id: Optional[str] = None):
         """
@@ -388,4 +233,50 @@ class Webhook:
             params["thread_id"] = thread_id
         return await self.client.http.get_webhook_message(
             self.id, self.token, message_id, **params
+        )
+
+    async def edit_message(
+        self,
+        message_id: str,
+        *components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container],
+        thread_id: Optional[str] = None
+    ) -> Message:
+        """
+        Edits a message from the webhook.
+
+        Parameters
+        ----------
+        message_id: :class:`str`
+            The id of the message to edit.
+        *components:
+            Components to be sent with the message.
+        thread_id: Optional[:class:`str`]
+            The thread id the message is in.
+
+        Returns
+        -------
+        :class:`Message`
+        """
+        payload = _prepare_payload(View.from_children(*components))
+        resp = await self.client.http.edit_webhook_message(
+            self.id, self.token, message_id, payload, thread_id=thread_id, with_components="true"
+        )
+        data = await resp.json()
+        return Message(self.client, data)
+
+    async def delete_message(self, message_id: str) -> aiohttp.ClientResponse:
+        """
+        Deletes a message from the webhook.
+
+        Parameters
+        ----------
+        message_id: :class:`str`
+            The id of the message to delete.
+
+        Returns
+        -------
+        aiohttp.ClientResponse
+        """
+        return await self.client.http.delete_webhook_message(
+            self.id, self.token, message_id
         )
