@@ -83,7 +83,7 @@ async def _engine(request: Request):
                     await subcommand(interaction, *args, **kwargs)
                 else:
                     args, kwargs = build_slash_command_params(
-                        command.handler, interaction
+                        command.handler.callback, interaction
                     )
                     await command.handler(interaction, *args, **kwargs)
             except Exception as e:

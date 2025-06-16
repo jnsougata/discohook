@@ -26,7 +26,6 @@ class Webhook:
     ):
         self.data = data
         self.client = client
-        self.http = HTTPClient()
 
     @classmethod
     def from_url(cls, url: str, *, client: Optional["Client"] = None) -> "Webhook":
@@ -210,7 +209,9 @@ class Webhook:
         if thread_id:
             params["thread_id"] = thread_id
         payload = _prepare_payload(View.from_children(*components), **extras)
-        resp = await self.http.execute_webhook(self.id, self.token, payload, **params)
+        http = HTTPClient()
+        resp = await http.execute_webhook(self.id, self.token, payload, **params)
+        await http.session.close()
         return resp
 
     async def fetch_message(self, message_id: str, *, thread_id: Optional[str] = None):
