@@ -1127,11 +1127,16 @@ class HTTPClient:
         return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
 
     async def modify_webhook(
-        self, webhook_id: str, payload: Dict[str, Any], *, token: str = "", reason: Optional[str] = None
+        self,
+        webhook_id: str,
+        payload: Dict[str, Any],
+        *,
+        token: str = "",
+        reason: Optional[str] = None,
     ):
         if token:
             path = f"/webhooks/{webhook_id}/{token}"
-            authorize =False
+            authorize = False
         else:
             path = f"/webhooks/{webhook_id}"
             authorize = True
@@ -1180,13 +1185,13 @@ class HTTPClient:
         webhook_token: str,
         message_id: str,
         data: Any,
-        **params: Any
+        **params: Any,
     ):
         return await self.request(
             "PATCH",
             f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}",
             body=data,
-            **params
+            **params,
         )
 
     async def delete_webhook_message(

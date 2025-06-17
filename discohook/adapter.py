@@ -26,7 +26,7 @@ class InteractionResponse:
         self,
         *components: Union[
             TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ]
+        ],
     ):
         """
         Patches the response message.
@@ -82,7 +82,7 @@ class FollowupResponse:
             self.interaction.application_id,
             self.interaction.token,
             self.message.id,
-            _prepare_payload(View.from_children(*components))
+            _prepare_payload(View.from_children(*components)),
         )
         data = await resp.json()
         self.message = Message(self.interaction.client, data)
@@ -281,7 +281,7 @@ class ResponseAdapter:
 
         payload = _prepare_payload(
             View.from_children(*components),
-            payload_type=InteractionCallbackType.update_component_message
+            payload_type=InteractionCallbackType.update_component_message,
         )
         self.inter._responded = True
         await self.inter.client.http.create_interaction_response(

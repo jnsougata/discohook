@@ -1,7 +1,7 @@
 import hashlib
 import json
 import secrets
-from typing import Any, Callable, Coroutine, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Union
 
 if TYPE_CHECKING:
     from .interaction import Interaction
@@ -26,7 +26,11 @@ def snowflake_time(snowflake_id: str) -> float:
     return ((int(snowflake_id) >> 22) + discord_epoch) / 1000
 
 
-def resolve_description(name: str, description: Any, callback: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]) -> str:
+def resolve_description(
+    name: str,
+    description: Any,
+    callback: Callable[["Interaction", Any], Coroutine[Any, Any, Any]],
+) -> str:
     if description and isinstance(description, str):
         return description
     if callback.__doc__:

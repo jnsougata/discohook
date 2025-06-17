@@ -70,7 +70,9 @@ class View:
             The media to be added to the gallery.
         id: Optional[:class:`int`]
         """
-        self.children.append(MediaGallery(*media, id=id))
+        gallery = MediaGallery(*media, id=id)
+        self.attachments.extend(gallery.attachments)
+        self.children.append(gallery)
         return self
 
     def add_file(self, *file: File):
@@ -132,7 +134,7 @@ class View:
         """
         for component in components:
             if isinstance(component, Button):
-                self.interactables[component.handler.id] = component
+                self.interactables[component.handler.id] = component  # noqa
         self.children.append(Section(*components, accessory=accessory, id=id))
 
     def add_container(

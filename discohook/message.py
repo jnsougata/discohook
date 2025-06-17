@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 import aiohttp
 
 from .attachment import Attachment
-from .components import Container, Separator, Section, TextDisplay, MediaGallery, File, ActionRow
+from .components import (ActionRow, Container, File, MediaGallery, Section,
+                         Separator, TextDisplay)
 from .embed import Embed
 from .emoji import PartialEmoji
 from .models import AllowedMentions, MessageReference
@@ -244,7 +245,7 @@ class Message:
         self,
         *components: Union[
             TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ]
+        ],
     ):
         """
         Edits the message.
@@ -307,7 +308,7 @@ class Message:
             allowed_mentions=allowed_mentions,
             message_reference=MessageReference(
                 message_id=self.id, channel_id=self.channel_id
-            )
+            ),
         )
         resp = await self.client.http.create_message(self.channel_id, payload)
         return Message(self.client, await resp.json())

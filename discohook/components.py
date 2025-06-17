@@ -37,16 +37,24 @@ class ActionRow:
             "components": [component.to_dict() for component in self.components],
         }
         if self.id:
-            data["id"] = self.id
+            data["id"] = self.id  # noqa
         return data
 
 
 class Media:
 
     def __init__(
-        self, media: str, description: Optional[str] = None, spoiler: bool = False
+        self,
+        media: Union[str, File],
+        description: Optional[str] = None,
+        spoiler: bool = False,
     ):
-        self.media = media
+        self.attachment = None
+        if isinstance(media, File):
+            self.media = {"url": f"attachment://{media.name}"}
+            self.attachment = media
+        else:
+            self.media = media
         self.description = description
         self.spoiler = spoiler
 
@@ -64,6 +72,7 @@ class MediaGallery:
         self.id = id
         self.type = ComponentType.media_gallery
         self.items = media
+        self.attachments = [m.attachment for m in media if m.attachment]
         assert 1 <= len(media) <= 10, "MediaGallery must have between 1 and 10 items."
 
     def to_dict(self) -> Dict[str, Any]:
@@ -72,7 +81,7 @@ class MediaGallery:
             "items": [media.to_dict() for media in self.items],
         }
         if self.id:
-            data["id"] = self.id
+            data["id"] = self.id  # noqa
         return data
 
 
@@ -87,7 +96,7 @@ class TextDisplay:
     def to_dict(self) -> Dict[str, Any]:
         data = {"type": self.type, "content": self.content}
         if self.id:
-            data["id"] = self.id
+            data["id"] = self.id  # noqa
         return data
 
 
@@ -114,9 +123,9 @@ class Thumbnail:
             "spoiler": self.spoiler,
         }
         if self.id:
-            data["id"] = self.id
+            data["id"] = self.id  # noqa
         if self.description:
-            data["description"] = self.description
+            data["description"] = self.description  # noqa
         return data
 
 
@@ -140,7 +149,7 @@ class Section:
             "accessory": self.accessory.to_dict(),
         }
         if self.id:
-            data["id"] = self.id
+            data["id"] = self.id  # noqa
         return data
 
 
@@ -176,7 +185,12 @@ class Container:
         self.type = ComponentType.container
         self.components = components
         self.accent_color = accent_color
-        self.attachments = [c for c in components if isinstance(c, File) if c.content]
+        self.attachments = []
+        for c in components:
+            if isinstance(c, MediaGallery):
+                self.attachments.extend(c.attachments)
+            elif isinstance(c, File) and c.content:
+                self.attachments.append(c)
         assert (
             1 <= len(components) <= 10
         ), "Container must have between 1 and 10 components."
@@ -187,7 +201,7 @@ class Container:
             "components": [component.to_dict() for component in self.components],
         }
         if self.id:
-            data["id"] = self.id
+            data["id"] = self.id  # noqa
         if self.accent_color is not None:
-            data["accent_color"] = self.accent_color
+            data["accent_color"] = self.accent_color  # noqa
         return data

@@ -8,7 +8,8 @@ from starlette.responses import JSONResponse
 
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
-from .components import TextDisplay, MediaGallery, File, ActionRow, Section, Separator, Container
+from .components import (ActionRow, Container, File, MediaGallery, Section,
+                         Separator, TextDisplay)
 from .dash import dashboard
 from .engine import _engine
 from .guild import Guild
@@ -318,7 +319,7 @@ class Client(Starlette):
         channel_id: str,
         *components: Union[
             TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ]
+        ],
     ) -> Message:
         """
         Send a message to a channel using the ID of the channel.

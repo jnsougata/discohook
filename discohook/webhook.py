@@ -1,10 +1,11 @@
-from typing import TYPE_CHECKING, Optional, Union, Dict, Any
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 import aiohttp
 
 from .asset import Asset
 from .channel import PartialChannel
-from .components import TextDisplay, MediaGallery, File, ActionRow, Section, Separator, Container
+from .components import (ActionRow, Container, File, MediaGallery, Section,
+                         Separator, TextDisplay)
 from .guild import PartialGuild
 from .https import HTTPClient
 from .message import Message
@@ -34,7 +35,9 @@ class Webhook:
         return cls(data, client=client)
 
     @classmethod
-    async def fetch(cls, id: str, *, token: Optional[str] = None, client: Optional["Client"] = None):
+    async def fetch(
+        cls, id: str, *, token: Optional[str] = None, client: Optional["Client"] = None
+    ):
         """
         Fetches the webhook from Discord.
 
@@ -48,7 +51,9 @@ class Webhook:
         elif client and not token:
             resp = await client.http.get_webhook(id)
         else:
-            raise ValueError("Either client or token must be provided to fetch a webhook.")
+            raise ValueError(
+                "Either client or token must be provided to fetch a webhook."
+            )
         data = await resp.json()
         return cls(client=client, data=data)
 
@@ -129,7 +134,7 @@ class Webhook:
         name: Optional[str] = None,
         image_base64: Optional[str] = None,
         channel_id: Optional[str] = None,
-        reason: Optional[str] = None
+        reason: Optional[str] = None,
     ):
         """
         Edits the webhook.
@@ -161,13 +166,17 @@ class Webhook:
             payload["avatar"] = image_base64
         if channel_id:
             payload["channel_id"] = channel_id
-        resp = await self.client.http.modify_webhook(self.id, payload, token=self.token, reason=reason)
+        resp = await self.client.http.modify_webhook(
+            self.id, payload, token=self.token, reason=reason
+        )
         self.data = await resp.json()
         return self
 
     async def send(
         self,
-        *components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container],
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
         username: Optional[str] = None,
         avatar_url: Optional[str] = None,
         thread_name: Optional[str] = None,
@@ -202,10 +211,7 @@ class Webhook:
             "avatar_url": avatar_url,
             "thread_name": thread_name,
         }
-        params = {
-            "wait": "true" if wait else "false",
-            "with_components": "true"
-        }
+        params = {"wait": "true" if wait else "false", "with_components": "true"}
         if thread_id:
             params["thread_id"] = thread_id
         payload = _prepare_payload(View.from_children(*components), **extras)
@@ -239,8 +245,10 @@ class Webhook:
     async def edit_message(
         self,
         message_id: str,
-        *components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container],
-        thread_id: Optional[str] = None
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
+        thread_id: Optional[str] = None,
     ) -> Message:
         """
         Edits a message from the webhook.
@@ -260,7 +268,12 @@ class Webhook:
         """
         payload = _prepare_payload(View.from_children(*components))
         resp = await self.client.http.edit_webhook_message(
-            self.id, self.token, message_id, payload, thread_id=thread_id, with_components="true"
+            self.id,
+            self.token,
+            message_id,
+            payload,
+            thread_id=thread_id,
+            with_components="true",
         )
         data = await resp.json()
         return Message(self.client, data)

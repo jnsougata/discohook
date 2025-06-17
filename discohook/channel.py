@@ -2,11 +2,12 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 
+from .components import (ActionRow, Container, File, MediaGallery, Section,
+                         Separator, TextDisplay)
 from .emoji import PartialEmoji
 from .enums import ChannelType
 from .message import Message
 from .params import _prepare_payload
-from .components import TextDisplay, Section, MediaGallery, File, ActionRow, Separator, Container
 from .view import View
 
 if TYPE_CHECKING:
@@ -52,7 +53,7 @@ class PartialChannel:
         self,
         *components: Union[
             TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ]
+        ],
     ):
         """
         Sends a message to the channel.
