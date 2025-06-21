@@ -115,7 +115,7 @@ class ApplicationCommand:
         handler_func: Callable[["Interaction", Any], Any],
     ):
         self.name = name or handler_func.__name__
-        key = f"{name}:{type.value}"
+        key = f"{self.name}:{type.value}"
         if guild_id:
             key += f":{guild_id}"
         self.handler = Handler(key, handler_func)
@@ -239,7 +239,7 @@ def slash(
 
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
         return ApplicationCommand(
-            name or coro.__name__,
+            name=name,
             description=description,
             options=options,
             nsfw=nsfw,
