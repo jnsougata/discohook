@@ -98,7 +98,7 @@ class Client(Starlette):
     ratelimit_mux: RatelimitMux | None
         Whether to use a custom ratelimit mux or not. Defaults to None.
     **kwargs
-        Keyword arguments to pass to the FastAPI instance.
+        Keyword arguments to pass to the Starlette instance.
     """
 
     def __init__(
