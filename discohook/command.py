@@ -102,7 +102,7 @@ class ApplicationCommand:
 
     def __init__(
         self,
-        name: str,
+        name: Optional[str] = None,
         *,
         description: Optional[str] = None,
         options: Optional[List[Option]] = None,
@@ -120,7 +120,7 @@ class ApplicationCommand:
             key += f":{guild_id}"
         self.handler = Handler(key, handler_func)
         if type == ApplicationCommandType.slash:
-            self.description = resolve_description(name, description, handler_func)
+            self.description = resolve_description(self.name, description, handler_func)
         else:
             self.description = None
         self.options: List[Union[Option, SubCommand]] = options
