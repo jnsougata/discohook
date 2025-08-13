@@ -117,7 +117,8 @@ We will talk about it later.
 You can sync commands by just visiting the dashboard.
 The dashboard will be available at `https://example.io/api/dash `. 
 
-![image](https://github.com/jnsougata/discohook/assets/53375272/b174878b-7aac-4e05-83cc-62f00dfa8c80)
+<img width="1920" height="920" alt="dashboard" src="https://github.com/user-attachments/assets/3dba56fd-ff40-4f91-9e0e-d8c698f01d3c" />
+
 
 Once you visit the dashboard, it will automatically register all the commands. 
 You can also register commands manually by using the bash command below.   
