@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional, Union
 
 from .button import Button
-from .enums import ComponentType
+from .enums import ComponentType, TextInputFieldLength
 from .file import File
 from .select import Select
 
@@ -15,6 +15,8 @@ __all__ = [
     "Section",
     "Separator",
     "Container",
+    "TextInput",
+    "Label",
 ]
 
 
@@ -205,3 +207,89 @@ class Container:
         if self.accent_color is not None:
             data["accent_color"] = self.accent_color  # noqa
         return data
+
+
+class TextInput:
+    """
+    Represents a text input field in a modal.
+
+    Parameters
+    ----------
+    custom_id: :class:`str`
+        The label of the text input field.
+    id: :class:`int`
+        A unique id of the text input field. Must be valid python identifier.
+    required: :class:`bool`
+        Whether this component is required to be filled (defaults to true).
+    placeholder: :class:`str`
+        Custom placeholder text if the input is empty; max 100 characters.
+    value: :class:`str`
+        Pre-filled value for this component; max 4000 characters.
+    min_length: :class:`int`
+        The minimum length of the text input field.
+    max_length: :class:`int`
+        The maximum length of the text input field.
+    style: :class:`TextInputFieldLength`
+        The style of the text input field.
+    """
+
+    # noinspection PyShadowingBuiltins
+    def __init__(
+        self,
+        custom_id: str,
+        *,
+        id: Optional[int] = None,
+        required: bool = True,
+        placeholder: Optional[str] = None,
+        value: Optional[str] = None,
+        min_length: int = 0,
+        max_length: int = 4000,
+        style: TextInputFieldLength = TextInputFieldLength.short,
+    ):
+        self.custom_id = custom_id
+        assert custom_id.isidentifier(), "field_id must be a valid python identifier"
+        self.id = id
+        self.required = required
+        self.placeholder = placeholder
+        self.value = value
+        self.min_length = min_length
+        self.max_length = max_length
+        self.style = style
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "type": ComponentType.text_input.value,
+            "style": self.style.value,
+            "value": self.value,
+            "custom_id": self.custom_id,
+            "min_length": self.min_length,
+            "max_length": self.max_length,
+            "placeholder": self.placeholder,
+            "required": self.required,
+        }
+
+
+# noinspection PyShadowingBuiltins
+class Label:
+    def __init__(
+        self,
+        label: str,
+        child: Union[Select, TextInput],
+        *,
+        id: Optional[int] = None,
+        description: Optional[str] = None,
+    ):
+        self.label = label
+        self.id = id
+        self.description = description
+        self.child = child
+
+    def to_dict(self):
+        return {
+            "type": ComponentType.label.value,
+            "label": self.label,
+            "id": self.id,
+            "description": self.description,
+            "component": self.child.to_dict(),
+        }

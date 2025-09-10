@@ -223,25 +223,23 @@ class Client(Starlette):
         for component in view.children:
             self.active_handlers[component.handler.id] = component.handler
 
-    def register(self, handler: Handler):
+    def register(
+        self, item: Union[Handler, ApplicationCommand]
+    ) -> Union[Handler, ApplicationCommand]:
         """
-        Register a handler to the client.
+        Registers a handler or command to the client.
 
         Parameters
         ----------
-        handler
-            The handler to load to the app.
+        item: Union[Handler, ApplicationCommand]
+            The handler or command to register.
         """
-        self.active_handlers[handler.id] = handler
-        return handler
-
-    def load(self, command: ApplicationCommand) -> ApplicationCommand:
-        """
-        A decorator to load a command into the client.
-        """
-        self.active_commands[command.handler.id] = command
-        self._sync_queue.append(command)
-        return command
+        if isinstance(item, ApplicationCommand):
+            self.active_commands[item.handler.id] = item
+            self._sync_queue.append(item)
+        else:
+            self.active_handlers[item.id] = item
+        return item
 
     def commands(self, *commands: Union[ApplicationCommand, Any]):
         """

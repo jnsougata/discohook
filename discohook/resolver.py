@@ -131,18 +131,10 @@ def build_context_menu_param(interaction: Interaction):
     if interaction.data["type"] == ApplicationCommandType.message:
         message = interaction.data["resolved"]["messages"][target_id]
         return Message(interaction.client, message)
+    return None
 
 
-def build_modal_params(func: Callable, interaction: Interaction):
-    options = {}
-    for row in interaction.data["components"]:
-        comp = row["components"][0]
-        if comp["type"] == 4:
-            options[comp["custom_id"]] = comp["value"]
-    return handle_params_by_signature(func, options)
-
-
-def build_select_menu_values(interaction: Interaction) -> List[Any]:
+def resolve_select_menu_values(interaction: Interaction) -> List[Any]:
     if interaction.data["component_type"] == ComponentType.string_select:
         return interaction.data["values"]
     if interaction.data["component_type"] == ComponentType.channel_select:
@@ -179,3 +171,49 @@ def build_select_menu_values(interaction: Interaction) -> List[Any]:
         ]
         return users + roles  # type: ignore
     return []
+
+
+def build_modal_params(func: Callable, interaction: Interaction):
+    options = {}
+    for label in interaction.data["components"]:
+        component = label["component"]
+        component_type = component["type"]
+        custom_id = component["custom_id"]
+        if component_type == ComponentType.text_input:
+            options[custom_id] = component["value"]
+        elif component_type == ComponentType.string_select:
+            options[custom_id] = component["values"]
+        elif component_type == ComponentType.user_select:
+            resolved = interaction.data["resolved"]["users"]
+            options[custom_id] = [
+                User(interaction.client, resolved.pop(user_id))
+                for user_id in component["values"]
+            ]
+        elif component_type == ComponentType.role_select:
+            resolved = interaction.data["resolved"]["roles"]
+            options[custom_id] = [
+                Role(interaction.client, resolved.pop(role_id))
+                for role_id in component["values"]
+            ]
+        elif component_type == ComponentType.mentionable_select:
+            raw_values = component["values"]
+            resolved_roles = interaction.data["resolved"].get("roles", {})
+            resolved_users = interaction.data["resolved"].get("users", {})
+            users = [
+                User(interaction.client, resolved_users.pop(user_id))
+                for user_id in raw_values
+                if user_id in resolved_users
+            ]
+            roles = [
+                Role(interaction.client, resolved_roles.pop(role_id))
+                for role_id in raw_values
+                if role_id in resolved_roles
+            ]
+            options[custom_id] = users + roles  # type: ignore
+        elif component_type == ComponentType.channel_select:
+            resolved = interaction.data["resolved"]["channels"]
+            options[custom_id] = [
+                Channel(interaction.client, resolved.pop(channel_id))
+                for channel_id in component["values"]
+            ]
+    return handle_params_by_signature(func, options)

@@ -141,7 +141,7 @@ class Select:
         self.default_values: Optional[List[SelectDefaultValue]] = None
 
     @classmethod
-    def text(
+    def string(
         cls,
         *option: SelectOption,
         placeholder: Optional[str] = None,

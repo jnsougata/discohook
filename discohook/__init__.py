@@ -33,7 +33,7 @@ from .handler import handler
 from .interaction import Interaction
 from .member import Member
 from .message import Message
-from .modal import Modal, TextInput
+from .modal import Modal
 from .models import AllowedMentions, MessageReference
 from .option import Choice, Option
 from .permission import Permission

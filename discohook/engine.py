@@ -11,7 +11,7 @@ from .enums import (ApplicationCommandType, ComponentType,
 from .errors import CheckFailure, UnknownInteractionType
 from .interaction import Interaction
 from .resolver import (build_context_menu_param, build_modal_params,
-                       build_select_menu_values, build_slash_command_params)
+                       build_slash_command_params, resolve_select_menu_values)
 
 
 def _build_key(interaction: Interaction) -> str:
@@ -106,9 +106,11 @@ async def _engine(request: Request):
             ):
                 subcommand = command.subcommands[interaction.data["options"][0]["name"]]
                 args, kwargs = build_slash_command_params(
-                    subcommand.autocompletion_handler, interaction
+                    subcommand.autocompletion_handler.callback, interaction
                 )
-                await subcommand.autocompletion_handler(interaction, *args, **kwargs)
+                await subcommand.autocompletion_handler.callback(
+                    interaction, *args, **kwargs
+                )
             elif not command.autocompletion_handler:
                 raise Exception(
                     f"command `{interaction.data['name']}` ({interaction.data['id']}) has no autocompletion handler"
@@ -117,7 +119,9 @@ async def _engine(request: Request):
                 args, kwargs = build_slash_command_params(
                     command.autocompletion_handler, interaction
                 )
-                await command.autocompletion_handler(interaction, *args, **kwargs)
+                await command.autocompletion_handler.callback(
+                    interaction, *args, **kwargs
+                )
 
         elif interaction.type in (
             InteractionType.component,
@@ -148,7 +152,7 @@ async def _engine(request: Request):
                         await handler(interaction, custom_id)
                     else:
                         await handler(
-                            interaction, build_select_menu_values(interaction)
+                            interaction, resolve_select_menu_values(interaction)
                         )
                 elif interaction.type == InteractionType.modal_submit:
                     args, kwargs = build_modal_params(handler.callback, interaction)
