@@ -8,8 +8,15 @@ from starlette.responses import JSONResponse
 
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
-from .components import (ActionRow, Container, File, MediaGallery, Section,
-                         Separator, TextDisplay)
+from .components import (
+    ActionRow,
+    Container,
+    File,
+    MediaGallery,
+    Section,
+    Separator,
+    TextDisplay,
+)
 from .dash import dashboard
 from .engine import _engine
 from .guild import Guild

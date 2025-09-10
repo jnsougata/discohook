@@ -1,16 +1,8 @@
-import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from .emoji import PartialEmoji
-from .enums import (ChannelType, ComponentType, SelectDefaultValueType,
-                    SelectType)
+from .enums import ChannelType, ComponentType, SelectDefaultValueType, SelectType
 from .handler import Handler
-
-if TYPE_CHECKING:
-    from .channel import PartialChannel
-    from .interaction import Interaction
-    from .role import PartialRole
-    from .user import User
 
 
 # noinspection PyShadowingBuiltins

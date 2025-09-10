@@ -3,8 +3,15 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 import aiohttp
 
 from .attachment import Attachment
-from .components import (ActionRow, Container, File, MediaGallery, Section,
-                         Separator, TextDisplay)
+from .components import (
+    ActionRow,
+    Container,
+    File,
+    MediaGallery,
+    Section,
+    Separator,
+    TextDisplay,
+)
 from .embed import Embed
 from .emoji import PartialEmoji
 from .models import AllowedMentions, MessageReference
@@ -304,7 +311,7 @@ class Message:
                 allowed_mentions = AllowedMentions(replied_user=True)
             allowed_mentions.replied_user = True
         payload = _prepare_payload(
-            components=View.from_children(*components),
+            view=View.from_children(*components),
             allowed_mentions=allowed_mentions,
             message_reference=MessageReference(
                 message_id=self.id, channel_id=self.channel_id

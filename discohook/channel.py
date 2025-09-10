@@ -2,8 +2,15 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 
-from .components import (ActionRow, Container, File, MediaGallery, Section,
-                         Separator, TextDisplay)
+from .components import (
+    ActionRow,
+    Container,
+    File,
+    MediaGallery,
+    Section,
+    Separator,
+    TextDisplay,
+)
 from .emoji import PartialEmoji
 from .enums import ChannelType
 from .message import Message
