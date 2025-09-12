@@ -3,15 +3,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 import aiohttp
 
 from .attachment import Attachment
-from .components import (
-    ActionRow,
-    Container,
-    File,
-    MediaGallery,
-    Section,
-    Separator,
-    TextDisplay,
-)
+from .components import (ActionRow, Container, File, MediaGallery, Section,
+                         Separator, TextDisplay)
 from .embed import Embed
 from .emoji import PartialEmoji
 from .models import AllowedMentions, MessageReference

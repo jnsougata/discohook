@@ -3,7 +3,8 @@ from typing import Any, Callable, Dict, List, Tuple
 
 from .attachment import Attachment
 from .channel import Channel
-from .enums import ApplicationCommandOptionType, ApplicationCommandType, ComponentType
+from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
+                    ComponentType)
 from .interaction import Interaction
 from .member import Member
 from .message import Message
@@ -174,8 +175,10 @@ def resolve_select_menu_values(interaction: Interaction) -> List[Any]:
 
 def build_modal_params(func: Callable, interaction: Interaction):
     options = {}
-    for label in interaction.data["components"]:
-        component = label["component"]
+    for component in interaction.data["components"]:
+        if component["type"] == ComponentType.text_display:
+            continue
+        component = component["component"]
         component_type = component["type"]
         custom_id = component["custom_id"]
         if component_type == ComponentType.text_input:

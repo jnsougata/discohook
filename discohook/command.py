@@ -1,12 +1,9 @@
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, Dict, List, Optional, Union
+from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Dict, List,
+                    Optional, Union)
 
-from .enums import (
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-    ApplicationIntegrationType,
-    InteractionContextType,
-)
+from .enums import (ApplicationCommandOptionType, ApplicationCommandType,
+                    ApplicationIntegrationType, InteractionContextType)
 from .handler import Handler
 from .option import Option
 from .permission import Permission
@@ -42,17 +39,17 @@ class SubCommand:
     ):
         self.name = name
         self.options = options
-        self.callback = handler
+        self.handler = handler
         self.description = description
         self.autocompletion_handler: Optional[Handler] = None
 
     def __call__(self, *args, **kwargs):
-        if not self.callback:
+        if not self.handler:
             raise RuntimeWarning(
                 f"subcommand `{self.name}` of command "
                 f"`{args[0].data['name']}` (id: {args[0].data['id']}) has no callback"
             )
-        return self.callback(*args, **kwargs)
+        return self.handler(*args, **kwargs)
 
     def on_autocomplete(
         self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
@@ -183,7 +180,7 @@ class ApplicationCommand:
 
         def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
             subcommand = SubCommand(
-                name, description, options, handler=Handler(self.name, coro)
+                name, resolve_description(name, description, coro), options, handler=Handler(self.name, coro)
             )
             if self.options:
                 self.options.append(subcommand)

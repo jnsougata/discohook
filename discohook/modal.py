@@ -1,7 +1,9 @@
-from typing import List, Union
+from typing import List, Optional, Union
 
-from .components import Label, TextDisplay
+from .components import Label, TextDisplay, TextInput
+from .enums import ChannelType, SelectType, TextInputFieldLength
 from .handler import Handler
+from .select import Select, SelectDefaultValue, SelectOption
 
 
 class Modal:
@@ -26,8 +28,74 @@ class Modal:
         self.title = title
         self.components: List[Union[Label, TextDisplay]] = []
 
-    def append(self, *components: Union[Label, TextDisplay]):
-        self.components.extend(components)
+    # noinspection PyShadowingBuiltins
+    def append_text_display(self, markdown: str, *, id: Optional[int] = None):
+        self.components.append(TextDisplay(markdown, id=id))
+
+    # noinspection PyShadowingBuiltins
+    def append_text_input(
+        self,
+        *,
+        custom_id: str,
+        label: str,
+        description: Optional[str] = None,
+        id: Optional[int] = None,
+        required: bool = True,
+        placeholder: Optional[str] = None,
+        value: Optional[str] = None,
+        min_length: int = 0,
+        max_length: int = 4000,
+        style: TextInputFieldLength = TextInputFieldLength.short,
+    ):
+        self.components.append(
+            Label(
+                label=label,
+                child=TextInput(
+                    custom_id,
+                    required=required,
+                    placeholder=placeholder,
+                    value=value,
+                    min_length=min_length,
+                    max_length=max_length,
+                    style=style,
+                ),
+                id=id,
+                description=description,
+            )
+        )
+
+    # noinspection PyShadowingBuiltins
+    def append_select_menu(
+        self,
+        *,
+        custom_id: str,
+        label: str,
+        type: SelectType,
+        description: Optional[str] = None,
+        id: Optional[int] = None,
+        placeholder: Optional[str] = None,
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        options: Optional[List[SelectOption]] = None,
+        channel_types: Optional[List[ChannelType]] = None,
+        default_values: Optional[List[SelectDefaultValue]] = None,
+    ):
+        async def dummy(): ...
+
+        handler = Handler(id=custom_id, callback=dummy)  # noqa
+        select = Select(
+            type=type,
+            placeholder=placeholder,
+            min_values=min_values,
+            max_values=max_values,
+            handler=handler,
+        )
+        select.options = options
+        select.channel_types = channel_types
+        select.default_values = default_values
+        self.components.append(
+            Label(label=label, child=select, id=id, description=description)
+        )
 
     def to_dict(self):
         """

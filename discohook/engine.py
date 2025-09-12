@@ -6,20 +6,12 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from .command import ApplicationCommand, ApplicationCommandOptionType
-from .enums import (
-    ApplicationCommandType,
-    ComponentType,
-    InteractionCallbackType,
-    InteractionType,
-)
+from .enums import (ApplicationCommandType, ComponentType,
+                    InteractionCallbackType, InteractionType)
 from .errors import CheckFailure, UnknownInteractionType
 from .interaction import Interaction
-from .resolver import (
-    build_context_menu_param,
-    build_modal_params,
-    build_slash_command_params,
-    resolve_select_menu_values,
-)
+from .resolver import (build_context_menu_param, build_modal_params,
+                       build_slash_command_params, resolve_select_menu_values)
 
 
 def _build_key(interaction: Interaction) -> str:
@@ -86,9 +78,10 @@ async def _engine(request: Request):
                         interaction.data["options"][0]["name"]
                     ]
                     args, kwargs = build_slash_command_params(
-                        subcommand.callback, interaction
+                        subcommand.handler.callback, interaction
                     )
-                    await subcommand(interaction, *args, **kwargs)
+                    # noinspection PyUnresolvedReferences
+                    await subcommand.handler(interaction, *args, **kwargs)
                 else:
                     args, kwargs = build_slash_command_params(
                         command.handler.callback, interaction
