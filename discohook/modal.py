@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Union
 
-from .components import Label
+from .components import Label, TextDisplay
 from .handler import Handler
 
 
@@ -24,11 +24,10 @@ class Modal:
     ):
         self.handler = handler
         self.title = title
-        self.labels: List[Label] = []
+        self.components: List[Union[Label, TextDisplay]] = []
 
-    def append(self, label: Label):
-        self.labels.append(label)
-        return self
+    def append(self, *components: Union[Label, TextDisplay]):
+        self.components.extend(components)
 
     def to_dict(self):
         """
@@ -37,5 +36,5 @@ class Modal:
         return {
             "title": self.title,
             "custom_id": self.handler.id,
-            "components": [label.to_dict() for label in self.labels],
+            "components": [label.to_dict() for label in self.components],
         }

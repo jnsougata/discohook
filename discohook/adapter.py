@@ -305,6 +305,8 @@ class ResponseAdapter:
 
         Returns
         -------
+        FollowupResponse
+            The followup response object containing the sent message.
 
         """
         payload = _prepare_payload(View.from_children(*components))
