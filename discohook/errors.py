@@ -4,6 +4,7 @@ import aiohttp
 
 from .ratelimit import Bucket
 
+
 class InteractionTypeMismatch(Exception):
     """Raised when the interaction type is not the expected type."""
 

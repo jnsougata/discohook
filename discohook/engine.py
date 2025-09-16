@@ -63,7 +63,9 @@ async def _engine(request: Request):
                                 f"returned {type(result)}, expected bool.",
                             )
                     if not all(results):
-                        raise CheckFailure(f"Checks for command `{command.name}` failed.")
+                        raise CheckFailure(
+                            f"Checks for command `{command.name}` failed."
+                        )
 
                 if not (interaction.data["type"] == ApplicationCommandType.slash):
                     await command.handler(
@@ -87,7 +89,9 @@ async def _engine(request: Request):
                                 f"returned {type(result)}, expected bool."
                             )
                     if not all(results):
-                        raise CheckFailure(f"Checks for subcommand `{command.name}.{subcommand.name}` failed.")
+                        raise CheckFailure(
+                            f"Checks for subcommand `{command.name}.{subcommand.name}` failed."
+                        )
                     args, kwargs = build_slash_command_params(
                         subcommand.handler.callback, interaction
                     )
@@ -150,7 +154,9 @@ async def _engine(request: Request):
                 custom_id = await request.app._custom_id_parser(interaction, custom_id)
             handler = request.app.active_handlers.get(custom_id)
             if not handler:
-                raise NotImplementedError(f"Component with custom_id `{custom_id}` was not found.")
+                raise NotImplementedError(
+                    f"Component with custom_id `{custom_id}` was not found."
+                )
             try:
                 if handler.checks:
                     results = await asyncio.gather(
@@ -163,7 +169,9 @@ async def _engine(request: Request):
                                 f"returned {type(result)}, expected bool."
                             )
                     if not all(results):
-                        raise CheckFailure(f"Checks for component with custom_id `{custom_id}` failed.")
+                        raise CheckFailure(
+                            f"Checks for component with custom_id `{custom_id}` failed."
+                        )
 
                 if interaction.type == InteractionType.component:
                     if interaction.data["component_type"] == ComponentType.button:
@@ -181,7 +189,9 @@ async def _engine(request: Request):
                 interaction._error = e
                 await handler._error_handler(interaction)
         else:
-            raise UnknownInteractionType(f"Unknown interaction type {interaction.type} encountered.")
+            raise UnknownInteractionType(
+                f"Unknown interaction type {interaction.type} encountered."
+            )
     except Exception as e:
         if not request.app._interaction_error_handler:
             raise e

@@ -92,6 +92,7 @@ class Modal:
         """
         Appends a select menu component to the modal.
         """
+
         async def dummy(): ...
 
         handler = Handler(id=custom_id, callback=dummy)  # noqa

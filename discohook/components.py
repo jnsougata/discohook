@@ -244,7 +244,7 @@ class TextInput:
         value: Optional[str] = None,
         min_length: int = 0,
         max_length: int = 4000,
-        style: TextInputFieldLength = TextInputFieldLength.short
+        style: TextInputFieldLength = TextInputFieldLength.short,
     ):
         self.custom_id = custom_id
         assert custom_id.isidentifier(), "field_id must be a valid python identifier"

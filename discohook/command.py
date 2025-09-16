@@ -32,9 +32,9 @@ class SubCommand:
     def __init__(
         self,
         name: str,
+        *,
         description: str,
         options: Optional[List[Option]] = None,
-        *,
         handler: Handler,
     ):
         self.name = name
@@ -71,8 +71,9 @@ class SubCommand:
         def decorator(coro: Callable[["Interaction"], bool]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
-            self.handler.checks.append(coro) # noqa
+            self.handler.checks.append(coro)  # noqa
             return self
+
         return decorator
 
     def on_autocomplete(
@@ -171,8 +172,9 @@ class ApplicationCommand:
         def decorator(coro: Callable[["Interaction"], bool]):
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
-            self.handler.checks.append(coro) # noqa
+            self.handler.checks.append(coro)  # noqa
             return self
+
         return decorator
 
     def on_error(self):
@@ -199,8 +201,8 @@ class ApplicationCommand:
     def subcommand(
         self,
         name: Optional[str] = None,
-        description: Optional[str] = None,
         *,
+        description: Optional[str] = None,
         options: Optional[List[Option]] = None,
     ):
         """
@@ -228,7 +230,7 @@ class ApplicationCommand:
                 name=resolved_name,
                 description=resolved_description,
                 options=options,
-                handler=Handler(self.name, coro)
+                handler=Handler(self.name, coro),
             )
             self.options.append(subcommand)
             if not asyncio.iscoroutinefunction(coro):
