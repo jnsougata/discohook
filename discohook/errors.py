@@ -1,33 +1,28 @@
 import json
-from typing import TYPE_CHECKING
 
 import aiohttp
 
 from .ratelimit import Bucket
 
-if TYPE_CHECKING:
-    from .interaction import Interaction
-
-
 class InteractionTypeMismatch(Exception):
     """Raised when the interaction type is not the expected type."""
 
-    def __init__(self, message: str, interaction: "Interaction"):
-        super().__init__(message, interaction)
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class CheckFailure(Exception):
     """Raised when a check fails."""
 
-    def __init__(self, message: str, interaction: "Interaction"):
-        super().__init__(message, interaction)
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class UnknownInteractionType(Exception):
     """Raised when the interaction type is unknown."""
 
-    def __init__(self, message: str, interaction: "Interaction"):
-        super().__init__(message, interaction)
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class HTTPException(Exception):

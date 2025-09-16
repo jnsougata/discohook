@@ -51,6 +51,30 @@ class SubCommand:
             )
         return self.handler(*args, **kwargs)
 
+    def on_error(self):
+        """
+        A decorator that adds an error handler to a specific command or component.
+        """
+
+        def decorator(coro: Callable[["Interaction"], None]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("error handler must be a coroutine")
+            self.handler._error_handler = coro
+
+        return decorator
+
+    def check(self):
+        """
+        A decorator that adds a check to the command.
+        """
+
+        def decorator(coro: Callable[["Interaction"], bool]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("check must be a coroutine")
+            self.handler.checks.append(coro) # noqa
+            return self
+        return decorator
+
     def on_autocomplete(
         self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
     ):
@@ -139,6 +163,30 @@ class ApplicationCommand:
         self.subcommands: Dict[str, SubCommand] = {}
         self.autocompletion_handler: Optional[Handler] = None
 
+    def check(self):
+        """
+        A decorator that adds a check to the command.
+        """
+
+        def decorator(coro: Callable[["Interaction"], bool]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("check must be a coroutine")
+            self.handler.checks.append(coro) # noqa
+            return self
+        return decorator
+
+    def on_error(self):
+        """
+        A decorator that adds an error handler to a specific command or component.
+        """
+
+        def decorator(coro: Callable[["Interaction"], None]):
+            if not asyncio.iscoroutinefunction(coro):
+                raise TypeError("error handler must be a coroutine")
+            self.handler._error_handler = coro
+
+        return decorator
+
     def on_autocomplete(
         self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
     ):
@@ -161,16 +209,11 @@ class ApplicationCommand:
         Parameters
         ----------
         name: str
-            The name of the subcommand. If If not provided, it will be resolved from the callback's name.
+            The name of the subcommand. If not provided, it will be resolved from the callback's name.
         description: Optional[str]
             The description of the subcommand. If not provided, it will be resolved from the callback's docstring.
         options: Optional[List[Option]]
             The options of the subcommand.
-
-        Returns
-        -------
-        SubCommand
-            The subcommand object.
 
         Raises
         ------
@@ -184,6 +227,7 @@ class ApplicationCommand:
             subcommand = SubCommand(
                 name=resolved_name,
                 description=resolved_description,
+                options=options,
                 handler=Handler(self.name, coro)
             )
             self.options.append(subcommand)

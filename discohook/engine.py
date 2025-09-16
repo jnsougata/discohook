@@ -59,11 +59,11 @@ async def _engine(request: Request):
                     for result in results:
                         if not isinstance(result, bool):
                             raise CheckFailure(
-                                f"check returned {type(result)}, expected bool",
-                                interaction,
+                                f"Any of the checks for command `{command.name}` "
+                                f"returned {type(result)}, expected bool.",
                             )
                     if not all(results):
-                        raise CheckFailure(f"command checks failed", interaction)
+                        raise CheckFailure(f"Checks for command `{command.name}` failed.")
 
                 if not (interaction.data["type"] == ApplicationCommandType.slash):
                     await command.handler(
@@ -77,11 +77,28 @@ async def _engine(request: Request):
                     subcommand = command.subcommands[
                         interaction.data["options"][0]["name"]
                     ]
+                    results = await asyncio.gather(
+                        *[check(interaction) for check in subcommand.handler.checks]
+                    )
+                    for result in results:
+                        if not isinstance(result, bool):
+                            raise CheckFailure(
+                                f"Any of the checks for subcommand `{command.name}.{subcommand.name}` "
+                                f"returned {type(result)}, expected bool."
+                            )
+                    if not all(results):
+                        raise CheckFailure(f"Checks for subcommand `{command.name}.{subcommand.name}` failed.")
                     args, kwargs = build_slash_command_params(
                         subcommand.handler.callback, interaction
                     )
-                    # noinspection PyUnresolvedReferences
-                    await subcommand.handler(interaction, *args, **kwargs)
+                    try:
+                        # noinspection PyUnresolvedReferences
+                        await subcommand.handler(interaction, *args, **kwargs)
+                    except Exception as e:
+                        if not subcommand.handler._error_handler:
+                            raise e
+                        interaction._error = e
+                        await subcommand.handler._error_handler(interaction)
                 else:
                     args, kwargs = build_slash_command_params(
                         command.handler.callback, interaction
@@ -99,7 +116,7 @@ async def _engine(request: Request):
             )
             if not command:
                 raise Exception(
-                    f"command `{interaction.data['name']}` ({interaction.data['id']}) not found"
+                    f"Command `{interaction.data['name']}` ({interaction.data['id']}) was not found."
                 )
             if (
                 interaction.data["options"][0]["type"]
@@ -114,7 +131,7 @@ async def _engine(request: Request):
                 )
             elif not command.autocompletion_handler:
                 raise Exception(
-                    f"command `{interaction.data['name']}` ({interaction.data['id']}) has no autocompletion handler"
+                    f"Command `{interaction.data['name']}` ({interaction.data['id']}) has no autocompletion handler."
                 )
             else:
                 args, kwargs = build_slash_command_params(
@@ -133,7 +150,7 @@ async def _engine(request: Request):
                 custom_id = await request.app._custom_id_parser(interaction, custom_id)
             handler = request.app.active_handlers.get(custom_id)
             if not handler:
-                raise NotImplementedError(f"component `{custom_id}` not found")
+                raise NotImplementedError(f"Component with custom_id `{custom_id}` was not found.")
             try:
                 if handler.checks:
                     results = await asyncio.gather(
@@ -142,11 +159,11 @@ async def _engine(request: Request):
                     for result in results:
                         if not isinstance(result, bool):
                             raise CheckFailure(
-                                f"check returned {type(result)}, expected bool",
-                                interaction,
+                                f"Any of the checks for component with custom_id `{custom_id}` "
+                                f"returned {type(result)}, expected bool."
                             )
                     if not all(results):
-                        raise CheckFailure("component checks failed", interaction)
+                        raise CheckFailure(f"Checks for component with custom_id `{custom_id}` failed.")
 
                 if interaction.type == InteractionType.component:
                     if interaction.data["component_type"] == ComponentType.button:
@@ -164,9 +181,7 @@ async def _engine(request: Request):
                 interaction._error = e
                 await handler._error_handler(interaction)
         else:
-            raise UnknownInteractionType(
-                f"unknown interaction type {interaction.type}", interaction
-            )
+            raise UnknownInteractionType(f"Unknown interaction type {interaction.type} encountered.")
     except Exception as e:
         if not request.app._interaction_error_handler:
             raise e
