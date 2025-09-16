@@ -29,11 +29,17 @@ class Modal:
         self.components: List[Union[Label, TextDisplay]] = []
 
     # noinspection PyShadowingBuiltins
-    def append_text_display(self, markdown: str, *, id: Optional[int] = None):
+    def display(self, markdown: str, *, id: Optional[int] = None):
+        """
+        Appends a text display component to the modal.
+
+        Parameters
+        ----
+        """
         self.components.append(TextDisplay(markdown, id=id))
 
     # noinspection PyShadowingBuiltins
-    def append_text_input(
+    def input(
         self,
         *,
         custom_id: str,
@@ -47,6 +53,9 @@ class Modal:
         max_length: int = 4000,
         style: TextInputFieldLength = TextInputFieldLength.short,
     ):
+        """
+        Appends a text input component to the modal.
+        """
         self.components.append(
             Label(
                 label=label,
@@ -65,7 +74,7 @@ class Modal:
         )
 
     # noinspection PyShadowingBuiltins
-    def append_select_menu(
+    def select_menu(
         self,
         *,
         custom_id: str,
@@ -80,6 +89,9 @@ class Modal:
         channel_types: Optional[List[ChannelType]] = None,
         default_values: Optional[List[SelectDefaultValue]] = None,
     ):
+        """
+        Appends a select menu component to the modal.
+        """
         async def dummy(): ...
 
         handler = Handler(id=custom_id, callback=dummy)  # noqa

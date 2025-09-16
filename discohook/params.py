@@ -55,7 +55,6 @@ def _prepare_payload(
         payload.update(kwargs)
     if payload_type:
         payload = {"type": payload_type.value, "data": payload}
-
     if len(view.attachments):
         form = aiohttp.MultipartWriter("form-data")
         form.append_json(

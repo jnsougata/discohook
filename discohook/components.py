@@ -56,14 +56,14 @@ class Media:
             self.media = {"url": f"attachment://{media.name}"}
             self.attachment = media
         else:
-            self.media = media
+            self.media = {"url": media}
         self.description = description
         self.spoiler = spoiler
 
     def to_dict(self) -> Dict[str, Any]:
         data = {"media": self.media, "spoiler": self.spoiler}
         if self.description:
-            data["description"] = self.description
+            data["description"] = self.description  # type: ignore
         return data
 
 

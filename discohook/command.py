@@ -123,7 +123,7 @@ class ApplicationCommand:
             self.description = resolve_description(self.name, description, handler_func)
         else:
             self.description = None
-        self.options: List[Union[Option, SubCommand]] = options
+        self.options: List[Union[Option, SubCommand]] = options or []
         self.nsfw = nsfw
         self.application_id = None
         self.type = type
@@ -161,9 +161,9 @@ class ApplicationCommand:
         Parameters
         ----------
         name: str
-            The name of the subcommand.
-        description: str
-            The description of the subcommand.
+            The name of the subcommand. If If not provided, it will be resolved from the callback's name.
+        description: Optional[str]
+            The description of the subcommand. If not provided, it will be resolved from the callback's docstring.
         options: Optional[List[Option]]
             The options of the subcommand.
 
@@ -179,16 +179,17 @@ class ApplicationCommand:
         """
 
         def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
+            resolved_name = name or coro.__name__
+            resolved_description = resolve_description(name, description, coro)
             subcommand = SubCommand(
-                name, resolve_description(name, description, coro), options, handler=Handler(self.name, coro)
+                name=resolved_name,
+                description=resolved_description,
+                handler=Handler(self.name, coro)
             )
-            if self.options:
-                self.options.append(subcommand)
-            else:
-                self.options = [subcommand]
+            self.options.append(subcommand)
             if not asyncio.iscoroutinefunction(coro):
                 raise TypeError("subcommand callback must be a coroutine")
-            self.subcommands[name] = subcommand
+            self.subcommands[resolved_name] = subcommand
             return subcommand
 
         return decorator
