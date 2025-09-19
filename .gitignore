@@ -140,3 +140,4 @@ ping.py
 .vscode/
 cogs/
 main.py
+docs/node_modules/
