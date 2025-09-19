@@ -3,11 +3,10 @@ layout: home
 
 hero:
   name: "Discohook"
-  text: "Let's make your Discord webhooks easier!"
-  tagline: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+  tagline: "A discord interaction API wrapper for serverless applications."
   image:
-    src: /icon.png
-    alt: Discohook Logo
+    src: /discord.png
+    alt: discord
   actions:
     - theme: brand
       text: Get Started
@@ -15,9 +14,4 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/jnsougata/discohook
-
-features:
-  - icon: 📁
-    title: Yo
-    details: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 ---
