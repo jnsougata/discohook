@@ -21,7 +21,7 @@ export default defineConfig({
       {
         text: "Concepts",
         items: [
-          { text: "ASGI Apps", link: "/content/concepts/client" }
+          { text: "Client", link: "/content/client" }
         ],
       }
     ],
