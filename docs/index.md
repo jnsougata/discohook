@@ -7,7 +7,7 @@ hero:
   tagline: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
   image:
     src: /icon.png
-    alt: Fishweb
+    alt: Discohook Logo
   actions:
     - theme: brand
       text: Get Started

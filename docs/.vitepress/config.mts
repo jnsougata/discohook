@@ -2,7 +2,7 @@ import { defineConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  base: "/",
+  base: "/discohook/",
   title: "Discohook",
   description: "A discord interaction API wrapper for serverless applications.",
   cleanUrls: true,
