@@ -21,7 +21,6 @@ from .message import Message
 from .ratelimit import RatelimitMux
 from .user import User
 from .utils import compare_password
-from .view import LegacyView
 from .webhook import Webhook
 
 
@@ -204,19 +203,6 @@ class Client(Starlette):
             return coro
 
         return decorator
-
-    def load_view(self, view: LegacyView):
-        """
-        Loads multiple components into the client.
-        Do not use this method unless you know what you are doing.
-
-        Parameters
-        ----------
-        view: LegacyView
-            The view to load components from.
-        """
-        for component in view.children:
-            self.active_handlers[component.handler.id] = component.handler
 
     def register(
         self, item: Union[Handler, ApplicationCommand]
