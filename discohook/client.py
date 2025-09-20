@@ -119,9 +119,9 @@ class Client(Starlette):
         self.application_id = application_id
         self.password = password
         self.http = HTTPClient(
-            token=token, application_id=application_id, rate_limiter=ratelimit_mux
+            token=token, application_id=str(application_id), rate_limiter=ratelimit_mux
         )
-        self.active_handlers: Dict[str, Handler] = {}
+        self.active_handlers: Dict[str, Optional[Handler]] = {}
         self._sync_queue: List[ApplicationCommand] = []
         self.active_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, _engine, methods=["POST"], include_in_schema=False)
@@ -179,18 +179,13 @@ class Client(Starlette):
 
         load_dotenv(path)
 
-        application_id = os.getenv("APPLICATION_ID")
-        public_key = os.getenv("PUBLIC_KEY")
-        token = os.getenv("BOT_TOKEN")
+        application_id = os.environ["APPLICATION_ID"]
+        public_key = os.environ["PUBLIC_KEY"]
+        token = os.environ["BOT_TOKEN"]
         password = os.getenv("APPLICATION_PASSWORD")
 
-        if not application_id or not public_key or not token:
-            raise ValueError(
-                "APPLICATION_ID, PUBLIC_KEY and BOT_TOKEN must be set in the environment."
-            )
-
         return cls(
-            application_id=application_id,
+            application_id=str(application_id),
             public_key=public_key,
             token=token,
             password=password,
@@ -344,7 +339,7 @@ class Client(Starlette):
         User
             The client as a user.
         """
-        resp = await self.http.get_user(self.application_id)
+        resp = await self.http.get_user(str(self.application_id))
         return User(self, await resp.json())
 
     async def edit(self, username: str, *, avatar: Optional[str] = None):

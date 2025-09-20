@@ -35,7 +35,7 @@ def resolve_description(
         return description
     if callback.__doc__:
         return callback.__doc__.strip().split("\n")[0]
-    raise ValueError(f"description is required for slash command `{name}`")
+    raise ValueError(f"Description is required for slash command `{name}`")
 
 
 def unwrap_user(data: dict, guild_id: str) -> dict:
