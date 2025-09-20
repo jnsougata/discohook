@@ -29,6 +29,7 @@ export default defineConfig({
       provider: "local",
       options: {
         _render: (src, env, md) => {
+          // @ts-ignore
           if (env.relativePath.startsWith("docs")) {
             return "";
           }
