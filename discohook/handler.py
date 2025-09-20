@@ -17,7 +17,7 @@ class Handler:
 
         Parameters
         ----------
-        id : str
+        id: str
             The ID of the component or unique key for the command.
         callback : Callable[["Interaction", Any], Any]
             The callback function to be called when the interaction is received.
@@ -67,7 +67,7 @@ def handler(id: str) -> Callable[[Callable[["Interaction", Any], Any]], Handler]
 
     Parameters
     ----------
-    id : str
+    id: str
         The ID of the component or command.
     """
 

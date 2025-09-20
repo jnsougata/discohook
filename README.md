@@ -59,14 +59,6 @@ async def handler(_request, err: Exception):
     await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
     # If you don't have reference to `app` object, you can use `request.app` to get the app object.
 
-
-# Note: ApplicationCommand is a decorator factory.
-# It will return a decorator which will register the function as a command.
-# The decorator for different command types are different and take a different set of arguments.
-# If name is not provided, it will use the callback function name as the command name
-# If command description is not provided for slash command and function's docstring is not found, it will raise ValueError.
-
-
 # Making slash command
 @app.load
 @discohook.command.slash()
@@ -117,8 +109,7 @@ We will talk about it later.
 You can sync commands by just visiting the dashboard.
 The dashboard will be available at `https://example.io/api/dash `. 
 
-<img width="1920" height="920" alt="dashboard" src="https://github.com/user-attachments/assets/3dba56fd-ff40-4f91-9e0e-d8c698f01d3c" />
-
+![image](https://github.com/user-attachments/assets/3dba56fd-ff40-4f91-9e0e-d8c698f01d3c)
 
 Once you visit the dashboard, it will automatically register all the commands. 
 You can also register commands manually by using the bash command below.   
