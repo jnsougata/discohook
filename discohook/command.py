@@ -130,7 +130,7 @@ class ApplicationCommand:
         name: Optional[str] = None,
         *,
         description: Optional[str] = None,
-        options: Optional[List[Option]] = None,
+        options: Optional[List[Union[Option, SubCommand]]] = None,
         nsfw: bool = False,
         integration_types: Optional[List[ApplicationIntegrationType]] = None,
         contexts: Optional[List[InteractionContextType]] = None,
@@ -139,16 +139,16 @@ class ApplicationCommand:
         guild_id: Optional[str] = None,
         handler_func: Callable[["Interaction", Any], Any],
     ):
-        self.name = name or handler_func.__name__
-        key = f"{self.name}:{type.value}"
+        self.name = name if name else handler_func.__name__
+        handler_id = f"{self.name}:{type.value}"
         if guild_id:
-            key += f":{guild_id}"
-        self.handler = Handler(key, handler_func)
+            handler_id += f":{guild_id}"
+        self.handler = Handler(handler_id, handler_func)
         if type == ApplicationCommandType.slash:
             self.description = resolve_description(self.name, description, handler_func)
         else:
             self.description = None
-        self.options: List[Union[Option, SubCommand]] = options or []
+        self.options: List[Union[Option, SubCommand]] = options if options else []
         self.nsfw = nsfw
         self.application_id = None
         self.type = type
@@ -224,8 +224,8 @@ class ApplicationCommand:
         """
 
         def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
-            resolved_name = name or coro.__name__
-            resolved_description = resolve_description(name, description, coro)
+            resolved_name = name if name else coro.__name__
+            resolved_description = resolve_description(resolved_name, description, coro)
             subcommand = SubCommand(
                 name=resolved_name,
                 description=resolved_description,
