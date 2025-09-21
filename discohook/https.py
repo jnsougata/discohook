@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 import aiohttp
 
 from .errors import HTTPException
+from . import __url__, __version__
 
 if TYPE_CHECKING:
     from .client import Client
@@ -12,6 +13,7 @@ class HTTPClient:
     """Represents an HTTP client for Discord's API."""
 
     DISCORD_API_VERSION: int = 10
+    USER_AGENT: str = f"DiscordBot ({__url__}, {__version__})"
 
     def __init__(self, client: "Client", token: str):
         self.token = token
@@ -30,7 +32,8 @@ class HTTPClient:
         params: Optional[Dict[str, Any]] = None,
         authorize: bool = False,
     ):
-        headers = headers or {}
+        headers = headers if headers else {}
+        headers["User-Agent"] = self.USER_AGENT
         if authorize:
             headers["Authorization"] = f"Bot {self.token}"
         if reason:
@@ -456,9 +459,7 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def create_application_emoji(
-        self, payload: Dict[str, Any]
-    ):
+    async def create_application_emoji(self, payload: Dict[str, Any]):
         return await self.request(
             "POST",
             f"/applications/{self.client.application_id}/emojis",
@@ -466,9 +467,7 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def edit_application_emoji(
-        self, emoji_id: str, payload: Dict[str, Any]
-    ):
+    async def edit_application_emoji(self, emoji_id: str, payload: Dict[str, Any]):
         return await self.request(
             "PATCH",
             f"/applications/{self.client.application_id}/emojis/{emoji_id}",
@@ -476,9 +475,7 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def delete_application_emoji(
-        self, emoji_id: str
-    ):
+    async def delete_application_emoji(self, emoji_id: str):
         return await self.request(
             "DELETE",
             f"/applications/{self.client.application_id}/emojis/{emoji_id}",
