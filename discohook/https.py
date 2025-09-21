@@ -1248,10 +1248,10 @@ class HTTPClient:
 
     async def fetch_answer_voters(
         self,
+        *,
         channel_id: str,
         message_id: str,
         answer_id: int,
-        *,
         params: Dict[str, Any] = None,
     ):
         return await self.request(

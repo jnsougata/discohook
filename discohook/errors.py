@@ -45,8 +45,7 @@ class RateLimitExceeded(Exception):
     """Raised when a rate limit is exceeded."""
 
     def __init__(self, path: str, bucket: Bucket):
-        message = (
+        super().__init__(
             f"Rate limit exceeded for {path}. Retry after {bucket.reset_after} seconds."
         )
-        super().__init__(message)
         self.bucket = bucket
