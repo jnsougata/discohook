@@ -2,8 +2,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import aiohttp
 
-from .errors import HTTPException
 from . import __url__, __version__
+from .errors import HTTPException
 
 if TYPE_CHECKING:
     from .client import Client

@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
 from .component import Component
 from .emoji import PartialEmoji
-from .enums import ChannelType, ComponentType, SelectDefaultValueType, SelectType
+from .enums import (ChannelType, ComponentType, SelectDefaultValueType,
+                    SelectType)
 
 if TYPE_CHECKING:
     from .channel import PartialChannel
@@ -395,7 +396,7 @@ def mentionable(
     """
 
     def decorator(
-        coro: Callable[["Interaction", List[Union["User", "PartialRole"]]], Any]
+        coro: Callable[["Interaction", List[Union["User", "PartialRole"]]], Any],
     ):
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("Callback must be a coroutine.")

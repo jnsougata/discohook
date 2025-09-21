@@ -6,9 +6,9 @@ from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from .component import Component
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
+from .component import Component
 from .dash import dashboard
 from .embed import Embed
 from .errors import InteractionException

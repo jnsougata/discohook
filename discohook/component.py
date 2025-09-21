@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional
 from .enums import ComponentType
 
 if TYPE_CHECKING:
-    from .interaction import Interaction
     from .errors import InteractionException
+    from .interaction import Interaction
 
 
 class Interactable:

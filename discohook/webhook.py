@@ -79,12 +79,7 @@ class PartialWebhook:
         aiohttp.ClientResponse
         """
         payload = _SendingPayload(
-            content=content,
-            tts=tts,
-            embed=embed,
-            embeds=embeds,
-            file=file,
-            files=files
+            content=content, tts=tts, embed=embed, embeds=embeds, file=file, files=files
         )
         extras = {}
         if username:
@@ -101,7 +96,7 @@ class PartialWebhook:
         resp = await session.post(
             f"https://discord.com/api/v{self.api_version}/webhooks/{self.id}/{self.token}",
             data=payload.to_form(**extras),
-            params=params
+            params=params,
         )
         if not is_external_session:
             await session.close()
@@ -113,7 +108,7 @@ class PartialWebhook:
         url: str,
         *,
         session: Optional[aiohttp.ClientSession] = None,
-        api_version: int = 10
+        api_version: int = 10,
     ) -> "PartialWebhook":
         return cls(*url.split("/")[-2:], session=session, api_version=api_version)
 

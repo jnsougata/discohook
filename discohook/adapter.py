@@ -227,7 +227,9 @@ class ResponseAdapter:
             InteractionType.component,
             InteractionType.app_command,
         ):
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}", self.inter)
+            raise InteractionTypeMismatch(
+                f"Method not supported for {self.inter.type}", self.inter
+            )
         self.inter.client.active_components[modal.custom_id] = modal
         payload = {
             "data": modal.to_dict(),
@@ -249,7 +251,9 @@ class ResponseAdapter:
             The choices to send
         """
         if self.inter.type != InteractionType.autocomplete:
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}", self.inter)
+            raise InteractionTypeMismatch(
+                f"Method not supported for {self.inter.type}", self.inter
+            )
         choices = choices[:25]
         payload = {
             "type": InteractionCallbackType.autocomplete,
@@ -297,7 +301,9 @@ class ResponseAdapter:
             if ephemeral:
                 payload["data"] = {"flags": 64}
         else:
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}", self.inter)
+            raise InteractionTypeMismatch(
+                f"Method not supported for {self.inter.type}", self.inter
+            )
 
         self.inter._responded = True
         await self.inter.client.http.send_interaction_callback(
@@ -311,7 +317,9 @@ class ResponseAdapter:
         This method is only available for applications with a premium SKU set up
         """
         if self.inter.type == InteractionType.autocomplete:
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}", self.inter)
+            raise InteractionTypeMismatch(
+                f"Method not supported for {self.inter.type}", self.inter
+            )
         payload = {
             "data": {},
             "type": InteractionCallbackType.premium_required,
@@ -365,7 +373,9 @@ class ResponseAdapter:
             self.inter.type == InteractionType.component
             or self.inter.type == InteractionType.modal_submit
         ):
-            raise InteractionTypeMismatch(f"Method not supported for {self.inter.type}", self.inter)
+            raise InteractionTypeMismatch(
+                f"Method not supported for {self.inter.type}", self.inter
+            )
 
         payload = _EditingPayload(
             content=content,

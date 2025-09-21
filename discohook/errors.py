@@ -1,4 +1,4 @@
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import aiohttp
 
@@ -13,6 +13,7 @@ class InteractionException(Exception):
         self.message = message
         self.interaction = interaction
         super().__init__(message)
+
 
 class InteractionTypeMismatch(InteractionException):
     """Raised when the interaction type is not the expected type."""

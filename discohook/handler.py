@@ -6,20 +6,12 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from .command import ApplicationCommand, ApplicationCommandOptionType
-from .enums import (
-    ApplicationCommandType,
-    ComponentType,
-    InteractionCallbackType,
-    InteractionType,
-)
-from .errors import CheckFailure, UnknownInteractionType, InteractionException
+from .enums import (ApplicationCommandType, ComponentType,
+                    InteractionCallbackType, InteractionType)
+from .errors import CheckFailure, InteractionException, UnknownInteractionType
 from .interaction import Interaction
-from .resolver import (
-    build_context_menu_param,
-    build_modal_params,
-    build_select_menu_values,
-    build_slash_command_params,
-)
+from .resolver import (build_context_menu_param, build_modal_params,
+                       build_select_menu_values, build_slash_command_params)
 
 
 def _build_key(interaction: Interaction) -> str:
@@ -65,7 +57,7 @@ async def _handler(request: Request):
                         if not isinstance(result, bool):
                             raise CheckFailure(
                                 f"check returned {type(result)}, expected bool",
-                                interaction
+                                interaction,
                             )
                     if not all(results):
                         raise CheckFailure(f"command checks failed", interaction)
@@ -134,7 +126,7 @@ async def _handler(request: Request):
                         if not isinstance(result, bool):
                             raise CheckFailure(
                                 f"check returned {type(result)}, expected bool",
-                                interaction
+                                interaction,
                             )
                     if not all(results):
                         raise CheckFailure("component checks failed", interaction)
@@ -152,12 +144,18 @@ async def _handler(request: Request):
             except Exception as e:
                 if not component._error_handler:
                     raise e
-                await component._error_handler(InteractionException(str(e), interaction))
+                await component._error_handler(
+                    InteractionException(str(e), interaction)
+                )
         else:
-            raise UnknownInteractionType(f"unknown interaction type {interaction.type}", interaction)
+            raise UnknownInteractionType(
+                f"unknown interaction type {interaction.type}", interaction
+            )
     except Exception as e:
         if request.app._interaction_error_handler:
-            await request.app._interaction_error_handler(InteractionException(str(e), interaction))
+            await request.app._interaction_error_handler(
+                InteractionException(str(e), interaction)
+            )
             return Response(status_code=500)
         else:
             raise e from None
