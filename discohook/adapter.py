@@ -20,7 +20,7 @@ class InteractionResponse:
     """
 
     def __init__(self, interaction: "Interaction") -> None:
-        self.inter = interaction
+        self.interaction = interaction
 
     async def edit(
         self,
@@ -31,22 +31,22 @@ class InteractionResponse:
         """
         Patches the response message.
         """
-        resp = await self.inter.client.http.edit_webhook_message(
-            self.inter.application_id,
-            self.inter.token,
+        resp = await self.interaction.client.http.edit_webhook_message(
+            self.interaction.application_id,
+            self.interaction.token,
             "@original",
             _prepare_payload(View.from_children(*components)),
         )
         data = await resp.json()
-        self.inter._responded = True
-        return Message(self.inter.client, data)
+        self.interaction._responded = True
+        return Message(self.interaction.client, data)
 
     async def delete(self):
         """
         Deletes the response message.
         """
-        await self.inter.client.http.delete_webhook_message(
-            self.inter.application_id, self.inter.token, "@original"
+        await self.interaction.client.http.delete_webhook_message(
+            self.interaction.application_id, self.interaction.token, "@original"
         )
 
 
@@ -94,7 +94,7 @@ class ResponseAdapter:
     """
 
     def __init__(self, interaction: "Interaction") -> None:
-        self.inter = interaction
+        self.interaction = interaction
 
     async def send(
         self,
@@ -104,9 +104,9 @@ class ResponseAdapter:
         with_response: bool = False,
         ephemeral: bool = False,
     ):
-        await self.inter.client.http.create_interaction_response(
-            self.inter.id,
-            self.inter.token,
+        await self.interaction.client.http.create_interaction_response(
+            self.interaction.id,
+            self.interaction.token,
             _prepare_payload(
                 View.from_children(*components),
                 ephemeral=ephemeral,
@@ -114,8 +114,8 @@ class ResponseAdapter:
             ),
             with_response=with_response,
         )
-        self.inter._responded = True
-        return InteractionResponse(self.inter)
+        self.interaction._responded = True
+        return InteractionResponse(self.interaction)
 
     async def send_modal(
         self, modal: Union[Modal, Any], with_response: bool = False
@@ -134,22 +134,20 @@ class ResponseAdapter:
         -------
         InteractionResponse
         """
-        if self.inter.type not in (
+        if self.interaction.type not in (
             InteractionType.component,
             InteractionType.app_command,
         ):
-            raise InteractionTypeMismatch(
-                f"Method not supported for {self.inter.type}", self.inter
-            )
+            raise InteractionTypeMismatch(f"Method not supported for {self.interaction.type}")
         payload = {
             "data": modal.to_dict(),
             "type": InteractionCallbackType.modal,
         }
-        self.inter._responded = True
-        await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload, with_response
+        self.interaction._responded = True
+        await self.interaction.client.http.create_interaction_response(
+            self.interaction.id, self.interaction.token, payload, with_response
         )
-        return InteractionResponse(self.inter)
+        return InteractionResponse(self.interaction)
 
     async def autocomplete(self, choices: List[Choice], with_response: bool = False):
         """
@@ -162,17 +160,15 @@ class ResponseAdapter:
         with_response: bool
             Whether to include an interaction callback object as the response.
         """
-        if self.inter.type != InteractionType.autocomplete:
-            raise InteractionTypeMismatch(
-                f"Method not supported for {self.inter.type}", self.inter
-            )
+        if self.interaction.type != InteractionType.autocomplete:
+            raise InteractionTypeMismatch(f"Method not supported for {self.interaction.type}")
         choices = choices[:25]
         payload = {
             "type": InteractionCallbackType.autocomplete,
             "data": {"choices": [i.to_dict() for i in choices]},
         }
-        await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload, with_response
+        await self.interaction.client.http.create_interaction_response(
+            self.interaction.id, self.interaction.token, payload, with_response
         )
 
     async def defer(
@@ -198,8 +194,8 @@ class ResponseAdapter:
         """
         payload = {}
         if (
-            self.inter.type is InteractionType.component
-            or self.inter.type is InteractionType.modal_submit
+            self.interaction.type is InteractionType.component
+            or self.interaction.type is InteractionType.modal_submit
         ):
             if thinking:
                 payload["type"] = (
@@ -211,41 +207,37 @@ class ResponseAdapter:
                 payload["type"] = (
                     InteractionCallbackType.deferred_update_component_message
                 )
-        elif self.inter.type == InteractionType.app_command:
+        elif self.interaction.type == InteractionType.app_command:
             payload["type"] = (
                 InteractionCallbackType.deferred_channel_message_with_source
             )
             if ephemeral:
                 payload["data"] = {"flags": 64}
         else:
-            raise InteractionTypeMismatch(
-                f"Method not supported for {self.inter.type}", self.inter
-            )
+            raise InteractionTypeMismatch(f"Method not supported for {self.interaction.type}")
 
-        self.inter._responded = True
-        await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload, with_response
+        self.interaction._responded = True
+        await self.interaction.client.http.create_interaction_response(
+            self.interaction.id, self.interaction.token, payload, with_response
         )
-        return InteractionResponse(self.inter)
+        return InteractionResponse(self.interaction)
 
     async def require_premium(self, with_response: bool = False):
         """
         Prompts the user that a premium purchase is required for this interaction
         This method is only available for applications with a premium SKU set up
         """
-        if self.inter.type == InteractionType.autocomplete:
-            raise InteractionTypeMismatch(
-                f"Method not supported for {self.inter.type}", self.inter
-            )
+        if self.interaction.type == InteractionType.autocomplete:
+            raise InteractionTypeMismatch(f"Method not supported for {self.interaction.type}")
         payload = {
             "data": {},
             "type": InteractionCallbackType.premium_required,
         }
-        self.inter._responded = True
-        await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload, with_response
+        self.interaction._responded = True
+        await self.interaction.client.http.create_interaction_response(
+            self.interaction.id, self.interaction.token, payload, with_response
         )
-        return InteractionResponse(self.inter)
+        return InteractionResponse(self.interaction)
 
     async def edit_origin(
         self,
@@ -272,22 +264,20 @@ class ResponseAdapter:
 
         """
         if not (
-            self.inter.type == InteractionType.component
-            or self.inter.type == InteractionType.modal_submit
+                self.interaction.type == InteractionType.component
+                or self.interaction.type == InteractionType.modal_submit
         ):
-            raise InteractionTypeMismatch(
-                f"Method not supported for {self.inter.type}", self.inter
-            )
+            raise InteractionTypeMismatch(f"Method not supported for {self.interaction.type}")
 
         payload = _prepare_payload(
             View.from_children(*components),
             payload_type=InteractionCallbackType.update_component_message,
         )
-        self.inter._responded = True
-        await self.inter.client.http.create_interaction_response(
-            self.inter.id, self.inter.token, payload, with_response
+        self.interaction._responded = True
+        await self.interaction.client.http.create_interaction_response(
+            self.interaction.id, self.interaction.token, payload, with_response
         )
-        return InteractionResponse(self.inter)
+        return InteractionResponse(self.interaction)
 
     async def followup(
         self,
@@ -306,12 +296,12 @@ class ResponseAdapter:
         Returns
         -------
         FollowupResponse
-            The followup response object containing the sent message.
+            The followup response object containing additional methods.
 
         """
         payload = _prepare_payload(View.from_children(*components))
-        resp = await self.inter.client.http.execute_webhook(
-            self.inter.application_id, self.inter.token, payload
+        resp = await self.interaction.client.http.execute_webhook(
+            self.interaction.application_id, self.interaction.token, payload
         )
         data = await resp.json()
-        return FollowupResponse(data, self.inter)
+        return FollowupResponse(data, self.interaction)
