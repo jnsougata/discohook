@@ -195,7 +195,7 @@ class ApplicationCommand:
         """
         A decorator to register a callback for the command's autocomplete options.
         """
-        self.autocompletion_handler = coro
+        self.autocompletion_handler = Handler(self.name, coro)
         return coro
 
     def subcommand(
