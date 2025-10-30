@@ -139,7 +139,7 @@ async def _engine(request: Request):
                 )
             else:
                 args, kwargs = build_slash_command_params(
-                    command.autocompletion_handler, interaction
+                    command.autocompletion_handler.callback, interaction
                 )
                 await command.autocompletion_handler.callback(
                     interaction, *args, **kwargs
