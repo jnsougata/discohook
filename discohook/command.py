@@ -82,7 +82,7 @@ class SubCommand:
         """
         A decorator to register a callback for the subcommand's autocomplete options.
         """
-        self.autocompletion_handler = coro
+        self.autocompletion_handler = Handler(self.name, coro)
         return coro
 
     def to_dict(self) -> Dict[str, Any]:
