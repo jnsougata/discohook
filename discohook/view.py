@@ -131,9 +131,10 @@ class View:
         id: Optional[:class:`str`]
             The id of the section. This is used to identify the section when it is submitted.
         """
-        for component in components:
-            if isinstance(component, Button):
-                self.interactables[component.handler.id] = component  # noqa
+        if isinstance(accessory, Button):
+            self.interactables[accessory.handler.id] = accessory  # noqa
+        if isinstance(accessory, Thumbnail):
+            self.attachments.append(accessory.attachment)
         self.children.append(Section(*components, accessory=accessory, id=id))
 
     def add_container(

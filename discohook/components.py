@@ -106,7 +106,7 @@ class TextDisplay:
 class Thumbnail:
     def __init__(
         self,
-        media: str,
+        media: Union[str, File],
         *,
         description: Optional[str] = None,
         spoiler: bool = False,
@@ -117,11 +117,12 @@ class Thumbnail:
         self.media = media
         self.description = description
         self.spoiler = spoiler
+        self.attachment = media if isinstance(media, File) else None
 
     def to_dict(self) -> Dict[str, Any]:
         data = {
             "type": self.type,
-            "media": {"url": self.media},
+            "media": {"url": self.media if isinstance(self.media, str) else f"attachment://{self.media.name}"},
             "spoiler": self.spoiler,
         }
         if self.id:
@@ -143,6 +144,7 @@ class Section:
         self.components = components
         self.accessory = accessory
         self.id = id
+        self.attachment = accessory.attachment if isinstance(accessory, Thumbnail) else None
 
     def to_dict(self):
         data = {
