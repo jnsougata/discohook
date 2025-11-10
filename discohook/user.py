@@ -1,11 +1,13 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 import aiohttp
 
 from .asset import Asset
-from .embed import Embed
+from .components import (ActionRow, Container, MediaGallery, Section,
+                         Separator, TextDisplay)
 from .file import File
 from .params import _prepare_payload
+from .view import View
 
 if TYPE_CHECKING:
     from .client import Client
@@ -128,39 +130,19 @@ class User:
 
     async def send(
         self,
-        content: str,
-        *,
-        tts: bool = False,
-        embed: Optional[Embed] = None,
-        embeds: Optional[List[Embed]] = None,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
+        *components: Union[
+            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
+        ],
     ) -> aiohttp.ClientResponse:
         """
         Sends a message to the user.
 
         Parameters
         ----------
-        content: :class:`str`
-            The content of the message.
-        tts: :class:`bool`
-            Whether the message should be sent using text-to-speech.
-        embed: Optional[:class:`Embed`]
-            The embed to be sent with the message.
-        embeds: Optional[:class:`List`[:class:`Embed`]`]
-            The embeds to be sent with the message.
-        file: Optional[:class:`File`]
-            The file to be sent with the message.
-        files: Optional[:class:`List`[:class:`File`]`]
-            The files to be sent with the message.
+        *components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container]
+            The components to send in the message.
         """
-        payload = _prepare_payload(
-            content=content,
-            tts=tts,
-            embed=embed,
-            embeds=embeds,
-            file=file,
-            files=files,
+        channel = await self.client.http.create_dm({"recipient_id": self.id})
+        return await self.client.http.create_message(
+            (await channel.json())["id"], _prepare_payload(View.from_children(components))
         )
-        resp = await self.client.http.create_dm({"recipient_id": self.id})
-        return await self.client.http.create_message((await resp.json())["id"], payload)

@@ -305,6 +305,10 @@ class Client(Starlette):
 
         Parameters
         ----------
+        channel_id: str
+            The ID of the channel to send the message to.
+        *components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container]
+            The components to send in the message.
 
         Returns
         -------

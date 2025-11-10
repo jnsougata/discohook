@@ -122,7 +122,13 @@ class Thumbnail:
     def to_dict(self) -> Dict[str, Any]:
         data = {
             "type": self.type,
-            "media": {"url": self.media if isinstance(self.media, str) else f"attachment://{self.media.name}"},
+            "media": {
+                "url": (
+                    self.media
+                    if isinstance(self.media, str)
+                    else f"attachment://{self.media.name}"
+                )
+            },
             "spoiler": self.spoiler,
         }
         if self.id:
@@ -144,7 +150,9 @@ class Section:
         self.components = components
         self.accessory = accessory
         self.id = id
-        self.attachment = accessory.attachment if isinstance(accessory, Thumbnail) else None
+        self.attachment = (
+            accessory.attachment if isinstance(accessory, Thumbnail) else None
+        )
 
     def to_dict(self):
         data = {
