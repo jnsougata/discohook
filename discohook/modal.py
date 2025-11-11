@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 
-from .components import Label, TextDisplay, TextInput, FileUpload
+from .components import FileUpload, Label, TextDisplay, TextInput
 from .enums import ChannelType, SelectType, TextInputFieldLength
 from .handler import Handler
 from .select import Select, SelectDefaultValue, SelectOption

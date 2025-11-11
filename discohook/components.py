@@ -16,6 +16,7 @@ __all__ = [
     "Separator",
     "Container",
     "TextInput",
+    "FileUpload",
     "Label",
 ]
 
@@ -279,6 +280,7 @@ class TextInput:
             "required": self.required,
         }
 
+
 class FileUpload:
     """
     Represents a file upload component in a modal.
@@ -323,6 +325,7 @@ class FileUpload:
             "max_values": self.max_values,
             "required": self.required,
         }
+
 
 # noinspection PyShadowingBuiltins
 class Label:

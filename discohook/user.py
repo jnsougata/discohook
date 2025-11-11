@@ -144,5 +144,6 @@ class User:
         """
         channel = await self.client.http.create_dm({"recipient_id": self.id})
         return await self.client.http.create_message(
-            (await channel.json())["id"], _prepare_payload(View.from_children(*components))
+            (await channel.json())["id"],
+            _prepare_payload(View.from_children(*components)),
         )
