@@ -18,6 +18,8 @@ class Attachment:
         self.duration_secs: Optional[int] = data.get("duration_secs")
         self.waveform: Optional[str] = data.get("waveform")
         self.flags: Optional[int] = data.get("flags")
+        self.placeholder: Optional[str] = data.get("placeholder")
+        self.placeholder_version: Optional[int] = data.get("placeholder_version")
 
     async def read(self) -> bytes:
         async with aiohttp.ClientSession() as session:

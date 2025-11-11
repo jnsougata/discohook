@@ -279,13 +279,57 @@ class TextInput:
             "required": self.required,
         }
 
+class FileUpload:
+    """
+    Represents a file upload component in a modal.
+
+    Parameters
+    ----------
+    custom_id: :class:`str`
+        The label of the file upload field.
+    id: :class:`int`
+        A unique id of the file upload field. Must be valid python identifier.
+    min_values: :class:`int`
+        Minimum number of items that must be uploaded (defaults to 1); min 0, max 10
+    max_values: :class:`int`
+        Maximum number of items that can be uploaded (defaults to 1); max 10
+    required: :class:`bool`
+        Whether this component is required to be filled (defaults to true).
+    """
+
+    # noinspection PyShadowingBuiltins
+    def __init__(
+        self,
+        custom_id: str,
+        *,
+        id: Optional[int] = None,
+        min_values: int = 1,
+        max_values: int = 1,
+        required: bool = True,
+    ):
+        self.custom_id = custom_id
+        assert custom_id.isidentifier(), "field_id must be a valid python identifier"
+        self.id = id
+        self.min_values = min_values
+        self.max_values = max_values
+        self.required = required
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "type": ComponentType.file_upload.value,
+            "custom_id": self.custom_id,
+            "min_values": self.min_values,
+            "max_values": self.max_values,
+            "required": self.required,
+        }
 
 # noinspection PyShadowingBuiltins
 class Label:
     def __init__(
         self,
         label: str,
-        child: Union[Select, TextInput],
+        child: Union[Select, TextInput, FileUpload],
         *,
         id: Optional[int] = None,
         description: Optional[str] = None,

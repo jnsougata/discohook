@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 
-from .components import Label, TextDisplay, TextInput
+from .components import Label, TextDisplay, TextInput, FileUpload
 from .enums import ChannelType, SelectType, TextInputFieldLength
 from .handler import Handler
 from .select import Select, SelectDefaultValue, SelectOption
@@ -26,7 +26,7 @@ class Modal:
     ):
         self.handler = handler
         self.title = title
-        self.components: List[Union[Label, TextDisplay]] = []
+        self.components: List[Union[Label, TextDisplay, FileUpload]] = []
 
     # noinspection PyShadowingBuiltins
     def display(self, markdown: str, *, id: Optional[int] = None):
@@ -108,6 +108,33 @@ class Modal:
         select.default_values = default_values
         self.components.append(
             Label(label=label, child=select, id=id, description=description)
+        )
+
+    def file_upload(
+        self,
+        *,
+        label: str,
+        custom_id: str,
+        id: Optional[int] = None,
+        min_values: int = 1,
+        max_values: int = 1,
+        required: bool = True,
+    ):
+        """
+        Appends a file upload component to the modal.
+        """
+
+        self.components.append(
+            Label(
+                label=label,
+                child=FileUpload(
+                    custom_id,
+                    min_values=min_values,
+                    max_values=max_values,
+                    required=required,
+                ),
+                id=id,
+            )
         )
 
     def to_dict(self):

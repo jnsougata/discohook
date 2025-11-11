@@ -200,6 +200,7 @@ class ComponentType(int, Enum):
     separator = 14
     container = 17
     label = 18
+    file_upload = 19
 
 
 class SelectType(int, Enum):

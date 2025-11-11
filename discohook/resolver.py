@@ -183,6 +183,11 @@ def build_modal_params(func: Callable, interaction: Interaction):
         custom_id = component["custom_id"]
         if component_type == ComponentType.text_input:
             options[custom_id] = component["value"]
+        if component_type == ComponentType.file_upload:
+            options[custom_id] = [
+                Attachment(interaction.data["resolved"]["attachments"][file_id])
+                for file_id in component["values"]
+            ]
         elif component_type == ComponentType.string_select:
             options[custom_id] = component["values"]
         elif component_type == ComponentType.user_select:
