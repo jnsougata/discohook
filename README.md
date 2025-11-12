@@ -15,7 +15,6 @@ pip install git+https://github.com/jnsougata/discohook.git
 ### Links
 - [Documentation](https://discohook.readthedocs.io/en/latest/)
 - [Discord](https://discord.gg/5PwqKbM7wu)
-- [Examples](/sample)
 
 
 ## Quickstart
