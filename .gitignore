@@ -103,12 +103,8 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
-env/
+.venv/
 venv/
-ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
@@ -129,15 +125,6 @@ dmypy.json
 .pyre/
 
 .idea/
-.deta/
-.detaignore
-.spaceignore
-.space/
-bot/
-webhook.png
-ping.py
-!examples/*
 .vscode/
-cogs/
 main.py
 docs/node_modules/
