@@ -8,8 +8,15 @@ from starlette.responses import JSONResponse
 
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
-from .components import (ActionRow, Container, File, MediaGallery, Section,
-                         Separator, TextDisplay)
+from .components import (
+    ActionRow,
+    Container,
+    File,
+    MediaGallery,
+    Section,
+    Separator,
+    TextDisplay,
+)
 from .dash import dashboard
 from .engine import _engine
 from .guild import Guild
@@ -281,17 +288,11 @@ class Client(Starlette):
 
         return decorator
 
-    def custom_id_parser(self):
+    def custom_id_parser(self, coro: Callable[[Interaction, str], str]):
         """
         A decorator to register a dev defined custom id parser.
         """
-
-        def decorator(coro: Callable[[Interaction, str], str]):
-            if not asyncio.iscoroutinefunction(coro):
-                raise TypeError("Custom id parser must be a coroutine.")
-            self._custom_id_parser = coro  # noqa
-
-        return decorator
+        self._custom_id_parser = coro
 
     async def send(
         self,

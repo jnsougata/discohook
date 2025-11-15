@@ -29,6 +29,19 @@ class Handler:
         self.checks: List[Callable[["Interaction"], bool]] = []
         self._error_handler: Optional[Callable[["Interaction"], Any]] = None
 
+    def fork(self, suffix: str, separator: str = "::") -> "Handler":
+        """
+        Forks a generic handler into a new handler with a different ID.
+
+        Parameters
+        ----------
+        suffix: str
+            The new ID suffix to append to the original ID.
+        separator: str
+            The separator to use between the original ID and the suffix. Default is "::".
+        """
+        return Handler(f"{self.id}{separator}{suffix}", ...)  # type: ignore
+
     def check(self):
         """
         A decorator that adds a check to a specific command or component.

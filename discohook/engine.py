@@ -6,12 +6,20 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
 from .command import ApplicationCommand, ApplicationCommandOptionType
-from .enums import (ApplicationCommandType, ComponentType,
-                    InteractionCallbackType, InteractionType)
+from .enums import (
+    ApplicationCommandType,
+    ComponentType,
+    InteractionCallbackType,
+    InteractionType,
+)
 from .errors import CheckFailure, UnknownInteractionType
 from .interaction import Interaction
-from .resolver import (build_context_menu_param, build_modal_params,
-                       build_slash_command_params, resolve_select_menu_values)
+from .resolver import (
+    build_context_menu_param,
+    build_modal_params,
+    build_slash_command_params,
+    resolve_select_menu_values,
+)
 
 
 def _build_key(interaction: Interaction) -> str:
@@ -149,13 +157,18 @@ async def _engine(request: Request):
             InteractionType.component,
             InteractionType.modal_submit,
         ):
-            custom_id = interaction.data["custom_id"]
+            original_custom_id = interaction.data["custom_id"]
+            parsed_custom_id = None
             if request.app._custom_id_parser:
-                custom_id = await request.app._custom_id_parser(interaction, custom_id)
-            handler = request.app.active_handlers.get(custom_id)
+                parsed_custom_id = await request.app._custom_id_parser(
+                    interaction, original_custom_id
+                )
+            handler = request.app.active_handlers.get(
+                parsed_custom_id or original_custom_id
+            )
             if not handler:
                 raise NotImplementedError(
-                    f"Component with custom_id `{custom_id}` was not found."
+                    f"Component with custom_id `{original_custom_id}` was not found."
                 )
             try:
                 if handler.checks:
@@ -165,17 +178,17 @@ async def _engine(request: Request):
                     for result in results:
                         if not isinstance(result, bool):
                             raise CheckFailure(
-                                f"Any of the checks for component with custom_id `{custom_id}` "
+                                f"Any of the checks for component with custom_id `{original_custom_id}` "
                                 f"returned {type(result)}, expected bool."
                             )
                     if not all(results):
                         raise CheckFailure(
-                            f"Checks for component with custom_id `{custom_id}` failed."
+                            f"Checks for component with custom_id `{original_custom_id}` failed."
                         )
 
                 if interaction.type == InteractionType.component:
                     if interaction.data["component_type"] == ComponentType.button:
-                        await handler(interaction, custom_id)
+                        await handler(interaction, original_custom_id)
                     else:
                         await handler(
                             interaction, resolve_select_menu_values(interaction)
