@@ -36,11 +36,11 @@ class Handler:
         Parameters
         ----------
         suffix: str
-            The new ID suffix to append to the original ID.
+            The suffix to append to the original ID.
         separator: str
             The separator to use between the original ID and the suffix. Default is "::".
         """
-        return Handler(f"{self.id}{separator}{suffix}", ...)  # type: ignore
+        return Handler(f"{self.id}{separator}{suffix}", self.callback)
 
     def check(self):
         """
