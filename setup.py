@@ -16,7 +16,7 @@ with open("README.md") as f:
 setup(
     name="discohook",
     version=version,
-    description="discord http api wrapper for serverless apps",
+    description="A discord interaction API wrapper for serverless applications.",
     url="https://github.com/jnsougata/discohook",
     author="Sougata Jana",
     author_email="jnsougata@gmail.com",
