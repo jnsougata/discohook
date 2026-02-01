@@ -1,7 +1,65 @@
-from starlette.responses import HTMLResponse
+from starlette.requests import Request
+from starlette.responses import HTMLResponse, JSONResponse
+from starlette.routing import Route
+
+from .utils import compare_password
 
 
-async def dashboard(_):
+async def delete_cmd(request: Request):
+    if not request.app.password:
+        return JSONResponse(
+            {"error": "Password not set inside the application"}, status_code=500
+        )
+    data = await request.json()
+    password = data.get("password")
+    command_id = data.get("id")
+    guild_id = data.get("guild_id")
+    if not compare_password(request.app.password, password):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    resp = await request.app.delete_command(command_id, guild_id=guild_id)
+    if resp.status == 204:
+        return JSONResponse({"success": True}, status_code=resp.status)
+    return JSONResponse({"error": "Failed to delete command"}, status_code=resp.status)
+
+
+async def sync(request: Request):
+    if not request.app.password:
+        return JSONResponse(
+            {"error": "Password not set inside the application"}, status_code=500
+        )
+    data = await request.json()
+    password = data.get("password")
+    if not compare_password(request.app.password, password):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    responses, raw = await request.app._sync()  # noqa
+    if not responses:
+        return JSONResponse([], status_code=200)
+    if not any([resp.status == 200 for resp in responses]):
+        erred_first_response = next(
+            (resp for resp in responses if resp.status != 200), None
+        )
+        data = await erred_first_response.json()
+        data["raw_payload"] = raw
+        return JSONResponse(data, status_code=500)
+    commands = []
+    for resp in responses:
+        commands.extend(await resp.json())
+    return JSONResponse(commands, status_code=200)
+
+
+async def authenticate(request: Request):
+    if not request.app.password:
+        return JSONResponse(
+            {"error": "Password not set inside the application"}, status_code=500
+        )
+    data = await request.json()
+    password = data.get("password")
+    if not compare_password(request.app.password, password):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    return JSONResponse({"success": True}, status_code=200)
+
+
+async def homepage(_):
     return HTMLResponse(
         """
 <!DOCTYPE html>
@@ -180,3 +238,9 @@ async def dashboard(_):
         """,
         status_code=200,
     )
+
+
+homepage_route = Route("/api/dash", endpoint=homepage, methods=["GET"], include_in_schema=False)
+delete_cmd_route = Route("/api/commands", endpoint=delete_cmd, methods=["DELETE"], include_in_schema=False)
+sync_route = Route("/api/sync", endpoint=sync, methods=["POST"], include_in_schema=False)
+authenticate_route = Route("/api/verify", endpoint=authenticate, methods=["POST"], include_in_schema=False)

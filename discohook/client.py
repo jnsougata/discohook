@@ -4,20 +4,13 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import aiohttp
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import JSONResponse
 
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
-from .components import (
-    ActionRow,
-    Container,
-    File,
-    MediaGallery,
-    Section,
-    Separator,
-    TextDisplay,
-)
-from .dash import dashboard
+from .components import (ActionRow, Container, File, MediaGallery, Section,
+                         Separator, TextDisplay)
+from .dashboard import (authenticate_route, delete_cmd_route, homepage_route,
+                        sync_route)
 from .engine import _engine
 from .guild import Guild
 from .handler import Handler
@@ -27,60 +20,7 @@ from .interaction import Interaction
 from .message import Message
 from .ratelimit import RatelimitMux
 from .user import User
-from .utils import compare_password
 from .webhook import Webhook
-
-
-async def delete_cmd(request: Request):
-    if not request.app.password:
-        return JSONResponse(
-            {"error": "Password not set inside the application"}, status_code=500
-        )
-    data = await request.json()
-    password = data.get("password")
-    command_id = data.get("id")
-    guild_id = data.get("guild_id")
-    if not compare_password(request.app.password, password):
-        return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    resp = await request.app.delete_command(command_id, guild_id=guild_id)
-    if resp.status == 204:
-        return JSONResponse({"success": True}, status_code=resp.status)
-    return JSONResponse({"error": "Failed to delete command"}, status_code=resp.status)
-
-
-async def sync(request: Request):
-    if not request.app.password:
-        return JSONResponse(
-            {"error": "Password not set inside the application"}, status_code=500
-        )
-    data = await request.json()
-    password = data.get("password")
-    if not compare_password(request.app.password, password):
-        return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    responses, raw = await request.app._sync()  # noqa
-    if not any([resp.status == 200 for resp in responses]):
-        erred_first_response = next(
-            (resp for resp in responses if resp.status != 200), None
-        )
-        data = await erred_first_response.json()
-        data["raw_payload"] = raw
-        return JSONResponse(data, status_code=500)
-    commands = []
-    for resp in responses:
-        commands.extend(await resp.json())
-    return JSONResponse(commands, status_code=200)
-
-
-async def authenticate(request: Request):
-    if not request.app.password:
-        return JSONResponse(
-            {"error": "Password not set inside the application"}, status_code=500
-        )
-    data = await request.json()
-    password = data.get("password")
-    if not compare_password(request.app.password, password):
-        return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    return JSONResponse({"success": True}, status_code=200)
 
 
 class Client(Starlette):
@@ -119,7 +59,15 @@ class Client(Starlette):
         ratelimit_mux: Optional[RatelimitMux] = None,
         **kwargs,
     ):
-        super().__init__(**kwargs)
+        super().__init__(
+            **kwargs,
+            routes=[
+                sync_route,
+                homepage_route,
+                authenticate_route,
+                delete_cmd_route,
+            ],
+        )
         self.token = token
         self.public_key = public_key
         self.application_id = application_id
@@ -131,14 +79,14 @@ class Client(Starlette):
         self._sync_queue: List[ApplicationCommand] = []
         self.active_commands: Dict[str, ApplicationCommand] = {}
         self.add_route(route, _engine, methods=["POST"], include_in_schema=False)
-        self.add_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
-        self.add_route("/api/dash", dashboard, methods=["GET"], include_in_schema=False)
-        self.add_route(
-            "/api/verify", authenticate, methods=["POST"], include_in_schema=False
-        )
-        self.add_route(
-            "/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False
-        )
+        # self.add_route("/api/sync", sync, methods=["POST"], include_in_schema=False)
+        # self.add_route("/api/dash", homepage, methods=["GET"], include_in_schema=False)
+        # self.add_route(
+        #     "/api/verify", authenticate, methods=["POST"], include_in_schema=False
+        # )
+        # self.add_route(
+        #     "/api/commands", delete_cmd, methods=["DELETE"], include_in_schema=False
+        # )
         self._custom_id_parser: Optional[Callable[[Interaction, str], str]] = None
         if default_help_command:
             self.commands(_help)
