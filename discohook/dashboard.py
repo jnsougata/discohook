@@ -138,9 +138,9 @@ async def homepage(_):
                                 <p class="text-xs text-gray-400">Command management dashboard</p>
                             </div>
                         </div>
-                        <a href="https://github.com/jnsougata/discohook" target="_blank" class="group flex items-center gap-2 px-4 py-2 btn-ghost">
-                            <i class="fa-brands fa-github text-gray-400 group-hover:text-white transition-colors"></i>
-                            <span class="text-sm text-gray-400 group-hover:text-white transition-colors hidden sm:inline">View on GitHub</span>
+                        <a href="https://jnsougata.github.io/discohook/" target="_blank" class="group flex items-center gap-2 px-4 py-2 btn-ghost">
+                            <i class="fa-solid fa-book text-gray-400 group-hover:text-white transition-colors"></i>
+                            <span class="text-sm text-gray-400 group-hover:text-white transition-colors hidden sm:inline">View Docs</span>
                         </a>
                     </div>
                 </div>
