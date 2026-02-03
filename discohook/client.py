@@ -475,7 +475,7 @@ class Client(Starlette):
         self, *, name: str, image: bytes, image_type: Literal["png", "jpeg", "gif"]
     ) -> PartialEmoji:
         """
-        Create a new emoji in a guild.
+        Create a new application emoji.
 
         Parameters
         ----------

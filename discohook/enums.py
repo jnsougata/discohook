@@ -175,6 +175,7 @@ class InteractionCallbackType(int, Enum):
     autocomplete = 8
     modal = 9
     premium_required = 10
+    launch_activity = 12
 
 
 class ComponentType(int, Enum):
