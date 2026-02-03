@@ -1,5 +1,6 @@
 import asyncio
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+import base64
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 
 import aiohttp
 from starlette.applications import Starlette
@@ -11,6 +12,7 @@ from .components import (ActionRow, Container, File, MediaGallery, Section,
                          Separator, TextDisplay)
 from .dashboard import (authenticate_route, delete_cmd_route, homepage_route,
                         sync_route)
+from .emoji import PartialEmoji
 from .engine import _engine
 from .guild import Guild
 from .handler import Handler
@@ -469,7 +471,9 @@ class Client(Starlette):
         resp = await self.http.get_application_emoji(emoji_id)
         return await resp.json()
 
-    async def create_application_emoji(self, name: str, image_base64: str):
+    async def create_application_emoji(
+        self, *, name: str, image: bytes, image_type: Literal["png", "jpeg", "gif"]
+    ) -> PartialEmoji:
         """
         Create a new emoji in a guild.
 
@@ -477,10 +481,25 @@ class Client(Starlette):
         ----------
         name: str
             The name of the emoji.
-        image_base64: str
-            The base64 encoded image of the emoji. ( Size must be less than 256kb )
+        image: bytes
+            The image of the emoji in bytes.
+        image_type: str
+            The image type of the emoji. (e.g. "png", "jpeg", "gif")
+
+        Returns
+        -------
+        PartialEmoji
         """
-        await self.http.create_application_emoji({"name": name, "image": image_base64})
+        data_uri = f"data:image/{image_type};base64,{base64.b64encode(image).decode()}"
+        resp = await self.http.create_application_emoji(
+            {"name": name, "image": data_uri}
+        )
+        emoji_data = await resp.json()
+        return PartialEmoji(
+            name=emoji_data["name"],
+            id=emoji_data["id"],
+            animated=emoji_data.get("animated", False),
+        )
 
     async def edit_application_emoji(self, emoji_id: str, name: str):
         """

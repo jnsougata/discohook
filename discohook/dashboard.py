@@ -240,7 +240,15 @@ async def homepage(_):
     )
 
 
-homepage_route = Route("/api/dash", endpoint=homepage, methods=["GET"], include_in_schema=False)
-delete_cmd_route = Route("/api/commands", endpoint=delete_cmd, methods=["DELETE"], include_in_schema=False)
-sync_route = Route("/api/sync", endpoint=sync, methods=["POST"], include_in_schema=False)
-authenticate_route = Route("/api/verify", endpoint=authenticate, methods=["POST"], include_in_schema=False)
+homepage_route = Route(
+    "/api/dash", endpoint=homepage, methods=["GET"], include_in_schema=False
+)
+delete_cmd_route = Route(
+    "/api/commands", endpoint=delete_cmd, methods=["DELETE"], include_in_schema=False
+)
+sync_route = Route(
+    "/api/sync", endpoint=sync, methods=["POST"], include_in_schema=False
+)
+authenticate_route = Route(
+    "/api/verify", endpoint=authenticate, methods=["POST"], include_in_schema=False
+)
