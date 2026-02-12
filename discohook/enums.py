@@ -75,6 +75,7 @@ class ApplicationCommandType(int, Enum):
     slash = 1
     user = 2
     message = 3
+    primary_entry_point = 4
 
 
 class ApplicationCommandOptionType(int, Enum):
