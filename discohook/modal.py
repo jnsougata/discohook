@@ -112,6 +112,7 @@ class Modal:
             Label(label=label, child=select, id=id, description=description)
         )
 
+    # noinspection PyShadowingBuiltins
     def file_upload(
         self,
         *,
@@ -157,6 +158,7 @@ class Modal:
             )
         )
 
+    # noinspection PyShadowingBuiltins
     def checkbox_group(
         self,
         *,
@@ -187,6 +189,7 @@ class Modal:
             )
         )
 
+    # noinspection PyShadowingBuiltins
     def radio_group(
         self,
         *,
