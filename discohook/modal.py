@@ -1,6 +1,8 @@
 from typing import List, Optional, Union
 
-from .components import FileUpload, Label, TextDisplay, TextInput
+from .components import (Checkbox, CheckboxGroup, CheckboxGroupOption,
+                         FileUpload, Label, RadioGroup, RadioGroupOption,
+                         TextDisplay, TextInput)
 from .enums import ChannelType, SelectType, TextInputFieldLength
 from .handler import Handler
 from .select import Select, SelectDefaultValue, SelectOption
@@ -36,7 +38,7 @@ class Modal:
         Parameters
         ----
         """
-        self.components.append(TextDisplay(markdown, id=id))
+        self.components.append(TextDisplay(markdown=markdown, id=id))
 
     # noinspection PyShadowingBuiltins
     def input(
@@ -60,7 +62,7 @@ class Modal:
             Label(
                 label=label,
                 child=TextInput(
-                    custom_id,
+                    custom_id=custom_id,
                     required=required,
                     placeholder=placeholder,
                     value=value,
@@ -128,10 +130,82 @@ class Modal:
             Label(
                 label=label,
                 child=FileUpload(
-                    custom_id,
+                    custom_id=custom_id,
                     min_values=min_values,
                     max_values=max_values,
                     required=required,
+                ),
+                id=id,
+            )
+        )
+
+    # noinspection PyShadowingBuiltins
+    def checkbox(
+        self,
+        *,
+        custom_id: str,
+        label: str,
+        id: Optional[int] = None,
+        default: bool = False,
+    ):
+        """
+        Appends a checkbox component to the modal.
+        """
+        self.components.append(
+            Label(
+                label=label, child=Checkbox(custom_id=custom_id, default=default), id=id
+            )
+        )
+
+    def checkbox_group(
+        self,
+        *,
+        id: Optional[int] = None,
+        custom_id: str,
+        label: str,
+        options: List[CheckboxGroupOption],
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        required: bool = True,
+    ):
+        """
+        Appends a checkbox group component to the modal.
+        """
+        if len(options) < 1:
+            raise ValueError("Checkbox group must have at least one option.")
+        self.components.append(
+            Label(
+                label=label,
+                child=CheckboxGroup(
+                    custom_id=custom_id,
+                    options=options,
+                    min_values=min_values,
+                    max_values=max_values,
+                    required=required,
+                ),
+                id=id,
+            )
+        )
+
+    def radio_group(
+        self,
+        *,
+        id: Optional[int] = None,
+        custom_id: str,
+        label: str,
+        options: List[RadioGroupOption],
+        required: bool = True,
+    ):
+        """
+        Appends a radio group component to the modal.
+        """
+        if len(options) < 2:
+            raise ValueError("Radio group must have at least two options.")
+        self.components.append(
+            Label(
+                label=label,
+                child=RadioGroup(
+                    custom_id=custom_id, options=options, required=required
                 ),
                 id=id,
             )

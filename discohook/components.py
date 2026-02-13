@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from .button import Button
 from .enums import ComponentType, TextInputFieldLength
@@ -18,6 +18,11 @@ __all__ = [
     "TextInput",
     "FileUpload",
     "Label",
+    "Checkbox",
+    "CheckboxGroup",
+    "CheckboxGroupOption",
+    "RadioGroup",
+    "RadioGroupOption",
 ]
 
 
@@ -48,6 +53,7 @@ class Media:
 
     def __init__(
         self,
+        *,
         media: Union[str, File],
         description: Optional[str] = None,
         spoiler: bool = False,
@@ -91,7 +97,7 @@ class MediaGallery:
 # noinspection PyShadowingBuiltins
 class TextDisplay:
 
-    def __init__(self, markdown: str, *, id: Optional[int] = None):
+    def __init__(self, *, markdown: str, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.text_display
         self.content = markdown
@@ -107,8 +113,8 @@ class TextDisplay:
 class Thumbnail:
     def __init__(
         self,
-        media: Union[str, File],
         *,
+        media: Union[str, File],
         description: Optional[str] = None,
         spoiler: bool = False,
         id: Optional[int] = None,
@@ -247,9 +253,9 @@ class TextInput:
     # noinspection PyShadowingBuiltins
     def __init__(
         self,
-        custom_id: str,
         *,
         id: Optional[int] = None,
+        custom_id: str,
         required: bool = True,
         placeholder: Optional[str] = None,
         value: Optional[str] = None,
@@ -302,9 +308,9 @@ class FileUpload:
     # noinspection PyShadowingBuiltins
     def __init__(
         self,
-        custom_id: str,
         *,
         id: Optional[int] = None,
+        custom_id: str,
         min_values: int = 1,
         max_values: int = 1,
         required: bool = True,
@@ -327,12 +333,137 @@ class FileUpload:
         }
 
 
+class Checkbox:
+    def __init__(
+        self,
+        *,
+        id: Optional[int] = None,
+        custom_id: str,
+        default: bool = False,
+    ):
+        self.id = id
+        self.custom_id = custom_id
+        self.default = default
+
+    def to_dict(self):
+        return {
+            "type": ComponentType.checkbox.value,
+            "id": self.id,
+            "custom_id": self.custom_id,
+            "default": self.default,
+        }
+
+
+class CheckboxGroupOption:
+    def __init__(
+        self,
+        *,
+        label: str,
+        value: str,
+        description: Optional[str] = None,
+        default: bool = False,
+    ):
+        self.label = label
+        self.value = value
+        self.description = description
+        self.default = default
+
+    def to_dict(self):
+        return {
+            "label": self.label,
+            "value": self.value,
+            "description": self.description,
+            "default": self.default,
+        }
+
+
+class CheckboxGroup:
+    def __init__(
+        self,
+        *,
+        id: Optional[int] = None,
+        custom_id: str,
+        options: List[CheckboxGroupOption],
+        min_values: Optional[int] = None,
+        max_values: Optional[int] = None,
+        required: bool = True,
+    ):
+        self.id = id
+        self.custom_id = custom_id
+        self.options = options
+        self.min_values = min_values
+        self.max_values = max_values
+        self.required = required
+
+    def to_dict(self):
+        data = {
+            "type": ComponentType.checkbox_group.value,
+            "id": self.id,
+            "custom_id": self.custom_id,
+            "options": [option.to_dict() for option in self.options],
+            "required": self.required,
+        }
+        if self.min_values is not None:
+            data["min_values"] = self.min_values
+        if self.max_values is not None:
+            data["max_values"] = self.max_values
+        return data
+
+
+class RadioGroupOption:
+    def __init__(
+        self,
+        label: str,
+        value: str,
+        description: Optional[str] = None,
+        default: bool = False,
+    ):
+        self.label = label
+        self.value = value
+        self.description = description
+        self.default = default
+
+    def to_dict(self):
+        return {
+            "label": self.label,
+            "value": self.value,
+            "description": self.description,
+            "default": self.default,
+        }
+
+
+class RadioGroup:
+    def __init__(
+        self,
+        *,
+        id: Optional[int] = None,
+        custom_id: str,
+        options: List[RadioGroupOption],
+        required: bool = True,
+    ):
+        self.id = id
+        self.custom_id = custom_id
+        self.options = options
+        self.required = required
+
+    def to_dict(self):
+        return {
+            "type": ComponentType.radio_group.value,
+            "id": self.id,
+            "custom_id": self.custom_id,
+            "options": [option.to_dict() for option in self.options],
+            "required": self.required,
+        }
+
+
 # noinspection PyShadowingBuiltins
 class Label:
     def __init__(
         self,
         label: str,
-        child: Union[Select, TextInput, FileUpload],
+        child: Union[
+            Select, TextInput, FileUpload, Checkbox, CheckboxGroup, RadioGroup
+        ],
         *,
         id: Optional[int] = None,
         description: Optional[str] = None,

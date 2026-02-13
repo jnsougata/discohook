@@ -223,4 +223,10 @@ def build_modal_params(func: Callable, interaction: Interaction):
                 Channel(interaction.client, resolved.pop(channel_id))
                 for channel_id in component["values"]
             ]
+        elif component_type == ComponentType.checkbox:
+            options[custom_id] = component["value"]
+        elif component_type == ComponentType.checkbox_group:
+            options[custom_id] = component["values"]
+        elif component_type == ComponentType.radio_group:
+            options[custom_id] = component["value"]
     return handle_params_by_signature(func, options)
