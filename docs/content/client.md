@@ -40,8 +40,7 @@ async def handle_error(request: Request, exc: Exception):
 ```
 
 ## _def register(self, item)_
-This method is used to register a command or event handler with the client. You can pass an instance of a command or event handler to this method, and it will be registered with the client so that it can be invoked when the corresponding interaction is received from Discord.
-
+This method is used to register a command or event handler with the client. You can pass an instance of a command or event handler to this method, and it will be registered with the client.
 ```python
 @app.register  # Registering a slash command
 @discohook.command.slash()
@@ -53,3 +52,17 @@ async def ping(interaction: discohook.Interaction):
 async def handle_delete_button(interaction: discohook.Interaction):
     await interaction.message.delete()
 ```
+
+## _def commands(self, *commands: ApplicationCommand)_
+This method is used to add one or more application commands to the client's command registry. You can pass any number of `ApplicationCommand` instances to this method, and they will be added to the client's command registry.
+
+```python
+ping = discohook.ApplicationCommand(
+    name="ping",
+    description="Responds with Pong!",
+    handler_func=...
+)
+
+app.commands(ping)
+```
+> This method is typically used when you want to define your commands separately from their handlers, allowing for more modular code organization.
