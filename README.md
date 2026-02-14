@@ -59,7 +59,7 @@ async def handler(_request, err: Exception):
     # If you don't have reference to `app` object, you can use `request.app` to get the app object.
 
 # Making slash command
-@app.load
+@app.register
 @discohook.command.slash()
 async def ping(i: discohook.Interaction):
     """Ping the bot."""
@@ -67,7 +67,7 @@ async def ping(i: discohook.Interaction):
 
 
 # Making user command
-@app.load
+@app.register
 @discohook.command.user()
 async def avatar(i: discohook.Interaction, user: discohook.User):
     embed = discohook.Embed()
@@ -76,7 +76,7 @@ async def avatar(i: discohook.Interaction, user: discohook.User):
 
 
 # Making message command
-@app.load
+@app.register
 @discohook.command.message()
 async def quote(i: discohook.Interaction, message: discohook.Message):
     embed = discohook.Embed()
