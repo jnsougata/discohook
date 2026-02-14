@@ -7,12 +7,18 @@ Welcome to the **discohook** documentation. Whether you're new to discord bot de
 > If you already have a Discord application and bot set up, you can skip this section.
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click on "New Application".
 2. Enter a name for your application and click "Create".
+
 ![create_new_app](/create_new_app.png) 
 
 ## Gathering Required Credentials
 1. Choose your application and navigate to the `General Information` tab on the left sidebar.
 2. Copy the `Application ID` and `Public Key` and save them for later use.
-![gathering_general_info](/gathering_general_info.png) 
+
+![gathering_general_info](/gathering_general_info.png)
+
+3. Navigate to the `Bot` tab at the left sidebar and click on `Reset Token` to generate a new bot token. Copy the token and save it for later use.
+
+![gathering_bot_token](/gathering_bot_token.png)
 
 ## Installation
 
