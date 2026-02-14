@@ -100,9 +100,14 @@ There are few more shenanigans you have to do to make the command work.
 
 For example if your URL is `https://my-bot-url.com`, then you need to set the **Interaction Endpoint URL** in your Discord Developer Portal to `https://my-bot-url.com/interactions`.
 
-### 2. Syncing Commands
+### 2. Registering Commands
 After setting up the endpoint URL, you need to sync your commands with Discord. After you set up the endpoint URL, you can register your commands just by visiting the dashboard at `https://my-bot-url.com/api/dash`.
 > It will ask you to enter a password, which is the `APPLICATION_PASSWORD` you set in the environment variable if you are visiting the dashboard for the first time.
 
 ### 3. Testing the Command
 After syncing the commands, you can test the command in your Discord server. Just type `/ping` in any channel where the bot has access, and you should see the response "pong!".
+
+> 🎉 Congratulations! You've successfully set up your first slash command using **discohook**.
+
+## Need Help?
+If you have any questions or need further assistance, feel free to join our [support server](https://discord.gg/5PwqKbM7wu) or check out the [GitHub repository](https://github.com/jnsougata/discohook).
