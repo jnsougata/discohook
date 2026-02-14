@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: "Discohook"
+  name: "discohook"
   tagline: "A discord interaction API wrapper for serverless applications."
   image:
     src: /discord.png
