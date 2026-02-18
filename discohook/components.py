@@ -23,6 +23,7 @@ __all__ = [
     "CheckboxGroupOption",
     "RadioGroup",
     "RadioGroupOption",
+    "TopLevelComponent"
 ]
 
 
@@ -481,3 +482,5 @@ class Label:
             "description": self.description,
             "component": self.child.to_dict(),
         }
+
+TopLevelComponent = Union[str, TextDisplay, ActionRow, Section, Container, Separator, File, MediaGallery]

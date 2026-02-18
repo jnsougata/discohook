@@ -69,12 +69,7 @@ class FollowupResponse:
             self.message.id,
         )
 
-    async def edit(
-        self,
-        *components: Union[
-            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
-    ):
+    async def edit(self, *components: TopLevelComponent):
         """
         Edits the followup response message.
         """
@@ -98,9 +93,7 @@ class ResponseAdapter:
 
     async def send(
         self,
-        *components: Union[
-            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
+        *components: TopLevelComponent,
         with_response: bool = False,
         ephemeral: bool = False,
     ):
@@ -247,13 +240,7 @@ class ResponseAdapter:
         )
         return InteractionResponse(self.interaction)
 
-    async def edit_origin(
-        self,
-        *components: Union[
-            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
-        with_response: bool = False,
-    ) -> InteractionResponse:
+    async def edit_origin(self, *components: TopLevelComponent, with_response: bool = False) -> InteractionResponse:
         """
         Edits the original message of the interaction.
         Only available for buttons, select menus, and modal submission interactions.
@@ -289,12 +276,7 @@ class ResponseAdapter:
         )
         return InteractionResponse(self.interaction)
 
-    async def followup(
-        self,
-        *components: Union[
-            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
-    ) -> FollowupResponse:
+    async def followup(self, *components: TopLevelComponent) -> FollowupResponse:
         """
         Sends a followup message to the interaction.
 

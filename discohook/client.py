@@ -8,8 +8,7 @@ from starlette.requests import Request
 
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
-from .components import (ActionRow, Container, File, MediaGallery, Section,
-                         Separator, TextDisplay)
+from .components import TopLevelComponent
 from .dashboard import (authenticate_route, delete_cmd_route, homepage_route,
                         sync_route)
 from .emoji import PartialEmoji
@@ -244,13 +243,7 @@ class Client(Starlette):
         """
         self._custom_id_parser = coro
 
-    async def send(
-        self,
-        channel_id: str,
-        *components: Union[
-            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
-    ) -> Message:
+    async def send(self, channel_id: str, *components: TopLevelComponent) -> Message:
         """
         Send a message to a channel using the ID of the channel.
 

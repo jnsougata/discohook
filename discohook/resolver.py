@@ -229,4 +229,6 @@ def build_modal_params(func: Callable, interaction: Interaction):
             options[custom_id] = component["values"]
         elif component_type == ComponentType.radio_group:
             options[custom_id] = component["value"]
+        else:
+            options[custom_id] = component
     return handle_params_by_signature(func, options)

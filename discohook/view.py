@@ -31,12 +31,7 @@ class View:
         self.interactables: Dict[str, "Component"] = {}
 
     @classmethod
-    def from_children(
-        cls,
-        *children: Union[
-            TextDisplay, ActionRow, Section, Container, Separator, File, MediaGallery
-        ]
-    ):
+    def from_children(cls, *children: TopLevelComponent):
         self = cls()
         for child in children:
             if isinstance(child, ActionRow):
@@ -55,6 +50,8 @@ class View:
                 self.add_file(child)
             elif isinstance(child, MediaGallery):
                 self.add_gallery(*child.items, id=child.id)
+            elif isinstance(child, str):
+                self.children.append(TextDisplay(markdown=child))
             else:
                 self.children.append(child)
         return self

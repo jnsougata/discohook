@@ -3,8 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 import aiohttp
 
 from .attachment import Attachment
-from .components import (ActionRow, Container, File, MediaGallery, Section,
-                         Separator, TextDisplay)
+from .components import TopLevelComponent
 from .embed import Embed
 from .emoji import PartialEmoji
 from .models import AllowedMentions, MessageReference
@@ -241,12 +240,7 @@ class Message:
             self.channel_id, self.id, reason=reason
         )
 
-    async def edit(
-        self,
-        *components: Union[
-            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
-    ):
+    async def edit(self, *components: TopLevelComponent):
         """
         Edits the message.
 
@@ -277,9 +271,7 @@ class Message:
 
     async def reply(
         self,
-        *components: Union[
-            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
+        *components: TopLevelComponent,
         allowed_mentions: Optional[AllowedMentions] = None,
         mention_author: Optional[bool] = None,
     ):

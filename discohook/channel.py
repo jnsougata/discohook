@@ -2,8 +2,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 
-from .components import (ActionRow, Container, File, MediaGallery, Section,
-                         Separator, TextDisplay)
+from .components import TopLevelComponent
 from .emoji import PartialEmoji
 from .enums import ChannelType
 from .message import Message
@@ -49,12 +48,7 @@ class PartialChannel:
         """
         return f"<#{self.id}>"
 
-    async def send(
-        self,
-        *components: Union[
-            TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container
-        ],
-    ):
+    async def send(self, *components: TopLevelComponent):
         """
         Sends a message to the channel.
 
