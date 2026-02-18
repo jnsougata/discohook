@@ -240,7 +240,9 @@ class ResponseAdapter:
         )
         return InteractionResponse(self.interaction)
 
-    async def edit_origin(self, *components: TopLevelComponent, with_response: bool = False) -> InteractionResponse:
+    async def edit_origin(
+        self, *components: TopLevelComponent, with_response: bool = False
+    ) -> InteractionResponse:
         """
         Edits the original message of the interaction.
         Only available for buttons, select menus, and modal submission interactions.
