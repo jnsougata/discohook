@@ -128,3 +128,4 @@ dmypy.json
 .vscode/
 main.py
 docs/node_modules/
+docs/.vitepress/cache
