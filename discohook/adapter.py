@@ -32,10 +32,10 @@ class InteractionResponse:
         Edits an interaction response.
 
         Args:
-            components: The components to use in the edited response.
+            components: Components to use in the edited response.
 
         Returns:
-            Message: The edited response message.
+            Message: Edited response message.
         """
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
@@ -80,10 +80,10 @@ class FollowupResponse:
         Edits the followup response message.
 
         Args:
-            components (Tuple[TopLevelComponent]): The components to use in the edited response.
+            components (Tuple[TopLevelComponent]): Components to use in the edited response.
 
         Returns:
-            Message: The edited response message.
+            Message: Edited response message.
         """
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
@@ -114,12 +114,12 @@ class ResponseAdapter:
         Sends a response to the interaction
 
         Args:
-            components: The components to use in the response.
+            components: Components to use in the response.
             with_response (bool): Whether to get a response message or not.
             ephemeral (bool): Whether the response should be ephemeral or not (only for application commands).
 
         Returns:
-            InteractionResponse: The interaction response object for further actions.
+            InteractionResponse: Interaction response object for further actions.
         """
         await self.interaction.client.http.create_interaction_response(
             self.interaction.id,
@@ -141,11 +141,11 @@ class ResponseAdapter:
         Sends a modal to the interaction
 
         Args:
-            modal (Modal): The modal to send.
+            modal (Modal): Modal to send.
             with_response (bool):  Whether to get a response message or not.
 
         Returns:
-            InteractionResponse: The interaction response object for further actions.
+            InteractionResponse: Interaction response object for further actions.
         """
         if self.interaction.type not in (
             InteractionType.component,
@@ -169,7 +169,7 @@ class ResponseAdapter:
         Sends autocomplete choices to the interaction (max 25)
 
         Args:
-            choices (List[Choice]): The choices to send with autocomplete response.
+            choices (List[Choice]): Choices to send with autocomplete response.
             with_response (bool): Whether to get a response message or not.
 
         Raises:
@@ -206,7 +206,7 @@ class ResponseAdapter:
             with_response (bool): Whether to get a response message or not.
 
         Returns:
-            InteractionResponse: The interaction response object for further actions.
+            InteractionResponse: Interaction response object for further actions.
         """
         payload = {}
         if (
@@ -267,11 +267,11 @@ class ResponseAdapter:
         Only available for buttons, select menus, and modal submission interactions.
 
         Args:
-            components (Tuple(TopLevelComponent)): The components to include in the response message.
+            components (Tuple(TopLevelComponent)): Components to include in the response message.
             with_response (bool): Whether to get a response message or not.
 
         Returns:
-            InteractionResponse: The interaction response object for further actions.
+            InteractionResponse: Interaction response object for further actions.
         """
         if not (
             self.interaction.type == InteractionType.component
@@ -296,10 +296,10 @@ class ResponseAdapter:
         Sends a followup message to the interaction.
 
         Args:
-            components (Tuple(TopLevelComponent)): The components to include in the response message.
+            components (Tuple(TopLevelComponent)): Components to include in the response message.
 
         Returns:
-            FollowupResponse: The followup response object for further actions.
+            FollowupResponse: Followup response object for further actions.
 
         """
         payload = _prepare_payload(View.from_children(*components))
