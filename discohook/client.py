@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import base64
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 
@@ -26,26 +27,17 @@ from .webhook import Webhook
 
 class Client(Starlette):
     """
-    The base client class for discohook.
+    Base client class.
 
-    Parameters
-    ----------
-    application_id: int | str
-        The application ID of the bot.
-    public_key: str
-        The public key of the bot.
-    token: str
-        The token of the bot.
-    route: str
-        The route to listen for interactions on.
-    password: str | None
-        The password to use for the dashboard.
-    default_help_command: bool
-        Whether to use the default help command or not. Defaults to False.
-    ratelimit_mux: RatelimitMux | None
-        Whether to use a custom ratelimit mux or not. Defaults to None.
-    **kwargs
-        Keyword arguments to pass to the Starlette instance.
+    Args:
+        application_id (int | str): Application ID of the bot.
+        public_key (str): Public key of the bot.
+        token (str): Token of the bot.
+        route (str): Route to listen for interactions on. Defaults to `/interactions`.
+        password (str | None): Password to use for the dashboard.
+        default_help_command (bool): Whether to use the default help command or not. Defaults to False.
+        ratelimit_mux (RatelimitMux | None): Whether to use a custom ratelimit mux or not. Defaults to None.
+        kwargs: Keyword arguments to pass to the Starlette instance.
     """
 
     def __init__(
@@ -103,30 +95,17 @@ class Client(Starlette):
         **kwargs,
     ) -> "Client":
         """
-        Creates a client from environment variables.
-        The environment variables must be set in the following format:
-            - APPLICATION_ID: The application ID of the bot.
-            - PUBLIC_KEY: The public key of the bot.
-            - BOT_TOKEN: The token of the bot.
-            - APPLICATION_PASSWORD: The password to use for the dashboard (OPTIONAL).
-                The password is used to authenticate the dashboard and the sync route.
-                The password is not required if you are not using the dashboard or the sync route.
+        Creates a client using environment variables.
+        The environment variables are APPLICATION_ID, PUBLIC_KEY, BOT_TOKEN, and optionally APPLICATION_PASSWORD.
 
-        Parameters
-        ----------
-        path: str
-            Path to the .env file. Defaults to ".env".
-        default_help_command: bool
-            Whether to use the default help command or not. Defaults to False.
-        ratelimit_mux: RatelimitMux | None
-            Whether to use a custom ratelimit mux or not. Defaults to None.
-        **kwargs
-            Keyword arguments to pass to the Starlette instance.
+        Args:
+            path (str): Path to the .env file. Defaults to ".env".
+            default_help_command (bool): Whether to use the default help command or not. Defaults to False.
+            ratelimit_mux (RatelimitMux | None): Whether to use a custom ratelimit mux or not. Defaults to None.
+            kwargs: Keyword arguments to pass to the Starlette instance.
 
-        Returns
-        -------
-        Client
-            The client instance.
+        Returns:
+            Client: The client instance.
         """
         import os
 
@@ -151,7 +130,7 @@ class Client(Starlette):
 
     def on_error(self):
         """
-        A decorator to add an error handler for any server errors.
+        Decorator to add an error handler for any server side error.
         """
 
         def decorator(coro: Callable[[Request, Exception], Any]):
@@ -166,10 +145,8 @@ class Client(Starlette):
         """
         Registers a handler or command to the client.
 
-        Parameters
-        ----------
-        item: Union[Handler, ApplicationCommand]
-            The handler or command to register.
+        Args:
+            item (Handler | ApplicationCommand): The handler or command to register.
         """
         if isinstance(item, ApplicationCommand):
             self.active_commands[item.handler.id] = item
@@ -180,12 +157,10 @@ class Client(Starlette):
 
     def commands(self, *commands: Union[ApplicationCommand, Any]):
         """
-        Add commands to the client.
+        Adds commands to the client.
 
-        Parameters
-        ----------
-        *commands:
-            The commands to add to the client.
+        Args:
+            commands: Commands to add to the client.
         """
         for command in commands:
             self.active_commands[command.handler.id] = command
@@ -195,12 +170,9 @@ class Client(Starlette):
         """
         Delete a command from the client.
 
-        Parameters
-        ----------
-        command_id: str
-            The id of the command to delete.
-        guild_id: str | None
-            The id of the guild to delete the command from. Defaults to None.
+        Args:
+            command_id (str): ID of the command to delete.
+            guild_id (str | None): ID of the guild to delete the command from. Defaults to None.
         """
         return await self.http.delete_application_command(
             str(self.application_id), command_id, guild_id
@@ -226,11 +198,11 @@ class Client(Starlette):
 
     def on_interaction_error(self):
         """
-        A decorator to register a global interaction error handler.
+        Decorator to register a global interaction error handler.
         """
 
         def decorator(coro: Callable[[Interaction], Any]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("Exception handler must be a coroutine.")
             self._interaction_error_handler = coro
             return coro
@@ -239,25 +211,20 @@ class Client(Starlette):
 
     def custom_id_parser(self, coro: Callable[[Interaction, str], str]):
         """
-        A decorator to register a dev defined custom id parser.
+        Decorator to register a developer defined custom_id parser.
         """
         self._custom_id_parser = coro
 
     async def send(self, channel_id: str, *components: TopLevelComponent) -> Message:
         """
-        Send a message to a channel using the ID of the channel.
+        Send a message to a channel.
 
-        Parameters
-        ----------
-        channel_id: str
-            The ID of the channel to send the message to.
-        *components: Union[TextDisplay, Section, File, MediaGallery, ActionRow, Separator, Container]
-            The components to send in the message.
+        Args:
+            channel_id (str): ID of the channel to send the message to.
+            components (Tuple[TopLevelComponent]): Components to send in the message.
 
-        Returns
-        -------
-        Message
-            The message that was sent.
+        Returns:
+            Message object.
         """
         if not channel_id.isdigit():
             raise TypeError("Channel ID must be a snowflake.")
@@ -266,12 +233,10 @@ class Client(Starlette):
 
     async def me(self) -> User:
         """
-        Get the client as a discord user.
+        Fetch the client as a discord user.
 
-        Returns
-        -------
-        User
-            The client as a user.
+        Returns:
+              Client as a discord user.
         """
         resp = await self.http.get_user(str(self.application_id))
         return User(self, await resp.json())
@@ -280,12 +245,9 @@ class Client(Starlette):
         """
         Edits the client user.
 
-        Parameters
-        ----------
-        username: :class:`str`
-            The new username of the client user.
-        avatar: Optional[:class:`str`]
-            The new avatar of the client user in base64 data URI scheme.
+        Args:
+            username (str): Updated username.
+            avatar (str | None): Updated avatar of the client user in base64 data URI scheme. Defaults to None.
         """
         payload = {"username": username}
         if avatar:
@@ -294,9 +256,7 @@ class Client(Starlette):
 
     async def _sync(self) -> Tuple[List[aiohttp.ClientResponse], List[Dict[str, Any]]]:
         """
-        Sync the commands to the client.
-
-        This method is used internally by the client. You should not use this method.
+        Sync the commands to the client. This method is used internally by the client.
         """
         responses = []
         guild_commands = {}
@@ -335,23 +295,16 @@ class Client(Starlette):
         reason: Optional[str] = None,
     ):
         """
-        Create a webhook in a channel.
+        Creates a webhook in a channel.
 
-        Parameters
-        ----------
-        channel_id: str
-            The ID of the channel to create the webhook in.
-        name:
-            The name of the webhook.
-        image_base64:
-            The base64 encoded image of the webhook.
-        reason:
-            The reason for creating the webhook. This will be shown in the audit log.
-            This is optional and can be None.
-        Returns
-        -------
-        Webhook
+        Args:
+            channel_id (str): ID of the channel to create the webhook in.
+            name (str): Name of the webhook.
+            image_base64 (str | None): Base64 encoded image of the webhook.
+            reason (str | None): Reason for creating the webhook. This will be shown in the audit log.
 
+        Returns:
+            Webhook object.
         """
         resp = await self.http.create_webhook(
             channel_id, {"name": name, "avatar": image_base64}, reason=reason
@@ -364,28 +317,29 @@ class Client(Starlette):
     ):
         """
         Fetch a webhook from the client.
-        Parameters
-        ----------
-        webhook_id: str
-            The ID of the webhook to fetch.
-        webhook_token: Optional[str]
-            The token of the webhook to fetch.
-        Returns
-        -------
-        Webhook
+
+        Args:
+            webhook_id (str): ID of the webhook to fetch.
+            webhook_token (str | None): Token of the webhook to fetch.
+
+        Returns:
+            Webhook object.
         """
         resp = await self.http.get_webhook(webhook_id, webhook_token)
         return Webhook(await resp.json(), self)
 
     async def fetch_guild(
-        self, guild_id: str, *, with_counts: Optional[str] = False
+        self, guild_id: str, *, with_counts: Optional[bool] = False
     ) -> Optional[Guild]:
         """
         Fetches the guild of given id.
 
-        Returns
-        -------
-        Guild
+        Args:
+            guild_id (str): ID of the guild to fetch.
+            with_counts (bool): Whether the guild count is returned or not.
+
+        Returns:
+            Guild object or None.
         """
         resp = await self.http.get_guild(
             guild_id, with_counts="true" if with_counts else "false"
@@ -397,11 +351,13 @@ class Client(Starlette):
 
     async def fetch_user(self, user_id: str) -> Optional[User]:
         """
-        Fetches the user of given id.
+        Fetches the user from given ID.
 
-        Returns
-        -------
-        User
+        Args:
+            user_id (str): ID of the user to fetch.
+
+        Returns:
+            User object or None.
         """
         resp = await self.http.get_user(user_id)
         data = await resp.json()
@@ -411,11 +367,13 @@ class Client(Starlette):
 
     async def fetch_channel(self, channel_id: str) -> Optional[Channel]:
         """
-        Fetches the channel of given id.
+        Fetches the channel from given ID.
 
-        Returns
-        -------
-        Channel
+        Args:
+            channel_id (str): ID of the channel to fetch.
+
+        Returns:
+            Channel object or None.
         """
         resp = await self.http.get_channel(channel_id)
         data = await resp.json()
@@ -427,20 +385,18 @@ class Client(Starlette):
         """
         Fetches the commands of the client.
 
-        Returns
-        -------
-        List[Dict[str, Any]]
+        Returns:
+            Aiohttp response object.
         """
         resp = await self.http.get_global_application_commands(str(self.application_id))
         return await resp.json()
 
     async def fetch_info(self) -> Dict[str, Any]:
         """
-        Returns the application object associated with the requesting client user.
+        Fetches the application object associated with the requesting client user.
 
-        Returns
-        -------
-        Dict[str, Any]
+        Returns:
+            Aiohttp response object.
         """
         resp = await self.http.get_current_application()
         return await resp.json()
@@ -454,12 +410,13 @@ class Client(Starlette):
 
     async def fetch_application_emoji(self, emoji_id: str):
         """
-        Fetch an emoji from the client.
+        Fetches an emoji from the client.
 
-        Parameters
-        ----------
-        emoji_id: str
-            The ID of the emoji to fetch.
+        Args:
+            emoji_id (str): ID of the emoji.
+
+        Returns:
+            Aiohttp response object.
         """
         resp = await self.http.get_application_emoji(emoji_id)
         return await resp.json()
@@ -470,18 +427,13 @@ class Client(Starlette):
         """
         Create a new application emoji.
 
-        Parameters
-        ----------
-        name: str
-            The name of the emoji.
-        image: bytes
-            The image of the emoji in bytes.
-        image_type: str
-            The image type of the emoji. (e.g. "png", "jpeg", "gif")
+        Args:
+            name (str): Name of the emoji.
+            image (bytes): Image of the emoji in bytes.
+            image_type (str): Image type of the emoji. (e.g. "png", "jpeg", "gif")
 
-        Returns
-        -------
-        PartialEmoji
+        Returns:
+            PartialEmoji object.
         """
         data_uri = f"data:image/{image_type};base64,{base64.b64encode(image).decode()}"
         resp = await self.http.create_application_emoji(
@@ -496,14 +448,14 @@ class Client(Starlette):
 
     async def edit_application_emoji(self, emoji_id: str, name: str):
         """
-        Edit an existing emoji in a guild.
+        Edits an existing emoji in a guild.
 
-        Parameters
-        ----------
-        emoji_id: str
-            The ID of the emoji.
-        name: str
-            The name of the emoji.
+        Args:
+            emoji_id (str): ID of the emoji.
+            name (str): Name of the emoji.
+
+        Returns:
+            Aiohttp response object.
         """
         await self.http.modify_application_emoji(emoji_id, name)
 
@@ -511,9 +463,10 @@ class Client(Starlette):
         """
         Delete an existing emoji in a guild.
 
-        Parameters
-        ----------
-        emoji_id: str
-            The ID of the emoji.
+        Args:
+            emoji_id (str): ID of the emoji.
+
+        Returns:
+            Aiohttp response object.
         """
         await self.http.delete_application_emoji(emoji_id)
