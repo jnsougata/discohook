@@ -36,163 +36,163 @@ export default defineConfig({
         ]
     },
     {
-        "text": "API Reference",
+        "text": "Reference",
         "items": [
             {
                 "text": "Adapter",
-                "link": "/content/discohook_adapter"
+                "link": "/content/adapter"
             },
             {
                 "text": "Asset",
-                "link": "/content/discohook_asset"
+                "link": "/content/asset"
             },
             {
                 "text": "Attachment",
-                "link": "/content/discohook_attachment"
+                "link": "/content/attachment"
             },
             {
                 "text": "Button",
-                "link": "/content/discohook_button"
+                "link": "/content/button"
             },
             {
                 "text": "Channel",
-                "link": "/content/discohook_channel"
+                "link": "/content/channel"
             },
             {
                 "text": "Client",
-                "link": "/content/discohook_client"
+                "link": "/content/client"
             },
             {
                 "text": "Command",
-                "link": "/content/discohook_command"
+                "link": "/content/command"
             },
             {
                 "text": "Common",
-                "link": "/content/discohook_common"
+                "link": "/content/common"
             },
             {
                 "text": "Components",
-                "link": "/content/discohook_components"
+                "link": "/content/components"
             },
             {
                 "text": "Dashboard",
-                "link": "/content/discohook_dashboard"
+                "link": "/content/dashboard"
             },
             {
                 "text": "Embed",
-                "link": "/content/discohook_embed"
+                "link": "/content/embed"
             },
             {
                 "text": "Emoji",
-                "link": "/content/discohook_emoji"
+                "link": "/content/emoji"
             },
             {
                 "text": "Engine",
-                "link": "/content/discohook_engine"
+                "link": "/content/engine"
             },
             {
                 "text": "Enums",
-                "link": "/content/discohook_enums"
+                "link": "/content/enums"
             },
             {
                 "text": "Errors",
-                "link": "/content/discohook_errors"
+                "link": "/content/errors"
             },
             {
                 "text": "File",
-                "link": "/content/discohook_file"
+                "link": "/content/file"
             },
             {
                 "text": "Guild",
-                "link": "/content/discohook_guild"
+                "link": "/content/guild"
             },
             {
                 "text": "Handler",
-                "link": "/content/discohook_handler"
+                "link": "/content/handler"
             },
             {
                 "text": "Help",
-                "link": "/content/discohook_help"
+                "link": "/content/help"
             },
             {
                 "text": "Https",
-                "link": "/content/discohook_https"
+                "link": "/content/https"
             },
             {
                 "text": "Interaction",
-                "link": "/content/discohook_interaction"
+                "link": "/content/interaction"
             },
             {
                 "text": "Member",
-                "link": "/content/discohook_member"
+                "link": "/content/member"
             },
             {
                 "text": "Message",
-                "link": "/content/discohook_message"
+                "link": "/content/message"
             },
             {
                 "text": "Middleware",
-                "link": "/content/discohook_middleware"
+                "link": "/content/middleware"
             },
             {
                 "text": "Modal",
-                "link": "/content/discohook_modal"
+                "link": "/content/modal"
             },
             {
                 "text": "Models",
-                "link": "/content/discohook_models"
+                "link": "/content/models"
             },
             {
                 "text": "Option",
-                "link": "/content/discohook_option"
+                "link": "/content/option"
             },
             {
                 "text": "Params",
-                "link": "/content/discohook_params"
+                "link": "/content/params"
             },
             {
                 "text": "Permission",
-                "link": "/content/discohook_permission"
+                "link": "/content/permission"
             },
             {
                 "text": "Poll",
-                "link": "/content/discohook_poll"
+                "link": "/content/poll"
             },
             {
                 "text": "Ratelimit",
-                "link": "/content/discohook_ratelimit"
+                "link": "/content/ratelimit"
             },
             {
                 "text": "Resolver",
-                "link": "/content/discohook_resolver"
+                "link": "/content/resolver"
             },
             {
                 "text": "Role",
-                "link": "/content/discohook_role"
+                "link": "/content/role"
             },
             {
                 "text": "Select",
-                "link": "/content/discohook_select"
+                "link": "/content/select"
             },
             {
                 "text": "Thread",
-                "link": "/content/discohook_thread"
+                "link": "/content/thread"
             },
             {
                 "text": "User",
-                "link": "/content/discohook_user"
+                "link": "/content/user"
             },
             {
                 "text": "Utils",
-                "link": "/content/discohook_utils"
+                "link": "/content/utils"
             },
             {
                 "text": "View",
-                "link": "/content/discohook_view"
+                "link": "/content/view"
             },
             {
                 "text": "Webhook",
-                "link": "/content/discohook_webhook"
+                "link": "/content/webhook"
             }
         ]
     }

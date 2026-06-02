@@ -8,10 +8,10 @@ hero:
     alt: discohook logo
   actions:
   - theme: brand
-    text: Get Started
+    text: Docs
     link: /content/discohook
   - theme: alt
-    text: View on GitHub
-    link: https://github.com/xyz/pqr
+    text: GitHub
+    link: https://github.com/jnsougata/discohook
 features: []
 ---
