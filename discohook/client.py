@@ -1,6 +1,6 @@
 import asyncio
-import inspect
 import base64
+import inspect
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 
 import aiohttp

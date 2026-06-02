@@ -1,4 +1,4 @@
-import asyncio
+import inspect
 from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Dict, List,
                     Optional, Union)
 
@@ -15,18 +15,13 @@ if TYPE_CHECKING:
 
 class SubCommand:
     """
-    A class representing a discord application command subcommand.
+    Discord application command subcommand class.
 
-    Parameters
-    ----------
-    name: str
-        The name of the subcommand.
-    description: str
-        The description of the subcommand.
-    options: List[Option] | None
-        The options of the subcommand.
-    handler: `AsyncCallable` | None
-        The callback of the subcommand.
+    Args:
+        name (str): Name of the subcommand.
+        description (str): Description of the subcommand.
+        options (List[Option] | None): Options of the subcommand.
+        handler (Handler): Handler for the subcommand.
     """
 
     def __init__(
@@ -53,11 +48,11 @@ class SubCommand:
 
     def on_error(self):
         """
-        A decorator that adds an error handler to a specific command or component.
+        Decorator that adds an error handler to a specific command or component.
         """
 
         def decorator(coro: Callable[["Interaction"], None]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("error handler must be a coroutine")
             self.handler._error_handler = coro
 
@@ -65,11 +60,11 @@ class SubCommand:
 
     def check(self):
         """
-        A decorator that adds a check to the command.
+        Decorator that adds a check to the command.
         """
 
         def decorator(coro: Callable[["Interaction"], bool]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
             self.handler.checks.append(coro)  # noqa
             return self
@@ -80,7 +75,7 @@ class SubCommand:
         self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
     ):
         """
-        A decorator to register a callback for the subcommand's autocomplete options.
+        Decorator to register a callback for a subcommand's autocomplete options.
         """
         self.autocompletion_handler = Handler(self.name, coro)
         return coro
@@ -97,32 +92,26 @@ class SubCommand:
 
 
 class SubCommandGroup:
+    """
+    Barely need it.
+    """
     pass
 
 
 # noinspection PyShadowingBuiltins
 class ApplicationCommand:
     """
-    A class representing a discord application command.
+    Discord application command class.
 
-    Parameters
-    ----------
-    name: str
-        The name of the command.
-    description: str | None
-        The description of the command. Does not apply to user & message commands.
-    options: List[Option] | None
-        The options of the command. Does not apply to user & message commands.
-    nsfw: bool
-        Whether the command is age restricted. Defaults to False.
-    permissions: List[Permission] | None
-        The default permissions of the command.
-    type: ApplicationCommandType
-        The category of the command. Defaults to slash commands.
-    integration_types: List[ApplicationIntegrationType] | None
-         Installation context(s) where the command is available. only for globally-scoped commands.
-    contexts: List[InteractionContextType] | None
-         Interaction context(s) where the command can be used, only for globally-scoped commands.
+    Args:
+        name (str): Name of the command.
+        description (str | None): Description of the command. Does not apply to user and message commands.
+        options (List[Option] | None): Options of the command. Does not apply to user & message commands.
+        nsfw (bool): Whether the command is nsfw. Defaults to False.
+        permissions (List[Permission] | None): Permissions of the command. Defaults to None.
+        type (ApplicationCommandType): Type of the command. Defaults to slash commands.
+        integration_types (List[ApplicationIntegrationType] | None): Integrations of the command. Defaults to None.
+        contexts (List[InteractionContextType] | None): Contexts of the command. Defaults to None.
     """
 
     def __init__(
@@ -166,11 +155,11 @@ class ApplicationCommand:
 
     def check(self):
         """
-        A decorator that adds a check to the command.
+        Decorator that adds a check to the command.
         """
 
         def decorator(coro: Callable[["Interaction"], bool]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
             self.handler.checks.append(coro)  # noqa
             return self
@@ -179,11 +168,11 @@ class ApplicationCommand:
 
     def on_error(self):
         """
-        A decorator that adds an error handler to a specific command or component.
+        Decorator that adds an error handler to a specific command or component.
         """
 
         def decorator(coro: Callable[["Interaction"], None]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("error handler must be a coroutine")
             self.handler._error_handler = coro
 
@@ -193,7 +182,7 @@ class ApplicationCommand:
         self, coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]
     ):
         """
-        A decorator to register a callback for the command's autocomplete options.
+        Decorator to register a callback for the command's autocomplete options.
         """
         self.autocompletion_handler = Handler(self.name, coro)
         return coro
@@ -206,21 +195,16 @@ class ApplicationCommand:
         options: Optional[List[Option]] = None,
     ):
         """
-        A decorator to register a subcommand for the command.
+        Decorator to register a subcommand for the command.
 
-        Parameters
-        ----------
-        name: str
-            The name of the subcommand. If not provided, it will be resolved from the callback's name.
-        description: Optional[str]
-            The description of the subcommand. If not provided, it will be resolved from the callback's docstring.
-        options: Optional[List[Option]]
-            The options of the subcommand.
+        Args:
+            name (str): Name of the subcommand.
+            description (str): Description of the subcommand.
+                If not provided, it will be resolved from the callback's name.
+            options (List[Option] | None): Options of the subcommand.
 
-        Raises
-        ------
-        TypeError
-            If the callback is not a coroutine.
+        Raises:
+            TypeError: If the callback is not a coroutine.
         """
 
         def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
@@ -233,7 +217,7 @@ class ApplicationCommand:
                 handler=Handler(self.name, coro),
             )
             self.options.append(subcommand)
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("subcommand callback must be a coroutine")
             self.subcommands[resolved_name] = subcommand
             return subcommand
@@ -242,13 +226,10 @@ class ApplicationCommand:
 
     def to_dict(self) -> Dict[str, Any]:
         """
-        Converts the command to a dictionary.
+        Converts the command to a dictionary. Not intended for use by end-users.
 
-        This is used to send the command to the Discord API. Not intended for use by end-users.
-
-        Returns
-        -------
-        Dict[str, Any]
+        Returns:
+            Dictionary of the command object.
         """
         self.data["name"] = self.name
         self.data["type"] = self.type
@@ -281,7 +262,7 @@ def slash(
     contexts: Optional[List[InteractionContextType]] = None,
 ):
     """
-    A decorator to register a slash command with its callback.
+    Decorator to create a slash command with its callback.
     """
 
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
@@ -310,7 +291,7 @@ def user(
     contexts: Optional[List[InteractionContextType]] = None,
 ):
     """
-    A decorator to register a user command with its callback.
+    Decorator to create a user command with its callback.
     """
 
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):
@@ -338,7 +319,7 @@ def message(
     contexts: Optional[List[InteractionContextType]] = None,
 ):
     """
-    A decorator to register a message command with its callback.
+    Decorator to create a message command with its callback.
     """
 
     def decorator(coro: Callable[["Interaction", Any], Coroutine[Any, Any, Any]]):

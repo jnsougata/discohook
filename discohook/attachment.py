@@ -6,7 +6,7 @@ import aiohttp
 class Attachment:
     """
     Represents a discord file attachment.
-    
+
     Attributes:
         id (str): ID of attachment.
         filename (str): Filename of attachment.
@@ -24,6 +24,7 @@ class Attachment:
         placeholder (str): Placeholder of attachment.
         placeholder_version (int): Placeholder version of attachment.
     """
+
     def __init__(self, data: dict) -> None:
         self.id: str = data["id"]
         self.filename: str = data["filename"]
@@ -44,7 +45,7 @@ class Attachment:
     async def read(self) -> bytes:
         """
         Reads content of attachment.
-        
+
         Returns:
             bytes: Content of attachment in bytes.
         """
@@ -55,7 +56,7 @@ class Attachment:
     async def iter(self) -> aiohttp.StreamReader:
         """
         Creates an asynchronous generator.
-        
+
         Returns:
             aiohttp.StreamReader: Asynchronous generator.
         """
