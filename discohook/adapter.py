@@ -58,7 +58,7 @@ class InteractionResponse:
 
 class FollowupResponse:
     """
-    Represents a followup message sent by an interaction, subclassed from :class:`Message`.
+    Represents a followup message sent by an interaction.
     """
 
     def __init__(self, payload: Dict[str, Any], interaction: "Interaction") -> None:
