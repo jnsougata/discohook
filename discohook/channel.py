@@ -17,14 +17,10 @@ class PartialChannel:
     """
     Represents a partial discord channel object.
 
-    Parameters
-    ----------
-    channel_id: str
-        The channel's ID.
-    guild_id: str | None
-        The guild's ID.
-    client: :class:`Client`
-        The client that the channel belongs to.
+    Args:
+        channel_id (str): ID of the channel.
+        guild_id (str | None): Guild id of the channel.
+        client (Client): Client that the channel belongs to.
     """
 
     def __init__(
@@ -40,11 +36,10 @@ class PartialChannel:
     @property
     def mention(self) -> str:
         """
-        Returns the channel-mentionable string.
+        Builds channel mention formatting.
 
-        Returns
-        -------
-        :class:`str`
+        Returns:
+            str: String representation of the channel mention.
         """
         return f"<#{self.id}>"
 
@@ -52,10 +47,11 @@ class PartialChannel:
         """
         Sends a message to the channel.
 
-        Parameters
-        ----------
-        components:
-            The components to send in the message.
+        Args:
+            components (Tuple(TopLevelComponent)): The components to send in the message.
+
+        Returns:
+            Message: Message object returned by the API.
         """
 
         payload = _prepare_payload(View.from_children(*components))
@@ -63,11 +59,12 @@ class PartialChannel:
         data = await resp.json()
         return Message(self.client, data)
 
+    # noinspection PyShadowingBuiltins
     async def edit(
         self,
         *,
         name: Optional[str] = None,
-        kind: Optional[ChannelType] = None,
+        type: Optional[ChannelType] = None,
         position: Optional[int] = None,
         topic: Optional[str] = None,
         nsfw: Optional[bool] = None,
@@ -91,61 +88,46 @@ class PartialChannel:
         """
         Edits all kinds of channels.
 
-        Parameters
-        ----------
-        name: Optional[:class:`str`]
-            The new name of the channel.
-        kind: Optional[:class:`ChannelType`]
-            The new type of the channel.
-        position: Optional[:class:`int`]
-            The new position of the channel.
-        topic: Optional[:class:`str`]
-            The new topic of the channel.
-        nsfw: Optional[:class:`bool`]
-            Whether the channel should be marked as nsfw.
-        rate_limit_per_user: Optional[:class:`int`]
-            The duration of the slowmode in seconds. Must be between 0 and 21600. Applies to text and forum channels.
-        bitrate: Optional[:class:`int`]
-            The new bitrate of the channel. Must be between 8000 and 96000. Applies to voice channels.
-        user_limit: Optional[:class:`int`]
-            The new user limit of the channel. Must be between 0 and 99. Applies to voice channels.
-        permission_overwrites: Optional[List[:class:`dict`]]
-            A list of permission overwrites to apply to the channel. Applies to all channel types.
-        parent_id: Optional[:class:`str`]
-            The id of the parent category to move the channel to. Applies to all channel types.
-        rtc_region: Optional[:class:`str`]
-            The new region of the channel. Applies to voice channels.
-        video_quality_mode: Optional[:class:`int`]
-            The new video quality mode of the channel. Applies to voice channels.
-        default_auto_archive_duration: Optional[:class:`int`]
-            The new default auto archive duration of the channel. Applies to text and forum channels.
-        flags: Optional[:class:`int`]
-            The new flags of the channel. Applies to all channel types.
-        available_tags: Optional[List[:class:`dict`]]
-            The new available tags of the channel. Applies to text and forum channels.
-        icon: Optional[:class:`str`]
-            The new icon of the channel. Applies to Group DMs. Must be a base64 encoded string.
-        default_reaction_emoji: Optional[:class:`PartialEmoji`]
-            The new default reaction emoji of the channel. Applies to text and forum channels.
-        default_thread_rate_limit_per_user: Optional[:class:`int`]
-            The new default thread rate limit per user of the channel. Applies to text and forum channels.
-        default_sort_order: Optional[:class:`int`]
-            The new default sort order of the channel. Applies to text and forum channels.
-        default_forum_layout: Optional[:class:`int`]
-            The new default forum layout of the channel. Applies to text and forum channels.
-        reason: Optional[:class:`str`]
-            The reason for the edit. This will be shown in the audit log.
+        Args:
+            name (str | None): Updated name of the channel.
+            type (ChannelType): Updated type of the channel.
+            position (int | None): Updated position of the channel.
+            topic (str | None): Updated topic of the channel.
+            nsfw (bool | None): Whether the channel should be marked as NSFW.
+            rate_limit_per_user (int | None): Updated rate limit per user.
+                Must be between 0 and 21600. Applies to text and forum channels.
+            bitrate (int | None): Updated bitrate of the channel.
+                Must be between 8000 and 96000. Applies to voice channels.
+            user_limit (int | None): Updated user limit of the channel.
+                Must be between 0 and 99. Applies to voice channels.
+            permission_overwrites (List[dict] | None): Updated list permission overwrites to apply.
+            parent_id (str | None): ID of the parent category to move the channel to.
+            rtc_region (str | None): Updated region of the channel. Applies to voice channels.
+            video_quality_mode (int | None): New video quality mode of the channel. Applies to voice channels.
+            default_auto_archive_duration (int | None): Updated default auto archive duration of the channel.
+                Applies to text and forum channels.
+            flags (int | None): Updated flags of the channel. Applies to all channel types.
+            available_tags (List[dict] | None): Updated available tags of the channel.
+                Applies to text and forum channels.
+            icon (str | None): Updated icon of the channel. Applies to Group DMs. Must be a base64 encoded string.
+            default_reaction_emoji (PartialEmoji | None): Updated default reaction emoji of the channel.
+                Applies to text and forum channels.
+            default_thread_rate_limit_per_user (int | None): Updated default thread rate limit per user of the channel.
+                Applies to text and forum channels.
+            default_sort_order (int | None): Updated default sort order of the channel.
+                Applies to text and forum channels.
+            default_forum_layout (int | None): Updated default forum layout of the channel.
+                Applies to text and forum channels.
+            reason (str | None): The reason for the edit. This will be shown in the audit log.
 
-        Returns
-        -------
-        :class:`Channel`
-            The edited channel.
+        Returns:
+            Channel: Updated channel.
         """
         payload = {}
         if name:
             payload["name"] = name
-        if kind:
-            payload["type"] = kind
+        if type:
+            payload["type"] = type
         if position:
             payload["position"] = position
         if topic:
@@ -190,17 +172,13 @@ class PartialChannel:
 
     async def fetch_message(self, message_id: str) -> Optional[Message]:
         """
-        Fetches a message from the channel.
+        Fetches a message by its id from the channel.
 
-        Parameters
-        ----------
-        message_id: :class:`str`
-            The id of the message to fetch.
+        Args:
+            message_id (str): The id of the message to fetch.
 
-        Returns
-        -------
-        :class:`Message`
-            The fetched message.
+        Returns:
+            Message: Message fetched from the channel.
         """
         resp = await self.client.http.get_channel_message(self.id, message_id)
         data = await resp.json()
@@ -215,23 +193,16 @@ class PartialChannel:
         after: Optional[str] = None,
     ) -> List[Message]:
         """
-        Fetches messages from the channel.
+        Fetch multiple messages from the channel.
 
-        Parameters
-        ----------
-        limit: Optional[:class:`int`]
-            The maximum amount of messages to fetch.
-        around: Optional[:class:`str`]
-            The id of the message to fetch around.
-        before: Optional[:class:`str`]
-            The id of the message to fetch before.
-        after: Optional[:class:`str`]
-            The id of the message to fetch after.
+        Args:
+            limit (int): Maximum number of messages to fetch.
+            around (str): ID of the message to fetch around.
+            before (str): ID of the message to fetch before.
+            after (str): ID of the message to fetch after.
 
-        Returns
-        -------
-        List[:class:`Message`]
-            The fetched messages.
+        Returns:
+            List[Message]: Messages fetched from the channel.
         """
         params = {"limit": limit}
         if before:
@@ -254,25 +225,17 @@ class PartialChannel:
         reason: Optional[str] = None,
     ) -> List[Message]:
         """
-        Deletes messages from the channel in bulk.
+        Delete messages from the channel in bulk.
 
-        Parameters
-        ----------
-        limit: Optional[:class:`int`]
-            The maximum amount of messages to delete.
-        before: Optional[:class:`str`]
-            The id of the message to delete before.
-        after: Optional[:class:`str`]
-            The id of the message to delete after.
-        around: Optional[:class:`str`]
-            The id of the message to delete around.
-        reason: Optional[:class:`str`]
-            The reason for the deletion. This will be shown in the audit log.
+        Args:
+            limit (int): Maximum number of messages to purge.
+            around (str): ID of the message to purge around.
+            before (str): ID of the message to purge before.
+            after (str): ID of the message to purge after.
+            reason (str): The reason for the purge. This will be shown in the audit log.
 
-        Returns
-        -------
-        List[:class:`Message`]
-            The deleted messages.
+        Returns:
+            List[Message]: Messages purged from the channel.
         """
         messages = await self.fetch_messages(
             limit=limit, before=before, after=after, around=around
@@ -287,9 +250,24 @@ class PartialChannel:
         return messages
 
     async def delete(self, *, reason: Optional[str] = None):
+        """
+        Deletes the channel.
+
+        Args:
+            reason (str): The reason for the purge. This will be shown in the audit log.
+        """
         await self.client.http.delete_or_close_channel(self.id, reason=reason)
 
     async def crosspost(self, message_id: str):
+        """
+        Crosspost a message in the channel.
+
+        Args:
+            message_id (str): The id of the message to crosspost.
+
+        Returns:
+            Message: Message crossposted from the channel.
+        """
         resp = await self.client.http.crosspost_message(self.id, message_id)
         data = await resp.json()
         return Message(self.client, data)
@@ -306,21 +284,18 @@ class PartialChannel:
         """
         Creates a thread from the channel.
 
-        Parameters
-        ----------
-        name: :class:`str`
-            The name of the thread.
-        auto_archive_duration: Optional[:class:`int`]
-            The duration in minutes to automatically archive the thread after recent activity.
-        invitable: Optional[:class:`bool`]
-            Whether non-moderators can add other non-moderators to the thread.
-        rate_limit_per_user: Optional[:class:`int`]
-            Amount of seconds a user has to wait before sending another message (0-21600)
-        reason
+        Args:
+            name (str): Name of the thread.
+            auto_archive_duration (int): The duration in minutes to automatically archive the thread.
+                Defaults to 60.
+            invitable (bool): Whether non-moderators can add other non-moderators to the thread.
+                Defaults to True.
+            rate_limit_per_user (int): Amount of seconds a user has to wait before
+                sending another message (0-21600). Defaults to 0.
+            reason (str | None): The reason for the action. This will be shown in the audit log.
 
-        Returns
-        -------
-
+        Returns:
+            Channel: Thread channel.
         """
         payload = {
             "name": name,
@@ -343,75 +318,40 @@ class Channel(PartialChannel):
     """
     Represents a discord channel object.
 
-    Attributes
-    ----------
-    id: :class:`str`
-        The id of the channel.
-    type: Optional[:class:`int`]
-        The type of the channel.
-    guild_id: Optional[:class:`str`]
-        The id of the guild the channel belongs to.
-    position: Optional[:class:`int`]
-        The position of the channel.
-    permission_overwrites: Optional[List[:class:`dict`]]
-        A list of permission overwrites for the channel.
-    name: Optional[:class:`str`]
-        The name of the channel.
-    topic: Optional[:class:`str`]
-        The topic of the channel.
-    nsfw: Optional[:class:`bool`]
-        Whether the channel is nsfw.
-    last_message_id: Optional[:class:`str`]
-        The id of the last message sent in the channel.
-    bitrate: Optional[:class:`int`]
-        The bitrate of the channel if it is a voice channel.
-    user_limit: Optional[:class:`int`]
-        The user limit of the channel if it is a voice channel.
-    rate_limit_per_user: Optional[:class:`int`]
-        The rate limit per user of the channel if it is a text channel.
-    recipients: Optional[List[:class:`dict`]]
-        A list of recipients of the channel if it is a dm channel.
-    icon: Optional[:class:`str`]
-        The icon of the channel if it is a dm channel.
-    owner_id: Optional[:class:`str`]
-        The id of the owner of the channel if it is a dm channel.
-    application_id: Optional[:class:`str`]
-        The id of the application of the channel if it is a group dm channel.
-    parent_id: Optional[:class:`str`]
-        The id of the parent category of the channel.
-    last_pin_timestamp: Optional[:class:`str`]
-        The timestamp of the last pinned message in the channel.
-    rtc_region: Optional[:class:`str`]
-        The rtc region of the channel.
-    video_quality_mode: Optional[:class:`int`]
-        The video quality mode of the channel.
-    message_count: Optional[:class:`int`]
-        The message count of the channel.
-    member_count: Optional[:class:`int`]
-        The member count of the channel.
-    thread_metadata: Optional[:class:`dict`]
-        The thread metadata of the channel.
-    member: Optional[:class:`dict`]
-        The member of the channel. Appears in thread channels.
-    default_auto_archive_duration: Optional[:class:`int`]
-        The default auto archive duration of the channel. Appears in thread channels.
-    permissions: Optional[:class:`str`]
-        The permissions of the channel.
-    flags: Optional[:class:`int`]
-        The flags of the channel.
-    total_message_sent: Optional[:class:`int`]
-        The total message sent of the channel.
-    available_tags: Optional[List[:class:`str`]]
-        A list of available tags of the channel. Appears in thread channels.
-    default_reaction_emoji: Optional[:class:`dict`]
-        The default reaction emoji of the channel. Appears in thread channels.
-    default_thread_rate_limit_per_user: Optional[:class:`int`]
-        The default rate limit per user of the channel. Appears in thread channels.
-    default_sort_order: Optional[:class:`int`]
-        The default sort order of the channel.Appears in forum channels.
-    default_forum_layout: Optional[:class:`int`]
-        The default channel layout of the channel.Appears in forum channels.
-
+    Attributes:
+        id (str): ID of the channel.
+        type (int): Type of the channel.
+        guild_id (str): ID of the guild the channel belongs to.
+        position (int): Position of the channel in the guild.
+        permission_overwrites (List[dict]): A list of permission overwrites for the channel.
+        name (str): Name of the channel.
+        topic (str): Topic of the channel.
+        nsfw (bool): Whether the channel is NSFW.
+        last_message_id (str): ID of the last message sent in the channel.
+        bitrate (int): Bitrate of the channel if it is a voice channel.
+        user_limit (int): User limit of the channel if it is a voice channel.
+        rate_limit_per_user (int): Rate limit per user of the channel if it is a text channel.
+        recipients (List[dict]): A list of recipients of the channel if it is a DM channel.
+        icon (str): Icon of the channel if it is a DM channel.
+        owner_id (str): ID of the owner of the channel if it is a DM channel.
+        application_id (str): ID of the application of the channel if it is a group DM channel.
+        parent_id (str): ID of the parent category of the channel.
+        last_pin_timestamp (str): Timestamp of the last pinned message in the channel.
+        rtc_region (str): RTC region of the channel.
+        video_quality_mode (int): Video quality mode of the channel.
+        message_count (int): Message count of the channel.
+        member_count (int): Member count of the channel.
+        thread_metadata (dict): Thread metadata of the channel.
+        member (dict): Member of the channel. Appears in thread channels.
+        default_auto_archive_duration (int): Default auto archive duration of the channel. Appears in thread channels.
+        permissions (str): Permissions of the channel.
+        flags (int): Flags of the channel.
+        total_message_sent (int): Total message sent of the channel.
+        available_tags (List[str]): A list of available tags of the channel. Appears in thread channels.
+        default_reaction_emoji (dict): Default reaction emoji of the channel. Appers in thread channels.
+        default_thread_rate_limit_per_user (int): Default rate limit per user of the channel. Appears in thread channels.
+        default_sort_order (int): Default sort order of the channel. Appears in forum channels.
+        default_forum_layout (int): Default channel layout of the channel. Appears in forum channels.
     """
 
     def __init__(self, client: "Client", data: dict):
@@ -455,8 +395,28 @@ class Channel(PartialChannel):
 
     @classmethod
     async def from_response(cls, client: "Client", response: aiohttp.ClientResponse):
+        """
+        Create a channel object from an aiohttp response.
+
+        Args:
+            client (Client): Client object.
+            response (aiohttp.ClientResponse): Response to create the channel from.
+
+        Returns:
+            Channel: Channel object.
+        """
         return cls(client, await response.json())
 
     @classmethod
     def from_dict(cls, client: "Client", data: dict):
+        """
+        Create a channel object from a dictionary.
+
+        Args:
+            client (Client): Client object.
+            data (dict): Dictionary to create the channel from.
+
+        Returns:
+            Channel: Channel object.
+        """
         return cls(client, data)

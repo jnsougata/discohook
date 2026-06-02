@@ -199,10 +199,10 @@ class ResponseAdapter:
 
         Args:
             ephemeral (bool): Whether the successive responses should be ephemeral or not
-            (only for Application Commands or `thinking` is `True`)
+                (only for Application Commands or `thinking` is `True`)
             thinking (bool): Whether to send a new "is thinking..." message to be edited later
-            (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) or do nothing to edit the original message later
-            (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
+                (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) or do nothing to edit the original message later
+                (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
             with_response (bool): Whether to get a response message or not.
 
         Returns:
