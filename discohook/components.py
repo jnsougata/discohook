@@ -484,6 +484,4 @@ class Label:
         }
 
 
-TopLevelComponent = Union[
-    str, TextDisplay, ActionRow, Section, Container, Separator, File, MediaGallery
-]
+TopLevelComponent = Union[str, TextDisplay, ActionRow, Section, Container, Separator, File, MediaGallery]

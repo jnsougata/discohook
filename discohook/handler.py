@@ -1,4 +1,4 @@
-import asyncio
+import inspect
 from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 if TYPE_CHECKING:
@@ -23,7 +23,7 @@ class Handler:
             The callback function to be called when the interaction is received.
         """
         self.id = id
-        if not asyncio.iscoroutinefunction(callback):
+        if not inspect.iscoroutinefunction(callback):
             raise TypeError("Callback must be a coroutine.")
         self.callback = callback
         self.checks: List[Callable[["Interaction"], bool]] = []
@@ -48,7 +48,7 @@ class Handler:
         """
 
         def decorator(coro: Callable[["Interaction"], bool]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
             self.checks.append(coro)  # noqa
             return coro
@@ -61,7 +61,7 @@ class Handler:
         """
 
         def decorator(coro: Callable[["Interaction"], None]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("error handler must be a coroutine")
             self._error_handler = coro
 

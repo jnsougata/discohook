@@ -29,7 +29,13 @@ class InteractionResponse:
         ],
     ):
         """
-        Patches the response message.
+        Edits an interaction response.
+
+        Args:
+            components: The components to use in the edited response.
+
+        Returns:
+            Message: The edited response message.
         """
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
@@ -72,6 +78,12 @@ class FollowupResponse:
     async def edit(self, *components: TopLevelComponent):
         """
         Edits the followup response message.
+
+        Args:
+            components (Tuple[TopLevelComponent]): The components to use in the edited response.
+
+        Returns:
+            Message: The edited response message.
         """
         resp = await self.interaction.client.http.edit_webhook_message(
             self.interaction.application_id,
@@ -81,6 +93,7 @@ class FollowupResponse:
         )
         data = await resp.json()
         self.message = Message(self.interaction.client, data)
+        return self.message
 
 
 class ResponseAdapter:
@@ -97,6 +110,17 @@ class ResponseAdapter:
         with_response: bool = False,
         ephemeral: bool = False,
     ):
+        """
+        Sends a response to the interaction
+
+        Args:
+            components: The components to use in the response.
+            with_response (bool): Whether to get a response message or not.
+            ephemeral (bool): Whether the response should be ephemeral or not (only for application commands).
+
+        Returns:
+            InteractionResponse: The interaction response object for further actions.
+        """
         await self.interaction.client.http.create_interaction_response(
             self.interaction.id,
             self.interaction.token,
@@ -116,16 +140,12 @@ class ResponseAdapter:
         """
         Sends a modal to the interaction
 
-        Parameters
-        ----------
-        modal: Modal
-            The modal to send
-        with_response: bool
-            Whether to include an interaction callback object as the response.
+        Args:
+            modal (Modal): The modal to send.
+            with_response (bool):  Whether to get a response message or not.
 
-        Returns
-        -------
-        InteractionResponse
+        Returns:
+            InteractionResponse: The interaction response object for further actions.
         """
         if self.interaction.type not in (
             InteractionType.component,
@@ -148,12 +168,12 @@ class ResponseAdapter:
         """
         Sends autocomplete choices to the interaction (max 25)
 
-        Parameters
-        ----------
-        choices: List[Choice]
-            The choices to send
-        with_response: bool
-            Whether to include an interaction callback object as the response.
+        Args:
+            choices (List[Choice]): The choices to send with autocomplete response.
+            with_response (bool): Whether to get a response message or not.
+
+        Raises:
+            InteractionTypeMismatch: If the method is not supported for the current interaction type.
         """
         if self.interaction.type != InteractionType.autocomplete:
             raise InteractionTypeMismatch(
@@ -175,19 +195,18 @@ class ResponseAdapter:
         with_response: bool = False,
     ) -> InteractionResponse:
         """
-        Defers the interaction
+        Defers the interaction.
 
-        Parameters
-        ----------
-        ephemeral: bool
-            Whether the successive responses should be ephemeral or not
+        Args:
+            ephemeral (bool): Whether the successive responses should be ephemeral or not
             (only for Application Commands or `thinking` is `True`)
-        thinking: bool
-            Whether to send a new "is thinking..." message to be edited later
+            thinking (bool): Whether to send a new "is thinking..." message to be edited later
             (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) or do nothing to edit the original message later
             (DEFERRED_UPDATE_MESSAGE). Not available for application commands.
-        with_response: bool
-            Whether to include an interaction callback object as the response.
+            with_response (bool): Whether to get a response message or not.
+
+        Returns:
+            InteractionResponse: The interaction response object for further actions.
         """
         payload = {}
         if (
@@ -223,8 +242,8 @@ class ResponseAdapter:
 
     async def require_premium(self, with_response: bool = False):
         """
-        Prompts the user that a premium purchase is required for this interaction
-        This method is only available for applications with a premium SKU set up
+        Prompts the user that a premium purchase is required for this interaction.
+        This method is only available for applications with a premium SKU set up.
         """
         if self.interaction.type == InteractionType.autocomplete:
             raise InteractionTypeMismatch(
@@ -247,18 +266,12 @@ class ResponseAdapter:
         Edits the original message of the interaction.
         Only available for buttons, select menus, and modal submission interactions.
 
-        Parameters
-        ----------
-        *components:
-            The components to include in the response message.
-        with_response: bool
-            Whether to return the original message as a response object.
+        Args:
+            components (Tuple(TopLevelComponent)): The components to include in the response message.
+            with_response (bool): Whether to get a response message or not.
 
-        Returns
-        -------
-        InteractionResponse
-            The response object containing the edited message.
-
+        Returns:
+            InteractionResponse: The interaction response object for further actions.
         """
         if not (
             self.interaction.type == InteractionType.component
@@ -282,15 +295,11 @@ class ResponseAdapter:
         """
         Sends a followup message to the interaction.
 
-        Parameters
-        ----------
-        components:
-            The components to include in the followup message.
+        Args:
+            components (Tuple(TopLevelComponent)): The components to include in the response message.
 
-        Returns
-        -------
-        FollowupResponse
-            The followup response object containing additional methods.
+        Returns:
+            FollowupResponse: The followup response object for further actions.
 
         """
         payload = _prepare_payload(View.from_children(*components))

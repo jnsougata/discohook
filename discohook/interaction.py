@@ -60,6 +60,7 @@ class Interaction:
         self._parsed_options = None
         self.focused_option_name: Optional[str] = None
         self._error = None
+        self.custom_id: Optional[str] = None
 
     @property
     def error(self) -> Optional[Exception]:
@@ -73,7 +74,7 @@ class Interaction:
         return self._error
 
     @property
-    def tb(self) -> Optional[str]:
+    def traceback(self) -> Optional[str]:
         """
         The traceback of the error that occurred during the interaction
 
@@ -250,7 +251,7 @@ class Interaction:
         """
         ctx = self.payload.get("context")
         if ctx is None:
-            return
+            return None
         return InteractionContextType(int(ctx))
 
     @property
@@ -282,7 +283,7 @@ class Interaction:
     def guild(self) -> Optional[PartialGuild]:
         if not self.guild_id:
             return None
-        return PartialGuild(self.client, self.guild_id)
+        return PartialGuild(self.client, self.guild_id) if self.guild_id else None
 
     @property
     def message(self) -> Optional[Message]:
