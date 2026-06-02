@@ -9,18 +9,13 @@ class Button:
     """
     Represents a discord button type component.
 
-    Parameters
-    ----------
-    label: str | None
-        The text to be displayed on the button.
-    url: str | None
-        The url to be opened when the button is clicked if the style is set to :attr:`ButtonStyle.link`.
-    style: :class:`ButtonStyle`
-        The style of the button.
-    disabled: :class:`bool`
-        Whether the button is disabled or not.
-    emoji: :class:`str` | :class:`PartialEmoji` | None
-        The emoji to be displayed on the button.
+    Attributes:
+        label (str): Label of the button.
+        url (str | None): Url to be opened for `ButtonStyle.link`.
+        style (ButtonStyle): Style of the button.
+        disabled (bool): Whether the button is disabled or not.
+        emoji (PartialEmoji): Emoji object for the button.
+        handler (Handler): Handler for the button.
     """
 
     def __init__(
@@ -33,6 +28,17 @@ class Button:
         emoji: Optional[Union[str, PartialEmoji]] = None,
         handler: Optional[Handler] = None,
     ):
+        """
+        Initialize the button.
+
+        Args:
+            label (str | None): Label of the button.
+            url (str | None): Url to be opened for `ButtonStyle.link`.
+            style (ButtonStyle): Style of the button.
+            disabled (bool): Whether the button is disabled or not.
+            emoji (str | PartialEmoji | None): Emoji to be displayed on the button.
+
+        """
         self.handler = handler
         self.url = url
         self.label = label
@@ -42,14 +48,12 @@ class Button:
 
     def to_dict(self) -> Dict[str, Any]:
         """
-        Returns a dictionary representation of the button.
+        Builds a dictionary representation of the button.
 
-        This is used internally by the library. You should not need to use this method.
+        This is used internally by the library. It is rarely required for general purpose use cases.
 
-        Returns
-        -------
-        :class:`dict`
-            The dictionary representation of the button.
+        Returns:
+            dict: Dictionary representation of the button.
         """
         assert self.label or self.emoji, "label or emoji must be provided"
         payload = {
