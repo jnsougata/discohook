@@ -224,7 +224,7 @@ class Client(Starlette):
             components (Tuple[TopLevelComponent]): Components to send in the message.
 
         Returns:
-            Message object.
+            Message: Message object.
         """
         if not channel_id.isdigit():
             raise TypeError("Channel ID must be a snowflake.")
@@ -236,7 +236,7 @@ class Client(Starlette):
         Fetch the client as a discord user.
 
         Returns:
-              Client as a discord user.
+              User: Client as a discord user.
         """
         resp = await self.http.get_user(str(self.application_id))
         return User(self, await resp.json())
@@ -248,6 +248,9 @@ class Client(Starlette):
         Args:
             username (str): Updated username.
             avatar (str | None): Updated avatar of the client user in base64 data URI scheme. Defaults to None.
+
+        Returns:
+            aiohttp.ClientResponse: Updated client user.
         """
         payload = {"username": username}
         if avatar:
@@ -304,7 +307,7 @@ class Client(Starlette):
             reason (str | None): Reason for creating the webhook. This will be shown in the audit log.
 
         Returns:
-            Webhook object.
+            Webhook: Webhook object.
         """
         resp = await self.http.create_webhook(
             channel_id, {"name": name, "avatar": image_base64}, reason=reason
@@ -323,7 +326,7 @@ class Client(Starlette):
             webhook_token (str | None): Token of the webhook to fetch.
 
         Returns:
-            Webhook object.
+            Webhook: Webhook object.
         """
         resp = await self.http.get_webhook(webhook_id, webhook_token)
         return Webhook(await resp.json(), self)
@@ -339,7 +342,7 @@ class Client(Starlette):
             with_counts (bool): Whether the guild count is returned or not.
 
         Returns:
-            Guild object or None.
+            Guild | None: Guild object or None.
         """
         resp = await self.http.get_guild(
             guild_id, with_counts="true" if with_counts else "false"
@@ -357,7 +360,7 @@ class Client(Starlette):
             user_id (str): ID of the user to fetch.
 
         Returns:
-            User object or None.
+            User | None: User object or None.
         """
         resp = await self.http.get_user(user_id)
         data = await resp.json()
@@ -373,7 +376,7 @@ class Client(Starlette):
             channel_id (str): ID of the channel to fetch.
 
         Returns:
-            Channel object or None.
+            Channel: Channel object or None.
         """
         resp = await self.http.get_channel(channel_id)
         data = await resp.json()
@@ -386,7 +389,7 @@ class Client(Starlette):
         Fetches the commands of the client.
 
         Returns:
-            Aiohttp response object.
+            aiohttp.ClientResponse: Aiohttp response object.
         """
         resp = await self.http.get_global_application_commands(str(self.application_id))
         return await resp.json()
@@ -396,7 +399,7 @@ class Client(Starlette):
         Fetches the application object associated with the requesting client user.
 
         Returns:
-            Aiohttp response object.
+            aiohttp.ClientResponse: Aiohttp response object.
         """
         resp = await self.http.get_current_application()
         return await resp.json()
@@ -404,6 +407,9 @@ class Client(Starlette):
     async def fetch_application_emojis(self):
         """
         Fetch all emojis from the client.
+
+        Returns:
+            aiohttp.ClientResponse: Aiohttp response object.
         """
         resp = await self.http.list_application_emojis()
         return await resp.json()
@@ -416,7 +422,7 @@ class Client(Starlette):
             emoji_id (str): ID of the emoji.
 
         Returns:
-            Aiohttp response object.
+            aiohttp.ClientResponse: Aiohttp response object.
         """
         resp = await self.http.get_application_emoji(emoji_id)
         return await resp.json()
@@ -433,7 +439,7 @@ class Client(Starlette):
             image_type (str): Image type of the emoji. (e.g. "png", "jpeg", "gif")
 
         Returns:
-            PartialEmoji object.
+            PartialEmoji: PartialEmoji object.
         """
         data_uri = f"data:image/{image_type};base64,{base64.b64encode(image).decode()}"
         resp = await self.http.create_application_emoji(
@@ -455,7 +461,7 @@ class Client(Starlette):
             name (str): Name of the emoji.
 
         Returns:
-            Aiohttp response object.
+            aiohttp.ClientResponse: Aiohttp response object.
         """
         await self.http.modify_application_emoji(emoji_id, name)
 
@@ -467,6 +473,6 @@ class Client(Starlette):
             emoji_id (str): ID of the emoji.
 
         Returns:
-            Aiohttp response object.
+            aiohttp.ClientResponse: Aiohttp response object.
         """
         await self.http.delete_application_emoji(emoji_id)
