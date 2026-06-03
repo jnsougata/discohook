@@ -79,10 +79,6 @@ export default defineConfig({
                 "link": "/content/dashboard"
             },
             {
-                "text": "Embed",
-                "link": "/content/embed"
-            },
-            {
                 "text": "Emoji",
                 "link": "/content/emoji"
             },

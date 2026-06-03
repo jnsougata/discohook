@@ -229,7 +229,7 @@ class ApplicationCommand:
         Converts the command to a dictionary. Not intended for use by end-users.
 
         Returns:
-            Dictionary of the command object.
+            dict: Dictionary of the command object.
         """
         self.data["name"] = self.name
         self.data["type"] = self.type

@@ -16,10 +16,10 @@ title: discohook.common
 
 Represents a discord component.
 
-Parameters
-----------
-type: :class:`ComponentType`
-The type of the component.
+### Arguments
+
+- **type** (`ComponentType | None`): Type of the component.
+- **custom_id** (`str | None`): Custom ID of the component.
 
 ### Inheritance
 
@@ -46,7 +46,7 @@ The type of the component.
 check(self)
 ```
 
-A decorator that adds a check to a specific command or component.
+Decorator that adds a check to a specific command or component.
 
 <a id="interactable-error-handler"></a>
 #### `error_handler`
@@ -55,7 +55,7 @@ A decorator that adds a check to a specific command or component.
 error_handler(self)
 ```
 
-A decorator that adds an error handler to a specific command or component.
+Decorator that adds an error handler to a specific command or component.
 
 <a id="interactable-to-dict"></a>
 #### `to_dict`
@@ -64,5 +64,5 @@ A decorator that adds an error handler to a specific command or component.
 to_dict(self)
 ```
 
-Convert the component to a dict to be sent to discord. For internal use only.
+Convert the component to a dict. For internal use only.
 

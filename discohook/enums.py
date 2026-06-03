@@ -29,14 +29,11 @@ def try_enum(enum_class, value):
 
 class TextInputFieldLength(int, Enum):
     """
-    The length of a text input field for a modal.
+    Length of a text input field for a modal.
 
-    Attributes
-    ----------
-    short: :class:`int`
-        Used to specify a short length text input field (up to 100 characters).
-    long: :class:`int`
-        Used to specify a long length text input field (up to 3000 characters).
+    Attributes:
+        short (int): Used to specify a short text input field.
+        long (int): Used to specify a long text input field.
     """
 
     short = 1
@@ -45,14 +42,11 @@ class TextInputFieldLength(int, Enum):
 
 class ModalFieldType(int, Enum):
     """
-    The type of field in a modal.
-
+    Type of field in a modal.
     Used internally by the library. You should not need to use this.
 
-    Attributes
-    ----------
-    text_input: :class:`int`
-        Used to specify a text input field.
+    Attributes:
+        text_input (int): Used to specify a text input field.
     """
 
     text_input = 4
@@ -60,16 +54,12 @@ class ModalFieldType(int, Enum):
 
 class ApplicationCommandType(int, Enum):
     """
-    The type of application command.
+    Type of application command.
 
-    Attributes
-    ----------
-    slash: :class:`int`
-        Used to specify a slash command.
-    user: :class:`int`
-        Used to specify a user command.
-    message: :class:`int`
-        Used to specify a message command.
+    Attributes:
+        slash (int): Used to specify a slash command.
+        user (int): Used to specify a user command.
+        message (int): Used to specify a message command.
     """
 
     slash = 1
@@ -80,8 +70,7 @@ class ApplicationCommandType(int, Enum):
 
 class ApplicationCommandOptionType(int, Enum):
     """
-    The type of application command option.
-
+    Type of application command option.
     Used internally by the library. You should not need to use this.
     """
 
@@ -102,34 +91,20 @@ class ChannelType(int, Enum):
     """
     Use to specify discord channel type in application command Option.
 
-    Attributes
-    ----------
-    guild_text: :class:`int`
-        Used to specify a guild text channel.
-    dm: :class:`int`
-        Used to specify a dm channel.
-    guild_voice: :class:`int`
-        Used to specify a guild voice channel.
-    group_dm: :class:`int`
-        Used to specify a group dm channel.
-    guild_category: :class:`int`
-        Used to specify a guild category channel.
-    guild_announcement: :class:`int`
-        Used to specify a guild announcement channel.
-    guild_announcement_thread: :class:`int`
-        Used to specify a guild announcement thread channel.
-    public_thread: :class:`int`
-        Used to specify a guild public thread channel.
-    private_thread: :class:`int`
-        Used to specify a guild private thread channel.
-    guild_stage_voice: :class:`int`
-        Used to specify a guild stage voice channel.
-    guild_directory: :class:`int`
-        Used to specify a guild directory channel.
-    guild_forum: :class:`int`
-        Used to specify a guild forum channel.
-    guild_media: :class:`int`
-        Used to specify a guild media channel.
+    Attributes:
+        guild_text (int): Used to specify a guild text channel.
+        dm (int): Used to specify a dm channel.
+        guild_voice (int): Used to specify a guild voice channel.
+        group_dm (int): Used to specify a group dm channel.
+        guild_category (int): Used to specify a guild category channel.
+        guild_announcement (int): Used to specify a guild announcement channel.
+        guild_announcement_thread (int): Used to specify a guild announcement thread channel.
+        public_thread (int): Used to specify a guild public thread channel.
+        private_thread (int): Used to specify a guild private thread channel.
+        guild_stage_voice (int): Used to specify a guild stage voice channel.
+        guild_directory (int): Used to specify a guild directory channel.
+        guild_forum (int): Used to specify a guild forum channel.
+        guild_media (int): Used to specify a guild media channel.
     """
 
     guild_text = 0
@@ -149,8 +124,7 @@ class ChannelType(int, Enum):
 
 class InteractionType(int, Enum):
     """
-    The type of interaction received from discord.
-
+    Type of interaction received from discord.
     Used internally by the library. You should not need to use this.
     """
 
@@ -163,8 +137,7 @@ class InteractionType(int, Enum):
 
 class InteractionCallbackType(int, Enum):
     """
-    The type of interaction callback.
-
+    Type of interaction callback.
     Used internally by the library. You should not need to use this.
     """
 
@@ -181,8 +154,7 @@ class InteractionCallbackType(int, Enum):
 
 class ComponentType(int, Enum):
     """
-    The type of message component.
-
+    Type of message component.
     Used internally by the library. You should not need to use this.
     """
 
@@ -211,6 +183,13 @@ class ComponentType(int, Enum):
 class SelectType(int, Enum):
     """
     The type of select menu.
+
+    Attributes:
+        text (int): Used to specify a text select menu.
+        user (int): Used to specify a user select menu.
+        role (int): Used to specify a role select menu.
+        mentionable (int): Used to specify a mentionable select menu.
+        channel (int): Used to specify a channel select menu.
     """
 
     text = 3
@@ -224,22 +203,16 @@ class ButtonStyle(int, Enum):
     """
     Represents the style of a button.
 
-    Attributes
-    ----------
-    blurple: :class:`int`
-        Used to specify a blurple button.
-    grey: :class:`int`
-        Used to specify a grey button.
-    green: :class:`int`
-        Used to specify a green button.
-    red: :class:`int`
-        Used to specify a red button.
-    link: :class:`int`
-        Used to specify a link type button.
+    Attributes:
+        blurple (int): Used to specify a blurple button.
+        gray (int): Used to specify a gray button.
+        green (int): Used to specify a green button.
+        red (int): Used to specify a red button.
+        link (int): Used to specify a link type button.
     """
 
     blurple = 1
-    grey = 2
+    gray = 2
     green = 3
     red = 4
     link = 5
@@ -247,8 +220,7 @@ class ButtonStyle(int, Enum):
 
 class WebhookType(int, Enum):
     """
-    The type of webhook.
-
+    Type of webhook.
     Used internally by the library. You should not need to use this.
     """
 
@@ -261,7 +233,10 @@ class AllowedMentionsType(str, Enum):
     """
     The type of mentions allowed in a message.
 
-    Used internally by the library. You should not need to use this.
+    Attributes:
+        roles (int): Used to specify a role mentions allowed in a message.
+        users (int): Used to specify a user mentions allowed in a message.
+        everyone (int): Used to specify everyone mentions allowed in a message.
     """
 
     roles = "roles"
@@ -271,9 +246,12 @@ class AllowedMentionsType(str, Enum):
 
 class SelectDefaultValueType(str, Enum):
     """
-    The type of default value for a select menu.
+    Type of default values for a select menu.
 
-    Used internally by the library. You should not need to use this.
+    Attributes:
+        user (str): Used to specify a user default value for a select menu.
+        role (str): Used to specify a role default value for a select menu.
+        channel (str): Used to specify a channel default value for a select menu.
     """
 
     user = "user"
@@ -283,7 +261,12 @@ class SelectDefaultValueType(str, Enum):
 
 class InteractionContextType(int, Enum):
     """
-    The type of interaction context.
+    Type of interaction context.
+
+    Attributes:
+        guild (int): Used to specify a guild context.
+        bot_dm (int): Used to specify a bot dm context.
+        private_channel (int): Used to specify a private channel context.
     """
 
     guild = 0
@@ -294,6 +277,10 @@ class InteractionContextType(int, Enum):
 class ApplicationIntegrationType(int, Enum):
     """
     Installation context(s) where the command is available.
+
+    Attributes:
+        guild (int): Used to specify a guild context.
+        user (int): Used to specify a user context.
     """
 
     guild = 0
@@ -302,12 +289,10 @@ class ApplicationIntegrationType(int, Enum):
 
 class PollLayoutType(int, Enum):
     """
-    The type of layout for a poll.
+    Type of layout for a poll.
 
-    Attributes
-    ----------
-    default: :class:`int`
-        Used to specify the default layout.
+    Attributes:
+        default (int): Used to specify a default layout for a poll.
     """
 
     default = 1

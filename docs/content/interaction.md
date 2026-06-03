@@ -13,41 +13,7 @@ title: discohook.interaction
 
 **Qualified Name:** `discohook.interaction.Interaction`
 
-Base interaction class for all interactions
-
-Properties
-----------
-id: str
-The unique id of the interaction
-type: int
-The type of the interaction
-token: str
-The token of the interaction
-version: int
-The version of the interaction
-application_id: str
-The id of the application that the interaction was triggered for
-data: Optional[Dict[str, Any]]
-The command data payload (if the interaction is a command)
-guild_id: Optional[str]
-The guild id of the interaction
-channel_id: Optional[str]
-The channel id of the interaction
-app_permissions: Optional[int]
-The permissions of the application
-locale: Optional[str]
-The locale of the interaction
-guild_locale: Optional[str]
-The guild locale of the interaction
-created_at: int
-The timestamp when the interaction was created
-
-Parameters
-----------
-data: Dict[str, Any]
-The interaction data payload
-client: Client
-The stateful client
+Represents a discord interaction.
 
 ### Property Index
 
@@ -148,20 +114,22 @@ float
 <a id="interaction-data"></a>
 #### `data`
 
-The command data payload (if the interaction is a command)
+Command data payload (if the interaction is a command).
 
-Returns
--------
-Dict[str, Any]
+### Returns
+
+- **Type:** `Dict[str, Any]`
+  - Command data payload.
 
 <a id="interaction-error"></a>
 #### `error`
 
-The error that occurred during the interaction
+Error that occurred during the interaction
 
-Returns
--------
-Exception | None
+### Returns
+
+- **Type:** `Exception | None`
+  - Exception object.
 
 <a id="interaction-from-originator"></a>
 #### `from_originator`
@@ -196,11 +164,12 @@ Optional[str]
 <a id="interaction-id"></a>
 #### `id`
 
-The unique id of the interaction
+Unique id of the interaction
 
-Returns
--------
-str
+### Returns
+
+- **Type:** `str`
+  - Interaction id.
 
 <a id="interaction-locale"></a>
 #### `locale`
@@ -223,16 +192,17 @@ Message
 <a id="interaction-parsed-command-options"></a>
 #### `parsed_command_options`
 
-The resolved command options payload (if the interaction is a command)
+Resolved command options payload (if the interaction is a command).
 
 <a id="interaction-responded"></a>
 #### `responded`
 
-Whether the interaction has been responded to
+Whether the interaction has been responded to.
 
-Returns
--------
-bool
+### Returns
+
+- **Type:** `bool`
+  - Whether the interaction has been responded to.
 
 <a id="interaction-response"></a>
 #### `response`
@@ -255,11 +225,12 @@ str
 <a id="interaction-traceback"></a>
 #### `traceback`
 
-The traceback of the error that occurred during the interaction
+Traceback of the error that occurred during the interaction
 
-Returns
--------
-str | None
+### Returns
+
+- **Type:** `str | None`
+  - Traceback string.
 
 <a id="interaction-type"></a>
 #### `type`

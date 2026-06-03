@@ -16,41 +16,7 @@ if TYPE_CHECKING:
 
 class Interaction:
     """
-    Base interaction class for all interactions
-
-    Properties
-    ----------
-    id: str
-        The unique id of the interaction
-    type: int
-        The type of the interaction
-    token: str
-        The token of the interaction
-    version: int
-        The version of the interaction
-    application_id: str
-        The id of the application that the interaction was triggered for
-    data: Optional[Dict[str, Any]]
-        The command data payload (if the interaction is a command)
-    guild_id: Optional[str]
-        The guild id of the interaction
-    channel_id: Optional[str]
-        The channel id of the interaction
-    app_permissions: Optional[int]
-        The permissions of the application
-    locale: Optional[str]
-        The locale of the interaction
-    guild_locale: Optional[str]
-        The guild locale of the interaction
-    created_at: int
-        The timestamp when the interaction was created
-
-    Parameters
-    ----------
-    data: Dict[str, Any]
-        The interaction data payload
-    client: Client
-        The stateful client
+    Represents a discord interaction.
     """
 
     def __init__(self, client: "Client", data: Dict[str, Any]):
@@ -65,22 +31,20 @@ class Interaction:
     @property
     def error(self) -> Optional[Exception]:
         """
-        The error that occurred during the interaction
+        Error that occurred during the interaction
 
-        Returns
-        -------
-        Exception | None
+        Returns:
+            Exception | None: Exception object.
         """
         return self._error
 
     @property
     def traceback(self) -> Optional[str]:
         """
-        The traceback of the error that occurred during the interaction
+        Traceback of the error that occurred during the interaction
 
-        Returns
-        -------
-        str | None
+        Returns:
+            str | None: Traceback string.
         """
         if not self._error:
             return None
@@ -93,40 +57,37 @@ class Interaction:
     @property
     def data(self) -> Dict[str, Any]:
         """
-        The command data payload (if the interaction is a command)
+        Command data payload (if the interaction is a command).
 
-        Returns
-        -------
-        Dict[str, Any]
+        Returns:
+            Dict[str, Any]: Command data payload.
         """
         return self.payload.get("data", {})
 
     @property
     def parsed_command_options(self) -> Optional[Dict[str, Any]]:
         """
-        The resolved command options payload (if the interaction is a command)
+        Resolved command options payload (if the interaction is a command).
         """
         return self._parsed_options
 
     @property
     def responded(self) -> bool:
         """
-        Whether the interaction has been responded to
+        Whether the interaction has been responded to.
 
-        Returns
-        -------
-        bool
+        Returns:
+            bool: Whether the interaction has been responded to.
         """
         return self._responded
 
     @property
     def id(self) -> str:
         """
-        The unique id of the interaction
+        Unique id of the interaction
 
-        Returns
-        -------
-        str
+        Returns:
+            str: Interaction id.
         """
         return self.payload["id"]
 

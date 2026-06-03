@@ -15,14 +15,11 @@ title: discohook.emoji
 
 Represents a discord PartialEmoji object.
 
-Parameters
-----------
-name: :class:`str`
-The name of the emoji.
-id: :class:`str`
-The unique id of the emoji.
-animated: :class:`bool`
-Whether the emoji is animated.
+### Arguments
+
+- **name** (`str | None`): Name of the emoji.
+- **id** (`str | None`): ID of the emoji.
+- **animated** (`bool | None`): Whether the emoji is animated.
 
 ### Method Index
 
@@ -36,10 +33,14 @@ Whether the emoji is animated.
 
 Creates a partial emoji from a string formatted emoji.
 
-Parameters
-----------
-value: :class:`str`
-The string formatted emoji.
+### Arguments
+
+- **value** (`str`): Emoji string.
+
+### Returns
+
+- **Type:** `PartialEmoji`
+  - PartialEmoji object.
 
 <a id="partialemoji-to-dict"></a>
 #### `to_dict`

@@ -34,7 +34,11 @@ title: discohook.enums
 
 The type of mentions allowed in a message.
 
-Used internally by the library. You should not need to use this.
+### Attributes
+
+- **roles** (`int`): Used to specify a role mentions allowed in a message.
+- **users** (`int`): Used to specify a user mentions allowed in a message.
+- **everyone** (`int`): Used to specify everyone mentions allowed in a message.
 
 ### Inheritance
 
@@ -47,8 +51,7 @@ Used internally by the library. You should not need to use this.
 
 **Qualified Name:** `discohook.enums.ApplicationCommandOptionType`
 
-The type of application command option.
-
+Type of application command option.
 Used internally by the library. You should not need to use this.
 
 ### Inheritance
@@ -62,16 +65,13 @@ Used internally by the library. You should not need to use this.
 
 **Qualified Name:** `discohook.enums.ApplicationCommandType`
 
-The type of application command.
+Type of application command.
 
-Attributes
-----------
-slash: :class:`int`
-Used to specify a slash command.
-user: :class:`int`
-Used to specify a user command.
-message: :class:`int`
-Used to specify a message command.
+### Attributes
+
+- **slash** (`int`): Used to specify a slash command.
+- **user** (`int`): Used to specify a user command.
+- **message** (`int`): Used to specify a message command.
 
 ### Inheritance
 
@@ -86,6 +86,11 @@ Used to specify a message command.
 
 Installation context(s) where the command is available.
 
+### Attributes
+
+- **guild** (`int`): Used to specify a guild context.
+- **user** (`int`): Used to specify a user context.
+
 ### Inheritance
 
 - `builtins.int`
@@ -99,18 +104,13 @@ Installation context(s) where the command is available.
 
 Represents the style of a button.
 
-Attributes
-----------
-blurple: :class:`int`
-Used to specify a blurple button.
-grey: :class:`int`
-Used to specify a grey button.
-green: :class:`int`
-Used to specify a green button.
-red: :class:`int`
-Used to specify a red button.
-link: :class:`int`
-Used to specify a link type button.
+### Attributes
+
+- **blurple** (`int`): Used to specify a blurple button.
+- **gray** (`int`): Used to specify a gray button.
+- **green** (`int`): Used to specify a green button.
+- **red** (`int`): Used to specify a red button.
+- **link** (`int`): Used to specify a link type button.
 
 ### Inheritance
 
@@ -125,34 +125,21 @@ Used to specify a link type button.
 
 Use to specify discord channel type in application command Option.
 
-Attributes
-----------
-guild_text: :class:`int`
-Used to specify a guild text channel.
-dm: :class:`int`
-Used to specify a dm channel.
-guild_voice: :class:`int`
-Used to specify a guild voice channel.
-group_dm: :class:`int`
-Used to specify a group dm channel.
-guild_category: :class:`int`
-Used to specify a guild category channel.
-guild_announcement: :class:`int`
-Used to specify a guild announcement channel.
-guild_announcement_thread: :class:`int`
-Used to specify a guild announcement thread channel.
-public_thread: :class:`int`
-Used to specify a guild public thread channel.
-private_thread: :class:`int`
-Used to specify a guild private thread channel.
-guild_stage_voice: :class:`int`
-Used to specify a guild stage voice channel.
-guild_directory: :class:`int`
-Used to specify a guild directory channel.
-guild_forum: :class:`int`
-Used to specify a guild forum channel.
-guild_media: :class:`int`
-Used to specify a guild media channel.
+### Attributes
+
+- **guild_text** (`int`): Used to specify a guild text channel.
+- **dm** (`int`): Used to specify a dm channel.
+- **guild_voice** (`int`): Used to specify a guild voice channel.
+- **group_dm** (`int`): Used to specify a group dm channel.
+- **guild_category** (`int`): Used to specify a guild category channel.
+- **guild_announcement** (`int`): Used to specify a guild announcement channel.
+- **guild_announcement_thread** (`int`): Used to specify a guild announcement thread channel.
+- **public_thread** (`int`): Used to specify a guild public thread channel.
+- **private_thread** (`int`): Used to specify a guild private thread channel.
+- **guild_stage_voice** (`int`): Used to specify a guild stage voice channel.
+- **guild_directory** (`int`): Used to specify a guild directory channel.
+- **guild_forum** (`int`): Used to specify a guild forum channel.
+- **guild_media** (`int`): Used to specify a guild media channel.
 
 ### Inheritance
 
@@ -165,8 +152,7 @@ Used to specify a guild media channel.
 
 **Qualified Name:** `discohook.enums.ComponentType`
 
-The type of message component.
-
+Type of message component.
 Used internally by the library. You should not need to use this.
 
 ### Inheritance
@@ -180,8 +166,7 @@ Used internally by the library. You should not need to use this.
 
 **Qualified Name:** `discohook.enums.InteractionCallbackType`
 
-The type of interaction callback.
-
+Type of interaction callback.
 Used internally by the library. You should not need to use this.
 
 ### Inheritance
@@ -195,7 +180,13 @@ Used internally by the library. You should not need to use this.
 
 **Qualified Name:** `discohook.enums.InteractionContextType`
 
-The type of interaction context.
+Type of interaction context.
+
+### Attributes
+
+- **guild** (`int`): Used to specify a guild context.
+- **bot_dm** (`int`): Used to specify a bot dm context.
+- **private_channel** (`int`): Used to specify a private channel context.
 
 ### Inheritance
 
@@ -208,8 +199,7 @@ The type of interaction context.
 
 **Qualified Name:** `discohook.enums.InteractionType`
 
-The type of interaction received from discord.
-
+Type of interaction received from discord.
 Used internally by the library. You should not need to use this.
 
 ### Inheritance
@@ -223,14 +213,12 @@ Used internally by the library. You should not need to use this.
 
 **Qualified Name:** `discohook.enums.ModalFieldType`
 
-The type of field in a modal.
-
+Type of field in a modal.
 Used internally by the library. You should not need to use this.
 
-Attributes
-----------
-text_input: :class:`int`
-Used to specify a text input field.
+### Attributes
+
+- **text_input** (`int`): Used to specify a text input field.
 
 ### Inheritance
 
@@ -243,12 +231,11 @@ Used to specify a text input field.
 
 **Qualified Name:** `discohook.enums.PollLayoutType`
 
-The type of layout for a poll.
+Type of layout for a poll.
 
-Attributes
-----------
-default: :class:`int`
-Used to specify the default layout.
+### Attributes
+
+- **default** (`int`): Used to specify a default layout for a poll.
 
 ### Inheritance
 
@@ -261,9 +248,13 @@ Used to specify the default layout.
 
 **Qualified Name:** `discohook.enums.SelectDefaultValueType`
 
-The type of default value for a select menu.
+Type of default values for a select menu.
 
-Used internally by the library. You should not need to use this.
+### Attributes
+
+- **user** (`str`): Used to specify a user default value for a select menu.
+- **role** (`str`): Used to specify a role default value for a select menu.
+- **channel** (`str`): Used to specify a channel default value for a select menu.
 
 ### Inheritance
 
@@ -278,6 +269,14 @@ Used internally by the library. You should not need to use this.
 
 The type of select menu.
 
+### Attributes
+
+- **text** (`int`): Used to specify a text select menu.
+- **user** (`int`): Used to specify a user select menu.
+- **role** (`int`): Used to specify a role select menu.
+- **mentionable** (`int`): Used to specify a mentionable select menu.
+- **channel** (`int`): Used to specify a channel select menu.
+
 ### Inheritance
 
 - `builtins.int`
@@ -289,14 +288,12 @@ The type of select menu.
 
 **Qualified Name:** `discohook.enums.TextInputFieldLength`
 
-The length of a text input field for a modal.
+Length of a text input field for a modal.
 
-Attributes
-----------
-short: :class:`int`
-Used to specify a short length text input field (up to 100 characters).
-long: :class:`int`
-Used to specify a long length text input field (up to 3000 characters).
+### Attributes
+
+- **short** (`int`): Used to specify a short text input field.
+- **long** (`int`): Used to specify a long text input field.
 
 ### Inheritance
 
@@ -309,8 +306,7 @@ Used to specify a long length text input field (up to 3000 characters).
 
 **Qualified Name:** `discohook.enums.WebhookType`
 
-The type of webhook.
-
+Type of webhook.
 Used internally by the library. You should not need to use this.
 
 ### Inheritance

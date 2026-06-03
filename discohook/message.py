@@ -4,7 +4,6 @@ import aiohttp
 
 from .attachment import Attachment
 from .components import TopLevelComponent
-from .embed import Embed
 from .emoji import PartialEmoji
 from .models import AllowedMentions, MessageReference
 from .params import _prepare_payload

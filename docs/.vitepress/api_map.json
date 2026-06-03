@@ -311,77 +311,77 @@
             "send": {
               "signature": "(self, channel_id: str, *components: str | discohook.components.TextDisplay | discohook.components.ActionRow | discohook.components.Section | discohook.components.Container | discohook.components.Separator | discohook.file.File | discohook.components.MediaGallery) -> discohook.message.Message",
               "async": true,
-              "docstring": "Send a message to a channel.\n\nArgs:\n    channel_id (str): ID of the channel to send the message to.\n    components (Tuple[TopLevelComponent]): Components to send in the message.\n\nReturns:\n    Message object."
+              "docstring": "Send a message to a channel.\n\nArgs:\n    channel_id (str): ID of the channel to send the message to.\n    components (Tuple[TopLevelComponent]): Components to send in the message.\n\nReturns:\n    Message: Message object."
             },
             "me": {
               "signature": "(self) -> discohook.user.User",
               "async": true,
-              "docstring": "Fetch the client as a discord user.\n\nReturns:\n      Client as a discord user."
+              "docstring": "Fetch the client as a discord user.\n\nReturns:\n      User: Client as a discord user."
             },
             "edit": {
               "signature": "(self, username: str, *, avatar: str | None = None)",
               "async": true,
-              "docstring": "Edits the client user.\n\nArgs:\n    username (str): Updated username.\n    avatar (str | None): Updated avatar of the client user in base64 data URI scheme. Defaults to None."
+              "docstring": "Edits the client user.\n\nArgs:\n    username (str): Updated username.\n    avatar (str | None): Updated avatar of the client user in base64 data URI scheme. Defaults to None.\n\nReturns:\n    aiohttp.ClientResponse: Updated client user."
             },
             "create_webhook": {
               "signature": "(self, channel_id: str, *, name: str, image_base64: str | None = None, reason: str | None = None)",
               "async": true,
-              "docstring": "Creates a webhook in a channel.\n\nArgs:\n    channel_id (str): ID of the channel to create the webhook in.\n    name (str): Name of the webhook.\n    image_base64 (str | None): Base64 encoded image of the webhook.\n    reason (str | None): Reason for creating the webhook. This will be shown in the audit log.\n\nReturns:\n    Webhook object."
+              "docstring": "Creates a webhook in a channel.\n\nArgs:\n    channel_id (str): ID of the channel to create the webhook in.\n    name (str): Name of the webhook.\n    image_base64 (str | None): Base64 encoded image of the webhook.\n    reason (str | None): Reason for creating the webhook. This will be shown in the audit log.\n\nReturns:\n    Webhook: Webhook object."
             },
             "fetch_webhook": {
               "signature": "(self, webhook_id: str, *, webhook_token: str | None = None)",
               "async": true,
-              "docstring": "Fetch a webhook from the client.\n\nArgs:\n    webhook_id (str): ID of the webhook to fetch.\n    webhook_token (str | None): Token of the webhook to fetch.\n\nReturns:\n    Webhook object."
+              "docstring": "Fetch a webhook from the client.\n\nArgs:\n    webhook_id (str): ID of the webhook to fetch.\n    webhook_token (str | None): Token of the webhook to fetch.\n\nReturns:\n    Webhook: Webhook object."
             },
             "fetch_guild": {
               "signature": "(self, guild_id: str, *, with_counts: bool | None = False) -> discohook.guild.Guild | None",
               "async": true,
-              "docstring": "Fetches the guild of given id.\n\nArgs:\n    guild_id (str): ID of the guild to fetch.\n    with_counts (bool): Whether the guild count is returned or not.\n\nReturns:\n    Guild object or None."
+              "docstring": "Fetches the guild of given id.\n\nArgs:\n    guild_id (str): ID of the guild to fetch.\n    with_counts (bool): Whether the guild count is returned or not.\n\nReturns:\n    Guild | None: Guild object or None."
             },
             "fetch_user": {
               "signature": "(self, user_id: str) -> discohook.user.User | None",
               "async": true,
-              "docstring": "Fetches the user from given ID.\n\nArgs:\n    user_id (str): ID of the user to fetch.\n\nReturns:\n    User object or None."
+              "docstring": "Fetches the user from given ID.\n\nArgs:\n    user_id (str): ID of the user to fetch.\n\nReturns:\n    User | None: User object or None."
             },
             "fetch_channel": {
               "signature": "(self, channel_id: str) -> discohook.channel.Channel | None",
               "async": true,
-              "docstring": "Fetches the channel from given ID.\n\nArgs:\n    channel_id (str): ID of the channel to fetch.\n\nReturns:\n    Channel object or None."
+              "docstring": "Fetches the channel from given ID.\n\nArgs:\n    channel_id (str): ID of the channel to fetch.\n\nReturns:\n    Channel: Channel object or None."
             },
             "fetch_commands": {
               "signature": "(self)",
               "async": true,
-              "docstring": "Fetches the commands of the client.\n\nReturns:\n    Aiohttp response object."
+              "docstring": "Fetches the commands of the client.\n\nReturns:\n    aiohttp.ClientResponse: Aiohttp response object."
             },
             "fetch_info": {
               "signature": "(self) -> Dict[str, Any]",
               "async": true,
-              "docstring": "Fetches the application object associated with the requesting client user.\n\nReturns:\n    Aiohttp response object."
+              "docstring": "Fetches the application object associated with the requesting client user.\n\nReturns:\n    aiohttp.ClientResponse: Aiohttp response object."
             },
             "fetch_application_emojis": {
               "signature": "(self)",
               "async": true,
-              "docstring": "Fetch all emojis from the client."
+              "docstring": "Fetch all emojis from the client.\n\nReturns:\n    aiohttp.ClientResponse: Aiohttp response object."
             },
             "fetch_application_emoji": {
               "signature": "(self, emoji_id: str)",
               "async": true,
-              "docstring": "Fetches an emoji from the client.\n\nArgs:\n    emoji_id (str): ID of the emoji.\n\nReturns:\n    Aiohttp response object."
+              "docstring": "Fetches an emoji from the client.\n\nArgs:\n    emoji_id (str): ID of the emoji.\n\nReturns:\n    aiohttp.ClientResponse: Aiohttp response object."
             },
             "create_application_emoji": {
               "signature": "(self, *, name: str, image: bytes, image_type: Literal['png', 'jpeg', 'gif']) -> discohook.emoji.PartialEmoji",
               "async": true,
-              "docstring": "Create a new application emoji.\n\nArgs:\n    name (str): Name of the emoji.\n    image (bytes): Image of the emoji in bytes.\n    image_type (str): Image type of the emoji. (e.g. \"png\", \"jpeg\", \"gif\")\n\nReturns:\n    PartialEmoji object."
+              "docstring": "Create a new application emoji.\n\nArgs:\n    name (str): Name of the emoji.\n    image (bytes): Image of the emoji in bytes.\n    image_type (str): Image type of the emoji. (e.g. \"png\", \"jpeg\", \"gif\")\n\nReturns:\n    PartialEmoji: PartialEmoji object."
             },
             "edit_application_emoji": {
               "signature": "(self, emoji_id: str, name: str)",
               "async": true,
-              "docstring": "Edits an existing emoji in a guild.\n\nArgs:\n    emoji_id (str): ID of the emoji.\n    name (str): Name of the emoji.\n\nReturns:\n    Aiohttp response object."
+              "docstring": "Edits an existing emoji in a guild.\n\nArgs:\n    emoji_id (str): ID of the emoji.\n    name (str): Name of the emoji.\n\nReturns:\n    aiohttp.ClientResponse: Aiohttp response object."
             },
             "delete_application_emoji": {
               "signature": "(self, emoji_id: str)",
               "async": true,
-              "docstring": "Delete an existing emoji in a guild.\n\nArgs:\n    emoji_id (str): ID of the emoji.\n\nReturns:\n    Aiohttp response object."
+              "docstring": "Delete an existing emoji in a guild.\n\nArgs:\n    emoji_id (str): ID of the emoji.\n\nReturns:\n    aiohttp.ClientResponse: Aiohttp response object."
             }
           }
         }
@@ -422,7 +422,7 @@
             "to_dict": {
               "signature": "(self) -> Dict[str, Any]",
               "async": false,
-              "docstring": "Converts the command to a dictionary. Not intended for use by end-users.\n\nReturns:\n    Dictionary of the command object."
+              "docstring": "Converts the command to a dictionary. Not intended for use by end-users.\n\nReturns:\n    dict: Dictionary of the command object."
             }
           }
         },
@@ -495,7 +495,7 @@
         "Component": {
           "name": "Component",
           "qualified_name": "discohook.common.Component",
-          "docstring": "Represents a discord component.\n\nParameters\n----------\ntype: :class:`ComponentType`\n    The type of the component.",
+          "docstring": "Represents a discord component.\n\nArgs:\n    type (ComponentType | None): Type of the component.\n    custom_id (str | None): Custom ID of the component.",
           "bases": [
             "discohook.common.Interactable"
           ],
@@ -512,17 +512,17 @@
             "check": {
               "signature": "(self)",
               "async": false,
-              "docstring": "A decorator that adds a check to a specific command or component."
+              "docstring": "Decorator that adds a check to a specific command or component."
             },
             "error_handler": {
               "signature": "(self)",
               "async": false,
-              "docstring": "A decorator that adds an error handler to a specific command or component."
+              "docstring": "Decorator that adds an error handler to a specific command or component."
             },
             "to_dict": {
               "signature": "(self)",
               "async": false,
-              "docstring": "Convert the component to a dict to be sent to discord. For internal use only."
+              "docstring": "Convert the component to a dict. For internal use only."
             }
           }
         }
@@ -536,7 +536,7 @@
         "ActionRow": {
           "name": "ActionRow",
           "qualified_name": "discohook.components.ActionRow",
-          "docstring": null,
+          "docstring": "Action row component.\n\nArgs:\n    components (Tuple[Button | Select]): Components to include in the action row. Must be between 1 and 5 components.\n    id (int | None): Unique id for the action row.\n\nAttributes:\n    id (int): Action row id.\n    type (ComponentType): Action row type.\n    components (List[Component]): Action row components.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -606,7 +606,7 @@
         "FileUpload": {
           "name": "FileUpload",
           "qualified_name": "discohook.components.FileUpload",
-          "docstring": "Represents a file upload component in a modal.\n\nParameters\n----------\ncustom_id: :class:`str`\n    The label of the file upload field.\nid: :class:`int`\n    A unique id of the file upload field. Must be valid python identifier.\nmin_values: :class:`int`\n    Minimum number of items that must be uploaded (defaults to 1); min 0, max 10\nmax_values: :class:`int`\n    Maximum number of items that can be uploaded (defaults to 1); max 10\nrequired: :class:`bool`\n    Whether this component is required to be filled (defaults to true).",
+          "docstring": "Represents a file upload component in a modal.\n\nArgs:\n    id (int): A unique id of the file upload field. Must be a valid python identifier.\n    min_values (int): Minimum number of items that must be uploaded (defaults to 1)\n    max_values (int): Maximum number of items that must be uploaded (defaults to 1)\n    required (bool): Whether this component is required to be filled (defaults to true).",
           "bases": [],
           "properties": {},
           "methods": {
@@ -634,7 +634,7 @@
         "Media": {
           "name": "Media",
           "qualified_name": "discohook.components.Media",
-          "docstring": null,
+          "docstring": "Media component.\n\nArgs:\n    media (str | File): Media to include in the media component.\n    description (str | None): Media description.\n    spoiler (bool): Whether the media should be spoiler or not.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -732,7 +732,7 @@
         "TextInput": {
           "name": "TextInput",
           "qualified_name": "discohook.components.TextInput",
-          "docstring": "Represents a text input field in a modal.\n\nParameters\n----------\ncustom_id: :class:`str`\n    The label of the text input field.\nid: :class:`int`\n    A unique id of the text input field. Must be valid python identifier.\nrequired: :class:`bool`\n    Whether this component is required to be filled (defaults to true).\nplaceholder: :class:`str`\n    Custom placeholder text if the input is empty; max 100 characters.\nvalue: :class:`str`\n    Pre-filled value for this component; max 4000 characters.\nmin_length: :class:`int`\n    The minimum length of the text input field.\nmax_length: :class:`int`\n    The maximum length of the text input field.\nstyle: :class:`TextInputFieldLength`\n    The style of the text input field.",
+          "docstring": "Represents a text input field in a modal.\n\nArgs:\n    custom_id (str): The label of the text input field. Must be a valid python identifier.\n    id (int | None): A unique id of the text input field. Must be a valid python identifier.\n    required (bool): Whether this component is required to be filled (defaults to true).\n    placeholder (str | None): Custom placeholder text if the input is empty; max 100 characters.\n    value (str | None): Pre-filled value for this component; max 4000 characters.\n    min_length (int): The minimum length of the text input field.\n    max_length (int): The maximum length of the text input field.\n    style (TextInputFieldLength): The style of the text input field.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -795,61 +795,6 @@
         }
       }
     },
-    "discohook.embed": {
-      "name": "discohook.embed",
-      "docstring": null,
-      "classes": {
-        "Embed": {
-          "name": "Embed",
-          "qualified_name": "discohook.embed.Embed",
-          "docstring": "Represents a discord Embed object.\n\nParameters\n----------\ntitle: str | None\n    The title of the embed.\ndescription: str | None\n    The description of the embed.\nurl: str | None\n    The url of the embed.\ncolor: int | str | None\n    The color of the embed in hex or int.\ntimestamp: str | None\n    The timestamp of the embed.",
-          "bases": [],
-          "properties": {
-            "attachments": {
-              "docstring": "Returns the attachments of the embed."
-            }
-          },
-          "methods": {
-            "from_dict": {
-              "signature": null,
-              "async": false,
-              "docstring": "Creates an embed from a dictionary.\nThis method is handy when you want to create an embed manually.\n\nParameters\n----------\ndata: :class:`dict`\n    The dictionary to create the embed from.\n\nReturns\n-------\n:class:`Embed`\n    The created embed."
-            },
-            "set_author": {
-              "signature": "(self, *, name: str, url: str | None = None, icon_url: str | None = None)",
-              "async": false,
-              "docstring": "Sets the author of the embed.\n\nParameters\n----------\nname: :class:`str`\n    The name of the author.\nurl: Optional[:class:`str`]\n    The url of the author.\nicon_url: Optional[:class:`str`]\n    The icon url of the author."
-            },
-            "set_footer": {
-              "signature": "(self, text: str, *, icon_url: str | None = None)",
-              "async": false,
-              "docstring": "Sets the footer of the embed.\n\nParameters\n----------\ntext: :class:`str`\n    The text of the footer.\nicon_url: Optional[:class:`str`]\n    The icon url of the footer."
-            },
-            "set_image": {
-              "signature": "(self, img: str | discohook.file.File)",
-              "async": false,
-              "docstring": "Sets the image of the embed from a file attachment or url.\n\nParameters\n----------\nimg: :class:`str` | :class:`File`\n    The url or file attachment of the image."
-            },
-            "set_thumbnail": {
-              "signature": "(self, img: str | discohook.file.File)",
-              "async": false,
-              "docstring": "Sets the thumbnail of the embed.\n\nParameters\n----------\nimg: :class:`str` | :class:`File`\n    The url or file attachment of the thumbnail."
-            },
-            "add_field": {
-              "signature": "(self, name: str, value: str, *, inline: bool = False)",
-              "async": false,
-              "docstring": "Adds a field to the embed.\n\nParameters\n----------\nname: :class:`str`\n    The name of the field.\nvalue: :class:`str`\n    The value of the field.\ninline: :class:`bool`\n    Whether the field is inline."
-            },
-            "to_dict": {
-              "signature": "(self) -> Dict[str, Any]",
-              "async": false,
-              "docstring": "Returns the embed as a dictionary.\n\nThis method is used internally by the library. You will rarely need to use it.\n\nReturns\n-------\n:class:`dict`\n    The embed as a dictionary."
-            }
-          }
-        }
-      },
-      "functions": {}
-    },
     "discohook.emoji": {
       "name": "discohook.emoji",
       "docstring": null,
@@ -857,14 +802,14 @@
         "PartialEmoji": {
           "name": "PartialEmoji",
           "qualified_name": "discohook.emoji.PartialEmoji",
-          "docstring": "Represents a discord PartialEmoji object.\n\nParameters\n----------\nname: :class:`str`\n    The name of the emoji.\nid: :class:`str`\n    The unique id of the emoji.\nanimated: :class:`bool`\n    Whether the emoji is animated.",
+          "docstring": "Represents a discord PartialEmoji object.\n\nArgs:\n    name (str | None): Name of the emoji.\n    id (str | None): ID of the emoji.\n    animated (bool | None): Whether the emoji is animated.",
           "bases": [],
           "properties": {},
           "methods": {
             "from_str": {
               "signature": null,
               "async": false,
-              "docstring": "Creates a partial emoji from a string formatted emoji.\n\nParameters\n----------\nvalue: :class:`str`\n    The string formatted emoji."
+              "docstring": "Creates a partial emoji from a string formatted emoji.\n\nArgs:\n    value (str): Emoji string.\n\nReturns:\n    PartialEmoji: PartialEmoji object."
             },
             "to_dict": {
               "signature": "(self) -> dict",
@@ -904,7 +849,7 @@
         "AllowedMentionsType": {
           "name": "AllowedMentionsType",
           "qualified_name": "discohook.enums.AllowedMentionsType",
-          "docstring": "The type of mentions allowed in a message.\n\nUsed internally by the library. You should not need to use this.",
+          "docstring": "The type of mentions allowed in a message.\n\nAttributes:\n    roles (int): Used to specify a role mentions allowed in a message.\n    users (int): Used to specify a user mentions allowed in a message.\n    everyone (int): Used to specify everyone mentions allowed in a message.",
           "bases": [
             "builtins.str",
             "enum.Enum"
@@ -915,7 +860,7 @@
         "ApplicationCommandOptionType": {
           "name": "ApplicationCommandOptionType",
           "qualified_name": "discohook.enums.ApplicationCommandOptionType",
-          "docstring": "The type of application command option.\n\nUsed internally by the library. You should not need to use this.",
+          "docstring": "Type of application command option.\nUsed internally by the library. You should not need to use this.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -926,7 +871,7 @@
         "ApplicationCommandType": {
           "name": "ApplicationCommandType",
           "qualified_name": "discohook.enums.ApplicationCommandType",
-          "docstring": "The type of application command.\n\nAttributes\n----------\nslash: :class:`int`\n    Used to specify a slash command.\nuser: :class:`int`\n    Used to specify a user command.\nmessage: :class:`int`\n    Used to specify a message command.",
+          "docstring": "Type of application command.\n\nAttributes:\n    slash (int): Used to specify a slash command.\n    user (int): Used to specify a user command.\n    message (int): Used to specify a message command.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -937,7 +882,7 @@
         "ApplicationIntegrationType": {
           "name": "ApplicationIntegrationType",
           "qualified_name": "discohook.enums.ApplicationIntegrationType",
-          "docstring": "Installation context(s) where the command is available.",
+          "docstring": "Installation context(s) where the command is available.\n\nAttributes:\n    guild (int): Used to specify a guild context.\n    user (int): Used to specify a user context.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -948,7 +893,7 @@
         "ButtonStyle": {
           "name": "ButtonStyle",
           "qualified_name": "discohook.enums.ButtonStyle",
-          "docstring": "Represents the style of a button.\n\nAttributes\n----------\nblurple: :class:`int`\n    Used to specify a blurple button.\ngrey: :class:`int`\n    Used to specify a grey button.\ngreen: :class:`int`\n    Used to specify a green button.\nred: :class:`int`\n    Used to specify a red button.\nlink: :class:`int`\n    Used to specify a link type button.",
+          "docstring": "Represents the style of a button.\n\nAttributes:\n    blurple (int): Used to specify a blurple button.\n    gray (int): Used to specify a gray button.\n    green (int): Used to specify a green button.\n    red (int): Used to specify a red button.\n    link (int): Used to specify a link type button.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -959,7 +904,7 @@
         "ChannelType": {
           "name": "ChannelType",
           "qualified_name": "discohook.enums.ChannelType",
-          "docstring": "Use to specify discord channel type in application command Option.\n\nAttributes\n----------\nguild_text: :class:`int`\n    Used to specify a guild text channel.\ndm: :class:`int`\n    Used to specify a dm channel.\nguild_voice: :class:`int`\n    Used to specify a guild voice channel.\ngroup_dm: :class:`int`\n    Used to specify a group dm channel.\nguild_category: :class:`int`\n    Used to specify a guild category channel.\nguild_announcement: :class:`int`\n    Used to specify a guild announcement channel.\nguild_announcement_thread: :class:`int`\n    Used to specify a guild announcement thread channel.\npublic_thread: :class:`int`\n    Used to specify a guild public thread channel.\nprivate_thread: :class:`int`\n    Used to specify a guild private thread channel.\nguild_stage_voice: :class:`int`\n    Used to specify a guild stage voice channel.\nguild_directory: :class:`int`\n    Used to specify a guild directory channel.\nguild_forum: :class:`int`\n    Used to specify a guild forum channel.\nguild_media: :class:`int`\n    Used to specify a guild media channel.",
+          "docstring": "Use to specify discord channel type in application command Option.\n\nAttributes:\n    guild_text (int): Used to specify a guild text channel.\n    dm (int): Used to specify a dm channel.\n    guild_voice (int): Used to specify a guild voice channel.\n    group_dm (int): Used to specify a group dm channel.\n    guild_category (int): Used to specify a guild category channel.\n    guild_announcement (int): Used to specify a guild announcement channel.\n    guild_announcement_thread (int): Used to specify a guild announcement thread channel.\n    public_thread (int): Used to specify a guild public thread channel.\n    private_thread (int): Used to specify a guild private thread channel.\n    guild_stage_voice (int): Used to specify a guild stage voice channel.\n    guild_directory (int): Used to specify a guild directory channel.\n    guild_forum (int): Used to specify a guild forum channel.\n    guild_media (int): Used to specify a guild media channel.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -970,7 +915,7 @@
         "ComponentType": {
           "name": "ComponentType",
           "qualified_name": "discohook.enums.ComponentType",
-          "docstring": "The type of message component.\n\nUsed internally by the library. You should not need to use this.",
+          "docstring": "Type of message component.\nUsed internally by the library. You should not need to use this.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -981,7 +926,7 @@
         "InteractionCallbackType": {
           "name": "InteractionCallbackType",
           "qualified_name": "discohook.enums.InteractionCallbackType",
-          "docstring": "The type of interaction callback.\n\nUsed internally by the library. You should not need to use this.",
+          "docstring": "Type of interaction callback.\nUsed internally by the library. You should not need to use this.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -992,7 +937,7 @@
         "InteractionContextType": {
           "name": "InteractionContextType",
           "qualified_name": "discohook.enums.InteractionContextType",
-          "docstring": "The type of interaction context.",
+          "docstring": "Type of interaction context.\n\nAttributes:\n    guild (int): Used to specify a guild context.\n    bot_dm (int): Used to specify a bot dm context.\n    private_channel (int): Used to specify a private channel context.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -1003,7 +948,7 @@
         "InteractionType": {
           "name": "InteractionType",
           "qualified_name": "discohook.enums.InteractionType",
-          "docstring": "The type of interaction received from discord.\n\nUsed internally by the library. You should not need to use this.",
+          "docstring": "Type of interaction received from discord.\nUsed internally by the library. You should not need to use this.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -1014,7 +959,7 @@
         "ModalFieldType": {
           "name": "ModalFieldType",
           "qualified_name": "discohook.enums.ModalFieldType",
-          "docstring": "The type of field in a modal.\n\nUsed internally by the library. You should not need to use this.\n\nAttributes\n----------\ntext_input: :class:`int`\n    Used to specify a text input field.",
+          "docstring": "Type of field in a modal.\nUsed internally by the library. You should not need to use this.\n\nAttributes:\n    text_input (int): Used to specify a text input field.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -1025,7 +970,7 @@
         "PollLayoutType": {
           "name": "PollLayoutType",
           "qualified_name": "discohook.enums.PollLayoutType",
-          "docstring": "The type of layout for a poll.\n\nAttributes\n----------\ndefault: :class:`int`\n    Used to specify the default layout.",
+          "docstring": "Type of layout for a poll.\n\nAttributes:\n    default (int): Used to specify a default layout for a poll.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -1036,7 +981,7 @@
         "SelectDefaultValueType": {
           "name": "SelectDefaultValueType",
           "qualified_name": "discohook.enums.SelectDefaultValueType",
-          "docstring": "The type of default value for a select menu.\n\nUsed internally by the library. You should not need to use this.",
+          "docstring": "Type of default values for a select menu.\n\nAttributes:\n    user (str): Used to specify a user default value for a select menu.\n    role (str): Used to specify a role default value for a select menu.\n    channel (str): Used to specify a channel default value for a select menu.",
           "bases": [
             "builtins.str",
             "enum.Enum"
@@ -1047,7 +992,7 @@
         "SelectType": {
           "name": "SelectType",
           "qualified_name": "discohook.enums.SelectType",
-          "docstring": "The type of select menu.",
+          "docstring": "The type of select menu.\n\nAttributes:\n    text (int): Used to specify a text select menu.\n    user (int): Used to specify a user select menu.\n    role (int): Used to specify a role select menu.\n    mentionable (int): Used to specify a mentionable select menu.\n    channel (int): Used to specify a channel select menu.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -1058,7 +1003,7 @@
         "TextInputFieldLength": {
           "name": "TextInputFieldLength",
           "qualified_name": "discohook.enums.TextInputFieldLength",
-          "docstring": "The length of a text input field for a modal.\n\nAttributes\n----------\nshort: :class:`int`\n    Used to specify a short length text input field (up to 100 characters).\nlong: :class:`int`\n    Used to specify a long length text input field (up to 3000 characters).",
+          "docstring": "Length of a text input field for a modal.\n\nAttributes:\n    short (int): Used to specify a short text input field.\n    long (int): Used to specify a long text input field.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -1069,7 +1014,7 @@
         "WebhookType": {
           "name": "WebhookType",
           "qualified_name": "discohook.enums.WebhookType",
-          "docstring": "The type of webhook.\n\nUsed internally by the library. You should not need to use this.",
+          "docstring": "Type of webhook.\nUsed internally by the library. You should not need to use this.",
           "bases": [
             "builtins.int",
             "enum.Enum"
@@ -1152,19 +1097,19 @@
         "File": {
           "name": "File",
           "qualified_name": "discohook.file.File",
-          "docstring": "Represents a file to send to Discord.\n\nParameters\n----------\nname: str\n    The name of the file.\ncontent: bytes\n    The content of the file in bytes.\ndescription: str | None\n    The description of the file.\nspoiler: bool\n    Whether the file is a spoiler.",
+          "docstring": "Represents a file to send to Discord.\n\nArgs:\n    name (str | None): Name of the file.\n    content (bytes | None): Content of the file in bytes.\n    description (str | None): Description of the file.\n    spoiler (bool): Whether the file is a spoiler.\n    id (int | None): ID of the file used to identify the file.",
           "bases": [],
           "properties": {},
           "methods": {
             "from_path": {
               "signature": null,
               "async": false,
-              "docstring": "Creates a File object from a file path.\n\nParameters\n----------\npath: str\n    The path to the file.\nspoiler: bool\n    Whether the file is a spoiler.\ndescription: str | None\n    The description of the file to be sent.\nid: int | None\n    The id of the file. This is used to identify the file when it is submitted."
+              "docstring": "Creates a File object from a file path.\n\nArgs:\n    path (str): Path to the file.\n    spoiler (bool): Whether the file is a spoiler.\n    description (str | None): Description of the file to be sent.\n    id (int | None): ID of the file used to identify the file.\n\nReturns:\n    File: File object."
             },
             "from_url": {
               "signature": null,
               "async": false,
-              "docstring": null
+              "docstring": "Creates a File object from a file URL.\n\nArgs:\n    url (str): URL to the file.\n    description (str | None): Description of the file to be sent.\n    spoiler (bool): Whether the file is a spoiler.\n    id (int | None): ID of the file used to identify the file.\n\nReturns:\n    File: File object."
             },
             "to_dict": {
               "signature": "(self) -> Dict[str, Any]",
@@ -1183,7 +1128,7 @@
         "Guild": {
           "name": "Guild",
           "qualified_name": "discohook.guild.Guild",
-          "docstring": "Represents a Discord guild. Subclass of :class:`PartialGuild`.\n\nAttributes\n----------\nid: :class:`str`\n    The id of the guild.\nname: :class:`str`\n    The name of the guild.\nicon: Optional[:class:`str`]\n    The icon hash of the guild.\nicon_hash: Optional[:class:`str`]\n    The icon hash of the guild.\nsplash: Optional[:class:`str`]\n    The splash hash of the guild.\ndiscovery_splash: Optional[:class:`str`]\n    The discovery splash hash of the guild.\nowner: Optional[:class:`bool`]\n    Whether the user is the owner of the guild.\nowner_id: :class:`str`\n    The id of the owner of the guild.\npermissions: Optional[:class:`int`]\n    The total permissions of the user in the guild (does not include channel overrides).\nafk_channel_id: Optional[:class:`str`]\n    The id of the afk channel.\nafk_timeout: :class:`int`\n    The afk timeout in seconds.\nwidget_enabled: Optional[:class:`bool`]\n    Whether the widget is enabled.\nwidget_channel_id: Optional[:class:`str`]\n    The id of the channel for the widget.\nverification_level: :class:`int`\n    The verification level required for the guild.\ndefault_message_notifications: :class:`int`\n    The default message notifications level.\nexplicit_content_filter: :class:`int`\n    The explicit content filter level.\nroles: List[:class:`Role`]\n    The roles in the guild.\nemojis: List[:class:`Emoji`]\n    The emojis in the guild.\nfeatures: List[:class:`str`]\n    The features of the guild.\nmfa_level: :class:`int`\n    The mfa level required for the guild.\napplication_id: Optional[:class:`str`]\n    The application id of the guild creator if it is bot-created.\nsystem_channel_id: Optional[:class:`str`]\n    The id of the system channel.\nsystem_channel_flags: :class:`int`\n    The system channel flags.\nrules_channel_id: Optional[:class:`str`]\n    The id of the rules channel.\nmax_presences: Optional[:class:`int`]\n    The maximum number of presences for the guild.\nmax_members: :class:`int`\n    The maximum number of members for the guild.\nvanity_url_code: Optional[:class:`str`]\n    The vanity url code of the guild.\ndescription: Optional[:class:`str`]\n    The description of the guild.\nbanner: Optional[:class:`str`]\n    The banner hash of the guild.\npremium_tier: :class:`int`\n    The premium tier of the guild.\npremium_subscription_count: :class:`int`\n    The number of boosts of the guild.\npreferred_locale: :class:`str`\n    The preferred locale of the guild.\npublic_updates_channel_id: Optional[:class:`str`]\n    The id of the public updates channel.\nmax_video_channel_users: Optional[:class:`int`]\n    The maximum number of users in a video channel.\napproximate_member_count: Optional[:class:`int`]\n    The approximate number of members in the guild.\napproximate_presence_count: Optional[:class:`int`]\n    The approximate number of presences in the guild.\nwelcome_screen: Optional[:class:`dict`]\n    The welcome screen object of the guild.\nnsfw_level: :class:`int`\n    The nsfw level of the guild.\nstickers: List[:class:`Sticker`]\n    The stickers in the guild.\npremium_progress_bar_enabled: Optional[:class:`bool`]\n    Whether the premium progress bar is enabled.",
+          "docstring": "Represents a Discord guild.\n\nAttributes:\n    id (str): The id of the guild.\n    name (str): The name of the guild.\n    icon (str | None): The icon hash of the guild.\n    icon_hash (str | None): The icon hash of the guild.\n    splash (str | None): The splash hash of the guild.\n    discovery_splash (str | None): The discovery splash hash of the guild.\n    owner (bool | None): Whether the user is the owner of the guild.\n    owner_id (str): The id of the owner of the guild.\n    permissions (int | None): The total permissions of the user in the guild\n        (does not include channel overrides).\n    afk_channel_id (str | None): The id of the afk channel.\n    afk_timeout (int): The afk timeout in seconds.\n    widget_enabled (bool | None): Whether the widget is enabled.\n    widget_channel_id (str | None): The id of the channel for the widget.\n    verification_level (int): The verification level required for the guild.\n    default_message_notifications (int): The default message notifications level.\n    explicit_content_filter (int): The explicit content filter level.\n    roles (list[Role]): The roles in the guild.\n    emojis (list[Emoji]): The emojis in the guild.\n    features (list[str]): The features of the guild.\n    mfa_level (int): The MFA level required for the guild.\n    application_id (str | None): The application id of the guild creator if it is\n        bot-created.\n    system_channel_id (str | None): The id of the system channel.\n    system_channel_flags (int): The system channel flags.\n    rules_channel_id (str | None): The id of the rules channel.\n    max_presences (int | None): The maximum number of presences for the guild.\n    max_members (int): The maximum number of members for the guild.\n    vanity_url_code (str | None): The vanity URL code of the guild.\n    description (str | None): The description of the guild.\n    banner (str | None): The banner hash of the guild.\n    premium_tier (int): The premium tier of the guild.\n    premium_subscription_count (int): The number of boosts of the guild.\n    preferred_locale (str): The preferred locale of the guild.\n    public_updates_channel_id (str | None): The id of the public updates channel.\n    max_video_channel_users (int | None): The maximum number of users in a video\n        channel.\n    approximate_member_count (int | None): The approximate number of members in the\n        guild.\n    approximate_presence_count (int | None): The approximate number of presences in\n        the guild.\n    welcome_screen (dict | None): The welcome screen object of the guild.\n    nsfw_level (int): The NSFW level of the guild.\n    stickers (list[Sticker]): The stickers in the guild.\n    premium_progress_bar_enabled (bool | None): Whether the premium progress bar is\n        enabled.",
           "bases": [
             "discohook.guild.PartialGuild"
           ],
@@ -1200,37 +1145,37 @@
             "fetch_member": {
               "signature": "(self, user_id: str) -> discohook.member.Member | None",
               "async": true,
-              "docstring": "Fetches a member from the guild.\n\nParameters\n----------\nuser_id: :class:`str`\n    The id of the user to fetch.\n\nReturns\n-------\nOptional[:class:`Member`]"
+              "docstring": "Fetches a member from the guild.\n\nArgs:\n    user_id (str): The id of the user to fetch.\n\nReturns:\n    Member | None: Member object or None."
             },
             "fetch_channels": {
               "signature": "(self) -> List[discohook.channel.Channel]",
               "async": true,
-              "docstring": "Fetches all channels in the guild.\n\nReturns\n-------\nList[Channel]"
+              "docstring": "Fetches all channels in the guild.\n\nReturns:\n    List[Channel]: Channels in the guild."
             },
             "fetch_roles": {
               "signature": "(self) -> List[discohook.role.Role]",
               "async": true,
-              "docstring": "Fetches all roles in the guild.\n\nReturns\n-------\nList[Role]"
+              "docstring": "Fetches all roles in the guild.\n\nReturns:\n    List[Role]: Roles in the guild."
             },
             "create_channel": {
               "signature": "(self, name: str, *, type: discohook.enums.ChannelType = <ChannelType.guild_text: 0>, topic: str | None = None, bitrate: int | None = None, user_limit: int | None = None, rate_limit_per_user: int | None = None, position: int | None = None, permission_overwrites: List[Dict[str, Any]] | None = None, parent_id: str | None = None, nsfw: bool | None = None, rtc_region: str | None = None, video_quality_mode: int | None = None, default_auto_archive_duration: int | None = None, default_reaction_emoji: discohook.emoji.PartialEmoji | None = None, available_tags: List[Dict[str, Any]] | None = None, default_sort_order: int | None = None, reason: str | None = None) -> discohook.channel.Channel",
               "async": true,
-              "docstring": "Creates a channel in the guild. Requires the MANAGE_CHANNELS permission.\n\nParameters\n----------\nname: str\n    Name of the channel (2-100 characters)\ntype: ChannelType\n    The type of channel\ntopic: str\n    Channel topic (0-1024 characters)\nbitrate: int\n    The bitrate (in bits) of the voice channel (voice only)\nuser_limit: int\n    The user limit of the voice channel (voice only)\nrate_limit_per_user: int\n    Amount of seconds a user has to wait before sending another message (0-21600)\n    bots, as well as users with the permission manage_messages or manage_channel, are unaffected\nposition: int\n    Sorting position of the channel\npermission_overwrites: List[Dict[str, Any]]\n    The channel's permission overwrites\nparent_id: str\n    The id of the parent category for a channel (each parent category can contain up to 50 channels)\nnsfw: bool\n    Whether the channel is nsfw\nrtc_region: str\n    The id of the voice region\nvideo_quality_mode: int\n    The camera video quality mode of the voice channel, 1 when not present\ndefault_auto_archive_duration: int\n    The default duration for newly created threads, in minutes, to automatically archive the thread\n    after recent activity, can be set to: 60, 1440, 4320, 10080\ndefault_reaction_emoji: PartialEmoji\n    The default auto-emoji for newly created threads, custom guild emojis must be enabled\navailable_tags: List[Dict[str, Any]]\n    The channel tags used for public guilds\ndefault_sort_order: int\n    The default sorting order for posts in a forum channel\n\nReturns\n-------\n:class:`Channel`"
+              "docstring": "Creates a channel in the guild. Requires the MANAGE_CHANNELS permission.\n\nArgs:\n    name (str): Name of the channel (2-100 characters).\n    type (ChannelType): Channel type.\n    topic (str | None): Channel topic (0-1024 characters).\n    bitrate (int | None): Channel bitrate (in bits) of the voice channel.\n    user_limit (int | None): User limit of the voice channel.\n    rate_limit_per_user (int | None): Amount of seconds a user has to wait before sending another message (0-21600).\n        Bots, as well as users with the permission manage_messages or manage_channel, are unaffected.\n    position (int | None): Sorting position of the channel.\n    permission_overwrites (List[Dict[str, Any]] | None): Channel's permission overwrites.\n    parent_id (str | None): ID of the parent category for a channel.\n    nsfw (bool | None): Whether the channel is nsfw.\n    rtc_region (str | None): ID of the voice region.\n    video_quality_mode (int | None): Video quality mode of the voice channel, 1 when not present.\n    default_auto_archive_duration (int | None): Default duration for newly created threads,\n        in minutes, to automatically archive the thread.\n    default_reaction_emoji (PartialEmoji | None): Default auto-emoji for newly created threads,\n        custom guild emojis must be enabled.\n    available_tags (List[Dict[str, Any]] | None): Channel tags used for public guilds.\n    default_sort_order (int | None): Default sorting order for posts in a forum channel.\n    reason (str | None): Reason for the creating the channel. Shows up on the audit log.\n\nReturns:\n    Channel: Channel object."
             },
             "edit_channel_position": {
               "signature": "(self, channel_id: str, *, position: int, lock_permissions: bool = False, parent_id: str | None = None)",
               "async": true,
-              "docstring": "Changes the position of the channel. Only available for guild channels.\n\nParameters\n----------\nchannel_id: :class:`str`\n    The id of the channel to move.\nposition: :class:`int`\n    The new position of the channel.\nlock_permissions:\n    Whether to sync the permissions of the channel with the parent category.\nparent_id: Optional[:class:`str`]\n    The id of the parent category to move the channel to.\n    If not provided, the channel will be moved to the root."
+              "docstring": "Changes the position of the channel. Only available for guild channels.\n\nArgs:\n    channel_id (str): ID of the channel to edit.\n    position (int): New position of the channel.\n    lock_permissions (bool): Whether to sync the permissions of the channel with the parent category.\n    parent_id (str | None): ID of the parent category to move the channel to.\n        If not provided, the channel will be moved to the root.\n\nReturns:\n    aiohttp.ClientResponse: Response object."
             },
             "create_role": {
-              "signature": "(self, name: str, *, permissions: List[discohook.permission.Permission] | None = None, color: int = 0, hoist: bool = False, mentionable: bool | None = False, icon_data_uri: str | None = None, unicode_emoji: str | None = None, reason: str | None = None)",
+              "signature": "(self, name: str, *, permissions: List[discohook.permission.Permission] | None = None, color: int = 0, hoist: bool = False, mentionable: bool = True, icon_data_uri: str | None = None, unicode_emoji: str | None = None, reason: str | None = None)",
               "async": true,
-              "docstring": null
+              "docstring": "Creates a new role in the guild.\n\nArgs:\n    name (str): Name of the new role.\n    permissions (List[Permission] | None): Permissions associated with the new role.\n    color (int): Color for the new role. Defaults to 0.\n    hoist (bool): If the new role should be hoisted. Defaults to False.\n    mentionable (bool): If the new role should be mentionable. Defaults to True.\n    icon_data_uri (str | None): Icon data URI for the new role.\n    unicode_emoji (str | None): Emoji data for the new role.\n    reason (str | None): Reason for the new role creation. Shows up on the audit log.\n\nReturns:\n    Role: Role object."
             },
             "create_emoji": {
               "signature": "(self, name: str, image: str, *, roles: List[str] | None = None, reason: str | None = None)",
               "async": true,
-              "docstring": "Creates a new emoji for the guild.\n\nParameters\n----------\nname: :class:`str`\n    The name of the emoji.\nimage: :class:`str`\n    The image data of the emoji in base64 data uri format.\nroles: Optional[List[:class:`str`]]\n    A list of role ids to limit the emoji to.\n\nReturns\n-------\n:class:`Emoji`"
+              "docstring": "Creates a new emoji in the guild.\n\nArgs:\n    name (str): Name of the new emoji.\n    image (str): Image data of the emoji in base64 data uri format.\n    roles (List[str] | None): List of role ids to limit the emoji to.\n    reason (str | None): Reason for the new emoji creation. Shows up on the audit log.\n\nReturns:\n    Emoji: Emoji object."
             }
           }
         }
@@ -2425,26 +2370,26 @@
         "Interaction": {
           "name": "Interaction",
           "qualified_name": "discohook.interaction.Interaction",
-          "docstring": "Base interaction class for all interactions\n\nProperties\n----------\nid: str\n    The unique id of the interaction\ntype: int\n    The type of the interaction\ntoken: str\n    The token of the interaction\nversion: int\n    The version of the interaction\napplication_id: str\n    The id of the application that the interaction was triggered for\ndata: Optional[Dict[str, Any]]\n    The command data payload (if the interaction is a command)\nguild_id: Optional[str]\n    The guild id of the interaction\nchannel_id: Optional[str]\n    The channel id of the interaction\napp_permissions: Optional[int]\n    The permissions of the application\nlocale: Optional[str]\n    The locale of the interaction\nguild_locale: Optional[str]\n    The guild locale of the interaction\ncreated_at: int\n    The timestamp when the interaction was created\n\nParameters\n----------\ndata: Dict[str, Any]\n    The interaction data payload\nclient: Client\n    The stateful client",
+          "docstring": "Represents a discord interaction.",
           "bases": [],
           "properties": {
             "error": {
-              "docstring": "The error that occurred during the interaction\n\nReturns\n-------\nException | None"
+              "docstring": "Error that occurred during the interaction\n\nReturns:\n    Exception | None: Exception object."
             },
             "traceback": {
-              "docstring": "The traceback of the error that occurred during the interaction\n\nReturns\n-------\nstr | None"
+              "docstring": "Traceback of the error that occurred during the interaction\n\nReturns:\n    str | None: Traceback string."
             },
             "data": {
-              "docstring": "The command data payload (if the interaction is a command)\n\nReturns\n-------\nDict[str, Any]"
+              "docstring": "Command data payload (if the interaction is a command).\n\nReturns:\n    Dict[str, Any]: Command data payload."
             },
             "parsed_command_options": {
-              "docstring": "The resolved command options payload (if the interaction is a command)"
+              "docstring": "Resolved command options payload (if the interaction is a command)."
             },
             "responded": {
-              "docstring": "Whether the interaction has been responded to\n\nReturns\n-------\nbool"
+              "docstring": "Whether the interaction has been responded to.\n\nReturns:\n    bool: Whether the interaction has been responded to."
             },
             "id": {
-              "docstring": "The unique id of the interaction\n\nReturns\n-------\nstr"
+              "docstring": "Unique id of the interaction\n\nReturns:\n    str: Interaction id."
             },
             "type": {
               "docstring": "The type of the interaction\n\nReturns\n-------\nOptional[InteractionType]"
@@ -3631,10 +3576,10 @@
     }
   },
   "summary": {
-    "modules": 40,
-    "classes": 84,
+    "modules": 39,
+    "classes": 83,
     "functions": 24,
-    "methods": 403,
-    "properties": 115
+    "methods": 396,
+    "properties": 114
   }
 }

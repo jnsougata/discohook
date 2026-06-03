@@ -18,7 +18,6 @@ from .channel import Channel, PartialChannel
 from .client import Client
 from .command import ApplicationCommand, SubCommand
 from .components import *
-from .embed import Embed
 from .emoji import PartialEmoji
 from .enums import *
 from .errors import *

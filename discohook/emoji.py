@@ -6,14 +6,10 @@ class PartialEmoji:
     """
     Represents a discord PartialEmoji object.
 
-    Parameters
-    ----------
-    name: :class:`str`
-        The name of the emoji.
-    id: :class:`str`
-        The unique id of the emoji.
-    animated: :class:`bool`
-        Whether the emoji is animated.
+    Args:
+        name (str | None): Name of the emoji.
+        id (str | None): ID of the emoji.
+        animated (bool | None): Whether the emoji is animated.
     """
 
     def __init__(
@@ -32,10 +28,11 @@ class PartialEmoji:
         """
         Creates a partial emoji from a string formatted emoji.
 
-        Parameters
-        ----------
-        value: :class:`str`
-            The string formatted emoji.
+        Args:
+            value (str): Emoji string.
+
+        Returns:
+            PartialEmoji: PartialEmoji object.
         """
         animated, name, id = value.strip("<>").split(":")
         return cls(name=name, id=id, animated=bool(animated))

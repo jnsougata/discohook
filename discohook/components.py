@@ -30,6 +30,19 @@ __all__ = [
 # noinspection PyShadowingBuiltins
 class ActionRow:
 
+    """
+    Action row component.
+
+    Args:
+        components (Tuple[Button | Select]): Components to include in the action row. Must be between 1 and 5 components.
+        id (int | None): Unique id for the action row.
+
+    Attributes:
+        id (int): Action row id.
+        type (ComponentType): Action row type.
+        components (List[Component]): Action row components.
+    """
+
     def __init__(
         self, *components: Union[Button, Select, Any], id: Optional[int] = None
     ):
@@ -51,6 +64,15 @@ class ActionRow:
 
 
 class Media:
+    """
+    Media component.
+
+    Args:
+        media (str | File): Media to include in the media component.
+        description (str | None): Media description.
+        spoiler (bool): Whether the media should be spoiler or not.
+
+    """
 
     def __init__(
         self,
@@ -231,24 +253,15 @@ class TextInput:
     """
     Represents a text input field in a modal.
 
-    Parameters
-    ----------
-    custom_id: :class:`str`
-        The label of the text input field.
-    id: :class:`int`
-        A unique id of the text input field. Must be valid python identifier.
-    required: :class:`bool`
-        Whether this component is required to be filled (defaults to true).
-    placeholder: :class:`str`
-        Custom placeholder text if the input is empty; max 100 characters.
-    value: :class:`str`
-        Pre-filled value for this component; max 4000 characters.
-    min_length: :class:`int`
-        The minimum length of the text input field.
-    max_length: :class:`int`
-        The maximum length of the text input field.
-    style: :class:`TextInputFieldLength`
-        The style of the text input field.
+    Args:
+        custom_id (str): The label of the text input field. Must be a valid python identifier.
+        id (int | None): A unique id of the text input field. Must be a valid python identifier.
+        required (bool): Whether this component is required to be filled (defaults to true).
+        placeholder (str | None): Custom placeholder text if the input is empty; max 100 characters.
+        value (str | None): Pre-filled value for this component; max 4000 characters.
+        min_length (int): The minimum length of the text input field.
+        max_length (int): The maximum length of the text input field.
+        style (TextInputFieldLength): The style of the text input field.
     """
 
     # noinspection PyShadowingBuiltins
@@ -292,18 +305,11 @@ class FileUpload:
     """
     Represents a file upload component in a modal.
 
-    Parameters
-    ----------
-    custom_id: :class:`str`
-        The label of the file upload field.
-    id: :class:`int`
-        A unique id of the file upload field. Must be valid python identifier.
-    min_values: :class:`int`
-        Minimum number of items that must be uploaded (defaults to 1); min 0, max 10
-    max_values: :class:`int`
-        Maximum number of items that can be uploaded (defaults to 1); max 10
-    required: :class:`bool`
-        Whether this component is required to be filled (defaults to true).
+    Args:
+        id (int): A unique id of the file upload field. Must be a valid python identifier.
+        min_values (int): Minimum number of items that must be uploaded (defaults to 1)
+        max_values (int): Maximum number of items that must be uploaded (defaults to 1)
+        required (bool): Whether this component is required to be filled (defaults to true).
     """
 
     # noinspection PyShadowingBuiltins

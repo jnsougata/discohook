@@ -87,6 +87,9 @@ Create a new application emoji.
 
 ### Returns
 
+- **Type:** `PartialEmoji`
+  - PartialEmoji object.
+
 <a id="client-create-webhook"></a>
 #### `create_webhook`
 
@@ -104,6 +107,9 @@ Creates a webhook in a channel.
 - **reason** (`str | None`): Reason for creating the webhook. This will be shown in the audit log.
 
 ### Returns
+
+- **Type:** `Webhook`
+  - Webhook object.
 
 <a id="client-custom-id-parser"></a>
 #### `custom_id_parser`
@@ -128,6 +134,9 @@ Delete an existing emoji in a guild.
 - **emoji_id** (`str`): ID of the emoji.
 
 ### Returns
+
+- **Type:** `aiohttp.ClientResponse`
+  - Aiohttp response object.
 
 <a id="client-delete-command"></a>
 #### `delete_command`
@@ -157,6 +166,11 @@ Edits the client user.
 - **username** (`str`): Updated username.
 - **avatar** (`str | None`): Updated avatar of the client user in base64 data URI scheme. Defaults to None.
 
+### Returns
+
+- **Type:** `aiohttp.ClientResponse`
+  - Updated client user.
+
 <a id="client-edit-application-emoji"></a>
 #### `edit_application_emoji`
 
@@ -173,6 +187,9 @@ Edits an existing emoji in a guild.
 
 ### Returns
 
+- **Type:** `aiohttp.ClientResponse`
+  - Aiohttp response object.
+
 <a id="client-fetch-application-emoji"></a>
 #### `fetch_application_emoji`
 
@@ -188,6 +205,9 @@ Fetches an emoji from the client.
 
 ### Returns
 
+- **Type:** `aiohttp.ClientResponse`
+  - Aiohttp response object.
+
 <a id="client-fetch-application-emojis"></a>
 #### `fetch_application_emojis`
 
@@ -196,6 +216,11 @@ async fetch_application_emojis(self)
 ```
 
 Fetch all emojis from the client.
+
+### Returns
+
+- **Type:** `aiohttp.ClientResponse`
+  - Aiohttp response object.
 
 <a id="client-fetch-channel"></a>
 #### `fetch_channel`
@@ -212,6 +237,9 @@ Fetches the channel from given ID.
 
 ### Returns
 
+- **Type:** `Channel`
+  - Channel object or None.
+
 <a id="client-fetch-commands"></a>
 #### `fetch_commands`
 
@@ -222,6 +250,9 @@ async fetch_commands(self)
 Fetches the commands of the client.
 
 ### Returns
+
+- **Type:** `aiohttp.ClientResponse`
+  - Aiohttp response object.
 
 <a id="client-fetch-guild"></a>
 #### `fetch_guild`
@@ -239,6 +270,9 @@ Fetches the guild of given id.
 
 ### Returns
 
+- **Type:** `Guild | None`
+  - Guild object or None.
+
 <a id="client-fetch-info"></a>
 #### `fetch_info`
 
@@ -249,6 +283,9 @@ async fetch_info(self) -> Dict[str, Any]
 Fetches the application object associated with the requesting client user.
 
 ### Returns
+
+- **Type:** `aiohttp.ClientResponse`
+  - Aiohttp response object.
 
 <a id="client-fetch-user"></a>
 #### `fetch_user`
@@ -265,6 +302,9 @@ Fetches the user from given ID.
 
 ### Returns
 
+- **Type:** `User | None`
+  - User object or None.
+
 <a id="client-fetch-webhook"></a>
 #### `fetch_webhook`
 
@@ -280,6 +320,9 @@ Fetch a webhook from the client.
 - **webhook_token** (`str | None`): Token of the webhook to fetch.
 
 ### Returns
+
+- **Type:** `Webhook`
+  - Webhook object.
 
 <a id="client-from-env"></a>
 #### `from_env`
@@ -309,6 +352,9 @@ async me(self) -> discohook.user.User
 Fetch the client as a discord user.
 
 ### Returns
+
+- **Type:** `User`
+  - Client as a discord user.
 
 <a id="client-on-error"></a>
 #### `on_error`
@@ -356,4 +402,7 @@ Send a message to a channel.
 - **components** (`Tuple[TopLevelComponent]`): Components to send in the message.
 
 ### Returns
+
+- **Type:** `Message`
+  - Message object.
 

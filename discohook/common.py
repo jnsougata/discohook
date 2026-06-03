@@ -1,4 +1,4 @@
-import asyncio
+import inspect
 from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 from .enums import ComponentType
@@ -16,11 +16,11 @@ class Interactable:
 
     def check(self):
         """
-        A decorator that adds a check to a specific command or component.
+        Decorator that adds a check to a specific command or component.
         """
 
         def decorator(coro: Callable[["Interaction"], bool]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("check must be a coroutine")
             self.checks.append(coro)
             return coro
@@ -28,18 +28,18 @@ class Interactable:
         return decorator
 
     def _set_callback(self, callback: Callable[["Interaction", Any], Any]):
-        if not asyncio.iscoroutinefunction(callback):
+        if not inspect.iscoroutinefunction(callback):
             raise TypeError("Callback must be a coroutine.")
         self.callback = callback
         # self._component_factory.append(self)
 
     def error_handler(self):
         """
-        A decorator that adds an error handler to a specific command or component.
+        Decorator that adds an error handler to a specific command or component.
         """
 
         def decorator(coro: Callable[["Interaction"], None]):
-            if not asyncio.iscoroutinefunction(coro):
+            if not inspect.iscoroutinefunction(coro):
                 raise TypeError("error handler must be a coroutine")
             self._error_handler = coro
 
@@ -52,7 +52,7 @@ class Interactable:
 
     def to_dict(self):
         """
-        Convert the component to a dict to be sent to discord. For internal use only.
+        Convert the component to a dict. For internal use only.
         """
         ...
 
@@ -62,10 +62,9 @@ class Component(Interactable):
     """
     Represents a discord component.
 
-    Parameters
-    ----------
-    type: :class:`ComponentType`
-        The type of the component.
+    Args:
+        type (ComponentType | None): Type of the component.
+        custom_id (str | None): Custom ID of the component.
     """
 
     def __init__(

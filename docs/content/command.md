@@ -101,6 +101,9 @@ Converts the command to a dictionary. Not intended for use by end-users.
 
 ### Returns
 
+- **Type:** `dict`
+  - Dictionary of the command object.
+
 
 <a id="class-subcommand"></a>
 ## Class `SubCommand`
