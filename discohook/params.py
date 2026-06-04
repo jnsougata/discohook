@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 import aiohttp
 
+from . import Poll
 from .enums import InteractionCallbackType
 from .file import File
 from .models import AllowedMentions, MessageReference
@@ -26,6 +27,7 @@ def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
 def _prepare_payload(
     view: View,
     *,
+    poll: Optional[Poll] = None,
     ephemeral: Optional[bool] = False,
     allowed_mentions: Optional[AllowedMentions] = None,
     message_reference: Optional[MessageReference] = None,
@@ -50,6 +52,8 @@ def _prepare_payload(
     payload["components"] = [child.to_dict() for child in view.children]
     if kwargs:
         payload.update(kwargs)
+    if poll:
+        payload["poll"] = poll.to_dict()
     if payload_type:
         payload = {"type": payload_type.value, "data": payload}
     if len(view.attachments):

@@ -25,6 +25,7 @@ from .user import User
 from .webhook import Webhook
 
 
+# noinspection PyShadowingBuiltins
 class Client(Starlette):
     """
     Base client class.
@@ -313,23 +314,21 @@ class Client(Starlette):
             channel_id, {"name": name, "avatar": image_base64}, reason=reason
         )
         data = await resp.json()
-        return Webhook(data, self)
+        return Webhook.from_data(self, data=data)
 
-    async def fetch_webhook(
-        self, webhook_id: str, *, webhook_token: Optional[str] = None
-    ):
+    async def fetch_webhook(self, id: str):
         """
         Fetch a webhook from the client.
 
         Args:
-            webhook_id (str): ID of the webhook to fetch.
-            webhook_token (str | None): Token of the webhook to fetch.
+            id (str): ID of the webhook to fetch.
 
         Returns:
             Webhook: Webhook object.
         """
-        resp = await self.http.get_webhook(webhook_id, webhook_token)
-        return Webhook(await resp.json(), self)
+        resp = await self.http.get_webhook(id=id)
+        data = await resp.json()
+        return Webhook.from_data(self, data=data)
 
     async def fetch_guild(
         self, guild_id: str, *, with_counts: Optional[bool] = False

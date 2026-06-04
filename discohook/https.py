@@ -8,6 +8,7 @@ from .errors import HTTPException, RateLimitExceeded
 from .ratelimit import RatelimitMux
 
 
+# noinspection PyShadowingBuiltins
 class HTTPClient:
     """Represents an HTTP client for Discord's API."""
 
@@ -1121,53 +1122,62 @@ class HTTPClient:
     async def get_guild_webhooks(self):
         pass
 
-    async def get_webhook(self, webhook_id: str, webhook_token: Optional[str] = None):
-        if webhook_token:
-            return await self.request("GET", f"/webhooks/{webhook_id}/{webhook_token}")
-        return await self.request("GET", f"/webhooks/{webhook_id}", authorize=True)
+    async def get_webhook(self, *, id: str):
+        return await self.request("GET", f"/webhooks/{id}", authorize=True)
+
+    async def get_webhook_with_token(self, *, id: str, token: str):
+        return await self.request("GET", f"/webhooks/{id}/{token}")
 
     async def modify_webhook(
         self,
+        *,
         webhook_id: str,
         payload: Dict[str, Any],
-        *,
-        token: str = "",
         reason: Optional[str] = None,
     ):
-        if token:
-            path = f"/webhooks/{webhook_id}/{token}"
-            authorize = False
-        else:
-            path = f"/webhooks/{webhook_id}"
-            authorize = True
         return await self.request(
             "PATCH",
-            path,
+            f"/webhooks/{webhook_id}",
             body=payload,
-            authorize=authorize,
+            authorize=True,
             reason=reason,
         )
 
-    async def modify_webhook_with_token(self):
-        pass
-
-    async def delete_webhook(self, webhook_id: str, *, reason: Optional[str] = None):
+    async def modify_webhook_with_token(
+        self,
+        *,
+        id: str,
+        token: str,
+        payload: Dict[str, Any]
+    ):
         return await self.request(
-            "DELETE", f"/webhooks/{webhook_id}", authorize=True, reason=reason
+            "PATCH",
+            f"/webhooks/{id}/{token}",
+            body=payload,
+            authorize=False,
         )
 
-    async def delete_webhook_with_token(self):
-        pass
+    async def delete_webhook(self, *, id: str, reason: Optional[str] = None):
+        return await self.request(
+            "DELETE", f"/webhooks/{id}", authorize=True, reason=reason
+        )
+
+    async def delete_webhook_with_token(self, *, id: str, token: str):
+        return await self.request(
+            "DELETE",
+            f"/webhooks/{id}/{token}",
+        )
 
     async def execute_webhook(
         self,
-        webhook_id: str,
-        webhook_token: str,
+        *,
+        id: str,
+        token: str,
         data: Any,
         **params: Any,
     ):
         return await self.request(
-            "POST", f"/webhooks/{webhook_id}/{webhook_token}", body=data, **params
+            "POST", f"/webhooks/{id}/{token}", body=data, **params
         )
 
     async def execute_slack_compatible_webhook(self):
@@ -1176,29 +1186,33 @@ class HTTPClient:
     async def execute_github_compatible_webhook(self):
         pass
 
-    async def get_webhook_message(self):
-        pass
+    async def get_webhook_message(self, *, id: str, token: str, message_id: str, **params):
+        return await self.request(
+            "GET", f"/webhooks/{id}/{token}/messages/{message_id}",
+            params=params,
+        )
 
     async def edit_webhook_message(
         self,
-        webhook_id: str,
-        webhook_token: str,
+        *,
+        id: str,
+        token: str,
         message_id: str,
         data: Any,
         **params: Any,
     ):
         return await self.request(
             "PATCH",
-            f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}",
+            f"/webhooks/{id}/{token}/messages/{message_id}",
             body=data,
             **params,
         )
 
     async def delete_webhook_message(
-        self, webhook_id: str, webhook_token: str, message_id: str
+        self, *, id: str, token: str, message_id: str
     ):
         await self.request(
-            "DELETE", f"/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"
+            "DELETE", f"/webhooks/{id}/{token}/messages/{message_id}"
         )
 
     # TODO
