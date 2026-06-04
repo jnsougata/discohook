@@ -1,6 +1,11 @@
+import re
 import vitedoc
 from vitedoc import Action
 
+
+version = ""
+with open("discohook/__init__.py") as f:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)  # type: ignore
 
 if __name__ == '__main__':
     vitedoc.init(
@@ -12,7 +17,7 @@ if __name__ == '__main__':
             Action(
                 theme="brand",
                 text="Docs",
-                link="/content/discohook",
+                link=f"/guide/{version}/introduction",
             ),
             Action(
                 theme="alt",
