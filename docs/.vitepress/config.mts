@@ -11,13 +11,13 @@ export default defineConfig({
         "link",
         {
             "rel": "icon",
-            "href": "/favicon.png"
+            "href": "/logo.png"
         }
     ]
 ],
 
     themeConfig: {
-        logo: "/favicon.png",
+        logo: "/logo.png",
 
         nav: [],
 

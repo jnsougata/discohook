@@ -12,7 +12,6 @@ if __name__ == '__main__':
         base_dir="docs",
         title="discohook",
         description="A discord interaction API wrapper for serverless applications.",
-        logo_path="/favicon.png",
         actions=[
             Action(
                 theme="brand",

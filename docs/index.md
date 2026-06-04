@@ -4,7 +4,7 @@ hero:
   name: discohook
   tagline: A discord interaction API wrapper for serverless applications.
   image:
-    src: /favicon.png
+    src: /logo.png
     alt: discohook logo
   actions:
   - theme: brand

@@ -3,7 +3,7 @@
   "modules": {
     "discohook": {
       "name": "discohook",
-      "docstring": "Discord HTTP Interaction API Wrapper\n\nA simple wrapper for the Discord HTTP Interaction API, designed for serverless apps.",
+      "docstring": "A simple wrapper for the Discord HTTP Interaction API, designed for serverless apps.",
       "classes": {},
       "functions": {}
     },
