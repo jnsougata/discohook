@@ -1,6 +1,6 @@
 import re
 import vitedoc
-from vitedoc import Action
+from vitedoc import Action, Feature
 
 
 version = ""
@@ -15,7 +15,7 @@ if __name__ == '__main__':
         actions=[
             Action(
                 theme="brand",
-                text="Docs",
+                text="Get started",
                 link=f"/guide/{version}/introduction",
             ),
             Action(
@@ -23,5 +23,19 @@ if __name__ == '__main__':
                 text="GitHub",
                 link="https://github.com/jnsougata/discohook"
             ),
+        ],
+        features=[
+            Feature(
+                icon_emoji="🚀",
+                title="Serverless Optimized",
+                details="Built specifically for cloud environments to ensure fast and low latency Discord "
+                        "interactions without persistent connections."
+            ),
+            Feature(
+                icon_emoji="🧩",
+                title="Unified Command System",
+                details="Quickly build and register various Discord interaction types including slash commands, "
+                        "user commands, and message commands all within one intuitive interface."
+            )
         ]
     )
