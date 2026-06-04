@@ -329,9 +329,9 @@
               "docstring": "Creates a webhook in a channel.\n\nArgs:\n    channel_id (str): ID of the channel to create the webhook in.\n    name (str): Name of the webhook.\n    image_base64 (str | None): Base64 encoded image of the webhook.\n    reason (str | None): Reason for creating the webhook. This will be shown in the audit log.\n\nReturns:\n    Webhook: Webhook object."
             },
             "fetch_webhook": {
-              "signature": "(self, webhook_id: str, *, webhook_token: str | None = None)",
+              "signature": "(self, id: str)",
               "async": true,
-              "docstring": "Fetch a webhook from the client.\n\nArgs:\n    webhook_id (str): ID of the webhook to fetch.\n    webhook_token (str | None): Token of the webhook to fetch.\n\nReturns:\n    Webhook: Webhook object."
+              "docstring": "Fetch a webhook from the client.\n\nArgs:\n    id (str): ID of the webhook to fetch.\n\nReturns:\n    Webhook: Webhook object."
             },
             "fetch_guild": {
               "signature": "(self, guild_id: str, *, with_counts: bool | None = False) -> discohook.guild.Guild | None",
@@ -2264,32 +2264,37 @@
               "docstring": null
             },
             "get_webhook": {
-              "signature": "(self, webhook_id: str, webhook_token: str | None = None)",
+              "signature": "(self, *, id: str)",
+              "async": true,
+              "docstring": null
+            },
+            "get_webhook_with_token": {
+              "signature": "(self, *, id: str, token: str)",
               "async": true,
               "docstring": null
             },
             "modify_webhook": {
-              "signature": "(self, webhook_id: str, payload: Dict[str, Any], *, token: str = '', reason: str | None = None)",
+              "signature": "(self, *, webhook_id: str, payload: Dict[str, Any], reason: str | None = None)",
               "async": true,
               "docstring": null
             },
             "modify_webhook_with_token": {
-              "signature": "(self)",
+              "signature": "(self, *, id: str, token: str, payload: Dict[str, Any])",
               "async": true,
               "docstring": null
             },
             "delete_webhook": {
-              "signature": "(self, webhook_id: str, *, reason: str | None = None)",
+              "signature": "(self, *, id: str, reason: str | None = None)",
               "async": true,
               "docstring": null
             },
             "delete_webhook_with_token": {
-              "signature": "(self)",
+              "signature": "(self, *, id: str, token: str)",
               "async": true,
               "docstring": null
             },
             "execute_webhook": {
-              "signature": "(self, webhook_id: str, webhook_token: str, data: Any, **params: Any)",
+              "signature": "(self, *, id: str, token: str, data: Any, **params: Any)",
               "async": true,
               "docstring": null
             },
@@ -2304,17 +2309,17 @@
               "docstring": null
             },
             "get_webhook_message": {
-              "signature": "(self)",
+              "signature": "(self, *, id: str, token: str, message_id: str, **params)",
               "async": true,
               "docstring": null
             },
             "edit_webhook_message": {
-              "signature": "(self, webhook_id: str, webhook_token: str, message_id: str, data: Any, **params: Any)",
+              "signature": "(self, *, id: str, token: str, message_id: str, data: Any, **params: Any)",
               "async": true,
               "docstring": null
             },
             "delete_webhook_message": {
-              "signature": "(self, webhook_id: str, webhook_token: str, message_id: str)",
+              "signature": "(self, *, id: str, token: str, message_id: str)",
               "async": true,
               "docstring": null
             },
@@ -2935,7 +2940,7 @@
         "_prepare_payload": {
           "name": "_prepare_payload",
           "qualified_name": "discohook.params._prepare_payload",
-          "signature": "(view: discohook.view.View, *, ephemeral: bool | None = False, allowed_mentions: discohook.models.AllowedMentions | None = None, message_reference: discohook.models.MessageReference | None = None, suppress_embeds: bool | None = False, supress_notifications: bool | None = False, payload_type: discohook.enums.InteractionCallbackType | None = None, **kwargs: Any) -> Dict[str, Any] | aiohttp.multipart.MultipartWriter",
+          "signature": "(view: discohook.view.View, *, poll: ForwardRef('Poll') | None = None, ephemeral: bool | None = False, allowed_mentions: discohook.models.AllowedMentions | None = None, message_reference: discohook.models.MessageReference | None = None, suppress_embeds: bool | None = False, supress_notifications: bool | None = False, payload_type: discohook.enums.InteractionCallbackType | None = None, **kwargs: Any) -> Dict[str, Any] | aiohttp.multipart.MultipartWriter",
           "async": false,
           "docstring": null
         }
@@ -3485,89 +3490,88 @@
       "name": "discohook.webhook",
       "docstring": null,
       "classes": {
-        "Webhook": {
-          "name": "Webhook",
-          "qualified_name": "discohook.webhook.Webhook",
-          "docstring": null,
+        "PartialWebhook": {
+          "name": "PartialWebhook",
+          "qualified_name": "discohook.webhook.PartialWebhook",
+          "docstring": "Represents a Discord webhook with no authentication.\n\nAttributes:\n    id (str): Discord webhook id.\n    token (str): Discord webhook token.\n    type (int): Discord webhook type.\n    guild_id (str): Discord webhook guild id.\n    channel_id (str): Discord webhook channel id.\n    name (str): Discord webhook name.\n    avatar (str): Discord webhook avatar hash.\n    application_id (str): ID of the application that created it.\n    source_guild (str): Guild of the channel that this webhook is following\n        (returned for Channel Follower Webhooks).\n    source_channel (str): Channel that this webhook is following\n        (returned for Channel Follower Webhooks).",
           "bases": [],
-          "properties": {
-            "id": {
-              "docstring": null
-            },
-            "type": {
-              "docstring": null
-            },
-            "guild_id": {
-              "docstring": null
-            },
-            "channel_id": {
-              "docstring": null
-            },
-            "name": {
-              "docstring": null
-            },
-            "avatar": {
-              "docstring": null
-            },
-            "token": {
-              "docstring": null
-            },
-            "application_id": {
-              "docstring": null
-            },
-            "source_guild": {
-              "docstring": null
-            },
-            "source_channel": {
-              "docstring": null
-            },
-            "url": {
-              "docstring": null
-            },
-            "user": {
-              "docstring": null
-            }
-          },
+          "properties": {},
           "methods": {
             "from_url": {
               "signature": null,
               "async": false,
-              "docstring": null
+              "docstring": "Creates a webhook from a Discord webhook URL.\n\nArgs:\n    url (str): Discord webhook URL.\n\nReturns:\n    PartialWebhook: Webhook object."
             },
-            "fetch": {
+            "from_data": {
               "signature": null,
               "async": false,
-              "docstring": "Fetches the webhook from Discord.\n\nReturns\n-------\n:class:`Webhook`\n    The fetched webhook."
+              "docstring": "Creates a webhook from a Discord webhook data.\n\nArgs:\n    data (dict): Discord webhook data.\n\nReturns:\n    PartialWebhook: Webhook object."
+            },
+            "resolve": {
+              "signature": "(self)",
+              "async": true,
+              "docstring": "Populates the webhook attributes."
             },
             "delete": {
-              "signature": "(self, *, reason: str | None = None)",
+              "signature": "(self)",
               "async": true,
-              "docstring": "Deletes the webhook.\nReturns\n-------\nNone"
+              "docstring": "Deletes the webhook."
             },
             "modify": {
-              "signature": "(self, name: str | None = None, image_base64: str | None = None, channel_id: str | None = None, reason: str | None = None)",
+              "signature": "(self, *, name: str | None = None, image_base64: str | None = None, channel_id: str | None = None)",
               "async": true,
-              "docstring": "Edits the webhook.\n\nParameters\n----------\nname: Optional[:class:`str`]\n    The new name of the webhook.\nimage_base64: Optional[:class:`str`]\n    The new avatar of the webhook.\nchannel_id: Optional[:class:`str`]\n    The new channel id of the webhook.\nreason: Optional[:class:`str`]\n    The reason for editing the webhook to be logged.\n\nReturns\n-------\n:class:`Webhook`\n\nNotes\n-----\nThe image must be a base64 encoded string.\nAll parameters are optional."
+              "docstring": "Edits the webhook.\n\nArgs:\n    name (str | None): Name of the webhook.\n    image_base64 (str | None): Avatar of the webhook as a base64 encoded string.\n    channel_id (str | None): Channel id of the webhook."
             },
-            "send": {
-              "signature": "(self, *components: discohook.components.TextDisplay | discohook.components.Section | discohook.file.File | discohook.components.MediaGallery | discohook.components.ActionRow | discohook.components.Separator | discohook.components.Container, username: str | None = None, avatar_url: str | None = None, thread_name: str | None = None, wait: bool = False, thread_id: str | None = None) -> aiohttp.client_reqrep.ClientResponse",
+            "execute": {
+              "signature": "(self, *components: str | discohook.components.TextDisplay | discohook.components.ActionRow | discohook.components.Section | discohook.components.Container | discohook.components.Separator | discohook.file.File | discohook.components.MediaGallery, poll: discohook.poll.Poll | None = None, username: str | None = None, avatar_url: str | None = None, thread_name: str | None = None, wait: bool = False, thread_id: str | None = None) -> aiohttp.client_reqrep.ClientResponse",
               "async": true,
-              "docstring": "Sends a message to the webhook.\n\nParameters\n----------\n*components:\n    Components to be sent with the message.\nusername:\n    The username of the webhook.\navatar_url:\n    The avatar url of the webhook. (Overrides the webhook's avatar)\nthread_name: Optional[:class:`str`]\n    The name of the thread to create.\nwait: :class:`bool`\n    Waits for server confirmation of the message.\nthread_id: Optional[:class:`str`]\n    Whether to send to a specified thread within the webhook's channel.\n\nReturns\n-------\naiohttp.ClientResponse"
+              "docstring": "Executes the webhook.\n\nArgs:\n    components (Tuple[TopLevelComponent]): Components to be sent with the message.\n    poll (Poll | None): Poll to be sent with the message.\n    username (str | None): Name of the webhook. (Overrides the default username)\n    avatar_url (str | None): Avatar of the webhook. (Overrides the default avatar)\n    thread_name (str | None): Name of the thread to create.\n        (Requires the webhook channel to be a forum or media channel)\n    wait (bool): Whether to wait for server confirmation of the message before responding.\n    thread_id (str): Whether to send to a specified thread within the webhook's channel.\n\nReturns:\n    aiohttp.ClientResponse: Response from the webhook.\n\nRaises:\n    ValueError: If the webhook token is not set or resolved."
             },
             "fetch_message": {
               "signature": "(self, message_id: str, *, thread_id: str | None = None)",
               "async": true,
-              "docstring": "Fetches a message sent by the webhook.\n\nParameters\n----------\nmessage_id: :class:`str`\n    The id of the message to edit.\nthread_id: Optional[:class:`str`]\n    The thread id the message is in.\n\nReturns\n-------\n:class:`Message`"
+              "docstring": "Fetches a message sent by the webhook.\n\nArgs:\n    message_id (str): Message id to fetch.\n    thread_id (str | None): ID of the thread the message is in.\n\nReturns:\n    aiohttp.ClientResponse: Response from the webhook.\n\nRaises:\n    ValueError: If the webhook token is not set or resolved."
             },
             "edit_message": {
-              "signature": "(self, message_id: str, *components: discohook.components.TextDisplay | discohook.components.Section | discohook.file.File | discohook.components.MediaGallery | discohook.components.ActionRow | discohook.components.Separator | discohook.components.Container, thread_id: str | None = None) -> discohook.message.Message",
+              "signature": "(self, message_id: str, *components: str | discohook.components.TextDisplay | discohook.components.ActionRow | discohook.components.Section | discohook.components.Container | discohook.components.Separator | discohook.file.File | discohook.components.MediaGallery, thread_id: str | None = None) -> discohook.message.Message",
               "async": true,
-              "docstring": "Edits a message from the webhook.\n\nParameters\n----------\nmessage_id: :class:`str`\n    The id of the message to edit.\n*components:\n    Components to be sent with the message.\nthread_id: Optional[:class:`str`]\n    The thread id the message is in.\n\nReturns\n-------\n:class:`Message`"
+              "docstring": "Edits a message from the webhook.\n\nArgs:\n    message_id (str): Message id to edit.\n    components (Tuple[TopLevelComponent]): Components to be sent with the message.\n    thread_id (str | None): ID of the thread the message is in.\n\nReturns:\n    aiohttp.ClientResponse: Response from the webhook."
             },
             "delete_message": {
               "signature": "(self, message_id: str) -> aiohttp.client_reqrep.ClientResponse",
               "async": true,
-              "docstring": "Deletes a message from the webhook.\n\nParameters\n----------\nmessage_id: :class:`str`\n    The id of the message to delete.\n\nReturns\n-------\naiohttp.ClientResponse"
+              "docstring": "Deletes a message from the webhook.\n\nArgs:\n    message_id (str): Message id to delete.\n\nReturns:\n    aiohttp.ClientResponse: Response from the webhook."
+            }
+          }
+        },
+        "Webhook": {
+          "name": "Webhook",
+          "qualified_name": "discohook.webhook.Webhook",
+          "docstring": "Represents a Discord webhook.",
+          "bases": [
+            "discohook.webhook.PartialWebhook"
+          ],
+          "properties": {},
+          "methods": {
+            "from_data": {
+              "signature": null,
+              "async": false,
+              "docstring": null
+            },
+            "resolve": {
+              "signature": "(self)",
+              "async": true,
+              "docstring": "Populates the webhook attributes."
+            },
+            "delete": {
+              "signature": "(self, *, reason: str | None = None)",
+              "async": true,
+              "docstring": "Deletes the webhook.\n\nArgs:\n    reason (str | None): Reason to delete the webhook. Shows up in audit log."
+            },
+            "modify": {
+              "signature": "(self, name: str | None = None, image_base64: str | None = None, channel_id: str | None = None, reason: str | None = None)",
+              "async": true,
+              "docstring": "Edits the webhook.\n\nArgs:\n    name (str | None): Name of the webhook.\n    image_base64 (str | None): Avatar of the webhook as a base64 encoded string.\n    channel_id (str | None): Channel id of the webhook.\n    reason (str | None): Reason to edit the webhook. Shows up in audit log.\n\nReturns:\n    Webhook: Modified webhook object."
             }
           }
         }
@@ -3577,9 +3581,9 @@
   },
   "summary": {
     "modules": 39,
-    "classes": 83,
+    "classes": 84,
     "functions": 24,
-    "methods": 396,
-    "properties": 114
+    "methods": 402,
+    "properties": 102
   }
 }

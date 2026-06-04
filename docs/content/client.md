@@ -309,15 +309,14 @@ Fetches the user from given ID.
 #### `fetch_webhook`
 
 ```python
-async fetch_webhook(self, webhook_id: str, *, webhook_token: str | None = None)
+async fetch_webhook(self, id: str)
 ```
 
 Fetch a webhook from the client.
 
 ### Arguments
 
-- **webhook_id** (`str`): ID of the webhook to fetch.
-- **webhook_token** (`str | None`): Token of the webhook to fetch.
+- **id** (`str`): ID of the webhook to fetch.
 
 ### Returns
 

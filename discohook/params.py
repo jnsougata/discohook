@@ -3,14 +3,13 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 import aiohttp
 
-from . import Poll
 from .enums import InteractionCallbackType
 from .file import File
 from .models import AllowedMentions, MessageReference
 from .view import View
 
 if TYPE_CHECKING:
-    pass
+    from .poll import Poll
 
 
 def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
@@ -27,7 +26,7 @@ def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
 def _prepare_payload(
     view: View,
     *,
-    poll: Optional[Poll] = None,
+    poll: Optional["Poll"] = None,
     ephemeral: Optional[bool] = False,
     allowed_mentions: Optional[AllowedMentions] = None,
     message_reference: Optional[MessageReference] = None,

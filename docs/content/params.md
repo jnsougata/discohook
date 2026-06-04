@@ -29,6 +29,6 @@ _append_file(form: aiohttp.multipart.MultipartWriter, index: int, file: discohoo
 ### Signature
 
 ```python
-_prepare_payload(view: discohook.view.View, *, ephemeral: bool | None = False, allowed_mentions: discohook.models.AllowedMentions | None = None, message_reference: discohook.models.MessageReference | None = None, suppress_embeds: bool | None = False, supress_notifications: bool | None = False, payload_type: discohook.enums.InteractionCallbackType | None = None, **kwargs: Any) -> Dict[str, Any] | aiohttp.multipart.MultipartWriter
+_prepare_payload(view: discohook.view.View, *, poll: ForwardRef('Poll') | None = None, ephemeral: bool | None = False, allowed_mentions: discohook.models.AllowedMentions | None = None, message_reference: discohook.models.MessageReference | None = None, suppress_embeds: bool | None = False, supress_notifications: bool | None = False, payload_type: discohook.enums.InteractionCallbackType | None = None, **kwargs: Any) -> Dict[str, Any] | aiohttp.multipart.MultipartWriter
 ```
 

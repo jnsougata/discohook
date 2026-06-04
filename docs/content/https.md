@@ -170,6 +170,7 @@ Represents an HTTP client for Discord's API.
 - [get_user_voice_state](#httpclient-get-user-voice-state)
 - [get_webhook](#httpclient-get-webhook)
 - [get_webhook_message](#httpclient-get-webhook-message)
+- [get_webhook_with_token](#httpclient-get-webhook-with-token)
 - [group_dm_add_recipient](#httpclient-group-dm-add-recipient)
 - [group_dm_remove_recipient](#httpclient-group-dm-remove-recipient)
 - [join_thread](#httpclient-join-thread)
@@ -696,21 +697,21 @@ async delete_user_reaction(self)
 #### `delete_webhook`
 
 ```python
-async delete_webhook(self, webhook_id: str, *, reason: str | None = None)
+async delete_webhook(self, *, id: str, reason: str | None = None)
 ```
 
 <a id="httpclient-delete-webhook-message"></a>
 #### `delete_webhook_message`
 
 ```python
-async delete_webhook_message(self, webhook_id: str, webhook_token: str, message_id: str)
+async delete_webhook_message(self, *, id: str, token: str, message_id: str)
 ```
 
 <a id="httpclient-delete-webhook-with-token"></a>
 #### `delete_webhook_with_token`
 
 ```python
-async delete_webhook_with_token(self)
+async delete_webhook_with_token(self, *, id: str, token: str)
 ```
 
 <a id="httpclient-edit-application-command-permissions"></a>
@@ -773,7 +774,7 @@ async edit_original_interaction_response(self)
 #### `edit_webhook_message`
 
 ```python
-async edit_webhook_message(self, webhook_id: str, webhook_token: str, message_id: str, data: Any, **params: Any)
+async edit_webhook_message(self, *, id: str, token: str, message_id: str, data: Any, **params: Any)
 ```
 
 <a id="httpclient-end-poll"></a>
@@ -801,7 +802,7 @@ async execute_slack_compatible_webhook(self)
 #### `execute_webhook`
 
 ```python
-async execute_webhook(self, webhook_id: str, webhook_token: str, data: Any, **params: Any)
+async execute_webhook(self, *, id: str, token: str, data: Any, **params: Any)
 ```
 
 <a id="httpclient-fetch-answer-voters"></a>
@@ -1305,14 +1306,21 @@ async get_user_voice_state(self)
 #### `get_webhook`
 
 ```python
-async get_webhook(self, webhook_id: str, webhook_token: str | None = None)
+async get_webhook(self, *, id: str)
 ```
 
 <a id="httpclient-get-webhook-message"></a>
 #### `get_webhook_message`
 
 ```python
-async get_webhook_message(self)
+async get_webhook_message(self, *, id: str, token: str, message_id: str, **params)
+```
+
+<a id="httpclient-get-webhook-with-token"></a>
+#### `get_webhook_with_token`
+
+```python
+async get_webhook_with_token(self, *, id: str, token: str)
 ```
 
 <a id="httpclient-group-dm-add-recipient"></a>
@@ -1669,14 +1677,14 @@ async modify_user_voice_state(self)
 #### `modify_webhook`
 
 ```python
-async modify_webhook(self, webhook_id: str, payload: Dict[str, Any], *, token: str = '', reason: str | None = None)
+async modify_webhook(self, *, webhook_id: str, payload: Dict[str, Any], reason: str | None = None)
 ```
 
 <a id="httpclient-modify-webhook-with-token"></a>
 #### `modify_webhook_with_token`
 
 ```python
-async modify_webhook_with_token(self)
+async modify_webhook_with_token(self, *, id: str, token: str, payload: Dict[str, Any])
 ```
 
 <a id="httpclient-pin-message"></a>

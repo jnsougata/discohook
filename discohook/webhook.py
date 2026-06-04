@@ -53,6 +53,9 @@ class PartialWebhook:
 
         Args:
             url (str): Discord webhook URL.
+
+        Returns:
+            PartialWebhook: Webhook object.
         """
         id, token = url.split("/")[-2:]
         return cls(id=id, token=token)
@@ -61,6 +64,12 @@ class PartialWebhook:
     def from_data(cls, data: dict) -> "PartialWebhook":
         """
         Creates a webhook from a Discord webhook data.
+
+        Args:
+            data (dict): Discord webhook data.
+
+        Returns:
+            PartialWebhook: Webhook object.
         """
         webhook = cls(id=data["id"], token=data.get("token", ""))
         for key, value in data.items():
@@ -229,7 +238,7 @@ class Webhook(PartialWebhook):
         super().__init__(id=id, token="")
         self.user = None
         self.client = client
-    
+
     @classmethod
     async def from_data(cls, client: "Client", *, data: dict) -> "Webhook":
         webhook = Webhook(client=client, id=data["id"])
