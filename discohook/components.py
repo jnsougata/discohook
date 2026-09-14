@@ -120,7 +120,7 @@ class MediaGallery:
 # noinspection PyShadowingBuiltins
 class TextDisplay:
 
-    def __init__(self, *, markdown: str, id: Optional[int] = None):
+    def __init__(self, markdown: str, *, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.text_display
         self.content = markdown
