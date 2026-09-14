@@ -157,12 +157,12 @@ class Message:
             return None
         return Poll._from_message(self.client, self)  # noqa
 
-    @property
-    def embeds(self) -> Optional[List[Embed]]:
-        embeds = self.data.get("embeds")
-        if not embeds:
-            return None
-        return [Embed.from_dict(x) for x in embeds]
+    # @property
+    # def embeds(self) -> Optional[List[Embed]]:
+    #     embeds = self.data.get("embeds")
+    #     if not embeds:
+    #         return None
+    #     return [Embed.from_dict(x) for x in embeds]
 
     @property
     def reactions(self) -> Optional[List[dict]]:

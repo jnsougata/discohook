@@ -304,7 +304,9 @@ class ResponseAdapter:
         """
         payload = _prepare_payload(View.from_children(*components))
         resp = await self.interaction.client.http.execute_webhook(
-            self.interaction.application_id, self.interaction.token, payload
+            id=self.interaction.application_id,
+            token=self.interaction.token,
+            data=payload
         )
         data = await resp.json()
         return FollowupResponse(data, self.interaction)
