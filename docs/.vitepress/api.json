@@ -550,7 +550,7 @@
         "Checkbox": {
           "name": "Checkbox",
           "qualified_name": "discohook.components.Checkbox",
-          "docstring": null,
+          "docstring": "Represents a checkbox component in a modal.\n\nArgs:\n    custom_id (str): A unique id of the checkbox field. Must be a valid python identifier.\n    id (int | None): A unique id of the checkbox field. Must be a valid python identifier.\n    default (bool): Whether this checkbox is checked by default (defaults to false).",
           "bases": [],
           "properties": {},
           "methods": {
@@ -564,7 +564,7 @@
         "CheckboxGroup": {
           "name": "CheckboxGroup",
           "qualified_name": "discohook.components.CheckboxGroup",
-          "docstring": null,
+          "docstring": "Represents a group of checkboxes in a modal.\n\nArgs:\n    custom_id (str): A unique id of the checkbox group. Must be a valid python identifier.\n    options (List[CheckboxGroupOption]): A list of checkbox options in the group.\n    min_values (int | None): Minimum number of checkboxes that must be checked (defaults to None).\n    max_values (int | None): Maximum number of checkboxes that can be checked (defaults to None).\n    required (bool): Whether this component is required to be filled (defaults to true).",
           "bases": [],
           "properties": {},
           "methods": {
@@ -578,7 +578,7 @@
         "CheckboxGroupOption": {
           "name": "CheckboxGroupOption",
           "qualified_name": "discohook.components.CheckboxGroupOption",
-          "docstring": null,
+          "docstring": "Represents an option in a checkbox group.\n\nArgs:\n    label (str): The label of the checkbox option.\n    value (str): The value of the checkbox option.\n    description (str | None): The description of the checkbox option.\n    default (bool): Whether this checkbox option is checked by default (defaults to false).",
           "bases": [],
           "properties": {},
           "methods": {
@@ -592,7 +592,7 @@
         "Container": {
           "name": "Container",
           "qualified_name": "discohook.components.Container",
-          "docstring": null,
+          "docstring": "Container component.\n\nArgs:\n    *components (Tuple[ActionRow | TextDisplay | Section | MediaGallery | Separator | File]): Components to include in the container. Must be between 1 and 10 components.\n    accent_color (int | None): Optional accent color for the container.\n    id (int | None): Unique id for the container.\n\nAttributes:\n    attachments (List[File]): List of attachments in the container.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -620,7 +620,7 @@
         "Label": {
           "name": "Label",
           "qualified_name": "discohook.components.Label",
-          "docstring": null,
+          "docstring": "Represents a label component in a modal.\n\nArgs:\n    label (str): The text of the label.\n    child (Select | TextInput | FileUpload | Checkbox | CheckboxGroup | RadioGroup): Child component for the label.\n    id (int | None): Optional unique id of the label.\n    description (str | None): The description of the label.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -648,7 +648,7 @@
         "MediaGallery": {
           "name": "MediaGallery",
           "qualified_name": "discohook.components.MediaGallery",
-          "docstring": null,
+          "docstring": "Media gallery component.\n\nArgs:\n    *media (Media): Media items to include in the gallery.\n    id (int | None): Unique id for the media gallery.\n\nAttributes:\n    id (int): Media gallery id.\n    type (ComponentType): Media gallery type.\n    items (Tuple[Media]): Media items in the gallery.\n    attachments (List[File]): Attachments for the media items.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -662,7 +662,7 @@
         "RadioGroup": {
           "name": "RadioGroup",
           "qualified_name": "discohook.components.RadioGroup",
-          "docstring": null,
+          "docstring": "Represents a group of radio buttons in a modal.\n\nArgs:\n    custom_id (str): A unique id of the radio group. Must be a valid python identifier.\n    options (List[RadioGroupOption]): A list of radio options in the group.\n    required (bool): Whether this component is required to be filled (defaults to true).",
           "bases": [],
           "properties": {},
           "methods": {
@@ -676,7 +676,7 @@
         "RadioGroupOption": {
           "name": "RadioGroupOption",
           "qualified_name": "discohook.components.RadioGroupOption",
-          "docstring": null,
+          "docstring": "Represents an option in a radio group.\n\nArgs:\n    label (str): Label of the radio option.\n    value (str): Value of the radio option.\n    description (str | None): Description of the radio option.\n    default (bool): Whether this radio option is selected by default (defaults to false).",
           "bases": [],
           "properties": {},
           "methods": {
@@ -690,7 +690,7 @@
         "Section": {
           "name": "Section",
           "qualified_name": "discohook.components.Section",
-          "docstring": null,
+          "docstring": "Section component.\n\nArgs:\n    *components (Tuple[TextDisplay]): Text display components to include in the section.\n    accessory (Button | Thumbnail): Accessory component for the section.\n    id (int | None): Unique id for the section.\n\nAttributes:\n    attachment (File | None): Attachment for the accessory if it is a File.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -704,7 +704,7 @@
         "Separator": {
           "name": "Separator",
           "qualified_name": "discohook.components.Separator",
-          "docstring": null,
+          "docstring": "Separator component.\n\nArgs:\n    id (int | None): Optional separator id.\n    spacing (int): The spacing of the separator. Must be either 1 or 2.\n\nRaises:\n    AssertionError: If spacing is not 1 or 2.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -718,7 +718,7 @@
         "TextDisplay": {
           "name": "TextDisplay",
           "qualified_name": "discohook.components.TextDisplay",
-          "docstring": null,
+          "docstring": "Text display component.\n\nArgs:\n    markdown (str): Markdown content to display.\n    id (int | None): Unique id for the text display.\n\nAttributes:\n    id (int | None): Optional text display id.\n    type (ComponentType): Text display type.\n    content (str): Markdown content to display.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -732,7 +732,7 @@
         "TextInput": {
           "name": "TextInput",
           "qualified_name": "discohook.components.TextInput",
-          "docstring": "Represents a text input field in a modal.\n\nArgs:\n    custom_id (str): The label of the text input field. Must be a valid python identifier.\n    id (int | None): A unique id of the text input field. Must be a valid python identifier.\n    required (bool): Whether this component is required to be filled (defaults to true).\n    placeholder (str | None): Custom placeholder text if the input is empty; max 100 characters.\n    value (str | None): Pre-filled value for this component; max 4000 characters.\n    min_length (int): The minimum length of the text input field.\n    max_length (int): The maximum length of the text input field.\n    style (TextInputFieldLength): The style of the text input field.",
+          "docstring": "Represents a text input field in a modal.\n\nArgs:\n    custom_id (str): Custom id of the text input field. Must be a valid python identifier.\n    id (int | None): Optional unique id of the text input field.\n    required (bool): Whether this component is required to be filled (defaults to true).\n    placeholder (str | None): Custom placeholder text if the input is empty; max 100 characters.\n    value (str | None): Pre-filled value for this component; max 4000 characters.\n    min_length (int): Minimum length of the text input field.\n    max_length (int): Maximum length of the text input field.\n    style (TextInputFieldLength): The style of the text input field.",
           "bases": [],
           "properties": {},
           "methods": {
@@ -746,7 +746,7 @@
         "Thumbnail": {
           "name": "Thumbnail",
           "qualified_name": "discohook.components.Thumbnail",
-          "docstring": null,
+          "docstring": "Thumbnail component.\n\nArgs:\n    media (str | File): Media to include in the thumbnail.\n    description (str | None): Thumbnail description.\n    spoiler (bool): Whether the thumbnail should be spoiler or not.\n    id (int | None): Unique id for the thumbnail.\n\nAttributes:\n    attachment (File | None): Attachment for the thumbnail if media is a File.",
           "bases": [],
           "properties": {},
           "methods": {
