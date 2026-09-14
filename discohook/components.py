@@ -170,8 +170,8 @@ class Thumbnail:
     """
     def __init__(
         self,
-        *,
         media: Union[str, File],
+        *,
         description: Optional[str] = None,
         spoiler: bool = False,
         id: Optional[int] = None,
@@ -297,6 +297,8 @@ class Container:
                 self.attachments.extend(c.attachments)
             elif isinstance(c, File) and c.content:
                 self.attachments.append(c)
+            elif isinstance(c, Section):
+                self.attachments.append(c.attachment)
         assert (
             1 <= len(components) <= 10
         ), "Container must have between 1 and 10 components."
