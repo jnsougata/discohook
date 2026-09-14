@@ -29,7 +29,6 @@ __all__ = [
 
 # noinspection PyShadowingBuiltins
 class ActionRow:
-
     """
     Action row component.
 
@@ -83,10 +82,10 @@ class Media:
     ):
         self.attachment = None
         if isinstance(media, File):
-            self.media = {"url": f"attachment://{media.name}"}
+            self.media = {"url": f"attachment://{media.name}"}  # noqa
             self.attachment = media
         else:
-            self.media = {"url": media}
+            self.media = {"url": media}  # noqa
         self.description = description
         self.spoiler = spoiler
 
@@ -99,7 +98,19 @@ class Media:
 
 # noinspection PyShadowingBuiltins
 class MediaGallery:
+    """
+    Media gallery component.
 
+    Args:
+        *media (Media): Media items to include in the gallery.
+        id (int | None): Unique id for the media gallery.
+
+    Attributes:
+        id (int): Media gallery id.
+        type (ComponentType): Media gallery type.
+        items (Tuple[Media]): Media items in the gallery.
+        attachments (List[File]): Attachments for the media items.
+    """
     def __init__(self, *media: Media, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.media_gallery
@@ -119,7 +130,18 @@ class MediaGallery:
 
 # noinspection PyShadowingBuiltins
 class TextDisplay:
+    """
+    Text display component.
 
+    Args:
+        markdown (str): Markdown content to display.
+        id (int | None): Unique id for the text display.
+
+    Attributes:
+        id (int | None): Optional text display id.
+        type (ComponentType): Text display type.
+        content (str): Markdown content to display.
+    """
     def __init__(self, markdown: str, *, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.text_display
@@ -134,6 +156,18 @@ class TextDisplay:
 
 # noinspection PyShadowingBuiltins
 class Thumbnail:
+    """
+    Thumbnail component.
+
+    Args:
+        media (str | File): Media to include in the thumbnail.
+        description (str | None): Thumbnail description.
+        spoiler (bool): Whether the thumbnail should be spoiler or not.
+        id (int | None): Unique id for the thumbnail.
+
+    Attributes:
+        attachment (File | None): Attachment for the thumbnail if media is a File.
+    """
     def __init__(
         self,
         *,
@@ -170,6 +204,17 @@ class Thumbnail:
 
 # noinspection PyShadowingBuiltins
 class Section:
+    """
+    Section component.
+
+    Args:
+        *components (Tuple[TextDisplay]): Text display components to include in the section.
+        accessory (Button | Thumbnail): Accessory component for the section.
+        id (int | None): Unique id for the section.
+
+    Attributes:
+        attachment (File | None): Attachment for the accessory if it is a File.
+    """
     def __init__(
         self,
         *components: TextDisplay,
@@ -197,7 +242,16 @@ class Section:
 
 # noinspection PyShadowingBuiltins
 class Separator:
+    """
+    Separator component.
 
+    Args:
+        id (int | None): Optional separator id.
+        spacing (int): The spacing of the separator. Must be either 1 or 2.
+
+    Raises:
+        AssertionError: If spacing is not 1 or 2.
+    """
     def __init__(self, *, id: Optional[int] = None, spacing: int = 1):
         self.id = id
         self.type = ComponentType.separator
@@ -214,7 +268,17 @@ class Separator:
 
 # noinspection PyShadowingBuiltins
 class Container:
+    """
+    Container component.
 
+    Args:
+        *components (Tuple[ActionRow | TextDisplay | Section | MediaGallery | Separator | File]): Components to include in the container. Must be between 1 and 10 components.
+        accent_color (int | None): Optional accent color for the container.
+        id (int | None): Unique id for the container.
+
+    Attributes:
+        attachments (List[File]): List of attachments in the container.
+    """
     def __init__(
         self,
         *components: Union[
@@ -254,13 +318,13 @@ class TextInput:
     Represents a text input field in a modal.
 
     Args:
-        custom_id (str): The label of the text input field. Must be a valid python identifier.
-        id (int | None): A unique id of the text input field. Must be a valid python identifier.
+        custom_id (str): Custom id of the text input field. Must be a valid python identifier.
+        id (int | None): Optional unique id of the text input field.
         required (bool): Whether this component is required to be filled (defaults to true).
         placeholder (str | None): Custom placeholder text if the input is empty; max 100 characters.
         value (str | None): Pre-filled value for this component; max 4000 characters.
-        min_length (int): The minimum length of the text input field.
-        max_length (int): The maximum length of the text input field.
+        min_length (int): Minimum length of the text input field.
+        max_length (int): Maximum length of the text input field.
         style (TextInputFieldLength): The style of the text input field.
     """
 
@@ -300,7 +364,7 @@ class TextInput:
             "required": self.required,
         }
 
-
+# noinspection PyShadowingBuiltins
 class FileUpload:
     """
     Represents a file upload component in a modal.
@@ -311,8 +375,6 @@ class FileUpload:
         max_values (int): Maximum number of items that must be uploaded (defaults to 1)
         required (bool): Whether this component is required to be filled (defaults to true).
     """
-
-    # noinspection PyShadowingBuiltins
     def __init__(
         self,
         *,
@@ -339,8 +401,16 @@ class FileUpload:
             "required": self.required,
         }
 
-
+# noinspection shadowing-builtins
 class Checkbox:
+    """
+    Represents a checkbox component in a modal.
+
+    Args:
+        custom_id (str): A unique id of the checkbox field. Must be a valid python identifier.
+        id (int | None): A unique id of the checkbox field. Must be a valid python identifier.
+        default (bool): Whether this checkbox is checked by default (defaults to false).
+    """
     def __init__(
         self,
         *,
@@ -362,6 +432,15 @@ class Checkbox:
 
 
 class CheckboxGroupOption:
+    """
+    Represents an option in a checkbox group.
+
+    Args:
+        label (str): The label of the checkbox option.
+        value (str): The value of the checkbox option.
+        description (str | None): The description of the checkbox option.
+        default (bool): Whether this checkbox option is checked by default (defaults to false).
+    """
     def __init__(
         self,
         *,
@@ -384,7 +463,18 @@ class CheckboxGroupOption:
         }
 
 
+# noinspection shadowing-builtins
 class CheckboxGroup:
+    """
+    Represents a group of checkboxes in a modal.
+
+    Args:
+        custom_id (str): A unique id of the checkbox group. Must be a valid python identifier.
+        options (List[CheckboxGroupOption]): A list of checkbox options in the group.
+        min_values (int | None): Minimum number of checkboxes that must be checked (defaults to None).
+        max_values (int | None): Maximum number of checkboxes that can be checked (defaults to None).
+        required (bool): Whether this component is required to be filled (defaults to true).
+    """
     def __init__(
         self,
         *,
@@ -418,6 +508,15 @@ class CheckboxGroup:
 
 
 class RadioGroupOption:
+    """
+    Represents an option in a radio group.
+
+    Args:
+        label (str): Label of the radio option.
+        value (str): Value of the radio option.
+        description (str | None): Description of the radio option.
+        default (bool): Whether this radio option is selected by default (defaults to false).
+    """
     def __init__(
         self,
         label: str,
@@ -438,8 +537,16 @@ class RadioGroupOption:
             "default": self.default,
         }
 
-
+# noinspection shadowing-builtins
 class RadioGroup:
+    """
+    Represents a group of radio buttons in a modal.
+
+    Args:
+        custom_id (str): A unique id of the radio group. Must be a valid python identifier.
+        options (List[RadioGroupOption]): A list of radio options in the group.
+        required (bool): Whether this component is required to be filled (defaults to true).
+    """
     def __init__(
         self,
         *,
@@ -465,6 +572,15 @@ class RadioGroup:
 
 # noinspection PyShadowingBuiltins
 class Label:
+    """
+    Represents a label component in a modal.
+
+    Args:
+        label (str): The text of the label.
+        child (Select | TextInput | FileUpload | Checkbox | CheckboxGroup | RadioGroup): Child component for the label.
+        id (int | None): Optional unique id of the label.
+        description (str | None): The description of the label.
+    """
     def __init__(
         self,
         label: str,
