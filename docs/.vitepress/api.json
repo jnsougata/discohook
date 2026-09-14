@@ -2588,9 +2588,6 @@
             "poll": {
               "docstring": null
             },
-            "embeds": {
-              "docstring": null
-            },
             "reactions": {
               "docstring": null
             },
@@ -3584,6 +3581,6 @@
     "classes": 84,
     "functions": 24,
     "methods": 402,
-    "properties": 102
+    "properties": 101
   }
 }
