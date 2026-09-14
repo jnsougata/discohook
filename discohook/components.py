@@ -388,7 +388,7 @@ class FileUpload:
     ):
         self.custom_id = custom_id
         assert custom_id.isidentifier(), "field_id must be a valid python identifier"
-        self.id = id
+        self.id = id  # noqa
         self.min_values = min_values
         self.max_values = max_values
         self.required = required
