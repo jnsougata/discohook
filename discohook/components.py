@@ -298,7 +298,8 @@ class Container:
             elif isinstance(c, File) and c.content:
                 self.attachments.append(c)
             elif isinstance(c, Section):
-                self.attachments.append(c.attachment)
+                if c.attachment:
+                    self.attachments.append(c.attachment)
         assert (
             1 <= len(components) <= 10
         ), "Container must have between 1 and 10 components."
