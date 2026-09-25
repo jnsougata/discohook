@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 def _append_file(form: aiohttp.MultipartWriter, index: int, file: File) -> None:
-    mime, _ = mimetypes.guess_type(file.name)
+    mime, _ = mimetypes.guess_type(file.name) # noqa
     form.append(
         file.content,
         headers={  # type: ignore

@@ -14,7 +14,6 @@ class View:
     """
     Represents a discord message component.
     """
-
     def __init__(self):
         self.children: List[
             Union[

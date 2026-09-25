@@ -93,7 +93,7 @@ class File:
     def to_dict(self) -> Dict[str, Any]:
         data = {"type": self.type, "file": {"url": self.url}, "spoiler": self.spoiler}
         if self.id:
-            data["id"] = self.id
+            data["id"] = self.id # noqa
         if self.description:
-            data["description"] = self.description
+            data["description"] = self.description # noqa
         return data
