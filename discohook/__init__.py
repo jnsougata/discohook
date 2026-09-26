@@ -6,7 +6,7 @@ __title__ = "discohook"
 __license__ = "MIT"
 __copyright__ = "Copyright 2022-present Sougata Jana"
 __author__ = "Sougata Jana"
-__version__ = "0.1.dev0"
+__version__ = "0.2.0"
 __url__ = "https://github.com/jnsougata/discohook"
 
 from .adapter import FollowupResponse, InteractionResponse

@@ -38,7 +38,7 @@ app = discohook.Client(
 )
 
 
-# Adding a error handler for all interactions
+# Adding an error handler for all interactions
 @app.on_interaction_error()
 async def handler(i: discohook.Interaction, err: Exception):
     user_response = "Some error occurred! Please contact the developer."
@@ -50,7 +50,8 @@ async def handler(i: discohook.Interaction, err: Exception):
     await app.send("12345678910", f"Error: {err}")  # send error to a channel in development server
 
 
-# Adding a error handler for any serverside exception
+
+# Adding an error handler for any serverside exception
 @app.on_error()
 async def handler(_request, err: Exception):
     # request: starlette.requests.Request
@@ -70,20 +71,25 @@ async def ping(i: discohook.Interaction):
 @app.register
 @discohook.command.user()
 async def avatar(i: discohook.Interaction, user: discohook.User):
-    embed = discohook.Embed()
-    embed.set_image(img=user.avatar.url)
-    await i.response.send(embed=embed)
+    container = discohook.Container(
+        discohook.Section(
+            discohook.TextDisplay(f"Avatar of {user.name}"),
+            accessory=discohook.Thumbnail(user.avatar.url)
+        )
+    )
+    await i.response.send(container)
 
 
 # Making message command
 @app.register
 @discohook.command.message()
 async def quote(i: discohook.Interaction, message: discohook.Message):
-    embed = discohook.Embed()
-    embed.set_author(name=message.author.name, icon_url=message.author.avatar.url)
-    embed.description = message.content
-    await i.response.send(embed=embed)
-
+    container = discohook.Container(
+        discohook.TextDisplay(f"Quote of {message.author.name}"),
+        discohook.Separator(),
+        discohook.TextDisplay(f"`{message.content}`"),
+    )
+    await i.response.send(container)
 ```
 ### Deployment
 Deploy the snippet above to your serverless function, and you're good to go to the next step.
