@@ -34,5 +34,4 @@ from .ratelimit import Bucket, RatelimitMux
 from .role import PartialRole, Role
 from .select import Select, SelectOption
 from .user import User
-from .view import View
 from .webhook import Webhook

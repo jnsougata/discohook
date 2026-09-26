@@ -14,16 +14,19 @@ class File:
         description (str | None): Description of the file.
         spoiler (bool): Whether the file is a spoiler.
         id (int | None): ID of the file used to identify the file.
+        title (str | None): Title of the file.
     """
 
     def __init__(
         self,
+        *,
         name: Optional[str] = None,
         content: Optional[bytes] = None,
         url: Optional[str] = None,
         description: Optional[str] = None,
         spoiler: bool = False,
         id: Optional[int] = None,
+        title: Optional[str] = None
     ):
         self.name = name
         self.content = content
@@ -32,6 +35,7 @@ class File:
         self.type = ComponentType.file
         self.url = url
         self.id = id
+        self.title = title
 
     @classmethod
     def from_path(
@@ -41,6 +45,7 @@ class File:
         spoiler: bool = False,
         description: Optional[str] = None,
         id: Optional[int] = None,
+        title: Optional[str] = None
     ):
         """
         Creates a File object from a file path.
@@ -50,6 +55,7 @@ class File:
             spoiler (bool): Whether the file is a spoiler.
             description (str | None): Description of the file to be sent.
             id (int | None): ID of the file used to identify the file.
+            title (str | None): Title of the file.
 
         Returns:
             File: File object.
@@ -59,12 +65,13 @@ class File:
             name = path.split("/")[-1]
             url = f"attachment://{name}"
             return cls(
-                name,
+                name=name,
                 content=content,
                 spoiler=spoiler,
                 description=description,
                 url=url,
                 id=id,
+                title=title
             )
 
     @classmethod
@@ -75,6 +82,7 @@ class File:
         description: Optional[str] = None,
         spoiler: bool = False,
         id: Optional[int] = None,
+        title: Optional[str] = None
     ):
         """
         Creates a File object from a file URL.
@@ -84,11 +92,12 @@ class File:
             description (str | None): Description of the file to be sent.
             spoiler (bool): Whether the file is a spoiler.
             id (int | None): ID of the file used to identify the file.
+            title (str | None): Title of the file.
 
         Returns:
             File: File object.
         """
-        return cls(url=url, description=description, spoiler=spoiler, id=id)
+        return cls(url=url, description=description, spoiler=spoiler, id=id, title=title)
 
     def to_dict(self) -> Dict[str, Any]:
         data = {"type": self.type, "file": {"url": self.url}, "spoiler": self.spoiler}
@@ -97,3 +106,10 @@ class File:
         if self.description:
             data["description"] = self.description # noqa
         return data
+
+    def to_partial_attachment(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "filename": self.name,
+            "title": self.title
+        }

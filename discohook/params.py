@@ -53,6 +53,11 @@ def _prepare_payload(
         payload.update(kwargs)
     if poll:
         payload["poll"] = poll.to_dict()
+    payload["attachments"] = []
+    if len(view.attachments):
+        for i, f in enumerate(view.attachments):
+            f.id = i
+            payload["attachments"].append(f.to_partial_attachment())
     if payload_type:
         payload = {"type": payload_type.value, "data": payload}
     if len(view.attachments):
