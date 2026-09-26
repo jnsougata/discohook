@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Literal
 
 from .button import Button
 from .enums import ComponentType, TextInputFieldLength
@@ -377,6 +377,7 @@ class FileUpload:
         min_values (int): Minimum number of items that must be uploaded (defaults to 1)
         max_values (int): Maximum number of items that must be uploaded (defaults to 1)
         required (bool): Whether this component is required to be filled (defaults to true).
+        file_types (List[str] | None): File types to filter for.
     """
     def __init__(
         self,
@@ -386,6 +387,10 @@ class FileUpload:
         min_values: int = 1,
         max_values: int = 1,
         required: bool = True,
+        file_types: Optional[List[Literal[
+        ".png",".gif", ".jpg", ".jpeg", ".jfif", ".webp", ".avif",
+        ".mp4",".mov", ".qt", ".webm", ".mp3", ".m4a", ".wav", ".ogg", ".opus", ".flac"
+        ]]] = None
     ):
         self.custom_id = custom_id
         assert custom_id.isidentifier(), "field_id must be a valid python identifier"
@@ -393,6 +398,7 @@ class FileUpload:
         self.min_values = min_values
         self.max_values = max_values
         self.required = required
+        self.file_types = file_types
 
     def to_dict(self):
         return {
@@ -402,6 +408,7 @@ class FileUpload:
             "min_values": self.min_values,
             "max_values": self.max_values,
             "required": self.required,
+            "file_types": self.file_types,
         }
 
 # noinspection shadowing-builtins

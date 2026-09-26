@@ -174,7 +174,7 @@ def resolve_select_menu_values(interaction: Interaction) -> List[Any]:
 
 
 def build_modal_params(func: Callable, interaction: Interaction):
-    options = {}
+    options = {"custom_id": interaction.data["custom_id"]}
     for component in interaction.data["components"]:
         if component["type"] == ComponentType.text_display:
             continue

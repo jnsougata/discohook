@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Literal
 
 from .components import (Checkbox, CheckboxGroup, CheckboxGroupOption,
                          FileUpload, Label, RadioGroup, RadioGroupOption,
@@ -122,6 +122,10 @@ class Modal:
         min_values: int = 1,
         max_values: int = 1,
         required: bool = True,
+        file_types: Optional[List[Literal[
+            ".png", ".gif", ".jpg", ".jpeg", ".jfif", ".webp", ".avif",
+            ".mp4", ".mov", ".qt", ".webm", ".mp3", ".m4a", ".wav", ".ogg", ".opus", ".flac"
+        ]]] = None
     ):
         """
         Appends a file upload component to the modal.
@@ -135,6 +139,7 @@ class Modal:
                     min_values=min_values,
                     max_values=max_values,
                     required=required,
+                    file_types=file_types,
                 ),
                 id=id,
             )
