@@ -185,26 +185,20 @@ class HTTPClient:
             params={"with_response": "true" if with_response else "false"},
         )
 
-    async def get_original_interaction_response(self):
-        pass  # get_webhook_message(self), message_id as @original
-
-    async def edit_original_interaction_response(self):
-        pass  # edit_webhook_message(self), message_id as @original
-
-    async def delete_original_interaction_response(self):
-        pass  # delete_webhook_message(self), message_id as @original + no thread_id param
-
-    async def create_followup_message(self):
-        pass  # execute_webhook(self)
-
-    async def get_followup_message(self):
-        pass  # get_webhook_message(self)
-
-    async def edit_followup_message(self):
-        pass  # edit_webhook_message(self)
-
-    async def delete_followup_message(self):
-        pass  # delete_webhook_message(self)
+    async def get_original_interaction_response(self): ...
+        # get_webhook_message(self), message_id as @original
+    async def edit_original_interaction_response(self): ...
+        # edit_webhook_message(self), message_id as @original
+    async def delete_original_interaction_response(self): ...
+        # delete_webhook_message(self), message_id as @original + no thread_id param
+    async def create_followup_message(self): ...
+        # execute_webhook(self)
+    async def get_followup_message(self): ...
+        # get_webhook_message(self)
+    async def edit_followup_message(self): ...
+        # edit_webhook_message(self)
+    async def delete_followup_message(self): ...
+        # delete_webhook_message(self)
 
     # Application Commands
     # https://discord.com/developers/docs/interactions/application-commands#application-commands
@@ -220,17 +214,10 @@ class HTTPClient:
             application_id=application_id,
         )
 
-    async def create_global_application_command(self):
-        pass
-
-    async def get_global_application_command(self):
-        pass
-
-    async def edit_global_application_command(self):
-        pass
-
-    async def delete_global_application_command(self):
-        pass
+    async def create_global_application_command(self): ...
+    async def get_global_application_command(self): ...
+    async def edit_global_application_command(self): ...
+    async def delete_global_application_command(self): ...
 
     async def delete_application_command(
         self, application_id: str, command_id: str, guild_id: Optional[str] = None
@@ -263,20 +250,11 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def get_guild_application_commands(self):
-        pass
-
-    async def create_guild_application_command(self):
-        pass
-
-    async def get_guild_application_command(self):
-        pass
-
-    async def edit_guild_application_command(self):
-        pass
-
-    async def delete_guild_application_command(self):
-        pass
+    async def get_guild_application_commands(self): ...
+    async def create_guild_application_command(self): ...
+    async def get_guild_application_command(self): ...
+    async def edit_guild_application_command(self): ...
+    async def delete_guild_application_command(self): ...
 
     async def bulk_overwrite_guild_application_commands(
         self, application_id: str, guild_id: str, commands: List[Dict[str, Any]]
@@ -290,23 +268,15 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def get_guild_application_command_permissions(self):
-        pass
-
-    async def get_application_command_permissions(self):
-        pass
-
-    async def edit_application_command_permissions(self):
-        pass
+    async def get_guild_application_command_permissions(self): ...
+    async def get_application_command_permissions(self): ...
+    async def edit_application_command_permissions(self): ...
 
     # Application Role Connection Metadata
     # https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata
 
-    async def get_application_role_connection_metadata_records(self):
-        pass
-
-    async def update_application_role_connection_metadata_records(self):
-        pass
+    async def get_application_role_connection_metadata_records(self): ...
+    async def update_application_role_connection_metadata_records(self): ...
 
     # Application Resource
     # https://discord.com/developers/docs/resources/application#application-resource
@@ -314,35 +284,22 @@ class HTTPClient:
     async def get_current_application(self):
         return await self.request("GET", "/applications/@me", authorize=True)
 
-    async def edit_current_application(self):
-        pass
-
-    async def get_application_activity_instance(self):
-        pass
+    async def edit_current_application(self): ...
+    async def get_application_activity_instance(self): ...
 
     # Audit Logs Resource
     # https://discord.com/developers/docs/resources/audit-log#audit-logs-resource
 
-    async def get_audit_log(self):
-        pass
+    async def get_audit_log(self): ...
 
     # Auto Moderation
     # https://discord.com/developers/docs/resources/auto-moderation#auto-moderation
 
-    async def list_auto_moderation_rules_for_guild(self):
-        pass
-
-    async def get_auto_moderation_rule(self):
-        pass
-
-    async def create_auto_moderation_rule(self):
-        pass
-
-    async def modify_auto_moderation_rule(self):
-        pass
-
-    async def delete_auto_moderation_rule(self):
-        pass
+    async def list_auto_moderation_rules_for_guild(self): ...
+    async def get_auto_moderation_rule(self): ...
+    async def create_auto_moderation_rule(self): ...
+    async def modify_auto_moderation_rule(self): ...
+    async def delete_auto_moderation_rule(self): ...
 
     # Channels Resource
     # https://discord.com/developers/docs/resources/channel#channels-resource
@@ -371,26 +328,13 @@ class HTTPClient:
             "DELETE", f"/channels/{channel_id}", authorize=True, reason=reason
         )
 
-    async def edit_channel_permissions(self):
-        pass
-
-    async def get_channel_invites(self):
-        pass
-
-    async def create_channel_invite(self):
-        pass
-
-    async def delete_channel_permission(self):
-        pass
-
-    async def follow_announcement_channel(self):
-        pass
-
-    async def trigger_typing_indicator(self):
-        pass
-
-    async def get_pinned_messages(self):
-        pass
+    async def edit_channel_permissions(self): ...
+    async def get_channel_invites(self): ...
+    async def create_channel_invite(self): ...
+    async def delete_channel_permission(self): ...
+    async def follow_announcement_channel(self): ...
+    async def trigger_typing_indicator(self): ...
+    async def get_pinned_messages(self): ...
 
     async def pin_message(
         self, channel_id: str, message_id: str, *, reason: Optional[str] = None
@@ -412,11 +356,8 @@ class HTTPClient:
             reason=reason,
         )
 
-    async def group_dm_add_recipient(self):
-        pass
-
-    async def group_dm_remove_recipient(self):
-        pass
+    async def group_dm_add_recipient(self): ...
+    async def group_dm_remove_recipient(self): ...
 
     async def start_thread_from_message(
         self,
@@ -445,44 +386,22 @@ class HTTPClient:
             reason=reason,
         )
 
-    async def start_thread_in_forum_or_media_channel(self):
-        pass
-
-    async def join_thread(self):
-        pass
-
-    async def add_thread_member(self):
-        pass
-
-    async def leave_thread(self):
-        pass
-
-    async def remove_thread_member(self):
-        pass
-
-    async def get_thread_member(self):
-        pass
-
-    async def list_thread_member(self):
-        pass
-
-    async def list_public_archived_threads(self):
-        pass
-
-    async def list_private_archived_threads(self):
-        pass
-
-    async def list_joined_private_threads(self):
-        pass
+    async def start_thread_in_forum_or_media_channel(self): ...
+    async def join_thread(self): ...
+    async def add_thread_member(self): ...
+    async def leave_thread(self): ...
+    async def remove_thread_member(self): ...
+    async def get_thread_member(self): ...
+    async def list_thread_member(self): ...
+    async def list_public_archived_threads(self): ...
+    async def list_private_archived_threads(self): ...
+    async def list_joined_private_threads(self): ...
 
     # Emoji Resource
     # https://discord.com/developers/docs/resources/emoji#emoji-resource
 
-    async def list_guild_emojis(self):
-        pass
-
-    async def get_guild_emoji(self):
-        pass
+    async def list_guild_emojis(self): ...
+    async def get_guild_emoji(self): ...
 
     async def create_guild_emoji(
         self, guild_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None
@@ -495,11 +414,8 @@ class HTTPClient:
             reason=reason,
         )
 
-    async def modify_guild_emoji(self):
-        pass
-
-    async def delete_guild_emoji(self):
-        pass
+    async def modify_guild_emoji(self): ...
+    async def delete_guild_emoji(self): ...
 
     async def list_application_emojis(self):
         return await self.request(
@@ -541,8 +457,7 @@ class HTTPClient:
     # Entitlements Resource
     # https://discord.com/developers/docs/resources/entitlement#entitlements-resource
 
-    async def list_entitlements(self):
-        pass
+    async def list_entitlements(self): ...
 
     async def get_entitlement(self, application_id: str, entitlement_id: str):
         return await self.request(
@@ -551,9 +466,7 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def consume_entitlement(self):
-        pass
-
+    async def consume_entitlement(self): ...
     async def create_test_entitlement(
         self, application_id: str, payload: Dict[str, Any]
     ):
@@ -574,67 +487,34 @@ class HTTPClient:
     # Guild Scheduled Event
     # https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event
 
-    async def list_scheduled_events_for_guild(self):
-        pass
-
-    async def create_guild_scheduled_event(self):
-        pass
-
-    async def get_guild_scheduled_event(self):
-        pass
-
-    async def modify_guild_scheduled_event(self):
-        pass
-
-    async def delete_guild_scheduled_event(self):
-        pass
-
-    async def get_guild_scheduled_event_users(self):
-        pass
-
+    async def list_scheduled_events_for_guild(self): ...
+    async def create_guild_scheduled_event(self): ...
+    async def get_guild_scheduled_event(self): ...
+    async def modify_guild_scheduled_event(self): ...
+    async def delete_guild_scheduled_event(self): ...
+    async def get_guild_scheduled_event_users(self): ...
     # Guild Template Resource
     # https://discord.com/developers/docs/resources/guild-template#guild-template-resource
 
-    async def get_guild_template(self):
-        pass
-
-    async def create_guild_from_guild_template(self):
-        pass
-
-    async def get_guild_templates(self):
-        pass
-
-    async def create_guild_template(self):
-        pass
-
-    async def sync_guild_template(self):
-        pass
-
-    async def modify_guild_template(self):
-        pass
-
-    async def delete_guild_template(self):
-        pass
-
+    async def get_guild_template(self): ...
+    async def create_guild_from_guild_template(self): ...
+    async def get_guild_templates(self): ...
+    async def create_guild_template(self): ...
+    async def sync_guild_template(self): ...
+    async def modify_guild_template(self): ...
+    async def delete_guild_template(self): ...
     # Guild Resource
     # https://discord.com/developers/docs/resources/guild#guild-resource
 
-    async def create_guild(self):
-        pass
-
+    async def create_guild(self): ...
     async def get_guild(self, guild_id: str, **params: str):
         return await self.request(
             "GET", f"/guilds/{guild_id}", authorize=True, params=params
         )
 
-    async def get_guild_preview(self):
-        pass
-
-    async def modify_guild(self):
-        pass
-
-    async def delete_guild(self):
-        pass
+    async def get_guild_preview(self): ...
+    async def modify_guild(self): ...
+    async def delete_guild(self): ...
 
     async def get_guild_channels(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}/channels", authorize=True)
@@ -657,31 +537,19 @@ class HTTPClient:
             "PATCH", f"/guilds/{guild_id}/channels", body=payload, authorize=True
         )
 
-    async def list_active_guild_threads(self):
-        pass
+    async def list_active_guild_threads(self): ...
 
     async def get_guild_member(self, guild_id: str, user_id: str):
         return await self.request(
             "GET", f"/guilds/{guild_id}/members/{user_id}", authorize=True
         )
 
-    async def list_guild_members(self):
-        pass
-
-    async def search_guild_members(self):
-        pass
-
-    async def add_guild_member(self):
-        pass
-
-    async def modify_guild_member(self):
-        pass
-
-    async def modify_current_member(self):
-        pass
-
-    async def modify_current_user_nick(self):
-        pass
+    async def list_guild_members(self): ...
+    async def search_guild_members(self): ...
+    async def add_guild_member(self): ...
+    async def modify_guild_member(self): ...
+    async def modify_current_member(self): ...
+    async def modify_current_user_nick(self): ...
 
     async def add_guild_member_role(
         self, guild_id: str, user_id: str, role_id: str, *, reason: Optional[str] = None
@@ -713,11 +581,8 @@ class HTTPClient:
             reason=reason,
         )
 
-    async def get_guild_bans(self):
-        pass
-
-    async def get_guild_ban(self):
-        pass
+    async def get_guild_bans(self): ...
+    async def get_guild_ban(self): ...
 
     async def create_guild_ban(
         self,
@@ -735,17 +600,13 @@ class HTTPClient:
             reason=reason,
         )
 
-    async def remove_guild_ban(self):
-        pass
-
-    async def bulk_guild_ban(self):
-        pass
+    async def remove_guild_ban(self): ...
+    async def bulk_guild_ban(self): ...
 
     async def get_guild_roles(self, guild_id: str):
         return await self.request("GET", f"/guilds/{guild_id}/roles", authorize=True)
 
-    async def get_guild_role(self):
-        pass
+    async def get_guild_role(self): ...
 
     async def create_guild_role(
         self, guild_id: str, payload: Dict[str, Any], *, reason: Optional[str] = None
@@ -785,104 +646,48 @@ class HTTPClient:
             reason=reason,
         )
 
-    async def modify_guild_mfa_level(self):
-        pass
-
-    async def delete_guild_role(self):
-        pass
-
-    async def get_guild_prune_count(self):
-        pass
-
-    async def begin_guild_prune(self):
-        pass
-
-    async def get_guild_voice_regions(self):
-        pass
-
-    async def get_guild_invites(self):
-        pass
-
-    async def get_guild_integrations(self):
-        pass
-
-    async def delete_guild_integration(self):
-        pass
-
-    async def get_guild_widget_settings(self):
-        pass
-
-    async def modify_guild_widget(self):
-        pass
-
-    async def get_guild_widget(self):
-        pass
-
-    async def get_guild_vanity_url(self):
-        pass
-
-    async def get_guild_widget_image(self):
-        pass
-
-    async def get_guild_welcome_screen(self):
-        pass
-
-    async def modify_guild_welcome_screen(self):
-        pass
-
-    async def get_guild_onboarding(self):
-        pass
-
-    async def modify_guild_onboarding(self):
-        pass
-
-    async def modify_guild_incident_actions(self):
-        pass
+    async def modify_guild_mfa_level(self): ...
+    async def delete_guild_role(self): ...
+    async def get_guild_prune_count(self): ...
+    async def begin_guild_prune(self): ...
+    async def get_guild_voice_regions(self): ...
+    async def get_guild_invites(self): ...
+    async def get_guild_integrations(self): ...
+    async def delete_guild_integration(self): ...
+    async def get_guild_widget_settings(self): ...
+    async def modify_guild_widget(self): ...
+    async def get_guild_widget(self): ...
+    async def get_guild_vanity_url(self): ...
+    async def get_guild_widget_image(self): ...
+    async def get_guild_welcome_screen(self): ...
+    async def modify_guild_welcome_screen(self): ...
+    async def get_guild_onboarding(self): ...
+    async def modify_guild_onboarding(self): ...
+    async def modify_guild_incident_actions(self): ...
 
     # Invite Resource
     # https://discord.com/developers/docs/resources/invite#invite-resource
 
-    async def get_invite(self):
-        pass
-
-    async def delete_invite(self):
-        pass
+    async def get_invite(self): ...
+    async def delete_invite(self): ...
 
     # Lobby Resource
     # https://discord.com/developers/docs/resources/lobby#lobby-resource
 
-    async def create_lobby(self):
-        pass
-
-    async def get_lobby(self):
-        pass
-
-    async def modify_lobby(self):
-        pass
-
-    async def delete_lobby(self):
-        pass
-
-    async def add_a_member_to_a_lobby(self):
-        pass
-
-    async def remove_a_member_from_a_lobby(self):
-        pass
-
-    async def leave_lobby(self):
-        pass
-
-    async def link_channel_to_lobby(self):
-        pass
-
-    async def unlink_channel_from_lobby(self):
-        pass
+    async def create_lobby(self): ...
+    async def get_lobby(self): ...
+    async def modify_lobby(self): ...
+    async def delete_lobby(self): ...
+    async def add_a_member_to_a_lobby(self): ...
+    async def remove_a_member_from_a_lobby(self): ...
+    async def leave_lobby(self): ...
+    async def link_channel_to_lobby(self): ...
+    async def unlink_channel_from_lobby(self): ...
 
     # Messages Resource
     # https://discord.com/developers/docs/resources/channel#message-resource
 
-    async def get_channel_messages(self):
-        pass
+    async def get_channel_messages(self): ...
 
     async def get_channel_message(self, channel_id: str, message_id: str):
         return await self.request(
@@ -908,20 +713,11 @@ class HTTPClient:
             authorize=True,
         )
 
-    async def delete_own_reaction(self):
-        pass
-
-    async def delete_user_reaction(self):
-        pass
-
-    async def get_reactions(self):
-        pass
-
-    async def delete_all_reactions(self):
-        pass
-
-    async def delete_all_reactions_for_emoji(self):
-        pass
+    async def delete_own_reaction(self): ...
+    async def delete_user_reaction(self): ...
+    async def get_reactions(self): ...
+    async def delete_all_reactions(self): ...
+    async def delete_all_reactions_for_emoji(self): ...
 
     async def edit_message(self, channel_id: str, message_id: str, data: Any):
         return await self.request(
@@ -955,8 +751,7 @@ class HTTPClient:
     # Poll Resource
     # https://discord.com/developers/docs/resources/poll#poll-resource
 
-    async def get_answer_voters(self):
-        pass
+    async def get_answer_voters(self): ...
 
     async def end_poll(self, channel_id: str, message_id: str):
         return await self.request(
@@ -974,133 +769,72 @@ class HTTPClient:
     # Soundboard Resource
     # https://discord.com/developers/docs/resources/soundboard#soundboard-resource
 
-    async def send_soundboard_sound(self):
-        pass
-
-    async def list_default_soundboard_sounds(self):
-        pass
-
-    async def list_guild_soundboard_sounds(self):
-        pass
-
-    async def get_guild_soundboard_sound(self):
-        pass
-
-    async def create_guild_soundboard_sound(self):
-        pass
-
-    async def modify_guild_soundboard_sound(self):
-        pass
-
-    async def delete_guild_soundboard_sound(self):
-        pass
+    async def send_soundboard_sound(self): ...
+    async def list_default_soundboard_sounds(self): ...
+    async def list_guild_soundboard_sounds(self): ...
+    async def get_guild_soundboard_sound(self): ...
+    async def create_guild_soundboard_sound(self): ...
+    async def modify_guild_soundboard_sound(self): ...
+    async def delete_guild_soundboard_sound(self): ...
 
     # Stage Instance Resource
     # https://discord.com/developers/docs/resources/stage-instance#stage-instance-resource
 
-    async def create_stage_instance(self):
-        pass
-
-    async def get_stage_instance(self):
-        pass
-
-    async def modify_stage_instance(self):
-        pass
-
-    async def delete_stage_instance(self):
-        pass
+    async def create_stage_instance(self): ...
+    async def get_stage_instance(self): ...
+    async def modify_stage_instance(self): ...
+    async def delete_stage_instance(self): ...
 
     # Sticker Resource
     # https://discord.com/developers/docs/resources/sticker#sticker-resource
 
-    async def get_sticker(self):
-        pass
-
-    async def list_sticker_packs(self):
-        pass
-
-    async def get_sticker_pack(self):
-        pass
-
-    async def list_guild_stickers(self):
-        pass
-
-    async def get_guild_sticker(self):
-        pass
-
-    async def create_guild_sticker(self):
-        pass
-
-    async def modify_guild_sticker(self):
-        pass
-
-    async def delete_guild_sticker(self):
-        pass
+    async def get_sticker(self): ...
+    async def list_sticker_packs(self): ...
+    async def get_sticker_pack(self): ...
+    async def list_guild_stickers(self): ...
+    async def get_guild_sticker(self): ...
+    async def create_guild_sticker(self): ...
+    async def modify_guild_sticker(self): ...
+    async def delete_guild_sticker(self): ...
 
     # Subscription Resource
     # https://discord.com/developers/docs/resources/subscription#subscription-resource
 
-    async def list_sku_subscriptions(self):
-        pass
-
-    async def get_sku_subscription(self):
-        pass
+    async def list_sku_subscriptions(self): ...
+    async def get_sku_subscription(self): ...
 
     # Users Resource
     # https://discord.com/developers/docs/resources/user#user-resource
 
-    async def get_current_user(self):
-        pass
-
+    async def get_current_user(self): ...
     async def get_user(self, user_id: str):
         return await self.request("GET", f"/users/{user_id}", authorize=True)
 
     async def modify_current_user(self, payload: Dict[str, Any]):
         return await self.request("PATCH", "/users/@me", body=payload, authorize=True)
 
-    async def get_current_user_guilds(self):
-        pass
-
-    async def get_current_user_guild_member(self):
-        pass
-
-    async def leave_guild(self):
-        pass
+    async def get_current_user_guilds(self): ...
+    async def get_current_user_guild_member(self): ...
+    async def leave_guild(self): ...
 
     async def create_dm(self, payload: Dict[str, Any]):
         return await self.request(
             "POST", "/users/@me/channels", body=payload, authorize=True
         )
 
-    async def create_group_dm(self):
-        pass
-
-    async def get_current_user_connections(self):
-        pass
-
-    async def get_current_user_application_role_connection(self):
-        pass
-
-    async def update_current_user_application_role_connection(self):
-        pass
+    async def create_group_dm(self): ...
+    async def get_current_user_connections(self): ...
+    async def get_current_user_application_role_connection(self): ...
+    async def update_current_user_application_role_connection(self): ...
 
     # Voice Resource
     # https://discord.com/developers/docs/resources/voice#voice-resource
 
-    async def list_voice_regions(self):
-        pass
-
-    async def get_current_user_voice_state(self):
-        pass
-
-    async def get_user_voice_state(self):
-        pass
-
-    async def modify_current_user_voice_state(self):
-        pass
-
-    async def modify_user_voice_state(self):
-        pass
+    async def list_voice_regions(self): ...
+    async def get_current_user_voice_state(self): ...
+    async def get_user_voice_state(self): ...
+    async def modify_current_user_voice_state(self): ...
+    async def modify_user_voice_state(self): ...
 
     # Webhook Resource
     # https://discord.com/developers/docs/resources/webhook#webhook-resource
@@ -1116,11 +850,8 @@ class HTTPClient:
             reason=reason,
         )
 
-    async def get_channel_webhooks(self):
-        pass
-
-    async def get_guild_webhooks(self):
-        pass
+    async def get_channel_webhooks(self): ...
+    async def get_guild_webhooks(self): ...
 
     async def get_webhook(self, *, id: str):
         return await self.request("GET", f"/webhooks/{id}", authorize=True)
@@ -1180,12 +911,9 @@ class HTTPClient:
             "POST", f"/webhooks/{id}/{token}", body=data, **params
         )
 
-    async def execute_slack_compatible_webhook(self):
-        pass
-
-    async def execute_github_compatible_webhook(self):
-        pass
-
+    async def execute_slack_compatible_webhook(self): ...
+    async def execute_github_compatible_webhook(self): ...
+    
     async def get_webhook_message(self, *, id: str, token: str, message_id: str, **params):
         return await self.request(
             "GET", f"/webhooks/{id}/{token}/messages/{message_id}",
