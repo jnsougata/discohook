@@ -1,8 +1,13 @@
 import inspect
 from typing import Callable, List, Optional
 
-from .types import CallbackType, CheckType, ErrorHandlerType
-
+from .types import (
+    ButtonCallbackType,
+    CallbackType,
+    CheckType,
+    ErrorHandlerType,
+    SelectCallbackType,
+)
 
 
 # noinspection PyShadowingBuiltins
@@ -69,13 +74,43 @@ class Handler:
 # noinspection PyShadowingBuiltins
 def handler(id: str) -> Callable[[CallbackType], Handler]:
     """
-    A decorator that creates a handler.
+    A decorator that creates a generic handler.
 
     Args:
         id (str): The unique key for the handler.
     """
 
     def decorator(callback: CallbackType) -> Handler:
+        return Handler(id, callback)
+
+    return decorator
+
+
+# noinspection PyShadowingBuiltins
+def button_handler(id: str) -> Callable[[ButtonCallbackType], Handler]:
+    """
+    A decorator that creates a handler for button interactions.
+
+    Args:
+        id (str): The unique key for the handler.
+    """
+
+    def decorator(callback: ButtonCallbackType) -> Handler:
+        return Handler(id, callback)
+
+    return decorator
+
+
+# noinspection PyShadowingBuiltins
+def select_handler(id: str) -> Callable[[SelectCallbackType], Handler]:
+    """
+    A decorator that creates a handler for selectmenu interactions.
+
+    Args:
+        id (str): The unique key for the handler.
+    """
+
+    def decorator(callback: SelectCallbackType) -> Handler:
         return Handler(id, callback)
 
     return decorator

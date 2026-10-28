@@ -186,19 +186,26 @@ class HTTPClient:
         )
 
     async def get_original_interaction_response(self): ...
-        # get_webhook_message(self), message_id as @original
+
+    # get_webhook_message(self), message_id as @original
     async def edit_original_interaction_response(self): ...
-        # edit_webhook_message(self), message_id as @original
+
+    # edit_webhook_message(self), message_id as @original
     async def delete_original_interaction_response(self): ...
-        # delete_webhook_message(self), message_id as @original + no thread_id param
+
+    # delete_webhook_message(self), message_id as @original + no thread_id param
     async def create_followup_message(self): ...
-        # execute_webhook(self)
+
+    # execute_webhook(self)
     async def get_followup_message(self): ...
-        # get_webhook_message(self)
+
+    # get_webhook_message(self)
     async def edit_followup_message(self): ...
-        # edit_webhook_message(self)
+
+    # edit_webhook_message(self)
     async def delete_followup_message(self): ...
-        # delete_webhook_message(self)
+
+    # delete_webhook_message(self)
 
     # Application Commands
     # https://discord.com/developers/docs/interactions/application-commands#application-commands
@@ -493,6 +500,7 @@ class HTTPClient:
     async def modify_guild_scheduled_event(self): ...
     async def delete_guild_scheduled_event(self): ...
     async def get_guild_scheduled_event_users(self): ...
+
     # Guild Template Resource
     # https://discord.com/developers/docs/resources/guild-template#guild-template-resource
 
@@ -503,6 +511,7 @@ class HTTPClient:
     async def sync_guild_template(self): ...
     async def modify_guild_template(self): ...
     async def delete_guild_template(self): ...
+
     # Guild Resource
     # https://discord.com/developers/docs/resources/guild#guild-resource
 
@@ -875,11 +884,7 @@ class HTTPClient:
         )
 
     async def modify_webhook_with_token(
-        self,
-        *,
-        id: str,
-        token: str,
-        payload: Dict[str, Any]
+        self, *, id: str, token: str, payload: Dict[str, Any]
     ):
         return await self.request(
             "PATCH",
@@ -913,10 +918,13 @@ class HTTPClient:
 
     async def execute_slack_compatible_webhook(self): ...
     async def execute_github_compatible_webhook(self): ...
-    
-    async def get_webhook_message(self, *, id: str, token: str, message_id: str, **params):
+
+    async def get_webhook_message(
+        self, *, id: str, token: str, message_id: str, **params
+    ):
         return await self.request(
-            "GET", f"/webhooks/{id}/{token}/messages/{message_id}",
+            "GET",
+            f"/webhooks/{id}/{token}/messages/{message_id}",
             params=params,
         )
 
@@ -936,12 +944,8 @@ class HTTPClient:
             **params,
         )
 
-    async def delete_webhook_message(
-        self, *, id: str, token: str, message_id: str
-    ):
-        await self.request(
-            "DELETE", f"/webhooks/{id}/{token}/messages/{message_id}"
-        )
+    async def delete_webhook_message(self, *, id: str, token: str, message_id: str):
+        await self.request("DELETE", f"/webhooks/{id}/{token}/messages/{message_id}")
 
     # TODO
 

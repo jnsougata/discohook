@@ -26,7 +26,7 @@ class File:
         description: Optional[str] = None,
         spoiler: bool = False,
         id: Optional[int] = None,
-        title: Optional[str] = None
+        title: Optional[str] = None,
     ):
         self.name = name
         self.content = content
@@ -45,7 +45,7 @@ class File:
         spoiler: bool = False,
         description: Optional[str] = None,
         id: Optional[int] = None,
-        title: Optional[str] = None
+        title: Optional[str] = None,
     ):
         """
         Creates a File object from a file path.
@@ -71,7 +71,7 @@ class File:
                 description=description,
                 url=url,
                 id=id,
-                title=title
+                title=title,
             )
 
     @classmethod
@@ -82,7 +82,7 @@ class File:
         description: Optional[str] = None,
         spoiler: bool = False,
         id: Optional[int] = None,
-        title: Optional[str] = None
+        title: Optional[str] = None,
     ):
         """
         Creates a File object from a file URL.
@@ -97,19 +97,17 @@ class File:
         Returns:
             File: File object.
         """
-        return cls(url=url, description=description, spoiler=spoiler, id=id, title=title)
+        return cls(
+            url=url, description=description, spoiler=spoiler, id=id, title=title
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         data = {"type": self.type, "file": {"url": self.url}, "spoiler": self.spoiler}
         if self.id:
-            data["id"] = self.id # noqa
+            data["id"] = self.id  # noqa
         if self.description:
-            data["description"] = self.description # noqa
+            data["description"] = self.description  # noqa
         return data
 
     def to_partial_attachment(self) -> Dict[str, Any]:
-        return {
-            "id": self.id,
-            "filename": self.name,
-            "title": self.title
-        }
+        return {"id": self.id, "filename": self.name, "title": self.title}

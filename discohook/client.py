@@ -10,8 +10,7 @@ from starlette.requests import Request
 from .channel import Channel, PartialChannel
 from .command import ApplicationCommand
 from .components import TopLevelComponent
-from .dashboard import (authenticate_route, delete_cmd_route, homepage_route,
-                        sync_route)
+from .dashboard import authenticate_route, delete_cmd_route, homepage_route, sync_route
 from .emoji import PartialEmoji
 from .engine import _engine
 from .guild import Guild

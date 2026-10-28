@@ -32,6 +32,7 @@ class PartialWebhook:
         source_channel (str): Channel that this webhook is following
             (returned for Channel Follower Webhooks).
     """
+
     def __init__(self, *, id: str, token: str):
         self.id = id
         self.token = token
@@ -96,7 +97,7 @@ class PartialWebhook:
         *,
         name: Optional[str] = None,
         image_base64: Optional[str] = None,
-        channel_id: Optional[str] = None
+        channel_id: Optional[str] = None,
     ):
         """
         Edits the webhook.
@@ -113,7 +114,9 @@ class PartialWebhook:
             payload["avatar"] = image_base64
         if channel_id:
             payload["channel_id"] = channel_id
-        await self._http.modify_webhook_with_token(id=self.id, token=self.token, payload=payload)
+        await self._http.modify_webhook_with_token(
+            id=self.id, token=self.token, payload=payload
+        )
 
     async def execute(
         self,
@@ -147,7 +150,8 @@ class PartialWebhook:
 
         if not self.token:
             raise ValueError(
-                "Webhook token is required. Set or resolve the webhook token.")
+                "Webhook token is required. Set or resolve the webhook token."
+            )
         extras = {
             "username": username,
             "avatar_url": avatar_url,
@@ -157,7 +161,9 @@ class PartialWebhook:
         if thread_id:
             params["thread_id"] = thread_id
         payload = _prepare_payload(View.from_children(*components), poll=poll, **extras)
-        resp = await self._http.execute_webhook(id=self.id, token=self.token, data=payload, **params)
+        resp = await self._http.execute_webhook(
+            id=self.id, token=self.token, data=payload, **params
+        )
         return resp
 
     async def fetch_message(self, message_id: str, *, thread_id: Optional[str] = None):
@@ -176,7 +182,8 @@ class PartialWebhook:
         """
         if not self.token:
             raise ValueError(
-                "Webhook token is required. Set or resolve the webhook token.")
+                "Webhook token is required. Set or resolve the webhook token."
+            )
         params = {}
         if thread_id:
             params["thread_id"] = thread_id
@@ -206,11 +213,7 @@ class PartialWebhook:
         if thread_id:
             params["thread_id"] = thread_id
         return await self._http.edit_webhook_message(
-            id=self.id,
-            token=self.token,
-            message_id=message_id,
-            data=payload,
-            **params
+            id=self.id, token=self.token, message_id=message_id, data=payload, **params
         )
 
     async def delete_message(self, message_id: str) -> aiohttp.ClientResponse:

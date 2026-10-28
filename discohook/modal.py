@@ -1,8 +1,16 @@
-from typing import List, Optional, Union, Literal
+from typing import List, Literal, Optional, Union
 
-from .components import (Checkbox, CheckboxGroup, CheckboxGroupOption,
-                         FileUpload, Label, RadioGroup, RadioGroupOption,
-                         TextDisplay, TextInput)
+from .components import (
+    Checkbox,
+    CheckboxGroup,
+    CheckboxGroupOption,
+    FileUpload,
+    Label,
+    RadioGroup,
+    RadioGroupOption,
+    TextDisplay,
+    TextInput,
+)
 from .enums import ChannelType, SelectType, TextInputFieldLength
 from .handler import Handler
 from .select import Select, SelectDefaultValue, SelectOption
@@ -122,10 +130,29 @@ class Modal:
         min_values: int = 1,
         max_values: int = 1,
         required: bool = True,
-        file_types: Optional[List[Literal[
-            ".png", ".gif", ".jpg", ".jpeg", ".jfif", ".webp", ".avif",
-            ".mp4", ".mov", ".qt", ".webm", ".mp3", ".m4a", ".wav", ".ogg", ".opus", ".flac"
-        ]]] = None
+        file_types: Optional[
+            List[
+                Literal[
+                    ".png",
+                    ".gif",
+                    ".jpg",
+                    ".jpeg",
+                    ".jfif",
+                    ".webp",
+                    ".avif",
+                    ".mp4",
+                    ".mov",
+                    ".qt",
+                    ".webm",
+                    ".mp3",
+                    ".m4a",
+                    ".wav",
+                    ".ogg",
+                    ".opus",
+                    ".flac",
+                ]
+            ]
+        ] = None,
     ):
         """
         Appends a file upload component to the modal.

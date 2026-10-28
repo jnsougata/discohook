@@ -3,8 +3,14 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 import aiohttp
 
 from .asset import Asset
-from .components import (ActionRow, Container, MediaGallery, Section,
-                         Separator, TextDisplay)
+from .components import (
+    ActionRow,
+    Container,
+    MediaGallery,
+    Section,
+    Separator,
+    TextDisplay,
+)
 from .file import File
 from .params import _prepare_payload
 from .view import View

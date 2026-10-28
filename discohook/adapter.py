@@ -306,7 +306,7 @@ class ResponseAdapter:
         resp = await self.interaction.client.http.execute_webhook(
             id=self.interaction.application_id,
             token=self.interaction.token,
-            data=payload
+            data=payload,
         )
         data = await resp.json()
         return FollowupResponse(data, self.interaction)

@@ -21,7 +21,7 @@ from .enums import *
 from .errors import *
 from .file import File
 from .guild import Guild, PartialGuild
-from .handler import handler
+from .handler import button_handler, handler, select_handler
 from .interaction import Interaction
 from .member import Member
 from .message import Message

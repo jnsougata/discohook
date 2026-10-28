@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union, Literal
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from .button import Button
 from .enums import ComponentType, TextInputFieldLength
@@ -111,6 +111,7 @@ class MediaGallery:
         items (Tuple[Media]): Media items in the gallery.
         attachments (List[File]): Attachments for the media items.
     """
+
     def __init__(self, *media: Media, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.media_gallery
@@ -142,6 +143,7 @@ class TextDisplay:
         type (ComponentType): Text display type.
         content (str): Markdown content to display.
     """
+
     def __init__(self, markdown: str, *, id: Optional[int] = None):
         self.id = id
         self.type = ComponentType.text_display
@@ -168,6 +170,7 @@ class Thumbnail:
     Attributes:
         attachment (File | None): Attachment for the thumbnail if media is a File.
     """
+
     def __init__(
         self,
         media: Union[str, File],
@@ -215,6 +218,7 @@ class Section:
     Attributes:
         attachment (File | None): Attachment for the accessory if it is a File.
     """
+
     def __init__(
         self,
         *components: TextDisplay,
@@ -252,6 +256,7 @@ class Separator:
     Raises:
         AssertionError: If spacing is not 1 or 2.
     """
+
     def __init__(self, *, id: Optional[int] = None, spacing: int = 1):
         self.id = id
         self.type = ComponentType.separator
@@ -279,6 +284,7 @@ class Container:
     Attributes:
         attachments (List[File]): List of attachments in the container.
     """
+
     def __init__(
         self,
         *components: Union[
@@ -367,6 +373,7 @@ class TextInput:
             "required": self.required,
         }
 
+
 # noinspection PyShadowingBuiltins
 class FileUpload:
     """
@@ -379,6 +386,7 @@ class FileUpload:
         required (bool): Whether this component is required to be filled (defaults to true).
         file_types (List[str] | None): File types to filter for.
     """
+
     def __init__(
         self,
         *,
@@ -387,10 +395,29 @@ class FileUpload:
         min_values: int = 1,
         max_values: int = 1,
         required: bool = True,
-        file_types: Optional[List[Literal[
-        ".png",".gif", ".jpg", ".jpeg", ".jfif", ".webp", ".avif",
-        ".mp4",".mov", ".qt", ".webm", ".mp3", ".m4a", ".wav", ".ogg", ".opus", ".flac"
-        ]]] = None
+        file_types: Optional[
+            List[
+                Literal[
+                    ".png",
+                    ".gif",
+                    ".jpg",
+                    ".jpeg",
+                    ".jfif",
+                    ".webp",
+                    ".avif",
+                    ".mp4",
+                    ".mov",
+                    ".qt",
+                    ".webm",
+                    ".mp3",
+                    ".m4a",
+                    ".wav",
+                    ".ogg",
+                    ".opus",
+                    ".flac",
+                ]
+            ]
+        ] = None,
     ):
         self.custom_id = custom_id
         assert custom_id.isidentifier(), "field_id must be a valid python identifier"
@@ -411,6 +438,7 @@ class FileUpload:
             "file_types": self.file_types,
         }
 
+
 # noinspection shadowing-builtins
 class Checkbox:
     """
@@ -421,6 +449,7 @@ class Checkbox:
         id (int | None): A unique id of the checkbox field. Must be a valid python identifier.
         default (bool): Whether this checkbox is checked by default (defaults to false).
     """
+
     def __init__(
         self,
         *,
@@ -451,6 +480,7 @@ class CheckboxGroupOption:
         description (str | None): The description of the checkbox option.
         default (bool): Whether this checkbox option is checked by default (defaults to false).
     """
+
     def __init__(
         self,
         *,
@@ -485,6 +515,7 @@ class CheckboxGroup:
         max_values (int | None): Maximum number of checkboxes that can be checked (defaults to None).
         required (bool): Whether this component is required to be filled (defaults to true).
     """
+
     def __init__(
         self,
         *,
@@ -527,6 +558,7 @@ class RadioGroupOption:
         description (str | None): Description of the radio option.
         default (bool): Whether this radio option is selected by default (defaults to false).
     """
+
     def __init__(
         self,
         label: str,
@@ -547,6 +579,7 @@ class RadioGroupOption:
             "default": self.default,
         }
 
+
 # noinspection shadowing-builtins
 class RadioGroup:
     """
@@ -557,6 +590,7 @@ class RadioGroup:
         options (List[RadioGroupOption]): A list of radio options in the group.
         required (bool): Whether this component is required to be filled (defaults to true).
     """
+
     def __init__(
         self,
         *,
@@ -591,6 +625,7 @@ class Label:
         id (int | None): Optional unique id of the label.
         description (str | None): The description of the label.
     """
+
     def __init__(
         self,
         label: str,

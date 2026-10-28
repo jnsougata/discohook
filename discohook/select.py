@@ -1,8 +1,7 @@
 from typing import Any, Dict, List, Optional, Union
 
 from .emoji import PartialEmoji
-from .enums import (ChannelType, ComponentType, SelectDefaultValueType,
-                    SelectType)
+from .enums import ChannelType, ComponentType, SelectDefaultValueType, SelectType
 from .handler import Handler
 
 
