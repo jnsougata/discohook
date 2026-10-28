@@ -129,16 +129,14 @@ class Client(Starlette):
             **kwargs,
         )
 
-    def on_error(self):
+    def on_error(self, coro: Callable[[Request, Exception], Any]):
         """
         Decorator to add an error handler for any server side error.
+
+        Args:
+            coro (Callable[[Request, Exception], Any]): The coroutine to handle errors.
         """
-
-        def decorator(coro: Callable[[Request, Exception], Any]):
-            self.add_exception_handler(Exception, coro)
-            return coro
-
-        return decorator
+        self.add_exception_handler(Exception, coro)
 
     def register(
         self, item: Union[Handler, ApplicationCommand]
@@ -197,18 +195,21 @@ class Client(Starlette):
     #     for module in modules:
     #         importlib.import_module(module).setup(self)
 
-    def on_interaction_error(self):
+    def on_interaction_error(self, coro: Callable[[Interaction], Any]):
         """
         Decorator to register a global interaction error handler.
+
+        Args:
+            coro (Callable[[Interaction], Any]): The coroutine to handle interaction errors.
         """
-
-        def decorator(coro: Callable[[Interaction], Any]):
-            if not inspect.iscoroutinefunction(coro):
-                raise TypeError("Exception handler must be a coroutine.")
-            self._interaction_error_handler = coro
-            return coro
-
-        return decorator
+        if not inspect.iscoroutinefunction(coro):
+            raise TypeError("Exception handler must be a coroutine.")
+        self._interaction_error_handler = coro
+        # def decorator():
+        #
+        #     return coro
+        #
+        # return decorator
 
     def custom_id_parser(self, coro: Callable[[Interaction, str], str]):
         """
